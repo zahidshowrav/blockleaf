@@ -1,0 +1,65 @@
+:root {
+  color-scheme: light dark;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: canvas;
+  color: canvastext;
+}
+
+.sandbox {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.sandbox__bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid color-mix(in srgb, canvastext 15%, transparent);
+  padding-bottom: 0.75rem;
+}
+
+.sandbox__bar h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.sandbox__status {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.sandbox__panes {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .sandbox__panes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sandbox__pane {
+  border: 1px solid color-mix(in srgb, canvastext 15%, transparent);
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 60vh;
+}
+
+.sandbox__json {
+  margin: 0;
+  overflow: auto;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}

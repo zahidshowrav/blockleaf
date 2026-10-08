@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# test artefacts
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# editors / os
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# env
+.env
+.env.*
+!.env.example

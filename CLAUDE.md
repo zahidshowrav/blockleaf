@@ -1,0 +1,54 @@
+# CLAUDE.md
+
+Guidance for Claude Code working in this repository.
+
+## What this is
+
+`blockleaf` — a Notion-style block editor on Tiptap v3, published to npm as `@blockleaf/editor` (and later `@blockleaf/renderer`). pnpm + Turborepo. The full build plan, milestones and rationale live in `PROJECT_PLAN.md`; read the relevant section before starting work rather than re-deriving decisions.
+
+## Commands
+
+```bash
+pnpm install
+pnpm dev                 # sandbox + editor in watch mode
+pnpm build
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm format              # prettier --write across the repo
+pnpm format:check        # what CI runs
+pnpm check:packaging     # publint + are-the-types-wrong
+pnpm size                # size-limit, hard budget
+
+pnpm --filter @blockleaf/editor test
+```
+
+## Non-negotiables
+
+- **The document schema is the product.** It lives in other people's databases. Never change the stored shape without bumping `SCHEMA_VERSION`, writing the migration in the same PR, and updating `docs/schema.md`. The snapshot test exists to make an accidental change fail loudly.
+- **`src/core` must not import React**, and **`src/react` must not import `src/ui`**. Enforced by lint, not convention — extracting `@blockleaf/core` later must stay a `mv`.
+- **No CSS framework.** One stylesheet, `--bl-*` custom properties. No Tailwind, no `prose`, no build step. This is a stated differentiator, not a preference.
+- **Never use `any`.**
+- **ESM only.** No CJS build.
+- **Every PR touching a published package needs a changeset**, or CI fails.
+- **Docs ship in the same PR as the feature.**
+- **Link `href` sanitisation belongs in the schema**, never only in the UI.
+
+## Code style
+
+- Named exports everywhere except where a tool requires a default.
+- Prefer small hooks and components over monolithic ones; group `useEffect` calls together.
+- Avoid hardcoded strings — use the constants in `src/core/constants.ts`.
+- Remove dead code; use `// TODO:` for anything intentionally deferred.
+- Import order: external packages, then `@`-aliased, then relative — each group alphabetised, separated by a blank line.
+
+## Naming
+
+Files and folders lowercase-hyphenated (`use-blockleaf-editor.ts`). Components PascalCase, hooks `useThing`, types PascalCase, constants camelCase, enum keys UPPER_SNAKE_CASE.
+
+## Git
+
+- Conventional Commits, **2–3 lines maximum**: a subject plus at most one or two short lines.
+- **No attribution trailers and no tool mentions** in commit messages or PR text — no `Co-Authored-By`, no "Generated with …", no mention of Claude or Anthropic.
+- **Claude does not open pull requests.** The developer does.
+- **Claude does not create, switch, delete or rename branches**, and does not push or rewrite pushed history, without explicit permission for that specific action.

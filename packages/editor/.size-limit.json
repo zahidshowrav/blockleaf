@@ -1,0 +1,16 @@
+[
+  {
+    "name": "BlockleafEditor + Tiptap (what a consumer actually ships)",
+    "path": "dist/index.js",
+    "import": "{ BlockleafEditor }",
+    "limit": "130 kB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "schema helpers only (server-side import)",
+    "path": "dist/index.js",
+    "import": "{ createEmptyDocument, isBlockleafDocument, SCHEMA_VERSION }",
+    "limit": "2 kB",
+    "ignore": ["react", "react-dom"]
+  }
+]
