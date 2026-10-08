@@ -34,6 +34,14 @@ pnpm --filter @blockleaf/editor test
 - **Docs ship in the same PR as the feature.**
 - **Link `href` sanitisation belongs in the schema**, never only in the UI.
 
+## Toolchain constraints — do not "upgrade" these without checking
+
+- **TypeScript is pinned to 6.0.3 on purpose.** `latest` on npm is 7.x (the Go port), but typescript-eslint has no TS 7 support on any dist-tag — its peer range is `>=4.8.4 <6.1.0`. Bumping TypeScript to 7 silently breaks type-aware linting. Re-check typescript-eslint's peer range before moving.
+- **tsdown needs `unrun` installed** to load `tsdown.config.ts`. It is an optional peer, so pnpm will not add it for you; the build fails with `Failed to import module "unrun"` if it goes missing.
+- **`attw` runs with `--profile esm-only --exclude-entrypoints styles.css`.** The package is ESM-only by design, so the node10 and CJS-resolves-to-ESM results are expected, and attw cannot resolve a CSS entrypoint. Without those flags it exits 1 and CI fails on correct output.
+- **`size-limit` entries must declare `import`.** Without it the measurement tree-shakes to ~28 B and the budget passes forever. Each entry measures a real consumer import.
+- Verify a version against the registry before writing it into a manifest; several guessed versions in the initial scaffold were wrong.
+
 ## Code style
 
 - Named exports everywhere except where a tool requires a default.
