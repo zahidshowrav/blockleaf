@@ -28,7 +28,10 @@ import { BlockleafEditor, createEmptyDocument } from '@blockleaf/editor';
 import '@blockleaf/editor/styles.css';
 
 export const Composer = () => (
-  <BlockleafEditor defaultValue={createEmptyDocument()} onChange={(doc) => save(doc)} />
+	<BlockleafEditor
+		defaultValue={createEmptyDocument()}
+		onChange={(doc) => save(doc)}
+	/>
 );
 ```
 
@@ -51,9 +54,9 @@ Override any custom property on `.blockleaf-editor` or any ancestor:
 
 ```css
 .blockleaf-editor {
-  --bl-color-accent: #5e17eb;
-  --bl-font-body: 'Inter', sans-serif;
-  --bl-line-height: 1.8;
+	--bl-color-accent: #5e17eb;
+	--bl-font-body: 'Inter', sans-serif;
+	--bl-line-height: 1.8;
 }
 ```
 

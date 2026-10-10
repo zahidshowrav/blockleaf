@@ -1,29 +1,34 @@
 {
-  "name": "blockleaf",
-  "private": true,
-  "type": "module",
-  "packageManager": "pnpm@11.5.0",
-  "engines": {
-    "node": ">=22.13.0"
-  },
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "typecheck": "turbo run typecheck",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "check:packaging": "turbo run check:packaging",
-    "size": "turbo run size",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}\"",
-    "changeset": "changeset",
-    "version-packages": "changeset version && pnpm install --lockfile-only",
-    "release": "turbo run build --filter=./packages/* && changeset publish"
-  },
-  "devDependencies": {
-    "@changesets/cli": "3.0.3",
-    "prettier": "3.9.9",
-    "turbo": "2.11.7",
-    "typescript": "6.0.3"
-  }
+	"name": "blockleaf",
+	"private": true,
+	"type": "module",
+	"packageManager": "pnpm@11.5.0",
+	"engines": {
+		"node": ">=22.22.1"
+	},
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"typecheck": "turbo run typecheck",
+		"lint": "turbo run lint",
+		"test": "turbo run test",
+		"check:packaging": "turbo run check:packaging",
+		"size": "turbo run size",
+		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}\"",
+		"format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}\"",
+		"changeset": "changeset",
+		"version-packages": "changeset version && pnpm install --lockfile-only",
+		"release": "turbo run build --filter=./packages/* && changeset publish",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@blockleaf/eslint-config": "workspace:*",
+		"@changesets/cli": "3.0.3",
+		"eslint": "10.12.0",
+		"husky": "9.1.7",
+		"lint-staged": "17.6.0",
+		"prettier": "3.9.9",
+		"turbo": "2.11.7",
+		"typescript": "6.0.3"
+	}
 }

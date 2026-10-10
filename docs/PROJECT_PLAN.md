@@ -68,13 +68,16 @@ Inside `@blockleaf/editor`, keep the eventual split as **folders** from day one 
 ```jsonc
 // packages/editor/package.json
 {
-  "type": "module",
-  "sideEffects": ["*.css"],
-  "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./extensions": { "types": "./dist/extensions.d.ts", "import": "./dist/extensions.js" },
-    "./styles.css": "./dist/styles.css",
-  },
+	"type": "module",
+	"sideEffects": ["*.css"],
+	"exports": {
+		".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+		"./extensions": {
+			"types": "./dist/extensions.d.ts",
+			"import": "./dist/extensions.js"
+		},
+		"./styles.css": "./dist/styles.css"
+	}
 }
 ```
 
@@ -139,13 +142,13 @@ import { Editor, presets } from '@blockleaf/editor';
 import '@blockleaf/editor/styles.css';
 
 <Editor
-  defaultValue={doc}
-  extensions={presets.standard} // or presets.minimal, or your own array
-  onChange={(doc) => save(doc)} // debounced internally, documented
-  upload={uploadAdapter}
-  slashItems={(defaults) => [...defaults, myItem]}
-  labels={bn} // every string overridable
-  readOnly={false}
+	defaultValue={doc}
+	extensions={presets.standard} // or presets.minimal, or your own array
+	onChange={(doc) => save(doc)} // debounced internally, documented
+	upload={uploadAdapter}
+	slashItems={(defaults) => [...defaults, myItem]}
+	labels={bn} // every string overridable
+	readOnly={false}
 />;
 ```
 
@@ -177,11 +180,11 @@ Never bake in a storage provider. One interface, implemented by the host:
 
 ```ts
 type UploadAdapter = {
-  upload(
-    file: File,
-    signal: AbortSignal,
-  ): Promise<{ id: string; src: string; width?: number; height?: number }>;
-  remove?(id: string): Promise<void>;
+	upload(
+		file: File,
+		signal: AbortSignal
+	): Promise<{ id: string; src: string; width?: number; height?: number }>;
+	remove?(id: string): Promise<void>;
 };
 ```
 
@@ -200,7 +203,10 @@ Keyboard-complete slash and bubble menus, visible focus rings, ARIA roles on eve
 ```tsx
 // server component
 import { RenderDocument } from '@blockleaf/renderer/react';
-<RenderDocument doc={article.body} components={{ image: MyImage, codeBlock: MyCode }} />;
+<RenderDocument
+	doc={article.body}
+	components={{ image: MyImage, codeBlock: MyCode }}
+/>;
 ```
 
 - Per-node component overrides, so a host can route images through `next/image` and code blocks through its own highlighter.

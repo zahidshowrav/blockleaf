@@ -1,6 +1,10 @@
-import { BlockleafEditor, SCHEMA_VERSION, createEmptyDocument } from '@blockleaf/editor';
 import { useState } from 'react';
 
+import {
+	BlockleafEditor,
+	SCHEMA_VERSION,
+	createEmptyDocument
+} from '@blockleaf/editor';
 import type { BlockleafDocument } from '@blockleaf/editor';
 
 import '@blockleaf/editor/styles.css';
@@ -10,33 +14,35 @@ import '@blockleaf/editor/styles.css';
  * without booting the docs site. The polished demo lives in apps/docs (M4).
  */
 export const App = () => {
-  const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
-  const [dirty, setDirty] = useState(false);
+	const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
+	const [dirty, setDirty] = useState(false);
 
-  return (
-    <main className="sandbox">
-      <header className="sandbox__bar">
-        <h1>Blockleaf sandbox</h1>
-        <span className="sandbox__status">
-          schema v{SCHEMA_VERSION} · {dirty ? 'typing…' : 'settled'}
-        </span>
-      </header>
+	return (
+		<main className="sandbox">
+			<header className="sandbox__bar">
+				<h1>Blockleaf sandbox</h1>
+				<span className="sandbox__status">
+					schema v{SCHEMA_VERSION} · {dirty ? 'typing…' : 'settled'}
+				</span>
+			</header>
 
-      <section className="sandbox__panes">
-        <div className="sandbox__pane">
-          <BlockleafEditor
-            defaultValue={doc}
-            autofocus
-            onChangeImmediate={() => setDirty(true)}
-            onChange={(next) => {
-              setDoc(next);
-              setDirty(false);
-            }}
-          />
-        </div>
+			<section className="sandbox__panes">
+				<div className="sandbox__pane">
+					<BlockleafEditor
+						defaultValue={doc}
+						autofocus
+						onChangeImmediate={() => setDirty(true)}
+						onChange={(next) => {
+							setDoc(next);
+							setDirty(false);
+						}}
+					/>
+				</div>
 
-        <pre className="sandbox__pane sandbox__json">{JSON.stringify(doc, null, 2)}</pre>
-      </section>
-    </main>
-  );
+				<pre className="sandbox__pane sandbox__json">
+					{JSON.stringify(doc, null, 2)}
+				</pre>
+			</section>
+		</main>
+	);
 };

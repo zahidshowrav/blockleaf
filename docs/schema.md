@@ -10,9 +10,14 @@ Every document is a single `doc` node carrying its schema version:
 
 ```json
 {
-  "type": "doc",
-  "attrs": { "schemaVersion": 1 },
-  "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Hello" }] }]
+	"type": "doc",
+	"attrs": { "schemaVersion": 1 },
+	"content": [
+		{
+			"type": "paragraph",
+			"content": [{ "type": "text", "text": "Hello" }]
+		}
+	]
 }
 ```
 

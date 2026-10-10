@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Prevent pushes on protected branches
+./scripts/prevent-git-branch.sh

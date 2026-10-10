@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Prevent commits on protected branches
+./scripts/prevent-git-branch.sh
+
+# Run lint-staged
+pnpm lint-staged

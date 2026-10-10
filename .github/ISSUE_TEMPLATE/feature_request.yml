@@ -2,40 +2,40 @@ name: Feature request
 description: Propose something the editor should do and does not.
 labels: ['enhancement']
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Please check `docs/PROJECT_PLAN.md` §3 first. Columns, embeds,
-        footnotes, mentions, comments and math are deliberately out of v0.1 —
-        each is a project of its own, and the roadmap says so rather than
-        leaving it ambiguous. Proposing one of those is still welcome; it just
-        starts from "why now" rather than "why at all".
+    - type: markdown
+      attributes:
+          value: |
+              Please check `docs/PROJECT_PLAN.md` §3 first. Columns, embeds,
+              footnotes, mentions, comments and math are deliberately out of v0.1 —
+              each is a project of its own, and the roadmap says so rather than
+              leaving it ambiguous. Proposing one of those is still welcome; it just
+              starts from "why now" rather than "why at all".
 
-  - type: textarea
-    id: problem
-    attributes:
-      label: The problem
-      description: >
-        What are you unable to do today? Describe the situation rather than the
-        feature — the best version of a feature is often not the one first
-        imagined.
-    validations:
-      required: true
+    - type: textarea
+      id: problem
+      attributes:
+          label: The problem
+          description: >
+              What are you unable to do today? Describe the situation rather than the
+              feature — the best version of a feature is often not the one first
+              imagined.
+      validations:
+          required: true
 
-  - type: textarea
-    id: proposal
-    attributes:
-      label: What you have in mind
-    validations:
-      required: true
+    - type: textarea
+      id: proposal
+      attributes:
+          label: What you have in mind
+      validations:
+          required: true
 
-  - type: textarea
-    id: schema
-    attributes:
-      label: Does this change the stored document?
-      description: >
-        If it adds or changes a node, mark or attribute, say so. Schema changes
-        carry a version bump and a migration, so they are weighed differently
-        from everything else.
-    validations:
-      required: false
+    - type: textarea
+      id: schema
+      attributes:
+          label: Does this change the stored document?
+          description: >
+              If it adds or changes a node, mark or attribute, say so. Schema changes
+              carry a version bump and a migration, so they are weighed differently
+              from everything else.
+      validations:
+          required: false
