@@ -6,8 +6,8 @@
 export const SCHEMA_VERSION = 1;
 
 export type BlockleafMark = {
-  type: string;
-  attrs?: Record<string, unknown>;
+	type: string;
+	attrs?: Record<string, unknown>;
 };
 
 /**
@@ -16,41 +16,43 @@ export type BlockleafMark = {
  * over the real node set; until then it stays structural but not loose.
  */
 export type BlockleafNode = {
-  type: string;
-  attrs?: Record<string, unknown>;
-  content?: BlockleafNode[];
-  marks?: BlockleafMark[];
-  text?: string;
+	type: string;
+	attrs?: Record<string, unknown>;
+	content?: BlockleafNode[];
+	marks?: BlockleafMark[];
+	text?: string;
 };
 
 export type BlockleafDocument = {
-  type: 'doc';
-  attrs: { schemaVersion: number };
-  content?: BlockleafNode[];
+	type: 'doc';
+	attrs: { schemaVersion: number };
+	content?: BlockleafNode[];
 };
 
 export const createEmptyDocument = (): BlockleafDocument => ({
-  type: 'doc',
-  attrs: { schemaVersion: SCHEMA_VERSION },
-  content: [{ type: 'paragraph' }],
+	type: 'doc',
+	attrs: { schemaVersion: SCHEMA_VERSION },
+	content: [{ type: 'paragraph' }]
 });
 
 /**
  * Structural guard only — it answers "did this come from Blockleaf?", not "is
  * every node valid?". Deep validation ships as an exported Zod schema in M1.
  */
-export const isBlockleafDocument = (value: unknown): value is BlockleafDocument => {
-  if (typeof value !== 'object' || value === null) return false;
-  const doc = value as Partial<BlockleafDocument>;
-  return doc.type === 'doc' && typeof doc.attrs?.schemaVersion === 'number';
+export const isBlockleafDocument = (
+	value: unknown
+): value is BlockleafDocument => {
+	if (typeof value !== 'object' || value === null) return false;
+	const doc = value as Partial<BlockleafDocument>;
+	return doc.type === 'doc' && typeof doc.attrs?.schemaVersion === 'number';
 };
 
 /** Stamps the current schema version onto a document Tiptap just produced. */
 export const withSchemaVersion = (doc: {
-  attrs?: Record<string, unknown>;
-  content?: BlockleafNode[];
+	attrs?: Record<string, unknown>;
+	content?: BlockleafNode[];
 }): BlockleafDocument => ({
-  ...doc,
-  type: 'doc',
-  attrs: { ...doc.attrs, schemaVersion: SCHEMA_VERSION },
+	...doc,
+	type: 'doc',
+	attrs: { ...doc.attrs, schemaVersion: SCHEMA_VERSION }
 });

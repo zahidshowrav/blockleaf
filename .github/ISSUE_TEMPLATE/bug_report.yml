@@ -1,0 +1,54 @@
+name: Bug report
+description: Something in the editor behaves differently from how it is documented.
+labels: ['bug']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              If the stored JSON is wrong rather than the UI, say so explicitly — the
+              document schema is the part that lives in your database, so those
+              reports are triaged first.
+
+    - type: textarea
+      id: what-happened
+      attributes:
+          label: What happened
+          description: What you did, what you expected, and what you got instead.
+      validations:
+          required: true
+
+    - type: textarea
+      id: reproduction
+      attributes:
+          label: Reproduction
+          description: >
+              A link to a minimal repo or a StackBlitz is worth more than a
+              description. If the bug needs a particular document to appear, paste the
+              JSON — `editor.getJSON()` — rather than a screenshot of it.
+          render: json
+      validations:
+          required: true
+
+    - type: input
+      id: version
+      attributes:
+          label: '@blockleaf/editor version'
+          placeholder: 0.1.0
+      validations:
+          required: true
+
+    - type: input
+      id: environment
+      attributes:
+          label: Framework and browser
+          placeholder: Next.js 15 App Router, Chrome 141
+      validations:
+          required: true
+
+    - type: checkboxes
+      id: checks
+      attributes:
+          label: Before submitting
+          options:
+              - label: I am on the latest version, or I have said which version I am on and why.
+                required: true

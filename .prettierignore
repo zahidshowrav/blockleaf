@@ -1,6 +1,26 @@
+# Ignore artifacts:
 node_modules/
 dist/
+build/
+out/
 .turbo/
 coverage/
 pnpm-lock.yaml
+package-lock.json
+.pnpm-store/
+*.log
+*.tmp
+.husky/
+
+# Changesets writes these; prettier would fight the generator
 CHANGELOG.md
+
+# Test artefacts
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Env
+.env
+.env.*

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Reject attribution trailers and messages over 3 lines
+./scripts/check-commit-message.sh "$1"

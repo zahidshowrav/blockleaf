@@ -1,5 +1,5 @@
 {
-  "extends": "@blockleaf/tsconfig/react-library.json",
-  "include": ["src", "tests", "*.config.ts", "eslint.config.js"],
-  "exclude": ["dist", "node_modules"]
+	"extends": "@blockleaf/tsconfig/react-library.json",
+	"include": ["src", "tests", "*.config.ts", "eslint.config.js"],
+	"exclude": ["dist", "node_modules"]
 }

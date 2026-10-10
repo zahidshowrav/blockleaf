@@ -9,7 +9,16 @@ pnpm install
 pnpm dev
 ```
 
-Node 22.13+ (see `.nvmrc`) and pnpm 11.
+Node 22.22.1+ (see `.nvmrc`) and pnpm 11. `lint-staged` requires that Node
+floor; below it the pre-commit hook will not run.
+
+`pnpm install` also installs the git hooks (husky):
+
+- `pre-commit` — blocks commits on `main`, then runs typecheck, eslint and prettier over staged files.
+- `commit-msg` — Conventional Commits, 3 lines maximum, no attribution trailers or tool mentions.
+- `pre-push` — blocks pushes to `main`.
+
+Don't bypass them with `--no-verify`.
 
 ## Before you open a PR
 

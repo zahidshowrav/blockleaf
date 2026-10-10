@@ -20,3 +20,7 @@ blob-report/
 .env
 .env.*
 !.env.example
+
+# agent local settings
+.claude/settings.local.json
+.gemini/settings.local.json

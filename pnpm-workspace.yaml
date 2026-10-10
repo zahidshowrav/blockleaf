@@ -11,3 +11,8 @@ minimumReleaseAgeExclude:
   - '@size-limit/webpack@14.2.0'
   - size-limit@14.2.0
   - vite@8.3.4
+# `eslint-plugin-import-x` pulls in `unrs-resolver`, which ships prebuilt platform
+# bindings as optional deps — the install script is only a fallback, so the lint
+# rules work without it. Answered here so pnpm stops prompting per machine.
+allowBuilds:
+  unrs-resolver: false

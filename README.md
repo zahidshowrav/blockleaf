@@ -15,7 +15,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 | **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                         |
 | **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                        |
 
-Where it loses today: no tables, no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose](#roadmap).
+Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose](#roadmap).
 
 ## Install
 
@@ -28,7 +28,10 @@ import { BlockleafEditor, createEmptyDocument } from '@blockleaf/editor';
 import '@blockleaf/editor/styles.css';
 
 export const Composer = () => (
-  <BlockleafEditor defaultValue={createEmptyDocument()} onChange={(doc) => save(doc)} />
+	<BlockleafEditor
+		defaultValue={createEmptyDocument()}
+		onChange={(doc) => save(doc)}
+	/>
 );
 ```
 
@@ -51,9 +54,9 @@ Override any custom property on `.blockleaf-editor` or any ancestor:
 
 ```css
 .blockleaf-editor {
-  --bl-color-accent: #5e17eb;
-  --bl-font-body: 'Inter', sans-serif;
-  --bl-line-height: 1.8;
+	--bl-color-accent: #5e17eb;
+	--bl-font-body: 'Inter', sans-serif;
+	--bl-line-height: 1.8;
 }
 ```
 
@@ -81,14 +84,14 @@ pnpm check:packaging   # publint + are-the-types-wrong
 
 ## Roadmap
 
-- **M1** — full node and mark set, stable block ids, markdown input rules, paste normalisation, link sanitisation
-- **M2** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
-- **M3** — upload adapter, images, code blocks with highlighting
-- **M4** — `@blockleaf/renderer` + docs site → public `0.1.0`
-- **M5** — accessibility pass, i18n, mobile, large-document performance
-- **Later** — collaboration, AI commands, markdown import/export, tables, comments
+- **EC** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
+- **CH** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
+- **MC** — upload adapter, images, code blocks with highlighting
+- **RD** — `@blockleaf/renderer` + docs site → public `0.1.0`
+- **HD** — accessibility pass, i18n, mobile, large-document performance
+- **Later** — collaboration, AI commands, markdown import/export, comments
 
-Tables, collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
+Collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
 
 ## Licence
 

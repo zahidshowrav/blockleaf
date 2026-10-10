@@ -1,0 +1,56 @@
+name: Tiptap latest
+
+# PROJECT_PLAN §11: Tiptap v3 churn is mitigated by pinning exact versions *and*
+# by finding breakage before a user does. The pin lives in package.json; this is
+# the other half. It never runs on a pull request, so it cannot block a merge —
+# when it goes red, that is information, not a gate.
+
+on:
+    schedule:
+        - cron: '0 6 * * 1' # Mondays, 06:00 UTC
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+
+jobs:
+    canary:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+
+            - name: Resolve Tiptap at latest
+              run: |
+                  pnpm --filter @blockleaf/editor add \
+                    @tiptap/core@latest \
+                    @tiptap/pm@latest \
+                    @tiptap/react@latest \
+                    @tiptap/starter-kit@latest
+
+            - name: Report the versions under test
+              run: pnpm --filter @blockleaf/editor list --depth 0 '@tiptap/*'
+
+            - name: Typecheck
+              run: pnpm --filter @blockleaf/editor typecheck
+
+            - name: Unit tests
+              run: pnpm --filter @blockleaf/editor test
+
+            - name: Build
+              run: pnpm --filter @blockleaf/editor build
+
+            - name: Bundle size against the current ceiling
+              run: pnpm --filter @blockleaf/editor size
