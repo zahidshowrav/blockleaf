@@ -96,18 +96,19 @@ Decide this before writing a single component. Everything else can be refactored
 
 ### Node and mark set for v0.1
 
-| Nodes                                   | Notes                                                                                 |
-| --------------------------------------- | ------------------------------------------------------------------------------------- |
-| `doc`, `paragraph`, `text`, `hardBreak` |                                                                                       |
-| `heading`                               | Levels 1–3 only. Deeper levels are a document-structure smell and a renderer problem. |
-| `bulletList`, `orderedList`, `listItem` | Nesting allowed, capped at 3 levels.                                                  |
-| `taskList`, `taskItem`                  | Checkboxes; the single most-expected Notion feature.                                  |
-| `blockquote`                            |                                                                                       |
-| `codeBlock`                             | With `lowlight` for highlighting; store `language`.                                   |
-| `horizontalRule`                        |                                                                                       |
-| `image`                                 | `{ id, src, alt, width, align }` — see the upload adapter below.                      |
-| `callout`                               | Custom node: `{ emoji, tone }`. Cheap to build, instantly reads as "Notion".          |
-| `details` / `toggle`                    | Open-sourced in Tiptap 3.0.                                                           |
+| Nodes                                           | Notes                                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `doc`, `paragraph`, `text`, `hardBreak`         |                                                                                       |
+| `heading`                                       | Levels 1–3 only. Deeper levels are a document-structure smell and a renderer problem. |
+| `bulletList`, `orderedList`, `listItem`         | Nesting allowed, capped at 3 levels.                                                  |
+| `taskList`, `taskItem`                          | Checkboxes; the single most-expected Notion feature.                                  |
+| `blockquote`                                    |                                                                                       |
+| `codeBlock`                                     | With `lowlight` for highlighting; store `language`. Curated grammars only — F10.      |
+| `horizontalRule`                                |                                                                                       |
+| `image`                                         | `{ id, src, alt, width, align }` — see the upload adapter below.                      |
+| `callout`                                       | Custom node: `{ emoji, tone }`. Cheap to build, instantly reads as "Notion".          |
+| `details` / `toggle`                            | Open-sourced in Tiptap 3.0.                                                           |
+| `table`, `tableRow`, `tableHeader`, `tableCell` | Admitted to v0.1 on 2026-10-10. `colspan`, `rowspan`, `colwidth`. See §3.1.           |
 
 | Marks                                           | Notes                                                                                                                        |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -115,7 +116,17 @@ Decide this before writing a single component. Everything else can be refactored
 | `link`                                          | Sanitise `href`: allow `https:`, `mailto:` and site-relative paths; reject `javascript:` at the schema level, not in the UI. |
 | `highlight`                                     | Optional colour attribute.                                                                                                   |
 
-**Explicitly out of v0.1:** tables, columns, embeds, footnotes, mentions, comments, math. Each is a project of its own. Say so in the roadmap so people stop asking.
+**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own. Say so in the roadmap so people stop asking.
+
+### 3.1 Tables, and why they are in
+
+Tables were written out of v0.1 in the first draft of this plan, as the headline example of scope creep. That decision was reversed on 2026-10-10, deliberately rather than by drift, so the reasoning is recorded here instead of being argued again later.
+
+The cost of a table is almost entirely in the schema, and the schema cost is lowest **now**. Nothing is published — the registry has no `0.0.1` — so adding four nodes today costs no `SCHEMA_VERSION` bump and no migration, because there are no stored documents to migrate. The same four nodes added after `0.1.0` cost both, forever, for every host. A feature this schema-heavy is either admitted before the first release or it is genuinely expensive.
+
+What is **not** admitted with it: nested tables, column resizing persisted as layout, cell background colours, spreadsheet behaviour of any kind. A table in v0.1 is a grid of rich-text cells with an optional header row. The moment it starts storing presentation, it has become the thing §11 warns about.
+
+One attribute deserves scrutiny in review: `colwidth` stores pixel widths in the document. That is presentation in a document that otherwise stores meaning, and it is the one part of the table schema that a renderer on a narrow viewport has to argue with. It is included because ProseMirror's table implementation expects it; it is not a precedent for storing other layout.
 
 ---
 
@@ -195,6 +206,7 @@ import { RenderDocument } from '@blockleaf/renderer/react';
 - Per-node component overrides, so a host can route images through `next/image` and code blocks through its own highlighter.
 - An HTML-string export for emails, RSS and OG generation.
 - Plain-text and heading extractors for search indexing, reading time and tables of contents.
+- Tables render as real `<table>` markup with a `<thead>` when a header row is set — not as a div grid. Email clients and RSS readers are the whole point of the HTML-string export, and they understand tables and little else.
 - Zero client JS by default.
 
 Keep this package's dependency list ruthlessly small. It is what makes the whole thing usable in a server-rendered site, and it is the part competitors tend to skip.
@@ -235,7 +247,7 @@ Write docs in the same PR as the feature. Documentation written "later" is never
 | Size      | `size-limit`, hard budget                     | Bundle creep                                                                 |
 | a11y      | `@axe-core/playwright`                        | Menus, focus, contrast                                                       |
 
-ProseMirror bugs hide in selection and input-rule edge cases that jsdom cannot see. Real browser tests are not optional here — budget for them from M1, not M5.
+ProseMirror bugs hide in selection and input-rule edge cases that jsdom cannot see. Real browser tests are not optional here — budget for them from `EC`, not `HD`.
 
 ---
 
@@ -256,42 +268,44 @@ ProseMirror bugs hide in selection and input-rule edge cases that jsdom cannot s
 
 Each one ends in something demonstrable. Don't start the next until the exit test passes.
 
-### M0 — Scaffold (½ week)
+Each block has a short id — `SC`, `EC`, `CH` — which is the stable handle used by `docs/progress-tracker.md` and by every task in it (`EC-13`). The blocks below are in order, so the old `M0`–`M7` labels map onto them one for one; a few source comments still say `M1`, meaning `EC`.
 
-Repo, pnpm + Turborepo, shared tsconfig/eslint, Vitest, Playwright, Changesets, CI, `@blockleaf/editor` publishing a trivial component to npm under `0.0.1`.
+### SC — Scaffold (½ week)
+
+Repo, pnpm + Turborepo, shared tsconfig/eslint, Vitest, Changesets, CI, `@blockleaf/editor` publishing a trivial component to npm under `0.0.1`. Playwright is deliberately not here — it moved to `EC`, where selection behaviour gives it something to catch.
 **Exit:** `pnpm add @blockleaf/editor` works in a throwaway app and renders a box you can type in.
 
-### M1 — Editing core (1½ weeks)
+### EC — Editing core (1½ weeks)
 
-Schema and node/mark set, document versioning, stable block ids, markdown input rules, keyboard shortcuts, paste normalisation, link sanitisation, schema snapshot tests.
-**Exit:** every node and mark can be created by keyboard alone, and the JSON round-trips through a snapshot test.
+Schema and node/mark set, document versioning, stable block ids, markdown input rules, keyboard shortcuts, paste normalisation, link sanitisation, schema snapshot tests. Tables land here as schema and commands — the node set, the insert and structure commands, cell navigation — with no menu attached to them. Playwright arrives at the start of this block, because cell navigation is the first behaviour jsdom cannot honestly test.
+**Exit:** every node and mark can be created by keyboard alone, tables included, and the JSON round-trips through a snapshot test. Proven headlessly against the command API, with no chrome rendered.
 
-### M2 — The chrome (2 weeks)
+### CH — The chrome (2 weeks)
 
-Slash menu with a command registry, bubble menu with a link editor, drag handle and block menu, placeholder, trailing node. Keyboard-complete and axe-clean.
-**Exit:** a stranger sits down, types `/`, and builds a document without touching the mouse or reading a doc.
+Slash menu with a command registry, bubble menu with a link editor, drag handle and block menu, placeholder, trailing node, table controls. Keyboard-complete and axe-clean.
+**Exit:** a stranger sits down, types `/`, and builds a document — a table in it — without touching the mouse or reading a doc.
 
-### M3 — Media and code (1 week)
+### MC — Media and code (1 week)
 
-Upload adapter, drop/paste/picker, progress and abort, image block with alt and alignment, code block with `lowlight` and a language picker.
+Upload adapter, drop/paste/picker, progress and abort, image block with alt and alignment, code block with `lowlight` and a language picker. `lowlight` ships a curated grammar set, not `common` — the full set costs 39.27 kB and would leave 3.79 kB of the budget for the four nodes still unbuilt. Hosts register additional languages themselves. See F10.
 **Exit:** dragging a 5 MB image in works, shows progress, survives a mid-upload navigation, and a failed upload is retryable.
 
-### M4 — Renderer + docs → **public 0.1.0** (1½ weeks)
+### RD — Renderer + docs → **public 0.1.0** (1½ weeks)
 
 `@blockleaf/renderer`, component overrides, HTML-string and plain-text exports, docs site with the live demo, README with a demo GIF, LICENSE, CONTRIBUTING, issue templates.
 **Exit:** someone who has never seen the repo installs it from the docs alone and renders stored JSON on a server.
 
-### M5 — Hardening (1–2 weeks)
+### HD — Hardening (1–2 weeks)
 
 Full a11y pass, i18n via `labels`, theming docs, mobile and touch behaviour, large-document performance (10k+ blocks, virtualisation if needed), `examples/vite-spa`.
 **Exit:** a 500-page document stays responsive; the editor is fully usable on a phone.
 
-### M6 — Optional packages (ongoing)
+### OP — Optional packages (ongoing)
 
 `@blockleaf/collab` (Yjs + provider adapter), `@blockleaf/ai` (streaming adapter, no bundled provider), `@blockleaf/markdown`, comments/mentions.
 **Exit:** each is additive — removing it changes nothing in the base bundle.
 
-### M7 — 1.0
+### V1 — 1.0
 
 Schema frozen with a written stability policy, migration path documented, two or more real apps in production on it.
 
@@ -301,7 +315,7 @@ Schema frozen with a written stability policy, migration path documented, two or
 
 ## 10. Dogfood it
 
-The first real consumer should be your own project, during M4 — not after 1.0. Nothing exposes a bad API like using it under a deadline.
+The first real consumer should be your own project, during `RD` — not after 1.0. Nothing exposes a bad API like using it under a deadline.
 
 Note the one real integration decision when that time comes: an existing app may already store a different JSON shape. Either adopt this editor's document as the stored shape (a migration, done once) or keep a converter at the boundary (no migration, but limits the editor to what the old shape can express). Decide per app; don't let the editor's design be bent by one consumer's legacy format.
 
@@ -309,14 +323,14 @@ Note the one real integration decision when that time comes: an existing app may
 
 ## 11. Risks, named
 
-| Risk                                   | Mitigation                                                                                                                                                   |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Tiptap v3 churn                        | Pin exact Tiptap versions; a scheduled CI job builds against `@latest` so breakage is found before a user finds it.                                          |
-| Schema change after release            | Versioned documents and shipped migrations from day one. This is the single most expensive mistake available.                                                |
-| Scope creep (tables, collab, comments) | Written out of v0.1 in the public roadmap. Every "can you also…" gets pointed at it.                                                                         |
-| Maintenance load                       | Set expectations in the README (response times, supported versions). Label `good first issue` generously. Burnout, not competition, kills most OSS projects. |
-| Nobody uses it                         | The wedge in §1 plus the migration guides in §6. Launch with a working demo, a GIF, and a real app already running on it.                                    |
-| Bundle bloat                           | `size-limit` budget enforced in CI from M0, when the budget is easy to meet.                                                                                 |
+| Risk                                    | Mitigation                                                                                                                                                                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tiptap v3 churn                         | Pin exact Tiptap versions; a scheduled CI job builds against `@latest` so breakage is found before a user finds it.                                                                                                                   |
+| Schema change after release             | Versioned documents and shipped migrations from day one. This is the single most expensive mistake available.                                                                                                                         |
+| Scope creep (columns, collab, comments) | Written out of v0.1 in the public roadmap. Every "can you also…" gets pointed at it. Tables were admitted on 2026-10-10 with the reasoning in §3.1 — one reversal, argued once, is not drift; a second one without that bar would be. |
+| Maintenance load                        | Set expectations in the README (response times, supported versions). Label `good first issue` generously. Burnout, not competition, kills most OSS projects.                                                                          |
+| Nobody uses it                          | The wedge in §1 plus the migration guides in §6. Launch with a working demo, a GIF, and a real app already running on it.                                                                                                             |
+| Bundle bloat                            | `size-limit` budget enforced in CI from `SC`, when the budget is easy to meet.                                                                                                                                                        |
 
 ---
 
@@ -331,4 +345,4 @@ Note the one real integration decision when that time comes: an existing app may
 7. Write §3 (the schema) as a markdown doc in the repo, and only then start writing extensions.
 8. MIT LICENSE, CODE_OF_CONDUCT, CONTRIBUTING, issue templates, Discussions on.
 
-Then M1.
+Then `EC`.
