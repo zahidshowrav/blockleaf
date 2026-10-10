@@ -20,11 +20,11 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `SC`, not yet closed. The scaffold is complete and CI is green,
-but the exit test cannot run until `0.0.1` is on npm — see flags F1 and F2.
+**Position:** `SC`, not yet closed. The scaffold is complete and scope/tokens
+are configured (F1, F2); ready for the `0.0.1` publish in SC-14.
 
-**Last verified:** 2026-10-10, against commit `7f7e934`. Tables added to `EC` on
-2026-10-10 — see F9.
+**Last verified:** 2026-10-11. Open flags F1, F2, F4, F7 settled — see
+`open-flags.md`.
 
 ---
 
@@ -61,23 +61,23 @@ waits on the other, and the table is usable at the end of both.
 **Exit:** `pnpm add @blockleaf/editor` works in a throwaway app and renders a box
 you can type in.
 
-| Id    | Task                                                                 | Status      | Commit    | Completed  |
-| ----- | -------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| SC-01 | pnpm workspace + Turborepo, stripped to the §2 layout                | Done        | `b96a94f` | 2026-10-09 |
-| SC-02 | Shared `@blockleaf/tsconfig` and `@blockleaf/eslint-config`          | Done        | `b96a94f` | 2026-10-09 |
-| SC-03 | `core` → `react` → `ui` import boundary enforced in lint             | Done        | `b96a94f` | 2026-10-09 |
-| SC-04 | Vitest + jsdom; schema, extensions and editor tests                  | Done        | `b96a94f` | 2026-10-09 |
-| SC-05 | Changesets, release workflow, npm provenance via `id-token: write`   | Done        | `b96a94f` | 2026-10-09 |
-| SC-06 | CI gates: typecheck, lint, format, test, build, publint + attw, size | Done        | `b96a94f` | 2026-10-09 |
-| SC-07 | Changeset-required gate on pull requests                             | Done        | `b96a94f` | 2026-10-09 |
-| SC-08 | `size-limit` budgets declaring `import` (130 kB editor, 2 kB schema) | Done        | `b96a94f` | 2026-10-09 |
-| SC-09 | MIT LICENSE, CODE_OF_CONDUCT, CONTRIBUTING                           | Done        | `b96a94f` | 2026-10-09 |
-| SC-10 | `docs/schema.md` written before any extension work (§12.7)           | Done        | `b96a94f` | 2026-10-09 |
-| SC-11 | Toolchain pins recorded with their rationale                         | Done        | `30c432a` | 2026-10-09 |
-| SC-12 | GitHub remote connected, `main` pushed and tracking                  | Done        | —         | 2026-10-09 |
-| SC-13 | Playwright — moved to EC-20 on 2026-10-10; see F3                    | Moved       | —         | —          |
-| SC-14 | npm scope registered and `0.0.1` published — registry 404; see F1    | Blocked     | —         | —          |
-| SC-15 | Issue templates done; Discussions needs enabling by hand (F4)        | In progress | —         | —          |
+| Id    | Task                                                                  | Status      | Commit    | Completed  |
+| ----- | --------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| SC-01 | pnpm workspace + Turborepo, stripped to the §2 layout                 | Done        | `b96a94f` | 2026-10-09 |
+| SC-02 | Shared `@blockleaf/tsconfig` and `@blockleaf/eslint-config`           | Done        | `b96a94f` | 2026-10-09 |
+| SC-03 | `core` → `react` → `ui` import boundary enforced in lint              | Done        | `b96a94f` | 2026-10-09 |
+| SC-04 | Vitest + jsdom; schema, extensions and editor tests                   | Done        | `b96a94f` | 2026-10-09 |
+| SC-05 | Changesets, release workflow, npm provenance via `id-token: write`    | Done        | `b96a94f` | 2026-10-09 |
+| SC-06 | CI gates: typecheck, lint, format, test, build, publint + attw, size  | Done        | `b96a94f` | 2026-10-09 |
+| SC-07 | Changeset-required gate on pull requests                              | Done        | `b96a94f` | 2026-10-09 |
+| SC-08 | `size-limit` budgets declaring `import` (130 kB editor, 2 kB schema)  | Done        | `b96a94f` | 2026-10-09 |
+| SC-09 | MIT LICENSE, CODE_OF_CONDUCT, CONTRIBUTING                            | Done        | `b96a94f` | 2026-10-09 |
+| SC-10 | `docs/schema.md` written before any extension work (§12.7)            | Done        | `b96a94f` | 2026-10-09 |
+| SC-11 | Toolchain pins recorded with their rationale                          | Done        | `30c432a` | 2026-10-09 |
+| SC-12 | GitHub remote connected, `main` pushed and tracking                   | Done        | —         | 2026-10-09 |
+| SC-13 | Playwright — moved to EC-20 on 2026-10-10; see F3                     | Moved       | —         | —          |
+| SC-14 | npm scope registered (F1, F2); ready for `0.0.1` publish              | In progress | —         | —          |
+| SC-15 | Issue templates done; Discussions enabled in repository settings (F4) | Done        | —         | 2026-10-11 |
 
 ## EC — Editing core (1½ weeks)
 

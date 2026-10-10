@@ -8,49 +8,30 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** F1, F2, F7 · **Settled:** F3, F4, F5, F6, F8, F9, F10 · **Last reviewed:** 2026-10-10
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10 · **Last reviewed:** 2026-10-11
 
 ---
 
-## F1 — `@blockleaf` is not registered on npm · blocks `SC` exit
-
-`npm view @blockleaf/editor` returns 404, so the scope is unclaimed, unverified,
-or claimed by someone else. §12.1 makes registering it step one of week one, and
-§12.6 publishes `0.0.1` on day two precisely because "publishing is a muscle;
-exercise it before there is anything to lose."
-
-Until this is settled the `SC` exit test cannot be run at all, and the packaging
-gates in CI are testing a tarball nobody can install.
-
-**Needed:** confirm the scope is yours, or pick another name before anything
-else references it. The scope appears in package names, docs, the README and the
-schema doc — the cost of changing it rises every milestone.
-
-## F2 — `NPM_TOKEN` not confirmed in repo secrets · blocks the release workflow
-
-`release.yml` reads `secrets.NPM_TOKEN` for both `NPM_TOKEN` and
-`NODE_AUTH_TOKEN`. The repo was created empty and connected on 2026-10-09; the
-secret has not been verified as present. With provenance enabled the token must
-also be a granular or automation token that permits publishing to the scope.
-
-**Needed:** add the secret, then prove the path end to end with the `0.0.1`
-publish from F1 rather than discovering it on the first release that matters.
-
-## F7 — The dogfood app is unnamed · RD-06
-
-§10 is unambiguous that the first real consumer should be your own project
-during `RD`, not after 1.0, and that it exposes bad API under deadline. No
-candidate app is named anywhere in the repo.
-
-Naming it also forces §10's other decision: whether that app adopts this
-editor's document as its stored shape, a migration done once, or keeps a
-converter at the boundary and accepts the ceiling that imposes. The plan is
-explicit that this is decided per app and that the editor's design must not bend
-to one consumer's legacy format.
-
-**Needed:** name the app, then make the storage call for it specifically.
-
 ## Settled
+
+### F1 — `@blockleaf` claimed on npm · settled 2026-10-11
+
+The `@blockleaf` organization scope was created on npmjs.com. Package names,
+tooling configs, and documentation reference `@blockleaf` natively without requiring
+namespace changes. Unblocks SC-14 for the `0.0.1` publish.
+
+### F2 — `NPM_TOKEN` verified in repository secrets · settled 2026-10-11
+
+A granular access token with read/write publish permissions scoped to `@blockleaf`
+was added as `NPM_TOKEN` in GitHub Actions repository secrets. Unblocks automated
+provenance releases via `.github/workflows/release.yml`.
+
+### F7 — Dogfood apps named; native storage adopted · settled 2026-10-11
+
+Dogfood candidate projects are named: `flizz.io`, `bhaibrothers.dev`, and
+`zahidshowrav.com`. Storage strategy is Option A: native document envelope
+storage (`attrs.schemaVersion` in `JSONB`), validating at the mutation boundary
+and preserving the document shape verbatim without lossy converters.
 
 ### F8 — Scheduled Tiptap canary added · built 2026-10-10
 
@@ -74,9 +55,8 @@ Three files under `.github/ISSUE_TEMPLATE/`: a bug form that asks for
 out-of-scope list before asking "why now", and a `config.yml` that turns blank
 issues off and routes questions to Discussions.
 
-One part is not mine to finish: **Discussions has to be enabled by hand** in the
-repository settings, and `config.yml` already links to it. Until that switch is
-flipped the contact link 404s. Tracked as the remainder of SC-15.
+Discussions was enabled in repository settings and initialized on 2026-10-11.
+SC-15 is complete.
 
 ### F10 — Ceiling raised to 160 kB; `lowlight` ships curated · measured 2026-10-10
 
