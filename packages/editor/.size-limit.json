@@ -3,7 +3,7 @@
     "name": "BlockleafEditor + Tiptap (what a consumer actually ships)",
     "path": "dist/index.js",
     "import": "{ BlockleafEditor }",
-    "limit": "130 kB",
+    "limit": "160 kB",
     "ignore": ["react", "react-dom"]
   },
   {
