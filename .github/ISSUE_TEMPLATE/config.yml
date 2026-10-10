@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question, idea or "how do I…"
+    url: https://github.com/zahidshowrav/blockleaf/discussions
+    about: Anything that is not a reproducible bug or a concrete proposal belongs in Discussions.
+  - name: Document schema reference
+    url: https://github.com/zahidshowrav/blockleaf/blob/main/docs/schema.md
+    about: The stored JSON contract — every node, mark and attribute, and the rules for changing them.
