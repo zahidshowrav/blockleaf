@@ -5,6 +5,8 @@ export {
 	EDITOR_CLASS_NAME
 } from './constants.js';
 export { createExtensions, presets, type PresetName } from './extensions.js';
+export { Link, sanitizeHref } from './marks/link.js';
+export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
 	SCHEMA_VERSION,
 	createEmptyDocument,

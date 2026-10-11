@@ -87,14 +87,14 @@ command API, with no chrome rendered.
 | Id    | Task                                                                    | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | Done        | `b96a94f` | 2026-10-09 |
-| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Done        | —         | 2026-10-11 |
-| EC-03 | Full node and mark set per `docs/schema.md`                             | Not started | —         | —          |
-| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | In progress | `b96a94f` | —          |
+| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Done        | `8e6a8c8` | 2026-10-11 |
+| EC-03 | Full node and mark set per `docs/schema.md`                             | Done        | —         | 2026-10-12 |
+| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done        | —         | 2026-10-12 |
 | EC-05 | Stable block ids                                                        | Not started | —         | —          |
 | EC-06 | Markdown input rules                                                    | Not started | —         | —          |
 | EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —          |
 | EC-08 | Paste normalisation                                                     | Not started | —         | —          |
-| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Not started | —         | —          |
+| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done        | —         | 2026-10-12 |
 | EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Not started | —         | —          |
 | EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Not started | —         | —          |
 | EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Not started | —         | —          |

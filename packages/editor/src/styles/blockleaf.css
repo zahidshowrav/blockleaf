@@ -16,6 +16,9 @@
 	--bl-color-code-bg: #f4f4f5;
 	--bl-color-quote-border: #d1d5db;
 	--bl-color-selection: #cfe0ff;
+	--bl-color-callout-bg: #f8fafc;
+	--bl-color-callout-border: #e2e8f0;
+	--bl-color-highlight: #fef08a;
 
 	/* type */
 	--bl-font-body:
@@ -46,6 +49,9 @@
 		--bl-color-code-bg: #161b22;
 		--bl-color-quote-border: #30363d;
 		--bl-color-selection: #1f3a68;
+		--bl-color-callout-bg: #161b22;
+		--bl-color-callout-border: #30363d;
+		--bl-color-highlight: rgba(254, 240, 138, 0.25);
 	}
 }
 
@@ -58,6 +64,9 @@
 	--bl-color-code-bg: #161b22;
 	--bl-color-quote-border: #30363d;
 	--bl-color-selection: #1f3a68;
+	--bl-color-callout-bg: #161b22;
+	--bl-color-callout-border: #30363d;
+	--bl-color-highlight: rgba(254, 240, 138, 0.25);
 }
 
 .blockleaf-editor__content {
@@ -141,6 +150,51 @@
 	max-width: 100%;
 	height: auto;
 	border-radius: var(--bl-radius);
+}
+
+.blockleaf-editor__content mark {
+	background-color: var(--bl-color-highlight);
+	border-radius: calc(var(--bl-radius) - 3px);
+	padding: 0.1em 0.25em;
+}
+
+.blockleaf-editor__content ul[data-type='taskList'] {
+	list-style: none;
+	padding-left: 0;
+}
+
+.blockleaf-editor__content li[data-type='taskItem'] {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5em;
+}
+
+.blockleaf-editor__content li[data-type='taskItem'] > label {
+	user-select: none;
+	margin-top: 0.2em;
+	cursor: pointer;
+}
+
+.blockleaf-editor__content li[data-type='taskItem'] > div {
+	flex: 1 1 auto;
+}
+
+.blockleaf-editor__content .blockleaf-callout {
+	display: flex;
+	position: relative;
+	padding: 0.85em 1em 0.85em 2.75em;
+	border-radius: var(--bl-radius);
+	background: var(--bl-color-callout-bg);
+	border: 1px solid var(--bl-color-callout-border);
+}
+
+.blockleaf-editor__content .blockleaf-callout::before {
+	content: attr(data-emoji);
+	position: absolute;
+	left: 0.85em;
+	top: 0.85em;
+	font-size: 1.15em;
+	line-height: 1;
 }
 
 /* The editing surface itself shows focus with the caret, not a ring — an
