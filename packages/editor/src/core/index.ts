@@ -4,9 +4,15 @@ export {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME
 } from './constants.js';
-export { createExtensions, presets, type PresetName } from './extensions.js';
+export {
+	BLOCK_NODE_TYPES,
+	createExtensions,
+	presets,
+	type PresetName
+} from './extensions.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
+export { UniqueID } from '@tiptap/extension-unique-id';
 export {
 	SCHEMA_VERSION,
 	createEmptyDocument,

@@ -3,6 +3,7 @@ import { Highlight } from '@tiptap/extension-highlight';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
 import { Underline } from '@tiptap/extension-underline';
+import { UniqueID } from '@tiptap/extension-unique-id';
 import { StarterKit } from '@tiptap/starter-kit';
 
 import { HEADING_LEVELS } from './constants.js';
@@ -11,14 +12,28 @@ import { Callout } from './nodes/callout.js';
 
 export type PresetName = 'minimal' | 'standard';
 
+export const BLOCK_NODE_TYPES = [
+	'paragraph',
+	'heading',
+	'blockquote',
+	'codeBlock',
+	'horizontalRule',
+	'bulletList',
+	'orderedList',
+	'listItem',
+	'taskList',
+	'taskItem',
+	'callout'
+] as const;
+
 /**
  * Creates Tiptap extensions for the requested preset.
  *
  * - `minimal`: Inline and micro-content editing (paragraphs, text, bold, italic,
- *   strike, underline, code, and sanitised links).
+ *   strike, underline, code, sanitised links, and stable paragraph IDs).
  * - `standard`: Full Notion-style document core per docs/schema.md (StarterKit with
  *   capped heading levels 1–3, Underline, Link, Highlight, TaskList, TaskItem,
- *   and Callout).
+ *   Callout, and UniqueID for stable block IDs).
  */
 export const createExtensions = (
 	preset: PresetName = 'standard'
@@ -37,7 +52,10 @@ export const createExtensions = (
 				underline: false
 			}),
 			Underline,
-			Link
+			Link,
+			UniqueID.configure({
+				types: ['paragraph']
+			})
 		];
 	}
 
@@ -58,7 +76,10 @@ export const createExtensions = (
 		TaskItem.configure({
 			nested: true
 		}),
-		Callout
+		Callout,
+		UniqueID.configure({
+			types: [...BLOCK_NODE_TYPES]
+		})
 	];
 };
 

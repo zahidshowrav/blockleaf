@@ -25,11 +25,12 @@ describe('extension presets', () => {
 		expect(names).toContain('starterKit');
 		expect(names).toContain('underline');
 		expect(names).toContain('link');
+		expect(names).toContain('uniqueID');
 		expect(names).not.toContain('callout');
 		expect(names).not.toContain('taskList');
 	});
 
-	it('configures standard preset with full node and mark set (EC-03, EC-04)', () => {
+	it('configures standard preset with full node and mark set (EC-03, EC-04, EC-05)', () => {
 		const extensions = createExtensions('standard');
 		const names = extensions.map((e) => e.name);
 
@@ -40,5 +41,6 @@ describe('extension presets', () => {
 		expect(names).toContain('taskList');
 		expect(names).toContain('taskItem');
 		expect(names).toContain('callout');
+		expect(names).toContain('uniqueID');
 	});
 });
