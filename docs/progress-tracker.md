@@ -88,24 +88,24 @@ command API, with no chrome rendered.
 | ----- | ----------------------------------------------------------------------- | ------ | --------- | ---------- |
 | EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | Done   | `b96a94f` | 2026-10-09 |
 | EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Done   | `8e6a8c8` | 2026-10-11 |
-| EC-03 | Full node and mark set per `docs/schema.md`                             | Done   | —         | 2026-10-12 |
-| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done   | —         | 2026-10-12 |
-| EC-05 | Stable block ids                                                        | Done   | —         | 2026-10-12 |
-| EC-06 | Markdown input rules                                                    | Done   | —         | 2026-10-12 |
-| EC-07 | Keyboard shortcuts for every node and mark                              | Done   | —         | 2026-10-12 |
-| EC-08 | Paste normalisation                                                     | Done   | —         | 2026-10-12 |
-| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done   | —         | 2026-10-12 |
-| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Done   | —         | 2026-10-12 |
-| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Done   | —         | 2026-10-12 |
-| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Done   | —         | 2026-10-12 |
-| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Done   | —         | 2026-10-12 |
-| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Done   | —         | 2026-10-12 |
-| EC-15 | Cell merge and split                                                    | Done   | —         | 2026-10-12 |
-| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Done   | —         | 2026-10-12 |
-| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Done   | —         | 2026-10-12 |
-| EC-18 | Table document in the schema snapshot and the round-trip test           | Done   | —         | 2026-10-12 |
-| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Done   | —         | 2026-10-12 |
-| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Done   | —         | 2026-10-12 |
+| EC-03 | Full node and mark set per `docs/schema.md`                             | Done   | `32d55f2` | 2026-10-12 |
+| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done   | `32d55f2` | 2026-10-12 |
+| EC-05 | Stable block ids                                                        | Done   | `c15f81e` | 2026-10-12 |
+| EC-06 | Markdown input rules                                                    | Done   | `00b273e` | 2026-10-12 |
+| EC-07 | Keyboard shortcuts for every node and mark                              | Done   | `1243e38` | 2026-10-12 |
+| EC-08 | Paste normalisation                                                     | Done   | `f42a550` | 2026-10-12 |
+| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done   | `32d55f2` | 2026-10-12 |
+| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Done   | `c8bb06d` | 2026-10-12 |
+| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Done   | `e19816e` | 2026-10-12 |
+| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Done   | `e0d61c8` | 2026-10-12 |
+| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Done   | `8e6559d` | 2026-10-12 |
+| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Done   | `880c0a9` | 2026-10-12 |
+| EC-15 | Cell merge and split                                                    | Done   | `d350b3b` | 2026-10-12 |
+| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Done   | `550813e` | 2026-10-12 |
+| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Done   | `f05eaf2` | 2026-10-12 |
+| EC-18 | Table document in the schema snapshot and the round-trip test           | Done   | `011304d` | 2026-10-12 |
+| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Done   | `d9d74ec` | 2026-10-12 |
+| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Done   | `efbd920` | 2026-10-12 |
 
 ## CH — The chrome (2 weeks)
 
