@@ -12,6 +12,7 @@
 		"typecheck": "turbo run typecheck",
 		"lint": "turbo run lint",
 		"test": "turbo run test",
+		"test:e2e": "playwright test",
 		"check:packaging": "turbo run check:packaging",
 		"size": "turbo run size",
 		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}\"",
@@ -24,6 +25,7 @@
 	"devDependencies": {
 		"@blockleaf/eslint-config": "workspace:*",
 		"@changesets/cli": "3.0.3",
+		"@playwright/test": "^1.64.0",
 		"eslint": "10.12.0",
 		"husky": "9.1.7",
 		"lint-staged": "17.6.0",
