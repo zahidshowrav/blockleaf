@@ -325,3 +325,143 @@ describe('cell merge and split (EC-15)', () => {
 		editor.destroy();
 	});
 });
+
+describe('table cell navigation and keymap coordination (EC-16)', () => {
+	it('navigates through cells with Tab and Shift-Tab and appends row on Tab in last cell', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		editor.commands.insertTable({ rows: 2, cols: 2, withHeaderRow: false });
+
+		const pressKey = (
+			key: string,
+			modifiers: {
+				shiftKey?: boolean;
+			} = {}
+		) => {
+			const event = new KeyboardEvent('keydown', {
+				key,
+				bubbles: true,
+				cancelable: true,
+				...modifiers
+			});
+			let handled = false;
+			editor.view.someProp('handleKeyDown', (f) => {
+				if (f(editor.view, event)) {
+					handled = true;
+					return true;
+				}
+				return false;
+			});
+			return handled;
+		};
+
+		const initialPos = editor.state.selection.from;
+
+		// Tab moves to next cell
+		const handledTab1 = pressKey('Tab');
+		expect(handledTab1).toBe(true);
+		expect(editor.state.selection.from).toBeGreaterThan(initialPos);
+		const posCell1 = editor.state.selection.from;
+
+		// Shift-Tab moves back to previous cell
+		const handledShiftTab = pressKey('Tab', { shiftKey: true });
+		expect(handledShiftTab).toBe(true);
+		expect(editor.state.selection.from).toBeLessThan(posCell1);
+
+		// Navigate to last cell of 2x2 table
+		pressKey('Tab'); // cell 1
+		pressKey('Tab'); // cell 2
+		pressKey('Tab'); // cell 3 (last cell)
+
+		let rowCount = editor.getJSON().content?.find((n) => n.type === 'table')
+			?.content?.length;
+		expect(rowCount).toBe(2);
+
+		// Pressing Tab in the last cell appends a new row
+		pressKey('Tab');
+		rowCount = editor.getJSON().content?.find((n) => n.type === 'table')
+			?.content?.length;
+		expect(rowCount).toBe(3);
+
+		editor.destroy();
+	});
+
+	it('preserves Tab and Shift-Tab list indentation outside of tables', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<ul><li><p>Item 1</p></li><li><p>Item 2</p></li></ul>'
+		});
+
+		// Put cursor at end of list (on Item 2)
+		editor.commands.focus('end');
+
+		const pressKey = (
+			key: string,
+			modifiers: {
+				shiftKey?: boolean;
+			} = {}
+		) => {
+			const event = new KeyboardEvent('keydown', {
+				key,
+				bubbles: true,
+				cancelable: true,
+				...modifiers
+			});
+			let handled = false;
+			editor.view.someProp('handleKeyDown', (f) => {
+				if (f(editor.view, event)) {
+					handled = true;
+					return true;
+				}
+				return false;
+			});
+			return handled;
+		};
+
+		// Tab sinks the list item
+		const handledTab = pressKey('Tab');
+		expect(handledTab).toBe(true);
+
+		const json = editor.getJSON();
+		const list = json.content?.[0];
+		expect(list?.type).toBe('bulletList');
+		const firstItem = list?.content?.[0];
+		const hasNestedList =
+			firstItem &&
+			'content' in firstItem &&
+			Array.isArray(firstItem.content)
+				? firstItem.content.some(
+						(n: { type?: string }) => n.type === 'bulletList'
+					)
+				: false;
+		expect(hasNestedList).toBe(true);
+
+		// Shift-Tab lifts the list item
+		const handledShiftTab = pressKey('Tab', { shiftKey: true });
+		expect(handledShiftTab).toBe(true);
+
+		editor.destroy();
+	});
+
+	it('supports arrow key and cell navigation commands', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		editor.commands.insertTable({ rows: 2, cols: 2, withHeaderRow: false });
+
+		const pos0 = editor.state.selection.from;
+		expect(editor.commands.goToNextCell()).toBe(true);
+		expect(editor.state.selection.from).toBeGreaterThan(pos0);
+
+		const pos1 = editor.state.selection.from;
+		expect(editor.commands.goToPreviousCell()).toBe(true);
+		expect(editor.state.selection.from).toBeLessThan(pos1);
+
+		editor.destroy();
+	});
+});
