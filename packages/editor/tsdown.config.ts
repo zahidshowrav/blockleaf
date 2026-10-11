@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-	entry: ['src/index.ts', 'src/extensions.ts'],
+	entry: ['src/index.ts', 'src/extensions.ts', 'src/validate.ts'],
 	format: ['esm'],
 	dts: true,
 	clean: true,
@@ -10,6 +10,6 @@ export default defineConfig({
 	// The package is `"type": "module"` and ESM-only, so `.mjs` buys nothing and
 	// only makes the exports map harder to read.
 	outExtensions: () => ({ js: '.js', dts: '.d.ts' }),
-	// react is a peer; @tiptap/* stay runtime dependencies rather than inlined
-	external: [/^react($|\/)/, /^react-dom($|\/)/, /^@tiptap\//]
+	// react and zod are peers; @tiptap/* stay runtime dependencies rather than inlined
+	external: [/^react($|\/)/, /^react-dom($|\/)/, /^@tiptap\//, /^zod($|\/)/]
 });
