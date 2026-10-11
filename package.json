@@ -1,6 +1,14 @@
 {
 	"name": "blockleaf",
 	"private": true,
+	"homepage": "https://blockleaf.dev",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zahidshowrav/blockleaf.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zahidshowrav/blockleaf/issues"
+	},
 	"type": "module",
 	"packageManager": "pnpm@11.5.0",
 	"engines": {
