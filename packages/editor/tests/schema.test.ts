@@ -136,4 +136,305 @@ describe('document schema', () => {
 		expect(isBlockleafDocument(complexDoc)).toBe(true);
 		expect(complexDoc.content).toHaveLength(4);
 	});
+
+	it('matches committed schema snapshot fixture (EC-10)', () => {
+		const canonicalDocument = {
+			type: 'doc' as const,
+			attrs: { schemaVersion: SCHEMA_VERSION },
+			content: [
+				{
+					type: 'heading' as const,
+					attrs: { level: 1 as const, id: 'heading-1' },
+					content: [
+						{
+							type: 'text' as const,
+							text: 'Document Title',
+							marks: [{ type: 'bold' as const }]
+						}
+					]
+				},
+				{
+					type: 'heading' as const,
+					attrs: { level: 2 as const, id: 'heading-2' },
+					content: [
+						{ type: 'text' as const, text: 'Section Heading' }
+					]
+				},
+				{
+					type: 'heading' as const,
+					attrs: { level: 3 as const, id: 'heading-3' },
+					content: [
+						{ type: 'text' as const, text: 'Subsection Heading' }
+					]
+				},
+				{
+					type: 'paragraph' as const,
+					attrs: { id: 'para-1' },
+					content: [
+						{ type: 'text' as const, text: 'Plain text, ' },
+						{
+							type: 'text' as const,
+							text: 'bold',
+							marks: [{ type: 'bold' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'italic',
+							marks: [{ type: 'italic' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'strike',
+							marks: [{ type: 'strike' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'underline',
+							marks: [{ type: 'underline' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'code',
+							marks: [{ type: 'code' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'highlight',
+							marks: [
+								{
+									type: 'highlight' as const,
+									attrs: { color: '#ffff00' }
+								}
+							]
+						},
+						{ type: 'text' as const, text: ', and ' },
+						{
+							type: 'text' as const,
+							text: 'sanitised link',
+							marks: [
+								{
+									type: 'link' as const,
+									attrs: {
+										href: 'https://blockleaf.dev',
+										target: '_blank',
+										rel: 'noopener noreferrer'
+									}
+								}
+							]
+						},
+						{ type: 'hardBreak' as const }
+					]
+				},
+				{
+					type: 'blockquote' as const,
+					attrs: { id: 'quote-1' },
+					content: [
+						{
+							type: 'paragraph' as const,
+							content: [
+								{
+									type: 'text' as const,
+									text: 'Blockquote content'
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'codeBlock' as const,
+					attrs: { language: 'typescript', id: 'code-1' },
+					content: [
+						{
+							type: 'text' as const,
+							text: 'const answer: number = 42;'
+						}
+					]
+				},
+				{
+					type: 'horizontalRule' as const,
+					attrs: { id: 'hr-1' }
+				},
+				{
+					type: 'bulletList' as const,
+					attrs: { id: 'bl-1' },
+					content: [
+						{
+							type: 'listItem' as const,
+							attrs: { id: 'li-1' },
+							content: [
+								{
+									type: 'paragraph' as const,
+									content: [
+										{
+											type: 'text' as const,
+											text: 'Bullet item 1'
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'orderedList' as const,
+					attrs: { start: 1, id: 'ol-1' },
+					content: [
+						{
+							type: 'listItem' as const,
+							attrs: { id: 'li-2' },
+							content: [
+								{
+									type: 'paragraph' as const,
+									content: [
+										{
+											type: 'text' as const,
+											text: 'Ordered item 1'
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'taskList' as const,
+					attrs: { id: 'tl-1' },
+					content: [
+						{
+							type: 'taskItem' as const,
+							attrs: { checked: true, id: 'ti-1' },
+							content: [
+								{
+									type: 'paragraph' as const,
+									content: [
+										{
+											type: 'text' as const,
+											text: 'Completed task'
+										}
+									]
+								}
+							]
+						},
+						{
+							type: 'taskItem' as const,
+							attrs: { checked: false, id: 'ti-2' },
+							content: [
+								{
+									type: 'paragraph' as const,
+									content: [
+										{
+											type: 'text' as const,
+											text: 'Pending task'
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'callout' as const,
+					attrs: { emoji: '💡', tone: 'info', id: 'co-1' },
+					content: [
+						{
+							type: 'paragraph' as const,
+							content: [
+								{
+									type: 'text' as const,
+									text: 'Callout block content'
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'details' as const,
+					attrs: { open: true, id: 'det-1' },
+					content: [
+						{
+							type: 'paragraph' as const,
+							content: [
+								{
+									type: 'text' as const,
+									text: 'Collapsible toggle content'
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'image' as const,
+					attrs: {
+						id: 'img-upload-id',
+						src: 'https://example.com/asset.png',
+						alt: 'Description',
+						width: 800,
+						align: 'center' as const
+					}
+				},
+				{
+					type: 'table' as const,
+					attrs: { id: 'tbl-1' },
+					content: [
+						{
+							type: 'tableRow' as const,
+							content: [
+								{
+									type: 'tableHeader' as const,
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: [150]
+									},
+									content: [
+										{
+											type: 'paragraph' as const,
+											content: [
+												{
+													type: 'text' as const,
+													text: 'Header Col'
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							type: 'tableRow' as const,
+							content: [
+								{
+									type: 'tableCell' as const,
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: [150]
+									},
+									content: [
+										{
+											type: 'paragraph' as const,
+											content: [
+												{
+													type: 'text' as const,
+													text: 'Cell Col'
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		};
+
+		expect(isBlockleafDocument(canonicalDocument)).toBe(true);
+		expect(canonicalDocument).toMatchSnapshot();
+	});
 });
