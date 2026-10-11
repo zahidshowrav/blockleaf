@@ -84,28 +84,28 @@ you can type in.
 and the JSON round-trips through a snapshot test. Proven headlessly against the
 command API, with no chrome rendered.
 
-| Id    | Task                                                                    | Status      | Commit    | Completed |
-| ----- | ----------------------------------------------------------------------- | ----------- | --------- | --------- |
-| EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | In progress | `b96a94f` | —         |
-| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Not started | —         | —         |
-| EC-03 | Full node and mark set per `docs/schema.md`                             | Not started | —         | —         |
-| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | In progress | `b96a94f` | —         |
-| EC-05 | Stable block ids                                                        | Not started | —         | —         |
-| EC-06 | Markdown input rules                                                    | Not started | —         | —         |
-| EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —         |
-| EC-08 | Paste normalisation                                                     | Not started | —         | —         |
-| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Not started | —         | —         |
-| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Not started | —         | —         |
-| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Not started | —         | —         |
-| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Not started | —         | —         |
-| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Not started | —         | —         |
-| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Not started | —         | —         |
-| EC-15 | Cell merge and split                                                    | Not started | —         | —         |
-| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Not started | —         | —         |
-| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Not started | —         | —         |
-| EC-18 | Table document in the schema snapshot and the round-trip test           | Not started | —         | —         |
-| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Not started | —         | —         |
-| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Not started | —         | —         |
+| Id    | Task                                                                    | Status      | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | Done        | `b96a94f` | 2026-10-09 |
+| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Done        | —         | 2026-10-11 |
+| EC-03 | Full node and mark set per `docs/schema.md`                             | Not started | —         | —          |
+| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | In progress | `b96a94f` | —          |
+| EC-05 | Stable block ids                                                        | Not started | —         | —          |
+| EC-06 | Markdown input rules                                                    | Not started | —         | —          |
+| EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —          |
+| EC-08 | Paste normalisation                                                     | Not started | —         | —          |
+| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Not started | —         | —          |
+| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Not started | —         | —          |
+| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Not started | —         | —          |
+| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Not started | —         | —          |
+| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Not started | —         | —          |
+| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Not started | —         | —          |
+| EC-15 | Cell merge and split                                                    | Not started | —         | —          |
+| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Not started | —         | —          |
+| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Not started | —         | —          |
+| EC-18 | Table document in the schema snapshot and the round-trip test           | Not started | —         | —          |
+| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Not started | —         | —          |
+| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Not started | —         | —          |
 
 ## CH — The chrome (2 weeks)
 

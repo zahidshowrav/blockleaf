@@ -1,7 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { createEmptyDocument } from '../src/core/schema.js';
+import {
+	createEmptyDocument,
+	type BlockleafDocument
+} from '../src/core/schema.js';
 import { BlockleafEditor } from '../src/react/editor.js';
 
 /** Queries are scoped to the render container — never `document` — so a leaked
@@ -31,7 +34,7 @@ describe('<BlockleafEditor />', () => {
 	});
 
 	it('seeds its content from defaultValue', async () => {
-		const doc = {
+		const doc: BlockleafDocument = {
 			...createEmptyDocument(),
 			content: [
 				{

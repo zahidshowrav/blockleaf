@@ -5,29 +5,255 @@
  */
 export const SCHEMA_VERSION = 1;
 
-export type BlockleafMark = {
-	type: string;
-	attrs?: Record<string, unknown>;
-};
+/* -------------------------------------------------------------------------- */
+/* Marks                                                                      */
+/* -------------------------------------------------------------------------- */
+
+export interface BoldMark {
+	type: 'bold';
+}
+
+export interface ItalicMark {
+	type: 'italic';
+}
+
+export interface StrikeMark {
+	type: 'strike';
+}
+
+export interface UnderlineMark {
+	type: 'underline';
+}
+
+export interface CodeMark {
+	type: 'code';
+}
+
+export interface LinkMark {
+	type: 'link';
+	attrs: {
+		href: string;
+		target?: string | null;
+		rel?: string | null;
+	};
+}
+
+export interface HighlightMark {
+	type: 'highlight';
+	attrs?: {
+		color?: string | null;
+	};
+}
+
+export type BlockleafMark =
+	| BoldMark
+	| ItalicMark
+	| StrikeMark
+	| UnderlineMark
+	| CodeMark
+	| LinkMark
+	| HighlightMark;
+
+/* -------------------------------------------------------------------------- */
+/* Inline Nodes                                                               */
+/* -------------------------------------------------------------------------- */
+
+export interface TextNode {
+	type: 'text';
+	text: string;
+	marks?: BlockleafMark[];
+}
+
+export interface HardBreakNode {
+	type: 'hardBreak';
+	marks?: BlockleafMark[];
+}
+
+export type InlineNode = TextNode | HardBreakNode;
+
+/* -------------------------------------------------------------------------- */
+/* Block Nodes                                                                */
+/* -------------------------------------------------------------------------- */
+
+export interface ParagraphNode {
+	type: 'paragraph';
+	attrs?: {
+		id?: string;
+	};
+	content?: InlineNode[];
+}
+
+export interface HeadingNode {
+	type: 'heading';
+	attrs: {
+		level: 1 | 2 | 3;
+		id?: string;
+	};
+	content?: InlineNode[];
+}
+
+export interface BlockquoteNode {
+	type: 'blockquote';
+	attrs?: {
+		id?: string;
+	};
+	content?: BlockNode[];
+}
+
+export interface CodeBlockNode {
+	type: 'codeBlock';
+	attrs?: {
+		language?: string | null;
+		id?: string;
+	};
+	content?: TextNode[];
+}
+
+export interface HorizontalRuleNode {
+	type: 'horizontalRule';
+	attrs?: {
+		id?: string;
+	};
+}
+
+export interface BulletListNode {
+	type: 'bulletList';
+	attrs?: {
+		id?: string;
+	};
+	content?: ListItemNode[];
+}
+
+export interface OrderedListNode {
+	type: 'orderedList';
+	attrs?: {
+		start?: number;
+		id?: string;
+	};
+	content?: ListItemNode[];
+}
+
+export interface ListItemNode {
+	type: 'listItem';
+	attrs?: {
+		id?: string;
+	};
+	content?: (
+		ParagraphNode | BulletListNode | OrderedListNode | TaskListNode
+	)[];
+}
+
+export interface TaskListNode {
+	type: 'taskList';
+	attrs?: {
+		id?: string;
+	};
+	content?: TaskItemNode[];
+}
+
+export interface TaskItemNode {
+	type: 'taskItem';
+	attrs: {
+		checked: boolean;
+		id?: string;
+	};
+	content?: (
+		ParagraphNode | BulletListNode | OrderedListNode | TaskListNode
+	)[];
+}
+
+export interface CalloutNode {
+	type: 'callout';
+	attrs?: {
+		emoji?: string;
+		tone?: string;
+		id?: string;
+	};
+	content?: BlockNode[];
+}
+
+export interface DetailsNode {
+	type: 'details';
+	attrs?: {
+		open?: boolean;
+		id?: string;
+	};
+	content?: BlockNode[];
+}
+
+export interface ImageNode {
+	type: 'image';
+	attrs: {
+		id: string;
+		src: string;
+		alt?: string | null;
+		width?: number | null;
+		align?: 'left' | 'center' | 'right' | null;
+	};
+}
+
+export interface TableNode {
+	type: 'table';
+	attrs?: {
+		id?: string;
+	};
+	content?: TableRowNode[];
+}
+
+export interface TableRowNode {
+	type: 'tableRow';
+	content?: (TableHeaderNode | TableCellNode)[];
+}
+
+export interface TableHeaderNode {
+	type: 'tableHeader';
+	attrs?: {
+		colspan?: number;
+		rowspan?: number;
+		colwidth?: number[] | null;
+	};
+	content?: BlockNode[];
+}
+
+export interface TableCellNode {
+	type: 'tableCell';
+	attrs?: {
+		colspan?: number;
+		rowspan?: number;
+		colwidth?: number[] | null;
+	};
+	content?: BlockNode[];
+}
+
+export type BlockNode =
+	| ParagraphNode
+	| HeadingNode
+	| BlockquoteNode
+	| CodeBlockNode
+	| HorizontalRuleNode
+	| BulletListNode
+	| OrderedListNode
+	| ListItemNode
+	| TaskListNode
+	| TaskItemNode
+	| CalloutNode
+	| DetailsNode
+	| ImageNode
+	| TableNode
+	| TableRowNode
+	| TableHeaderNode
+	| TableCellNode;
 
 /**
- * Deliberately our own type rather than a re-export of Tiptap's `JSONContent`,
- * which is `any`-typed throughout. M1 replaces this with a discriminated union
- * over the real node set; until then it stays structural but not loose.
+ * Discriminated union over the complete Blockleaf node set defined in docs/schema.md.
  */
-export type BlockleafNode = {
-	type: string;
-	attrs?: Record<string, unknown>;
-	content?: BlockleafNode[];
-	marks?: BlockleafMark[];
-	text?: string;
-};
+export type BlockleafNode = BlockNode | InlineNode;
 
-export type BlockleafDocument = {
+export interface BlockleafDocument {
 	type: 'doc';
 	attrs: { schemaVersion: number };
-	content?: BlockleafNode[];
-};
+	content?: BlockNode[];
+}
 
 export const createEmptyDocument = (): BlockleafDocument => ({
 	type: 'doc',
@@ -50,9 +276,10 @@ export const isBlockleafDocument = (
 /** Stamps the current schema version onto a document Tiptap just produced. */
 export const withSchemaVersion = (doc: {
 	attrs?: Record<string, unknown>;
-	content?: BlockleafNode[];
+	content?: unknown[];
 }): BlockleafDocument => ({
-	...doc,
+	...(doc as object),
 	type: 'doc',
-	attrs: { ...doc.attrs, schemaVersion: SCHEMA_VERSION }
+	attrs: { ...doc.attrs, schemaVersion: SCHEMA_VERSION },
+	content: doc.content as BlockNode[] | undefined
 });

@@ -39,4 +39,101 @@ describe('document schema', () => {
 	it('has not changed version by accident', () => {
 		expect(SCHEMA_VERSION).toBe(1);
 	});
+
+	it('validates and types a rich document with discriminated union nodes and marks', () => {
+		const complexDoc = {
+			type: 'doc' as const,
+			attrs: { schemaVersion: SCHEMA_VERSION },
+			content: [
+				{
+					type: 'heading' as const,
+					attrs: { level: 1 as const },
+					content: [
+						{
+							type: 'text' as const,
+							text: 'Title with ',
+							marks: [{ type: 'bold' as const }]
+						},
+						{
+							type: 'text' as const,
+							text: 'link',
+							marks: [
+								{
+									type: 'link' as const,
+									attrs: { href: 'https://example.com' }
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'callout' as const,
+					attrs: { emoji: '💡', tone: 'info' },
+					content: [
+						{
+							type: 'paragraph' as const,
+							content: [
+								{
+									type: 'text' as const,
+									text: 'Callout content'
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'taskList' as const,
+					content: [
+						{
+							type: 'taskItem' as const,
+							attrs: { checked: true },
+							content: [
+								{
+									type: 'paragraph' as const,
+									content: [
+										{
+											type: 'text' as const,
+											text: 'Done item'
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'table' as const,
+					content: [
+						{
+							type: 'tableRow' as const,
+							content: [
+								{
+									type: 'tableHeader' as const,
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: [120]
+									},
+									content: [
+										{
+											type: 'paragraph' as const,
+											content: [
+												{
+													type: 'text' as const,
+													text: 'Header'
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		};
+
+		expect(isBlockleafDocument(complexDoc)).toBe(true);
+		expect(complexDoc.content).toHaveLength(4);
+	});
 });
