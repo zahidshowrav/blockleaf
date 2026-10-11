@@ -45,5 +45,6 @@ describe('extension presets', () => {
 		expect(names).toContain('uniqueID');
 		expect(names).toContain('shortcuts');
 		expect(names).toContain('pasteNormalizer');
+		expect(names).toContain('tableKit');
 	});
 });

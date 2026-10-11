@@ -14,3 +14,4 @@ export {
 	markdownToHTML
 } from './core/paste.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
+export { TableKit } from '@tiptap/extension-table';

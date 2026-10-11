@@ -20,6 +20,7 @@ export {
 	markdownToHTML
 } from './paste.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
+export { TableKit } from '@tiptap/extension-table';
 export {
 	SCHEMA_VERSION,
 	createEmptyDocument,

@@ -1,5 +1,6 @@
 import { Extension, type Extensions } from '@tiptap/core';
 import { Highlight } from '@tiptap/extension-highlight';
+import { TableKit } from '@tiptap/extension-table';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
 import { Underline } from '@tiptap/extension-underline';
@@ -24,7 +25,8 @@ export const BLOCK_NODE_TYPES = [
 	'listItem',
 	'taskList',
 	'taskItem',
-	'callout'
+	'callout',
+	'table'
 ] as const;
 
 /**
@@ -93,6 +95,11 @@ export const createExtensions = (
 			nested: true
 		}),
 		Callout,
+		TableKit.configure({
+			table: {
+				resizable: false
+			}
+		}),
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
 		}),
