@@ -402,3 +402,140 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
   "type": "doc",
 }
 `;
+
+exports[`document schema > round-trips a table document through Editor standard preset (EC-18) 1`] = `
+{
+  "content": [
+    {
+      "attrs": {
+        "id": "heading-table",
+        "level": 2,
+      },
+      "content": [
+        {
+          "text": "Table Section",
+          "type": "text",
+        },
+      ],
+      "type": "heading",
+    },
+    {
+      "attrs": {
+        "id": "tbl-doc-1",
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "hdr-p1",
+                  },
+                  "content": [
+                    {
+                      "text": "Header 1",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableHeader",
+            },
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "hdr-p2",
+                  },
+                  "content": [
+                    {
+                      "text": "Header 2",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableHeader",
+            },
+          ],
+          "type": "tableRow",
+        },
+        {
+          "content": [
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "cell-p1",
+                  },
+                  "content": [
+                    {
+                      "text": "Cell 1",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableCell",
+            },
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "cell-p2",
+                  },
+                  "content": [
+                    {
+                      "text": "Cell 2",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableCell",
+            },
+          ],
+          "type": "tableRow",
+        },
+      ],
+      "type": "table",
+    },
+    {
+      "attrs": {
+        "id": "trailing-p",
+      },
+      "type": "paragraph",
+    },
+  ],
+  "type": "doc",
+}
+`;

@@ -103,7 +103,7 @@ command API, with no chrome rendered.
 | EC-15 | Cell merge and split                                                    | Done        | —         | 2026-10-12 |
 | EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Done        | —         | 2026-10-12 |
 | EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Done        | —         | 2026-10-12 |
-| EC-18 | Table document in the schema snapshot and the round-trip test           | Not started | —         | —          |
+| EC-18 | Table document in the schema snapshot and the round-trip test           | Done        | —         | 2026-10-12 |
 | EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Not started | —         | —          |
 | EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Not started | —         | —          |
 

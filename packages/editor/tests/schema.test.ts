@@ -1,5 +1,7 @@
+import { Editor } from '@tiptap/core';
 import { describe, expect, it } from 'vitest';
 
+import { createExtensions } from '../src/core/extensions.js';
 import {
 	SCHEMA_VERSION,
 	createEmptyDocument,
@@ -436,5 +438,138 @@ describe('document schema', () => {
 
 		expect(isBlockleafDocument(canonicalDocument)).toBe(true);
 		expect(canonicalDocument).toMatchSnapshot();
+	});
+
+	it('round-trips a table document through Editor standard preset (EC-18)', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		const tableDoc = {
+			type: 'doc',
+			attrs: { schemaVersion: SCHEMA_VERSION },
+			content: [
+				{
+					type: 'heading',
+					attrs: { level: 2, id: 'heading-table' },
+					content: [{ type: 'text', text: 'Table Section' }]
+				},
+				{
+					type: 'table',
+					attrs: { id: 'tbl-doc-1' },
+					content: [
+						{
+							type: 'tableRow',
+							content: [
+								{
+									type: 'tableHeader',
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: null
+									},
+									content: [
+										{
+											type: 'paragraph',
+											attrs: { id: 'hdr-p1' },
+											content: [
+												{
+													type: 'text',
+													text: 'Header 1'
+												}
+											]
+										}
+									]
+								},
+								{
+									type: 'tableHeader',
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: null
+									},
+									content: [
+										{
+											type: 'paragraph',
+											attrs: { id: 'hdr-p2' },
+											content: [
+												{
+													type: 'text',
+													text: 'Header 2'
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							type: 'tableRow',
+							content: [
+								{
+									type: 'tableCell',
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: null
+									},
+									content: [
+										{
+											type: 'paragraph',
+											attrs: { id: 'cell-p1' },
+											content: [
+												{ type: 'text', text: 'Cell 1' }
+											]
+										}
+									]
+								},
+								{
+									type: 'tableCell',
+									attrs: {
+										colspan: 1,
+										rowspan: 1,
+										colwidth: null
+									},
+									content: [
+										{
+											type: 'paragraph',
+											attrs: { id: 'cell-p2' },
+											content: [
+												{ type: 'text', text: 'Cell 2' }
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'paragraph',
+					attrs: { id: 'trailing-p' }
+				}
+			]
+		};
+
+		editor.commands.setContent(tableDoc);
+		const roundTrippedJSON = editor.getJSON();
+
+		expect(roundTrippedJSON.type).toBe('doc');
+		const tableNode = roundTrippedJSON.content?.find(
+			(n) => n.type === 'table'
+		);
+		expect(tableNode).toBeDefined();
+		expect(tableNode?.content).toHaveLength(2);
+
+		// Verify round-trip back into editor
+		editor.commands.setContent(roundTrippedJSON);
+		const secondRoundTripJSON = editor.getJSON();
+		expect(secondRoundTripJSON).toEqual(roundTrippedJSON);
+
+		// Verify snapshot
+		expect(roundTrippedJSON).toMatchSnapshot();
+
+		editor.destroy();
 	});
 });
