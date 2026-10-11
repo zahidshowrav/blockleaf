@@ -1,3 +1,4 @@
+import { InputRule } from '@tiptap/core';
 import { Link as TiptapLink } from '@tiptap/extension-link';
 
 /**
@@ -60,6 +61,30 @@ export const Link = TiptapLink.extend({
 				}
 			}
 		};
+	},
+
+	addInputRules() {
+		return [
+			new InputRule({
+				find: /(?:^|\s)\[([^\]]+)\]\(([^)]+)\)$/,
+				handler: ({ state, range, match }) => {
+					const [, text, href] = match;
+					if (!text || !href) return null;
+					const sanitized = sanitizeHref(href);
+					if (!sanitized) return null;
+					const { tr } = state;
+					const start = range.from + match[0].indexOf('[');
+					const end = range.to;
+					tr.replaceWith(
+						start,
+						end,
+						this.type.schema.text(text, [
+							this.type.create({ href: sanitized })
+						])
+					);
+				}
+			})
+		];
 	}
 }).configure({
 	openOnClick: false,

@@ -91,7 +91,7 @@ command API, with no chrome rendered.
 | EC-03 | Full node and mark set per `docs/schema.md`                             | Done        | —         | 2026-10-12 |
 | EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done        | —         | 2026-10-12 |
 | EC-05 | Stable block ids                                                        | Done        | —         | 2026-10-12 |
-| EC-06 | Markdown input rules                                                    | Not started | —         | —          |
+| EC-06 | Markdown input rules                                                    | Done        | —         | 2026-10-12 |
 | EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —          |
 | EC-08 | Paste normalisation                                                     | Not started | —         | —          |
 | EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done        | —         | 2026-10-12 |

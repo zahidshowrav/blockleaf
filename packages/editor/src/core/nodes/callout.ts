@@ -1,4 +1,4 @@
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node, mergeAttributes, wrappingInputRule } from '@tiptap/core';
 
 export interface CalloutOptions {
 	HTMLAttributes: Record<string, unknown>;
@@ -90,5 +90,14 @@ export const Callout = Node.create<CalloutOptions>({
 					return commands.lift(this.name);
 				}
 		};
+	},
+
+	addInputRules() {
+		return [
+			wrappingInputRule({
+				find: /^\s*:::\s$/,
+				type: this.type
+			})
+		];
 	}
 });
