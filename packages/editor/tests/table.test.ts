@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/core';
+import { CellSelection } from '@tiptap/pm/tables';
 import { describe, expect, it } from 'vitest';
 
 import { createExtensions } from '../src/core/extensions.js';
@@ -205,6 +206,121 @@ describe('table structure commands (EC-14)', () => {
 			.getJSON()
 			.content?.some((n) => n.type === 'table');
 		expect(hasTable).toBe(false);
+
+		editor.destroy();
+	});
+});
+
+describe('cell merge and split (EC-15)', () => {
+	it('supports merging and splitting table cells', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true });
+
+		const cellPositions: number[] = [];
+		editor.state.doc.descendants((node, pos) => {
+			if (
+				node.type.name === 'tableCell' ||
+				node.type.name === 'tableHeader'
+			) {
+				cellPositions.push(pos);
+			}
+		});
+
+		expect(cellPositions.length).toBe(9);
+
+		// Select first two cells in the first row
+		const sel = CellSelection.create(
+			editor.state.doc,
+			cellPositions[0]!,
+			cellPositions[1]!
+		);
+		editor.view.dispatch(editor.state.tr.setSelection(sel));
+
+		// Merge cells
+		const merged = editor.commands.mergeCells();
+		expect(merged).toBe(true);
+
+		// After merge, first row should have 2 cells instead of 3, and first cell should have colspan 2
+		let firstRowCells: number = 0;
+		let firstCellColspan: number | undefined;
+		editor.state.doc.descendants((node) => {
+			if (node.type.name === 'tableRow' && firstRowCells === 0) {
+				firstRowCells = node.childCount;
+				firstCellColspan = (
+					node.firstChild?.attrs as { colspan?: number }
+				)?.colspan;
+			}
+		});
+
+		expect(firstRowCells).toBe(2);
+		expect(firstCellColspan).toBe(2);
+
+		// Split cell back
+		const split = editor.commands.splitCell();
+		expect(split).toBe(true);
+
+		firstRowCells = 0;
+		editor.state.doc.descendants((node) => {
+			if (node.type.name === 'tableRow' && firstRowCells === 0) {
+				firstRowCells = node.childCount;
+			}
+		});
+		expect(firstRowCells).toBe(3);
+
+		editor.destroy();
+	});
+
+	it('supports mergeOrSplit command', () => {
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true });
+
+		const cellPositions: number[] = [];
+		editor.state.doc.descendants((node, pos) => {
+			if (
+				node.type.name === 'tableCell' ||
+				node.type.name === 'tableHeader'
+			) {
+				cellPositions.push(pos);
+			}
+		});
+
+		// Select first two cells
+		const sel = CellSelection.create(
+			editor.state.doc,
+			cellPositions[0]!,
+			cellPositions[1]!
+		);
+		editor.view.dispatch(editor.state.tr.setSelection(sel));
+
+		// mergeOrSplit merges them
+		expect(editor.commands.mergeOrSplit()).toBe(true);
+
+		let firstRowCells = 0;
+		editor.state.doc.descendants((node) => {
+			if (node.type.name === 'tableRow' && firstRowCells === 0) {
+				firstRowCells = node.childCount;
+			}
+		});
+		expect(firstRowCells).toBe(2);
+
+		// mergeOrSplit splits it
+		expect(editor.commands.mergeOrSplit()).toBe(true);
+
+		firstRowCells = 0;
+		editor.state.doc.descendants((node) => {
+			if (node.type.name === 'tableRow' && firstRowCells === 0) {
+				firstRowCells = node.childCount;
+			}
+		});
+		expect(firstRowCells).toBe(3);
 
 		editor.destroy();
 	});

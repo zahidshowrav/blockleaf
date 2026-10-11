@@ -100,7 +100,7 @@ command API, with no chrome rendered.
 | EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Done        | —         | 2026-10-12 |
 | EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Done        | —         | 2026-10-12 |
 | EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Done        | —         | 2026-10-12 |
-| EC-15 | Cell merge and split                                                    | Not started | —         | —          |
+| EC-15 | Cell merge and split                                                    | Done        | —         | 2026-10-12 |
 | EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Not started | —         | —          |
 | EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Not started | —         | —          |
 | EC-18 | Table document in the schema snapshot and the round-trip test           | Not started | —         | —          |
