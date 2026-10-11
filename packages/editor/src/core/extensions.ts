@@ -1,4 +1,4 @@
-import { Extension, type Extensions } from '@tiptap/core';
+import { Extension, InputRule, type Extensions } from '@tiptap/core';
 import { Highlight } from '@tiptap/extension-highlight';
 import { TableKit } from '@tiptap/extension-table';
 import { TaskItem } from '@tiptap/extension-task-item';
@@ -36,10 +36,36 @@ export const BLOCK_NODE_TYPES = [
 export const Shortcuts = Extension.create({
 	name: 'shortcuts',
 	addKeyboardShortcuts() {
+		const insertTableAction = () =>
+			this.editor.commands.insertTable({
+				rows: 3,
+				cols: 3,
+				withHeaderRow: true
+			});
+
 		return {
 			'Mod-Shift-9': () => this.editor.commands.toggleTaskList(),
-			'Mod-Alt--': () => this.editor.commands.setHorizontalRule()
+			'Mod-Alt--': () => this.editor.commands.setHorizontalRule(),
+			'Mod-Alt-t': insertTableAction,
+			'Mod-Alt-T': insertTableAction
 		};
+	},
+	addInputRules() {
+		return [
+			new InputRule({
+				find: /^\s*\|{3}\s$/,
+				handler: ({ chain, range }) => {
+					chain()
+						.deleteRange(range)
+						.insertTable({
+							rows: 3,
+							cols: 3,
+							withHeaderRow: true
+						})
+						.run();
+				}
+			})
+		];
 	}
 });
 
