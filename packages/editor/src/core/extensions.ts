@@ -9,6 +9,7 @@ import { StarterKit } from '@tiptap/starter-kit';
 import { HEADING_LEVELS } from './constants.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
+import { PasteNormalizer } from './paste.js';
 
 export type PresetName = 'minimal' | 'standard';
 
@@ -69,7 +70,8 @@ export const createExtensions = (
 			Link,
 			UniqueID.configure({
 				types: ['paragraph']
-			})
+			}),
+			PasteNormalizer
 		];
 	}
 
@@ -94,7 +96,8 @@ export const createExtensions = (
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
 		}),
-		Shortcuts
+		Shortcuts,
+		PasteNormalizer
 	];
 };
 

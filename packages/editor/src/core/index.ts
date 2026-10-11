@@ -13,6 +13,12 @@ export {
 } from './extensions.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
+export {
+	PasteNormalizer,
+	normalizePastedHTML,
+	isMarkdownText,
+	markdownToHTML
+} from './paste.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
 export {
 	SCHEMA_VERSION,
