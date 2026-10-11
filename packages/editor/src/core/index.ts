@@ -6,6 +6,7 @@ export {
 } from './constants.js';
 export {
 	BLOCK_NODE_TYPES,
+	Shortcuts,
 	createExtensions,
 	presets,
 	type PresetName

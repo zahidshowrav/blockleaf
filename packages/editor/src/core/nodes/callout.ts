@@ -99,5 +99,12 @@ export const Callout = Node.create<CalloutOptions>({
 				type: this.type
 			})
 		];
+	},
+
+	addKeyboardShortcuts() {
+		return {
+			'Mod-Shift-c': () => this.editor.commands.toggleCallout(),
+			'Mod-Shift-C': () => this.editor.commands.toggleCallout()
+		};
 	}
 });

@@ -1,4 +1,4 @@
-import type { Extensions } from '@tiptap/core';
+import { Extension, type Extensions } from '@tiptap/core';
 import { Highlight } from '@tiptap/extension-highlight';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
@@ -25,6 +25,20 @@ export const BLOCK_NODE_TYPES = [
 	'taskItem',
 	'callout'
 ] as const;
+
+/**
+ * Global keyboard shortcuts covering nodes that lack default bindings
+ * in upstream Tiptap packages.
+ */
+export const Shortcuts = Extension.create({
+	name: 'shortcuts',
+	addKeyboardShortcuts() {
+		return {
+			'Mod-Shift-9': () => this.editor.commands.toggleTaskList(),
+			'Mod-Alt--': () => this.editor.commands.setHorizontalRule()
+		};
+	}
+});
 
 /**
  * Creates Tiptap extensions for the requested preset.
@@ -79,7 +93,8 @@ export const createExtensions = (
 		Callout,
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
-		})
+		}),
+		Shortcuts
 	];
 };
 

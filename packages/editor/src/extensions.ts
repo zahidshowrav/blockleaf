@@ -1,5 +1,6 @@
 export {
 	BLOCK_NODE_TYPES,
+	Shortcuts,
 	createExtensions,
 	presets,
 	type PresetName

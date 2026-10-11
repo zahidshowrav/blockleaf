@@ -42,5 +42,6 @@ describe('extension presets', () => {
 		expect(names).toContain('taskItem');
 		expect(names).toContain('callout');
 		expect(names).toContain('uniqueID');
+		expect(names).toContain('shortcuts');
 	});
 });

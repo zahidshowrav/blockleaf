@@ -85,6 +85,22 @@ export const Link = TiptapLink.extend({
 				}
 			})
 		];
+	},
+
+	addKeyboardShortcuts() {
+		const handleLinkShortcut = () => {
+			if (this.editor.isActive(this.name)) {
+				return this.editor.commands.unsetLink();
+			}
+			const { empty } = this.editor.state.selection;
+			if (empty) return false;
+			return this.editor.commands.toggleLink({ href: 'https://' });
+		};
+
+		return {
+			'Mod-k': handleLinkShortcut,
+			'Mod-K': handleLinkShortcut
+		};
 	}
 }).configure({
 	openOnClick: false,

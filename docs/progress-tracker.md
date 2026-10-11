@@ -92,7 +92,7 @@ command API, with no chrome rendered.
 | EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done        | —         | 2026-10-12 |
 | EC-05 | Stable block ids                                                        | Done        | —         | 2026-10-12 |
 | EC-06 | Markdown input rules                                                    | Done        | —         | 2026-10-12 |
-| EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —          |
+| EC-07 | Keyboard shortcuts for every node and mark                              | Done        | —         | 2026-10-12 |
 | EC-08 | Paste normalisation                                                     | Not started | —         | —          |
 | EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done        | —         | 2026-10-12 |
 | EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Not started | —         | —          |
