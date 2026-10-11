@@ -1,0 +1,541 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`] = `
+{
+  "attrs": {
+    "schemaVersion": 1,
+  },
+  "content": [
+    {
+      "attrs": {
+        "id": "heading-1",
+        "level": 1,
+      },
+      "content": [
+        {
+          "marks": [
+            {
+              "type": "bold",
+            },
+          ],
+          "text": "Document Title",
+          "type": "text",
+        },
+      ],
+      "type": "heading",
+    },
+    {
+      "attrs": {
+        "id": "heading-2",
+        "level": 2,
+      },
+      "content": [
+        {
+          "text": "Section Heading",
+          "type": "text",
+        },
+      ],
+      "type": "heading",
+    },
+    {
+      "attrs": {
+        "id": "heading-3",
+        "level": 3,
+      },
+      "content": [
+        {
+          "text": "Subsection Heading",
+          "type": "text",
+        },
+      ],
+      "type": "heading",
+    },
+    {
+      "attrs": {
+        "id": "para-1",
+      },
+      "content": [
+        {
+          "text": "Plain text, ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "bold",
+            },
+          ],
+          "text": "bold",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "italic",
+            },
+          ],
+          "text": "italic",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "strike",
+            },
+          ],
+          "text": "strike",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "underline",
+            },
+          ],
+          "text": "underline",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "code",
+            },
+          ],
+          "text": "code",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "attrs": {
+                "color": "#ffff00",
+              },
+              "type": "highlight",
+            },
+          ],
+          "text": "highlight",
+          "type": "text",
+        },
+        {
+          "text": ", and ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "attrs": {
+                "href": "https://blockleaf.dev",
+                "rel": "noopener noreferrer",
+                "target": "_blank",
+              },
+              "type": "link",
+            },
+          ],
+          "text": "sanitised link",
+          "type": "text",
+        },
+        {
+          "type": "hardBreak",
+        },
+      ],
+      "type": "paragraph",
+    },
+    {
+      "attrs": {
+        "id": "quote-1",
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "text": "Blockquote content",
+              "type": "text",
+            },
+          ],
+          "type": "paragraph",
+        },
+      ],
+      "type": "blockquote",
+    },
+    {
+      "attrs": {
+        "id": "code-1",
+        "language": "typescript",
+      },
+      "content": [
+        {
+          "text": "const answer: number = 42;",
+          "type": "text",
+        },
+      ],
+      "type": "codeBlock",
+    },
+    {
+      "attrs": {
+        "id": "hr-1",
+      },
+      "type": "horizontalRule",
+    },
+    {
+      "attrs": {
+        "id": "bl-1",
+      },
+      "content": [
+        {
+          "attrs": {
+            "id": "li-1",
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Bullet item 1",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "listItem",
+        },
+      ],
+      "type": "bulletList",
+    },
+    {
+      "attrs": {
+        "id": "ol-1",
+        "start": 1,
+      },
+      "content": [
+        {
+          "attrs": {
+            "id": "li-2",
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Ordered item 1",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "listItem",
+        },
+      ],
+      "type": "orderedList",
+    },
+    {
+      "attrs": {
+        "id": "tl-1",
+      },
+      "content": [
+        {
+          "attrs": {
+            "checked": true,
+            "id": "ti-1",
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Completed task",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "taskItem",
+        },
+        {
+          "attrs": {
+            "checked": false,
+            "id": "ti-2",
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Pending task",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "taskItem",
+        },
+      ],
+      "type": "taskList",
+    },
+    {
+      "attrs": {
+        "emoji": "💡",
+        "id": "co-1",
+        "tone": "info",
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "text": "Callout block content",
+              "type": "text",
+            },
+          ],
+          "type": "paragraph",
+        },
+      ],
+      "type": "callout",
+    },
+    {
+      "attrs": {
+        "id": "det-1",
+        "open": true,
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "text": "Collapsible toggle content",
+              "type": "text",
+            },
+          ],
+          "type": "paragraph",
+        },
+      ],
+      "type": "details",
+    },
+    {
+      "attrs": {
+        "align": "center",
+        "alt": "Description",
+        "id": "img-upload-id",
+        "src": "https://example.com/asset.png",
+        "width": 800,
+      },
+      "type": "image",
+    },
+    {
+      "attrs": {
+        "id": "tbl-1",
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "attrs": {
+                "colspan": 1,
+                "colwidth": [
+                  150,
+                ],
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "content": [
+                    {
+                      "text": "Header Col",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableHeader",
+            },
+          ],
+          "type": "tableRow",
+        },
+        {
+          "content": [
+            {
+              "attrs": {
+                "colspan": 1,
+                "colwidth": [
+                  150,
+                ],
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "content": [
+                    {
+                      "text": "Cell Col",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableCell",
+            },
+          ],
+          "type": "tableRow",
+        },
+      ],
+      "type": "table",
+    },
+  ],
+  "type": "doc",
+}
+`;
+
+exports[`document schema > round-trips a table document through Editor standard preset (EC-18) 1`] = `
+{
+  "content": [
+    {
+      "attrs": {
+        "id": "heading-table",
+        "level": 2,
+      },
+      "content": [
+        {
+          "text": "Table Section",
+          "type": "text",
+        },
+      ],
+      "type": "heading",
+    },
+    {
+      "attrs": {
+        "id": "tbl-doc-1",
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "hdr-p1",
+                  },
+                  "content": [
+                    {
+                      "text": "Header 1",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableHeader",
+            },
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "hdr-p2",
+                  },
+                  "content": [
+                    {
+                      "text": "Header 2",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableHeader",
+            },
+          ],
+          "type": "tableRow",
+        },
+        {
+          "content": [
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "cell-p1",
+                  },
+                  "content": [
+                    {
+                      "text": "Cell 1",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableCell",
+            },
+            {
+              "attrs": {
+                "align": null,
+                "colspan": 1,
+                "colwidth": null,
+                "rowspan": 1,
+              },
+              "content": [
+                {
+                  "attrs": {
+                    "id": "cell-p2",
+                  },
+                  "content": [
+                    {
+                      "text": "Cell 2",
+                      "type": "text",
+                    },
+                  ],
+                  "type": "paragraph",
+                },
+              ],
+              "type": "tableCell",
+            },
+          ],
+          "type": "tableRow",
+        },
+      ],
+      "type": "table",
+    },
+    {
+      "attrs": {
+        "id": "trailing-p",
+      },
+      "type": "paragraph",
+    },
+  ],
+  "type": "doc",
+}
+`;

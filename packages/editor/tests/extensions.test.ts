@@ -17,4 +17,34 @@ describe('extension presets', () => {
 	it('caps headings at three levels', () => {
 		expect(HEADING_LEVELS).toEqual([1, 2, 3]);
 	});
+
+	it('configures minimal preset with inline formatting only', () => {
+		const extensions = createExtensions('minimal');
+		const names = extensions.map((e) => e.name);
+
+		expect(names).toContain('starterKit');
+		expect(names).toContain('underline');
+		expect(names).toContain('link');
+		expect(names).toContain('uniqueID');
+		expect(names).toContain('pasteNormalizer');
+		expect(names).not.toContain('callout');
+		expect(names).not.toContain('taskList');
+	});
+
+	it('configures standard preset with full node and mark set (EC-03, EC-04, EC-05, EC-08)', () => {
+		const extensions = createExtensions('standard');
+		const names = extensions.map((e) => e.name);
+
+		expect(names).toContain('starterKit');
+		expect(names).toContain('underline');
+		expect(names).toContain('link');
+		expect(names).toContain('highlight');
+		expect(names).toContain('taskList');
+		expect(names).toContain('taskItem');
+		expect(names).toContain('callout');
+		expect(names).toContain('uniqueID');
+		expect(names).toContain('shortcuts');
+		expect(names).toContain('pasteNormalizer');
+		expect(names).toContain('tableKit');
+	});
 });

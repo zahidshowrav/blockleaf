@@ -20,11 +20,10 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `SC`, not yet closed. The scaffold is complete and scope/tokens
-are configured (F1, F2); ready for the `0.0.1` publish in SC-14.
+**Position:** `EC`. `SC` scaffold is closed and `@blockleaf/editor@0.0.2` is live
+on npm (SC-14 exit test proven).
 
-**Last verified:** 2026-10-11. Open flags F1, F2, F4, F7 settled — see
-`open-flags.md`.
+**Last verified:** 2026-10-11. `@blockleaf/editor@0.0.2` verified on npm registry.
 
 ---
 
@@ -61,23 +60,23 @@ waits on the other, and the table is usable at the end of both.
 **Exit:** `pnpm add @blockleaf/editor` works in a throwaway app and renders a box
 you can type in.
 
-| Id    | Task                                                                  | Status      | Commit    | Completed  |
-| ----- | --------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| SC-01 | pnpm workspace + Turborepo, stripped to the §2 layout                 | Done        | `b96a94f` | 2026-10-09 |
-| SC-02 | Shared `@blockleaf/tsconfig` and `@blockleaf/eslint-config`           | Done        | `b96a94f` | 2026-10-09 |
-| SC-03 | `core` → `react` → `ui` import boundary enforced in lint              | Done        | `b96a94f` | 2026-10-09 |
-| SC-04 | Vitest + jsdom; schema, extensions and editor tests                   | Done        | `b96a94f` | 2026-10-09 |
-| SC-05 | Changesets, release workflow, npm provenance via `id-token: write`    | Done        | `b96a94f` | 2026-10-09 |
-| SC-06 | CI gates: typecheck, lint, format, test, build, publint + attw, size  | Done        | `b96a94f` | 2026-10-09 |
-| SC-07 | Changeset-required gate on pull requests                              | Done        | `b96a94f` | 2026-10-09 |
-| SC-08 | `size-limit` budgets declaring `import` (130 kB editor, 2 kB schema)  | Done        | `b96a94f` | 2026-10-09 |
-| SC-09 | MIT LICENSE, CODE_OF_CONDUCT, CONTRIBUTING                            | Done        | `b96a94f` | 2026-10-09 |
-| SC-10 | `docs/schema.md` written before any extension work (§12.7)            | Done        | `b96a94f` | 2026-10-09 |
-| SC-11 | Toolchain pins recorded with their rationale                          | Done        | `30c432a` | 2026-10-09 |
-| SC-12 | GitHub remote connected, `main` pushed and tracking                   | Done        | —         | 2026-10-09 |
-| SC-13 | Playwright — moved to EC-20 on 2026-10-10; see F3                     | Moved       | —         | —          |
-| SC-14 | npm scope registered (F1, F2); ready for `0.0.1` publish              | In progress | —         | —          |
-| SC-15 | Issue templates done; Discussions enabled in repository settings (F4) | Done        | —         | 2026-10-11 |
+| Id    | Task                                                                  | Status | Commit    | Completed  |
+| ----- | --------------------------------------------------------------------- | ------ | --------- | ---------- |
+| SC-01 | pnpm workspace + Turborepo, stripped to the §2 layout                 | Done   | `b96a94f` | 2026-10-09 |
+| SC-02 | Shared `@blockleaf/tsconfig` and `@blockleaf/eslint-config`           | Done   | `b96a94f` | 2026-10-09 |
+| SC-03 | `core` → `react` → `ui` import boundary enforced in lint              | Done   | `b96a94f` | 2026-10-09 |
+| SC-04 | Vitest + jsdom; schema, extensions and editor tests                   | Done   | `b96a94f` | 2026-10-09 |
+| SC-05 | Changesets, release workflow, npm provenance via `id-token: write`    | Done   | `b96a94f` | 2026-10-09 |
+| SC-06 | CI gates: typecheck, lint, format, test, build, publint + attw, size  | Done   | `b96a94f` | 2026-10-09 |
+| SC-07 | Changeset-required gate on pull requests                              | Done   | `b96a94f` | 2026-10-09 |
+| SC-08 | `size-limit` budgets declaring `import` (130 kB editor, 2 kB schema)  | Done   | `b96a94f` | 2026-10-09 |
+| SC-09 | MIT LICENSE, CODE_OF_CONDUCT, CONTRIBUTING                            | Done   | `b96a94f` | 2026-10-09 |
+| SC-10 | `docs/schema.md` written before any extension work (§12.7)            | Done   | `b96a94f` | 2026-10-09 |
+| SC-11 | Toolchain pins recorded with their rationale                          | Done   | `30c432a` | 2026-10-09 |
+| SC-12 | GitHub remote connected, `main` pushed and tracking                   | Done   | —         | 2026-10-09 |
+| SC-13 | Playwright — moved to EC-20 on 2026-10-10; see F3                     | Moved  | —         | —          |
+| SC-14 | npm scope registered and published (`0.0.2` on npm); SC exit proven   | Done   | `98fff4e` | 2026-10-11 |
+| SC-15 | Issue templates done; Discussions enabled in repository settings (F4) | Done   | —         | 2026-10-11 |
 
 ## EC — Editing core (1½ weeks)
 
@@ -85,28 +84,28 @@ you can type in.
 and the JSON round-trips through a snapshot test. Proven headlessly against the
 command API, with no chrome rendered.
 
-| Id    | Task                                                                    | Status      | Commit    | Completed |
-| ----- | ----------------------------------------------------------------------- | ----------- | --------- | --------- |
-| EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | In progress | `b96a94f` | —         |
-| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Not started | —         | —         |
-| EC-03 | Full node and mark set per `docs/schema.md`                             | Not started | —         | —         |
-| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | In progress | `b96a94f` | —         |
-| EC-05 | Stable block ids                                                        | Not started | —         | —         |
-| EC-06 | Markdown input rules                                                    | Not started | —         | —         |
-| EC-07 | Keyboard shortcuts for every node and mark                              | Not started | —         | —         |
-| EC-08 | Paste normalisation                                                     | Not started | —         | —         |
-| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Not started | —         | —         |
-| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Not started | —         | —         |
-| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Not started | —         | —         |
-| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Not started | —         | —         |
-| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Not started | —         | —         |
-| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Not started | —         | —         |
-| EC-15 | Cell merge and split                                                    | Not started | —         | —         |
-| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Not started | —         | —         |
-| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Not started | —         | —         |
-| EC-18 | Table document in the schema snapshot and the round-trip test           | Not started | —         | —         |
-| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Not started | —         | —         |
-| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Not started | —         | —         |
+| Id    | Task                                                                    | Status | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------------- | ------ | --------- | ---------- |
+| EC-01 | Schema module — `SCHEMA_VERSION`, `createEmptyDocument`, struct. guard  | Done   | `b96a94f` | 2026-10-09 |
+| EC-02 | `BlockleafNode` as a discriminated union over the real node set; F5     | Done   | `8e6a8c8` | 2026-10-11 |
+| EC-03 | Full node and mark set per `docs/schema.md`                             | Done   | `32d55f2` | 2026-10-12 |
+| EC-04 | Extension presets — `minimal` / `standard` beyond capped StarterKit     | Done   | `32d55f2` | 2026-10-12 |
+| EC-05 | Stable block ids                                                        | Done   | `c15f81e` | 2026-10-12 |
+| EC-06 | Markdown input rules                                                    | Done   | `00b273e` | 2026-10-12 |
+| EC-07 | Keyboard shortcuts for every node and mark                              | Done   | `1243e38` | 2026-10-12 |
+| EC-08 | Paste normalisation                                                     | Done   | `f42a550` | 2026-10-12 |
+| EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done   | `32d55f2` | 2026-10-12 |
+| EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Done   | `c8bb06d` | 2026-10-12 |
+| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Done   | `e19816e` | 2026-10-12 |
+| EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Done   | `e0d61c8` | 2026-10-12 |
+| EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Done   | `8e6559d` | 2026-10-12 |
+| EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Done   | `880c0a9` | 2026-10-12 |
+| EC-15 | Cell merge and split                                                    | Done   | `d350b3b` | 2026-10-12 |
+| EC-16 | Tab, Shift-Tab and arrow navigation; resolve the list-indent key clash  | Done   | `550813e` | 2026-10-12 |
+| EC-17 | Table paste from HTML, Google Docs and Word, normalised to the node set | Done   | `f05eaf2` | 2026-10-12 |
+| EC-18 | Table document in the schema snapshot and the round-trip test           | Done   | `011304d` | 2026-10-12 |
+| EC-19 | `@blockleaf/editor/validate` subpath — Zod schema, Zod as optional peer | Done   | `d9d74ec` | 2026-10-12 |
+| EC-20 | Playwright harness and a smoke spec, ahead of table selection work      | Done   | `efbd920` | 2026-10-12 |
 
 ## CH — The chrome (2 weeks)
 
