@@ -96,7 +96,7 @@ command API, with no chrome rendered.
 | EC-08 | Paste normalisation                                                     | Done        | —         | 2026-10-12 |
 | EC-09 | Link `href` sanitisation — in the schema, never only in the UI          | Done        | —         | 2026-10-12 |
 | EC-10 | Schema snapshot test that fails loudly on an accidental shape change    | Done        | —         | 2026-10-12 |
-| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Not started | —         | —          |
+| EC-11 | Table node set in the schema and `docs/schema.md`; no nesting           | Done        | —         | 2026-10-12 |
 | EC-12 | `@tiptap/extension-table` — `TableKit`, +11.74 kB measured (F9)         | Not started | —         | —          |
 | EC-13 | `insertTable` command **and** a keyboard path that needs no menu        | Not started | —         | —          |
 | EC-14 | Structure commands — add/delete row and column, toggle header, delete   | Not started | —         | —          |

@@ -30,6 +30,7 @@ export {
 	type OrderedListNode,
 	type ParagraphNode,
 	type StrikeMark,
+	type TableCellContentNode,
 	type TableCellNode,
 	type TableHeaderNode,
 	type TableNode,

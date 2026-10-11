@@ -205,6 +205,22 @@ export interface TableRowNode {
 	content?: (TableHeaderNode | TableCellNode)[];
 }
 
+/**
+ * Content allowed inside table cells and headers. Tables cannot be nested.
+ */
+export type TableCellContentNode =
+	| ParagraphNode
+	| HeadingNode
+	| BlockquoteNode
+	| CodeBlockNode
+	| HorizontalRuleNode
+	| BulletListNode
+	| OrderedListNode
+	| TaskListNode
+	| CalloutNode
+	| DetailsNode
+	| ImageNode;
+
 export interface TableHeaderNode {
 	type: 'tableHeader';
 	attrs?: {
@@ -212,7 +228,7 @@ export interface TableHeaderNode {
 		rowspan?: number;
 		colwidth?: number[] | null;
 	};
-	content?: BlockNode[];
+	content?: TableCellContentNode[];
 }
 
 export interface TableCellNode {
@@ -222,7 +238,7 @@ export interface TableCellNode {
 		rowspan?: number;
 		colwidth?: number[] | null;
 	};
-	content?: BlockNode[];
+	content?: TableCellContentNode[];
 }
 
 export type BlockNode =
