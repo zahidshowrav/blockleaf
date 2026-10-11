@@ -150,5 +150,132 @@ describe('paste normalisation (EC-08)', () => {
 
 			editor.destroy();
 		});
+
+		it('normalises Google Docs table HTML paste (EC-17)', () => {
+			const editor = new Editor({
+				extensions: createExtensions('standard'),
+				content: '<p></p>'
+			});
+
+			const googleDocsHTML = `
+				<b id="docs-internal-guid-5678" style="font-weight:normal;">
+					<table style="border-collapse:collapse;width:100%;">
+						<tbody>
+							<tr>
+								<td style="border:1px solid #000;padding:5px;" colspan="1" rowspan="1">
+									<p dir="ltr"><span>Col 1</span></p>
+								</td>
+								<td style="border:1px solid #000;padding:5px;" colspan="1" rowspan="1">
+									<p dir="ltr"><span>Col 2</span></p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</b>
+			`;
+
+			const cleaned = normalizePastedHTML(googleDocsHTML);
+			expect(cleaned).not.toContain('docs-internal-guid');
+			expect(cleaned).not.toContain('style="border-collapse');
+
+			editor.commands.setContent(cleaned);
+			const json = editor.getJSON();
+			const table = json.content?.find((n) => n.type === 'table');
+			expect(table).toBeDefined();
+
+			editor.destroy();
+		});
+
+		it('normalises Microsoft Word table HTML paste (EC-17)', () => {
+			const editor = new Editor({
+				extensions: createExtensions('standard'),
+				content: '<p></p>'
+			});
+
+			const wordHTML = `
+				<!--[if gte mso 9]><xml><w:WordDocument></w:WordDocument></xml><![endif]-->
+				<table class="MsoNormalTable" border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;mso-table-layout-alt:fixed">
+					<tr style="mso-yfti-irow:0;">
+						<td width="200" valign="top" style="width:150.0pt;padding:0cm 5.4pt;">
+							<p class="MsoNormal">Word Cell 1</p>
+						</td>
+						<td width="200" valign="top">
+							<p class="MsoNormal">Word Cell 2</p>
+						</td>
+					</tr>
+				</table>
+			`;
+
+			const cleaned = normalizePastedHTML(wordHTML);
+			expect(cleaned).not.toContain('MsoNormalTable');
+			expect(cleaned).not.toContain('cellspacing');
+			expect(cleaned).not.toContain('<!--[if');
+
+			editor.commands.setContent(cleaned);
+			const json = editor.getJSON();
+			const table = json.content?.find((n) => n.type === 'table');
+			expect(table).toBeDefined();
+
+			editor.destroy();
+		});
+
+		it('flattens nested tables to satisfy schema invariant (EC-17)', () => {
+			const nestedHTML = `
+				<table>
+					<tr>
+						<td>
+							<p>Parent Content</p>
+							<table>
+								<tr>
+									<td><p>Nested Content</p></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			`;
+
+			const cleaned = normalizePastedHTML(nestedHTML);
+			// Count total <table> occurrences - should only be 1 (nested one was flattened)
+			const matches = cleaned.match(/<table\b/g);
+			expect(matches?.length).toBe(1);
+			expect(cleaned).toContain('Parent Content');
+			expect(cleaned).toContain('Nested Content');
+		});
+
+		it('parses pasted plain-text markdown table into table nodes (EC-17)', () => {
+			const editor = new Editor({
+				extensions: createExtensions('standard'),
+				content: '<p></p>'
+			});
+
+			const mdTable =
+				'| Col A | Col B |\n| --- | --- |\n| Val 1 | Val 2 |';
+			expect(isMarkdownText(mdTable)).toBe(true);
+
+			const pasteEvent = new Event('paste', {
+				bubbles: true,
+				cancelable: true
+			}) as unknown as ClipboardEvent;
+			Object.defineProperty(pasteEvent, 'clipboardData', {
+				value: {
+					getData: (format: string) => {
+						if (format === 'text/plain') return mdTable;
+						return '';
+					}
+				}
+			});
+
+			editor.view.someProp('handlePaste', (f) =>
+				f(editor.view, pasteEvent, Slice.empty)
+			);
+
+			const json = editor.getJSON();
+			const table = json.content?.find((n) => n.type === 'table');
+			expect(table).toBeDefined();
+			expect(table?.content?.length).toBe(2); // 1 header row + 1 data row
+
+			editor.destroy();
+		});
 	});
 });
