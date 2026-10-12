@@ -20,10 +20,11 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `CH`. `EC` editing core is closed and `@blockleaf/editor@0.0.3` is live
-on npm.
+**Position:** `CH` is closed — all eight tasks done. `MC` is next.
+`@blockleaf/editor@0.0.3` is live on npm; the `CH` work is unreleased.
 
-**Last verified:** 2026-10-13. All gates green on `feat/chrome`; bundle at 131.32 kB of 160 kB.
+**Last verified:** 2026-10-13. All gates green on `feat/chrome`: 209 unit tests,
+15 Playwright specs, bundle at 141.82 kB of 160 kB, schema entry at 136 B of 2 kB.
 
 ---
 
@@ -115,16 +116,16 @@ command API, with no chrome rendered.
 `src/ui/` is an empty placeholder today, existing only so the import boundary is
 enforced from the first commit.
 
-| Id    | Task                                                                     | Status      | Commit    | Completed  |
-| ----- | ------------------------------------------------------------------------ | ----------- | --------- | ---------- |
-| CH-01 | Slash menu backed by a command registry                                  | Done        | `d4ee34a` | 2026-10-12 |
-| CH-02 | Bubble menu with a link editor — `extension-bubble-menu`, +6.16 kB (F11) | Done        | `e44eabb` | 2026-10-13 |
-| CH-03 | Drag handle and block menu — hand-rolled, +1.83 kB (F12)                 | Done        | `7f1cbc8` | 2026-10-13 |
-| CH-04 | Placeholder and trailing node — hand-rolled, +0.40 kB (F13)              | Done        | `5f8e57e` | 2026-10-13 |
-| CH-05 | Keyboard-complete and axe-clean                                          | Not started | —         | —          |
-| CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13           | Done        | `67a6702` | 2026-10-13 |
-| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15      | Done        | `b40815c` | 2026-10-13 |
-| CH-08 | Bubble menu, inside a table only, for cell-level actions                 | Done        | `d1f6727` | 2026-10-13 |
+| Id    | Task                                                                     | Status | Commit    | Completed  |
+| ----- | ------------------------------------------------------------------------ | ------ | --------- | ---------- |
+| CH-01 | Slash menu backed by a command registry                                  | Done   | `d4ee34a` | 2026-10-12 |
+| CH-02 | Bubble menu with a link editor — `extension-bubble-menu`, +6.16 kB (F11) | Done   | `e44eabb` | 2026-10-13 |
+| CH-03 | Drag handle and block menu — hand-rolled, +1.83 kB (F12)                 | Done   | `7f1cbc8` | 2026-10-13 |
+| CH-04 | Placeholder and trailing node — hand-rolled, +0.40 kB (F13)              | Done   | `5f8e57e` | 2026-10-13 |
+| CH-05 | Keyboard-complete and axe-clean                                          | Done   | `5efe7d3` | 2026-10-13 |
+| CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13           | Done   | `67a6702` | 2026-10-13 |
+| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15      | Done   | `b40815c` | 2026-10-13 |
+| CH-08 | Bubble menu, inside a table only, for cell-level actions                 | Done   | `d1f6727` | 2026-10-13 |
 
 ## MC — Media and code (1 week)
 
