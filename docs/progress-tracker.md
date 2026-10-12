@@ -123,7 +123,7 @@ enforced from the first commit.
 | CH-04 | Placeholder and trailing node — hand-rolled, +0.40 kB (F13)              | Done        | `5f8e57e` | 2026-10-13 |
 | CH-05 | Keyboard-complete and axe-clean                                          | Not started | —         | —          |
 | CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13           | Done        | `67a6702` | 2026-10-13 |
-| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15      | Not started | —         | —          |
+| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15      | Done        | `b40815c` | 2026-10-13 |
 | CH-08 | Bubble menu, inside a table only, for cell-level actions                 | Not started | —         | —          |
 
 ## MC — Media and code (1 week)
