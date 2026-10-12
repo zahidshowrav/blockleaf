@@ -3,6 +3,15 @@
 	"version": "0.0.3",
 	"description": "A Notion-style block editor on Tiptap. Headless-first, no CSS framework, versioned JSON out.",
 	"license": "MIT",
+	"homepage": "https://blockleaf.dev",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zahidshowrav/blockleaf.git",
+		"directory": "packages/editor"
+	},
+	"bugs": {
+		"url": "https://github.com/zahidshowrav/blockleaf/issues"
+	},
 	"type": "module",
 	"sideEffects": [
 		"*.css"
