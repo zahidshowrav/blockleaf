@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
+	NORMALISATION_META,
 	createExtensions,
 	withSchemaVersion,
 	type BlockleafDocument,
@@ -27,6 +28,16 @@ export type UseBlockleafEditorOptions = {
 	debounceMs?: number;
 	editable?: boolean;
 	autofocus?: boolean;
+	/**
+	 * Accessible name for the editing surface.
+	 *
+	 * A `contenteditable` is an ARIA textbox, and an unnamed one is read out
+	 * as nothing at all — axe files it as `aria-input-field-name`. It is a
+	 * prop rather than a constant because the right name depends on what the
+	 * host is editing; `labels` in HD-02 will fold it into the wider i18n
+	 * surface.
+	 */
+	label?: string;
 };
 
 export const useBlockleafEditor = ({
@@ -37,7 +48,8 @@ export const useBlockleafEditor = ({
 	onChangeImmediate,
 	debounceMs = DEFAULT_CHANGE_DEBOUNCE_MS,
 	editable = true,
-	autofocus = false
+	autofocus = false,
+	label = 'Document'
 }: UseBlockleafEditorOptions = {}): Editor | null => {
 	const onChangeRef = useRef(onChange);
 	const onChangeImmediateRef = useRef(onChangeImmediate);
@@ -59,9 +71,19 @@ export const useBlockleafEditor = ({
 		// single most common Tiptap/SSR mismatch. Handle it rather than document it.
 		immediatelyRender: false,
 		editorProps: {
-			attributes: { class: `${EDITOR_CLASS_NAME}__content` }
+			attributes: {
+				class: `${EDITOR_CLASS_NAME}__content`,
+				'aria-label': label
+			}
 		},
-		onUpdate: ({ editor: instance }) => {
+		onUpdate: ({ editor: instance, transaction }) => {
+			// Normalising the document on load is not a user edit. The meta
+			// catches the transaction itself; the step check catches the
+			// empty transaction ProseMirror appends after it, which is what
+			// Tiptap actually hands this callback.
+			if (transaction.getMeta(NORMALISATION_META)) return;
+			if (!transaction.docChanged) return;
+
 			// The one cast in the package, and the right place for it: Tiptap's
 			// JSONContent is `any`-typed, so this is where a loose shape becomes the
 			// documented contract. M1 validates here instead of asserting.

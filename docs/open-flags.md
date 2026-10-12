@@ -8,7 +8,7 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10 · **Last reviewed:** 2026-10-11
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13 · **Last reviewed:** 2026-10-13
 
 ---
 
@@ -57,6 +57,147 @@ issues off and routes questions to Discussions.
 
 Discussions was enabled in repository settings and initialized on 2026-10-11.
 SC-15 is complete.
+
+### F13 — Tiptap and ProseMirror packages declare no `sideEffects` · measured 2026-10-13
+
+`Placeholder` lives in `@tiptap/extensions@3.31.4`, which is already in the
+dependency tree via StarterKit, so this looked free. It was not.
+
+The package ships **no `sideEffects: false`** field, so a bundler must keep
+the whole module graph for anyone who imports a single export from it. The
+editor bundle barely noticed. The **schema-only** entry went from 136 B to
+**60.77 kB** — a server that imports nothing but `createEmptyDocument` would
+have shipped five editor extensions and ProseMirror's view layer.
+
+| Entry                  |    Before | With `@tiptap/extensions` | Hand-rolled |
+| ---------------------- | --------: | ------------------------: | ----------: |
+| Editor                 | 139.31 kB |                 139.60 kB |   139.71 kB |
+| Schema only (2 kB cap) |     136 B |              **60.77 kB** |   **136 B** |
+
+**Decision: hand-roll the placeholder as a decoration plugin**, 0.40 kB, no
+new import. The trailing node needed no new dependency either — StarterKit
+already ships `trailingNode`; it was simply never configured, and its default
+`notAfter: []` appends an empty paragraph after a _heading_, which then gets
+saved. The stored document is the product, so that default was never
+acceptable. It is now `['paragraph', 'heading']`, set in `createExtensions`.
+
+It happened a third time in CH-08: importing `CellSelection` from
+`@tiptap/pm/tables` to write `selection instanceof CellSelection` put 15.16 kB
+into the same budget, because `prosemirror-tables` declares no `sideEffects`
+either. A cell selection is now identified by its shape — `$anchorCell` and
+`$headCell`, the two properties that define it, both of which survive
+minification. Less obvious than `instanceof`, and commented accordingly.
+
+**The 2 kB budget earned its keep three times in one block.** It caught both
+of those, and it caught the unshakeable `new PluginKey` in F12. Nothing else in CI looks at
+what a server-side consumer actually downloads — the editor budget has 20 kB
+of headroom and would have absorbed both without a murmur.
+
+Two further things the measurement turned up, both fixed here:
+
+- `trailingNode` only appends from `appendTransaction`, which never runs for
+  the document the editor was _created_ with. A saved document ending in a
+  table opened with nowhere to click after it — the exact case the rule
+  exists for. `TrailingNodeOnLoad` runs the check once at startup.
+- That startup insert is not a user edit, but it reached `onChange`, so
+  merely opening a document reported it as changed and would have triggered
+  an autosave on load. It now carries `NORMALISATION_META` and
+  `addToHistory: false`, and `onUpdate` additionally ignores any transaction
+  with `docChanged === false` — ProseMirror appends an empty one after it,
+  and that is the transaction Tiptap actually hands the callback.
+
+### F12 — The drag handle is hand-rolled; Tiptap's costs 32.87 kB · measured 2026-10-13
+
+`@tiptap/extension-drag-handle@3.31.4` was the obvious answer and is not the
+right one. Its own dependency list is only `@floating-ui/dom`, which F11
+established is already paid for — but its **peers are not optional**, and the
+module-scope imports are real:
+
+```
+from "@tiptap/extension-collaboration"
+from "@tiptap/y-tiptap"
+```
+
+So a document that will never be collaborative still ships yjs to get a grip
+icon. Measured, not assumed:
+
+| Build                                 |      Size | Cost over baseline |
+| ------------------------------------- | --------: | -----------------: |
+| Baseline after CH-02                  | 137.48 kB |                  — |
+| + `@tiptap/extension-drag-handle`     | 170.35 kB |      **+32.87 kB** |
+| + a hand-rolled handle (what shipped) | 139.31 kB |       **+1.83 kB** |
+
+170.35 kB is **10.35 kB over the ceiling**, so this was never a budget
+conversation — the extension does not fit at any headroom this project will
+have. Opting out is not available either, because the import is unconditional.
+
+**Decision: hand-roll it, as CH-03 did.** The handle is a ProseMirror plugin
+that finds the hovered top-level block and positions a React-rendered element
+beside it; the drag itself is handed to ProseMirror by setting a
+`NodeSelection` and `view.dragging`, so nothing reimplements drop handling.
+This is the opposite call to F11, and for the opposite reason: there, the
+engine was already in the bundle and owning it bought nothing; here, the
+engine drags a collaboration stack behind it and owning it is the only way in.
+
+Revisit if Tiptap ever makes those peers optional — the extension handles
+multi-block range selection, which the hand-rolled version does not.
+
+**It also cost the schema-only budget, briefly.** The first build pushed the
+server-side entry from 136 B to **11.79 kB** against its 2 kB limit. Two
+module-scope expressions were not shakeable: `new PluginKey(...)` and the nine
+`turnInto(...)` calls that build `defaultBlockActions`. Both now carry
+`/* @__PURE__ */` and the entry is back to 136 B exactly. The 2 kB entry earned
+its place here — nothing else in CI would have caught a server consumer
+suddenly shipping the chrome.
+
+### F11 — Bubble menu uses Tiptap's extension; floating-ui is already paid for · measured 2026-10-13
+
+Measured the same way tables and `lowlight` were, before writing any of CH-02.
+The question was whether a bubble menu's positioning engine could be afforded
+with 28.68 kB of headroom and `MC-05`'s curated `lowlight` already holding a
+measured 16.69 kB claim on it.
+
+It turned out to be the wrong question. `@tiptap/suggestion` — bundled into the
+editor since CH-01 shipped the slash menu — already pulls `@floating-ui/dom`,
+and it is inlined in the shipped chunk today. The positioning engine is not a
+new cost; it is a cost already on the invoice.
+
+| Build                                       |      Size | Cost over baseline |
+| ------------------------------------------- | --------: | -----------------: |
+| Baseline — `BlockleafEditor` as shipped     | 131.32 kB |                  — |
+| A · `BubbleMenu` from `@tiptap/react/menus` | 137.57 kB |       **+6.25 kB** |
+| B · `@tiptap/extension-bubble-menu` plugin  | 135.66 kB |       **+4.34 kB** |
+| C · hand-rolled `coordsAtPos` positioner    | 131.75 kB |       **+0.43 kB** |
+
+**Decision: approach B — the framework-agnostic plugin, with our own React
+wrapper. No budget change.**
+
+B costs 4.34 kB because floating-ui is already there; what it adds is the
+bubble-menu plugin's own selection tracking, `autoUpdate` wiring and teardown.
+A costs 1.91 kB more than B for a React component that renders chrome we are
+replacing anyway — `src/ui` owns the markup, and CH-08 needs a second instance
+driven by a different `shouldShow`, which the plugin exposes directly.
+
+C is the cheapest by 3.91 kB and still the wrong trade. The measured version
+already carried flip, viewport clamping, rAF batching and scroll/resize
+teardown, and it still would not cover scroll containers, `position: fixed`
+ancestors, RTL or iOS visual-viewport behaviour — the cases HD-04 and HD-08 are
+going to file as bugs. Paying 3.91 kB once to not own that is the cheaper side
+of the trade, and it is the bundle-policy rule working as intended: measure
+first, then spend deliberately. Opting out is not available here either — the
+dependency is already in the graph, so nothing is saved for the consumer who
+never opens a bubble menu.
+
+Headroom after CH-02 lands at B: **24.34 kB**, which still clears `MC-05`'s
+16.69 kB with 7.65 kB behind it. CH-03's drag handle is the next claim on that
+and has not been measured.
+
+**What it actually cost, once built:** 137.48 kB, so **+6.16 kB** rather than
+the +4.34 kB this table predicted. The gap is ours, not Tiptap's — the
+difference is the toolbar, link editor, icons and actions that the measurement
+entry stubbed out. Real headroom is **22.52 kB**, which still clears `MC-05`
+but with 5.83 kB behind it rather than 7.65 kB. The lesson for CH-03 is to
+measure the dependency _and_ budget for the chrome that wraps it.
 
 ### F10 — Ceiling raised to 160 kB; `lowlight` ships curated · measured 2026-10-10
 

@@ -11,11 +11,13 @@ export type BlockleafEditorProps = UseBlockleafEditorOptions & {
 	className?: string;
 	/** Rendered before the editor is ready, so layout does not jump. */
 	fallback?: ReactNode;
+	children?: ReactNode;
 };
 
 export const BlockleafEditor = ({
 	className,
 	fallback = null,
+	children,
 	...options
 }: BlockleafEditorProps) => {
 	const editor = useBlockleafEditor(options);
@@ -31,6 +33,7 @@ export const BlockleafEditor = ({
 			}
 		>
 			<EditorContent editor={editor} />
+			{children}
 		</div>
 	);
 };
