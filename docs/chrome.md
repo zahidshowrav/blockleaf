@@ -148,6 +148,83 @@ returns the Tiptap extension on its own, for when you are assembling
 
 ---
 
+## Drag handle and block menu
+
+Hover a block and a handle appears in the gutter beside it. Drag it to move the
+block; click it for the block menu. A `+` button inserts an empty paragraph
+below.
+
+| Prop           | Default | What it does                                     |
+| -------------- | ------- | ------------------------------------------------ |
+| `dragHandle`   | `true`  | Turns the handle and its menu off entirely.      |
+| `blockActions` | —       | An array of actions, or `(defaults) => actions`. |
+| `insertButton` | `true`  | Whether the `+` button is shown.                 |
+
+The handle **starts** the drag; it does not implement one. It sets a
+`NodeSelection` on the block and hands ProseMirror `view.dragging`, so dropping
+goes through the same code path as any other ProseMirror drag — including
+inside tables, and including undo.
+
+### The block menu
+
+Two groups. **Turn into** converts the block — Text, Heading 1–3, Bullet list,
+Numbered list, To-do list, Quote, Code — and marks the current type with
+`aria-current`. **Actions** holds Move up, Move down, Duplicate and Delete.
+
+Move up on the first block, and move down on the last, are _removed_ rather
+than disabled, on the same reasoning as the bubble menu: a control that is
+never enabled is noise for a screen reader.
+
+| Key            | Does                      |
+| -------------- | ------------------------- |
+| `↑` / `↓`      | Move through the entries. |
+| `Home` / `End` | First / last entry.       |
+| `Enter`        | Run the focused entry.    |
+| `Escape`       | Close, running nothing.   |
+
+### Actions
+
+```ts
+type BlockAction = {
+	id: string;
+	title: string;
+	group: 'Turn into' | 'Actions' | (string & {});
+	icon?: ReactNode | ComponentType<IconProps> | (() => ReactNode);
+	isActive?: (editor: Editor, pos: number) => boolean;
+	isAvailable?: (editor: Editor, pos: number) => boolean;
+	danger?: boolean;
+	run: (editor: Editor, pos: number) => void;
+};
+```
+
+`pos` is the position _before_ the top-level block the handle points at.
+
+```tsx
+<BlockleafEditor
+	blockActions={(defaults) => [
+		...defaults,
+		{
+			id: 'copy-id',
+			title: 'Copy block id',
+			group: 'Actions',
+			run: (editor, pos) => {
+				const node = editor.state.doc.nodeAt(pos);
+				if (node) navigator.clipboard.writeText(node.attrs.id);
+			}
+		}
+	]}
+/>
+```
+
+**Why it is hand-rolled.** `@tiptap/extension-drag-handle` imports
+`@tiptap/y-tiptap` and `@tiptap/extension-collaboration` at module scope, so a
+document that will never be collaborative would still ship yjs — 32.87 kB,
+which is over the whole bundle ceiling. See F12 in
+[`open-flags.md`](./open-flags.md). The trade is that this handle moves one
+block at a time; multi-block range dragging is not implemented.
+
+---
+
 ## Styling
 
 Both menus read the editor's `--bl-*` variables and define their own scoped
@@ -161,5 +238,6 @@ automatic via `prefers-color-scheme`, and `[data-theme='dark']` or
 | Bubble menu    | `--bl-bubble-bg`, `--bl-bubble-active`, `--bl-bubble-danger` |
 
 Class names are stable and BEM-flavoured — `.blockleaf-bubble-menu`,
-`.blockleaf-bubble-menu__button`, `.blockleaf-slash-menu__item` — so a
+`.blockleaf-bubble-menu__button`, `.blockleaf-slash-menu__item`,
+`.blockleaf-block-handle__button`, `.blockleaf-block-menu__item` — so a
 stylesheet of your own can target them without `!important`.

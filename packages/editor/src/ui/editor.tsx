@@ -11,6 +11,10 @@ import {
 	type BubbleMenuShouldShow
 } from './bubble-menu/index.js';
 import {
+	createDragHandleExtension,
+	type BlockAction
+} from './drag-handle/index.js';
+import {
 	createSlashMenuExtension,
 	type CommandRegistry,
 	type SlashCommand
@@ -51,6 +55,18 @@ export type BlockleafEditorProps = Omit<
 	 * Overrides when the bubble menu is shown.
 	 */
 	bubbleShouldShow?: BubbleMenuShouldShow;
+	/**
+	 * Whether the drag handle and block menu are enabled. Defaults to `true`.
+	 */
+	dragHandle?: boolean;
+	/**
+	 * Custom block menu actions array or a function receiving defaults.
+	 */
+	blockActions?: BlockAction[] | ((defaults: BlockAction[]) => BlockAction[]);
+	/**
+	 * Whether the handle shows the `+` insert button. Defaults to `true`.
+	 */
+	insertButton?: boolean;
 	children?: ReactNode;
 };
 
@@ -64,6 +80,9 @@ export const BlockleafEditor = ({
 	bubbleActions,
 	linkEditor = true,
 	bubbleShouldShow,
+	dragHandle = true,
+	blockActions,
+	insertButton = true,
 	...rest
 }: BlockleafEditorProps) => {
 	const resolvedExtensions = useMemo(() => {
@@ -91,6 +110,16 @@ export const BlockleafEditor = ({
 			);
 		}
 
+		const hasDragHandle = chrome.some((ext) => ext.name === 'dragHandle');
+		if (dragHandle && !hasDragHandle) {
+			chrome.push(
+				createDragHandleExtension({
+					actions: blockActions,
+					insertButton
+				})
+			);
+		}
+
 		return chrome;
 	}, [
 		extensions,
@@ -101,7 +130,10 @@ export const BlockleafEditor = ({
 		bubbleMenu,
 		bubbleActions,
 		linkEditor,
-		bubbleShouldShow
+		bubbleShouldShow,
+		dragHandle,
+		blockActions,
+		insertButton
 	]);
 
 	return (

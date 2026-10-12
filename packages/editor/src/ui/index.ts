@@ -23,6 +23,29 @@ export {
 	type LinkEditorProps
 } from './bubble-menu/index.js';
 export {
+	ArrowDownIcon,
+	ArrowUpIcon,
+	BlockHandle,
+	BlockMenu,
+	DRAG_HANDLE_PLUGIN_KEY,
+	DragHandleExtension,
+	DuplicateIcon,
+	GripIcon,
+	PlusIcon,
+	TrashIcon,
+	createDragHandleExtension,
+	createDragHandlePlugin,
+	defaultBlockActions,
+	resolveBlockActions,
+	type BlockAction,
+	type BlockActionGroup,
+	type BlockHandleComponentProps,
+	type BlockHandleProps,
+	type BlockMenuProps,
+	type DragHandleController,
+	type DragHandleOptions
+} from './drag-handle/index.js';
+export {
 	BlockleafEditor,
 	Editor,
 	type BlockleafEditorProps

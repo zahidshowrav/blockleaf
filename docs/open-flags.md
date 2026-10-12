@@ -8,7 +8,7 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11 · **Last reviewed:** 2026-10-13
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12 · **Last reviewed:** 2026-10-13
 
 ---
 
@@ -57,6 +57,50 @@ issues off and routes questions to Discussions.
 
 Discussions was enabled in repository settings and initialized on 2026-10-11.
 SC-15 is complete.
+
+### F12 — The drag handle is hand-rolled; Tiptap's costs 32.87 kB · measured 2026-10-13
+
+`@tiptap/extension-drag-handle@3.31.4` was the obvious answer and is not the
+right one. Its own dependency list is only `@floating-ui/dom`, which F11
+established is already paid for — but its **peers are not optional**, and the
+module-scope imports are real:
+
+```
+from "@tiptap/extension-collaboration"
+from "@tiptap/y-tiptap"
+```
+
+So a document that will never be collaborative still ships yjs to get a grip
+icon. Measured, not assumed:
+
+| Build                                 |      Size | Cost over baseline |
+| ------------------------------------- | --------: | -----------------: |
+| Baseline after CH-02                  | 137.48 kB |                  — |
+| + `@tiptap/extension-drag-handle`     | 170.35 kB |      **+32.87 kB** |
+| + a hand-rolled handle (what shipped) | 139.31 kB |       **+1.83 kB** |
+
+170.35 kB is **10.35 kB over the ceiling**, so this was never a budget
+conversation — the extension does not fit at any headroom this project will
+have. Opting out is not available either, because the import is unconditional.
+
+**Decision: hand-roll it, as CH-03 did.** The handle is a ProseMirror plugin
+that finds the hovered top-level block and positions a React-rendered element
+beside it; the drag itself is handed to ProseMirror by setting a
+`NodeSelection` and `view.dragging`, so nothing reimplements drop handling.
+This is the opposite call to F11, and for the opposite reason: there, the
+engine was already in the bundle and owning it bought nothing; here, the
+engine drags a collaboration stack behind it and owning it is the only way in.
+
+Revisit if Tiptap ever makes those peers optional — the extension handles
+multi-block range selection, which the hand-rolled version does not.
+
+**It also cost the schema-only budget, briefly.** The first build pushed the
+server-side entry from 136 B to **11.79 kB** against its 2 kB limit. Two
+module-scope expressions were not shakeable: `new PluginKey(...)` and the nine
+`turnInto(...)` calls that build `defaultBlockActions`. Both now carry
+`/* @__PURE__ */` and the entry is back to 136 B exactly. The 2 kB entry earned
+its place here — nothing else in CI would have caught a server consumer
+suddenly shipping the chrome.
 
 ### F11 — Bubble menu uses Tiptap's extension; floating-ui is already paid for · measured 2026-10-13
 
