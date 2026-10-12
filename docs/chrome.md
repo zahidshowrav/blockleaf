@@ -350,6 +350,66 @@ normalisation flag, stays out of the undo history, and does not reach
 
 ---
 
+## Keyboard reference
+
+Everything the chrome does is reachable without a pointer. This is the CH
+block's exit condition, not a nice-to-have, and
+`e2e/accessibility.spec.ts` builds a document — heading, list and table —
+using only the keys below.
+
+| Key                   | Does                                                   |
+| --------------------- | ------------------------------------------------------ |
+| `/`                   | Open the slash menu.                                   |
+| `↑` `↓`               | Move through a menu.                                   |
+| `←` `→`               | Move along the bubble menu, or around the grid picker. |
+| `Home` `End`          | First / last entry.                                    |
+| `Enter`               | Run the focused entry.                                 |
+| `Escape`              | Dismiss. Returns focus to the document.                |
+| `Backspace`           | In the grid picker, back to the list.                  |
+| `Mod`+`K`             | Link editor for the selection.                         |
+| `Shift`+`F10`         | Block menu for the current block.                      |
+| `Mod`+`Alt`+`M`       | Block menu, for keyboards without `F10`.               |
+| `Mod`+`Alt`+`R` / `C` | Row / column menu, inside a table.                     |
+| `Mod`+`Alt`+`T`       | Insert a 3 × 3 table, no menu involved.                |
+| `Tab` / `Shift`+`Tab` | Next / previous cell, inside a table.                  |
+
+`Shift`+`F10` is the platform's context-menu key, and the one a screen reader
+user reaches for first. The drag handle only appears on hover, so without it
+the block menu would be mouse-only.
+
+The table menus need their own keys because `Tab` inside a table is cell
+navigation — there is no tab-stop route to the handles.
+
+## Accessibility
+
+Every surface is checked by axe, twice: in jsdom over each component
+(`tests/accessibility.test.tsx`), and in a real browser over the rendered
+page (`e2e/accessibility.spec.ts`), where colour contrast and focus
+visibility can actually be measured. The unit suite includes a test that
+feeds axe deliberately broken markup — a gate that cannot fail is not a gate.
+
+Conventions the chrome holds to:
+
+- **A control that can never be enabled is removed, not disabled.** A
+  permanently disabled button is noise for a screen reader.
+- **Each toolbar is one tab stop**, with a roving `tabindex`, as the ARIA
+  toolbar pattern specifies.
+- **`Escape` always returns focus to the document**, never to a handle that
+  is about to disappear.
+- The editing surface carries an accessible name — `label`, defaulting to
+  `"Document"`. A `contenteditable` is an ARIA textbox, and an unnamed one is
+  announced as nothing at all.
+
+```tsx
+<BlockleafEditor label="Release notes" />
+```
+
+Known and deferred to HD-01: the slash menu is a listbox driven by
+`aria-activedescendant` on itself rather than on the editor that holds focus.
+The full combobox pattern wants the relationship expressed on the textbox.
+
+---
+
 ## Styling
 
 Both menus read the editor's `--bl-*` variables and define their own scoped

@@ -58,8 +58,36 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 	}, [sanitized]);
 
 	useEffect(() => {
-		inputRef.current?.focus();
-		inputRef.current?.select();
+		// Focusing here is a race on two fronts: ProseMirror takes focus back
+		// when the shortcut's transaction settles, and `Mod+K` pressed before
+		// the toolbar has finished its update delay tries to focus an element
+		// that is still hidden, where `focus()` silently does nothing.
+		//
+		// So retry on a timer until it sticks, with a bound. A timer rather
+		// than `requestAnimationFrame` because a hidden subtree can have its
+		// frames throttled, which is exactly the case being waited on.
+		const deadline = Date.now() + 1200;
+
+		const attempt = () => {
+			const input = inputRef.current;
+			if (!input) return true;
+
+			input.focus();
+			if (document.activeElement === input) {
+				input.select();
+				return true;
+			}
+
+			return Date.now() > deadline;
+		};
+
+		if (attempt()) return;
+
+		const timer = setInterval(() => {
+			if (attempt()) clearInterval(timer);
+		}, 32);
+
+		return () => clearInterval(timer);
 	}, []);
 
 	return (

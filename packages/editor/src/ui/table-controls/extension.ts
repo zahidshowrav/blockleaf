@@ -12,6 +12,7 @@ import type { TableControlsOptions } from './types.js';
 type TableControlsStorage = {
 	renderer: ReactRenderer<unknown, TableControlsComponentProps> | null;
 	setLocked: ((locked: boolean) => void) | null;
+	openRequest: number;
 };
 
 export const TableControlsExtension =
@@ -23,7 +24,35 @@ export const TableControlsExtension =
 		},
 
 		addStorage(): TableControlsStorage {
-			return { renderer: null, setLocked: null };
+			return { renderer: null, setLocked: null, openRequest: 0 };
+		},
+
+		addKeyboardShortcuts() {
+			/**
+			 * The handles are rendered whenever the cursor is in a table, but
+			 * `Tab` inside a table is cell navigation (EC-16), so there is no
+			 * tab-stop route to them. These are the keyboard route.
+			 */
+			const open = (axis: 'row' | 'column') => () => {
+				const storage = this.storage as TableControlsStorage;
+				if (!storage.renderer) return false;
+				if (!this.editor.can().addRowAfter()) return false;
+
+				storage.openRequest += 1;
+				storage.renderer.updateProps({
+					openRequest: storage.openRequest,
+					openAxis: axis
+				});
+				storage.setLocked?.(true);
+				return true;
+			};
+
+			return {
+				'Mod-Alt-r': open('row'),
+				'Mod-Alt-R': open('row'),
+				'Mod-Alt-c': open('column'),
+				'Mod-Alt-C': open('column')
+			};
 		},
 
 		addProseMirrorPlugins() {
@@ -39,6 +68,8 @@ export const TableControlsExtension =
 					editor: this.editor,
 					actions,
 					placement: null,
+					openRequest: 0,
+					openAxis: 'row',
 					onLockChange: (locked: boolean) =>
 						storage.setLocked?.(locked)
 				}

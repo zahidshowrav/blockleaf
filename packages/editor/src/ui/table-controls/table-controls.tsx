@@ -13,6 +13,14 @@ export type TableControlsComponentProps = {
 	placement: TablePlacement | null;
 	/** Told when a menu opens, so the handles stop tracking the selection. */
 	onLockChange?: (locked: boolean) => void;
+	/**
+	 * Incremented by the extension's `Mod+Alt+R` / `Mod+Alt+C` shortcuts.
+	 * A counter rather than a boolean so a second press reopens a dismissed
+	 * menu.
+	 */
+	openRequest?: number;
+	/** Which menu that request opens. */
+	openAxis?: TableAxis;
 };
 
 const HANDLE_THICKNESS = 14;
@@ -21,14 +29,28 @@ export const TableControls = ({
 	editor,
 	actions,
 	placement,
-	onLockChange
+	onLockChange,
+	openRequest = 0,
+	openAxis: requestedAxis = 'row'
 }: TableControlsComponentProps) => {
 	const [openAxis, setOpenAxis] = useState<TableAxis | null>(null);
+	const [seenRequest, setSeenRequest] = useState(openRequest);
+
+	// Adjusting state from a changed prop during render, so the menu is in
+	// the first paint after the shortcut rather than the second — the second
+	// loses the focus the shortcut asked for.
+	if (openRequest !== seenRequest) {
+		setSeenRequest(openRequest);
+		setOpenAxis(requestedAxis);
+	}
 
 	const close = useCallback(() => {
 		setOpenAxis(null);
 		onLockChange?.(false);
-	}, [onLockChange]);
+		// Opened from the document, so focus returns there rather than to a
+		// handle that may be about to move.
+		editor.commands.focus();
+	}, [onLockChange, editor]);
 
 	const open = useCallback(
 		(axis: TableAxis) => {

@@ -45,6 +45,11 @@ const startBlockDrag = (
 export type BlockHandleComponentProps = BlockHandleProps & {
 	/** Told when the menu opens, so the handle stops following the pointer. */
 	onLockChange?: (locked: boolean) => void;
+	/**
+	 * Incremented by the extension's `Shift+F10` shortcut. A counter rather
+	 * than a boolean so a second press reopens a dismissed menu.
+	 */
+	openMenuRequest?: number;
 };
 
 export const BlockHandle = ({
@@ -52,14 +57,28 @@ export const BlockHandle = ({
 	actions,
 	insertButton,
 	pos,
-	onLockChange
+	onLockChange,
+	openMenuRequest = 0
 }: BlockHandleComponentProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [seenMenuRequest, setSeenMenuRequest] = useState(openMenuRequest);
+
+	// Adjusting state from a changed prop during render rather than in an
+	// effect: the effect version paints the handle once before the menu
+	// appears, which loses the focus the shortcut just asked for.
+	if (openMenuRequest !== seenMenuRequest) {
+		setSeenMenuRequest(openMenuRequest);
+		setMenuOpen(true);
+	}
 
 	const closeMenu = useCallback(() => {
 		setMenuOpen(false);
 		onLockChange?.(false);
-	}, [onLockChange]);
+		// The menu was opened from the document, so that is where focus goes
+		// back to. Leaving it on a handle that is about to disappear strands
+		// the keyboard user.
+		editor.commands.focus();
+	}, [onLockChange, editor]);
 
 	const openMenu = useCallback(() => {
 		setMenuOpen(true);

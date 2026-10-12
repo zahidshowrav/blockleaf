@@ -14,6 +14,7 @@ export const DRAG_HANDLE_PLUGIN_KEY = /* @__PURE__ */ new PluginKey(
 type DragHandleStorage = {
 	renderer: ReactRenderer<unknown, BlockHandleComponentProps> | null;
 	controller: DragHandleController | null;
+	openMenuRequest: number;
 };
 
 export const DragHandleExtension =
@@ -29,7 +30,37 @@ export const DragHandleExtension =
 		},
 
 		addStorage(): DragHandleStorage {
-			return { renderer: null, controller: null };
+			return { renderer: null, controller: null, openMenuRequest: 0 };
+		},
+
+		addKeyboardShortcuts() {
+			/**
+			 * `Shift+F10` is the platform's context-menu key, and the one a
+			 * screen reader user will try first. The handle itself only
+			 * appears on hover, so without this the block menu is
+			 * mouse-only — which would fail the block's own exit test.
+			 */
+			const openBlockMenu = () => {
+				const storage = this.storage as DragHandleStorage;
+				if (!storage.renderer) return false;
+
+				const { $from } = this.editor.state.selection;
+				if ($from.depth === 0) return false;
+
+				storage.openMenuRequest += 1;
+				storage.renderer.updateProps({
+					pos: $from.before(1),
+					openMenuRequest: storage.openMenuRequest
+				});
+				storage.controller?.setLocked(true);
+				return true;
+			};
+
+			return {
+				'Shift-F10': openBlockMenu,
+				'Mod-Alt-m': openBlockMenu,
+				'Mod-Alt-M': openBlockMenu
+			};
 		},
 
 		addProseMirrorPlugins() {

@@ -279,7 +279,11 @@
 .blockleaf-slash-menu {
 	--bl-slash-bg: var(--bl-color-bg, #ffffff);
 	--bl-slash-fg: var(--bl-color-fg, #1f2328);
-	--bl-slash-muted: var(--bl-color-muted, #6b7280);
+	/*
+	 * Darker than --bl-color-muted on purpose: #6b7280 on the selected row's
+	 * #eef2ff measures 4.32:1, just under AA. This measures 5.17:1.
+	 */
+	--bl-slash-muted: #5f6673;
 	--bl-slash-border: var(--bl-color-border, #e5e7eb);
 	--bl-slash-hover: #f3f4f6;
 	--bl-slash-selected: #eef2ff;
@@ -434,7 +438,7 @@
 .blockleaf-bubble-menu {
 	--bl-bubble-bg: var(--bl-color-bg, #ffffff);
 	--bl-bubble-fg: var(--bl-color-fg, #1f2328);
-	--bl-bubble-muted: var(--bl-color-muted, #6b7280);
+	--bl-bubble-muted: #5f6673;
 	--bl-bubble-border: var(--bl-color-border, #e5e7eb);
 	--bl-bubble-hover: #f3f4f6;
 	--bl-bubble-active: #eef2ff;
@@ -619,7 +623,7 @@
 .blockleaf-block-menu {
 	--bl-block-bg: var(--bl-color-bg, #ffffff);
 	--bl-block-fg: var(--bl-color-fg, #1f2328);
-	--bl-block-muted: var(--bl-color-muted, #6b7280);
+	--bl-block-muted: #5f6673;
 	--bl-block-border: var(--bl-color-border, #e5e7eb);
 	--bl-block-active: #eef2ff;
 	--bl-block-active-fg: var(--bl-color-accent, #3b5bdb);
@@ -846,7 +850,7 @@
 .blockleaf-table-menu {
 	--bl-table-menu-bg: var(--bl-color-bg, #ffffff);
 	--bl-table-menu-fg: var(--bl-color-fg, #1f2328);
-	--bl-table-menu-muted: var(--bl-color-muted, #6b7280);
+	--bl-table-menu-muted: #5f6673;
 	--bl-table-menu-border: var(--bl-color-border, #e5e7eb);
 	--bl-table-menu-active: #eef2ff;
 	--bl-table-menu-active-fg: var(--bl-color-accent, #3b5bdb);

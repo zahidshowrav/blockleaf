@@ -28,6 +28,16 @@ export type UseBlockleafEditorOptions = {
 	debounceMs?: number;
 	editable?: boolean;
 	autofocus?: boolean;
+	/**
+	 * Accessible name for the editing surface.
+	 *
+	 * A `contenteditable` is an ARIA textbox, and an unnamed one is read out
+	 * as nothing at all — axe files it as `aria-input-field-name`. It is a
+	 * prop rather than a constant because the right name depends on what the
+	 * host is editing; `labels` in HD-02 will fold it into the wider i18n
+	 * surface.
+	 */
+	label?: string;
 };
 
 export const useBlockleafEditor = ({
@@ -38,7 +48,8 @@ export const useBlockleafEditor = ({
 	onChangeImmediate,
 	debounceMs = DEFAULT_CHANGE_DEBOUNCE_MS,
 	editable = true,
-	autofocus = false
+	autofocus = false,
+	label = 'Document'
 }: UseBlockleafEditorOptions = {}): Editor | null => {
 	const onChangeRef = useRef(onChange);
 	const onChangeImmediateRef = useRef(onChangeImmediate);
@@ -60,7 +71,10 @@ export const useBlockleafEditor = ({
 		// single most common Tiptap/SSR mismatch. Handle it rather than document it.
 		immediatelyRender: false,
 		editorProps: {
-			attributes: { class: `${EDITOR_CLASS_NAME}__content` }
+			attributes: {
+				class: `${EDITOR_CLASS_NAME}__content`,
+				'aria-label': label
+			}
 		},
 		onUpdate: ({ editor: instance, transaction }) => {
 			// Normalising the document on load is not a user edit. The meta

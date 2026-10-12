@@ -161,7 +161,29 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 					: undefined
 			}
 			className="blockleaf-slash-menu"
-			tabIndex={-1}
+			// The list scrolls, so it has to be focusable or a keyboard-only
+			// user cannot reach the items below the fold — axe files it as
+			// `scrollable-region-focusable`. Normally the editor keeps focus
+			// and drives the list through `aria-activedescendant`; this is
+			// the fallback for when focus does land here, so the same keys
+			// have to work.
+			tabIndex={0}
+			onKeyDown={(event) => {
+				if (items.length === 0) return;
+
+				if (event.key === 'ArrowDown') {
+					event.preventDefault();
+					setSelectedIndex((prev) => (prev + 1) % items.length);
+				} else if (event.key === 'ArrowUp') {
+					event.preventDefault();
+					setSelectedIndex(
+						(prev) => (prev - 1 + items.length) % items.length
+					);
+				} else if (event.key === 'Enter') {
+					event.preventDefault();
+					selectItem(selectedIndex);
+				}
+			}}
 		>
 			{groups.map(({ group, items: groupItems }) => (
 				<div
