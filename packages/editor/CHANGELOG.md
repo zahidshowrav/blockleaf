@@ -1,5 +1,43 @@
 # @blockleaf/editor
 
+## 0.0.4
+
+### Patch Changes
+
+- d4ee34a: Implement slash command menu backed by command registry with full keyboard and accessibility support (CH-01)
+- e44eabb: Add the selection bubble menu with a link editor (CH-02). Six mark toggles with
+  ARIA toolbar keyboard navigation, and an href field that mirrors the schema's
+  sanitisation so a rejected link says why.
+- 7f1cbc8: Add the drag handle and block menu (CH-03). Hand-rolled rather than using
+  `@tiptap/extension-drag-handle`, which imports yjs at module scope and costs
+  32.87 kB; this costs 1.83 kB and no new dependency.
+- 5f8e57e: Add the placeholder and configure the trailing node (CH-04). The placeholder is
+  a hand-rolled decoration plugin — `@tiptap/extensions` declares no
+  `sideEffects`, which pushed the schema-only entry from 136 B to 60.77 kB.
+  StarterKit's `trailingNode` no longer appends an empty paragraph after a
+  heading, and a saved document that needs a trailing paragraph gets one on load
+  without reporting it as a user edit.
+- 5efe7d3: Make the chrome keyboard-complete and axe-clean (CH-05). Adds a `label` prop
+  giving the editing surface an accessible name, `Shift+F10` and `Mod+Alt+M` for
+  the block menu, `Mod+Alt+R` / `Mod+Alt+C` for the table menus, and fixes a
+  colour-contrast failure on selected menu rows. The link editor now wins focus
+  reliably, including when `Mod+K` is pressed before the toolbar has appeared.
+- 67a6702: Add the table grid-size picker to the slash menu (CH-06). Choosing Table now
+  opens an 8 × 8 grid driven by pointer or arrow key, calling the `insertTable`
+  command from EC-13. Slash commands can carry a `picker` for any command that
+  needs an argument.
+- b40815c: Add in-table row and column handles (CH-07). Each opens a menu of structure
+  operations calling the EC-14 and EC-15 commands, and asks those commands
+  whether they can run rather than re-deriving availability.
+- d1f6727: Add the in-table cell bubble menu (CH-08). A second bubble menu instance with
+  its own plugin key and `shouldShow`, offering merge, split and structure
+  operations for a selection spanning cells. The text bubble menu stands down
+  for a cell selection so the two never compete.
+- 23952c5: Fix `pnpm dev` leaving the sandbox unable to resolve `@blockleaf/editor`. The
+  stylesheet is now copied by the bundler rather than the `build` script, so
+  watch mode emits it too, and `clean` no longer wipes `dist/` when the watcher
+  starts. The published `./styles.css` subpath is unchanged.
+
 ## 0.0.3
 
 ### Patch Changes
