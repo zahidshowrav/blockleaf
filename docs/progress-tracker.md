@@ -119,7 +119,7 @@ enforced from the first commit.
 | ----- | ------------------------------------------------------------------------ | ----------- | --------- | ---------- |
 | CH-01 | Slash menu backed by a command registry                                  | Done        | `d4ee34a` | 2026-10-12 |
 | CH-02 | Bubble menu with a link editor — `extension-bubble-menu`, +6.16 kB (F11) | Done        | `e44eabb` | 2026-10-13 |
-| CH-03 | Drag handle and block menu                                               | Not started | —         | —          |
+| CH-03 | Drag handle and block menu — hand-rolled, +1.83 kB (F12)                 | Done        | `7f1cbc8` | 2026-10-13 |
 | CH-04 | Placeholder and trailing node                                            | Not started | —         | —          |
 | CH-05 | Keyboard-complete and axe-clean                                          | Not started | —         | —          |
 | CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13           | Not started | —         | —          |
