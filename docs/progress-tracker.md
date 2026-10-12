@@ -118,7 +118,7 @@ enforced from the first commit.
 | Id    | Task                                                                     | Status      | Commit    | Completed  |
 | ----- | ------------------------------------------------------------------------ | ----------- | --------- | ---------- |
 | CH-01 | Slash menu backed by a command registry                                  | Done        | `d4ee34a` | 2026-10-12 |
-| CH-02 | Bubble menu with a link editor — `extension-bubble-menu`, +4.34 kB (F11) | Not started | —         | —          |
+| CH-02 | Bubble menu with a link editor — `extension-bubble-menu`, +6.16 kB (F11) | Done        | `e44eabb` | 2026-10-13 |
 | CH-03 | Drag handle and block menu                                               | Not started | —         | —          |
 | CH-04 | Placeholder and trailing node                                            | Not started | —         | —          |
 | CH-05 | Keyboard-complete and axe-clean                                          | Not started | —         | —          |

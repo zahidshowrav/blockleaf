@@ -100,6 +100,13 @@ Headroom after CH-02 lands at B: **24.34 kB**, which still clears `MC-05`'s
 16.69 kB with 7.65 kB behind it. CH-03's drag handle is the next claim on that
 and has not been measured.
 
+**What it actually cost, once built:** 137.48 kB, so **+6.16 kB** rather than
+the +4.34 kB this table predicted. The gap is ours, not Tiptap's — the
+difference is the toolbar, link editor, icons and actions that the measurement
+entry stubbed out. Real headroom is **22.52 kB**, which still clears `MC-05`
+but with 5.83 kB behind it rather than 7.65 kB. The lesson for CH-03 is to
+measure the dependency _and_ budget for the chrome that wraps it.
+
 ### F10 — Ceiling raised to 160 kB; `lowlight` ships curated · measured 2026-10-10
 
 Measured the same way tables were. `lowlight` was indeed the risk, and its size
