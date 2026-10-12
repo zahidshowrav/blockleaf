@@ -225,6 +225,49 @@ block at a time; multi-block range dragging is not implemented.
 
 ---
 
+## Placeholder
+
+The empty block the cursor is in gets a label. Only that one — labelling every
+empty block at once turns a new document into a wall of grey text, which reads
+as content rather than as absence.
+
+| Prop          | Default                   | What it does                                           |
+| ------------- | ------------------------- | ------------------------------------------------------ |
+| `placeholder` | `"Type '/' for commands"` | A string for every block, per-node labels, or `false`. |
+
+```tsx
+<BlockleafEditor placeholder="Start writing…" />
+
+<BlockleafEditor
+	placeholder={{
+		paragraph: 'Write something',
+		heading: (level) => `Heading ${level}`,
+		fallback: ''
+	}}
+/>
+```
+
+It renders as a `data-placeholder` attribute on a decorated node, styled by
+`.blockleaf-empty-node::before`, and disappears when the editor is read-only
+or when text is selected.
+
+## Trailing node
+
+A document always ends somewhere you can click. Without this, a document
+ending in a table, a code block or a divider is a document you cannot type at
+the end of.
+
+This is **core behaviour, not chrome** — it changes the stored document, so it
+lives in `createExtensions` and a headless consumer gets it too. No trailing
+paragraph is added after a paragraph or a heading, because that paragraph
+would be saved and the stored document is the product.
+
+Opening a saved document that needs one is not an edit: the insert carries a
+normalisation flag, stays out of the undo history, and does not reach
+`onChange`. A document you only opened has not changed.
+
+---
+
 ## Styling
 
 Both menus read the editor's `--bl-*` variables and define their own scoped

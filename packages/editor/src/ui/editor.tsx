@@ -15,6 +15,10 @@ import {
 	type BlockAction
 } from './drag-handle/index.js';
 import {
+	createPlaceholderExtension,
+	type PlaceholderLabels
+} from './placeholder.js';
+import {
 	createSlashMenuExtension,
 	type CommandRegistry,
 	type SlashCommand
@@ -67,6 +71,12 @@ export type BlockleafEditorProps = Omit<
 	 * Whether the handle shows the `+` insert button. Defaults to `true`.
 	 */
 	insertButton?: boolean;
+	/**
+	 * Placeholder text for the focused empty block. A string applies to every
+	 * block; an object labels paragraphs and headings separately. `false`
+	 * turns the placeholder off.
+	 */
+	placeholder?: string | PlaceholderLabels | false;
 	children?: ReactNode;
 };
 
@@ -83,6 +93,7 @@ export const BlockleafEditor = ({
 	dragHandle = true,
 	blockActions,
 	insertButton = true,
+	placeholder,
 	...rest
 }: BlockleafEditorProps) => {
 	const resolvedExtensions = useMemo(() => {
@@ -120,6 +131,11 @@ export const BlockleafEditor = ({
 			);
 		}
 
+		const hasPlaceholder = chrome.some((ext) => ext.name === 'placeholder');
+		if (placeholder !== false && !hasPlaceholder) {
+			chrome.push(createPlaceholderExtension({ placeholder }));
+		}
+
 		return chrome;
 	}, [
 		extensions,
@@ -133,7 +149,8 @@ export const BlockleafEditor = ({
 		bubbleShouldShow,
 		dragHandle,
 		blockActions,
-		insertButton
+		insertButton,
+		placeholder
 	]);
 
 	return (

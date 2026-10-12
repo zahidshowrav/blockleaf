@@ -51,6 +51,15 @@ export {
 	type BlockleafEditorProps
 } from './editor.js';
 export {
+	PLACEHOLDER_PLUGIN_KEY,
+	PlaceholderExtension,
+	createPlaceholderExtension,
+	defaultPlaceholderLabels,
+	labelFor,
+	type PlaceholderExtensionOptions,
+	type PlaceholderLabels
+} from './placeholder.js';
+export {
 	BulletListIcon,
 	CalloutIcon,
 	CodeIcon,

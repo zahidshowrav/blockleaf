@@ -8,7 +8,7 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12 · **Last reviewed:** 2026-10-13
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13 · **Last reviewed:** 2026-10-13
 
 ---
 
@@ -57,6 +57,47 @@ issues off and routes questions to Discussions.
 
 Discussions was enabled in repository settings and initialized on 2026-10-11.
 SC-15 is complete.
+
+### F13 — `@tiptap/extensions` declares no `sideEffects`; the placeholder is hand-rolled · measured 2026-10-13
+
+`Placeholder` lives in `@tiptap/extensions@3.31.4`, which is already in the
+dependency tree via StarterKit, so this looked free. It was not.
+
+The package ships **no `sideEffects: false`** field, so a bundler must keep
+the whole module graph for anyone who imports a single export from it. The
+editor bundle barely noticed. The **schema-only** entry went from 136 B to
+**60.77 kB** — a server that imports nothing but `createEmptyDocument` would
+have shipped five editor extensions and ProseMirror's view layer.
+
+| Entry                  |    Before | With `@tiptap/extensions` | Hand-rolled |
+| ---------------------- | --------: | ------------------------: | ----------: |
+| Editor                 | 139.31 kB |                 139.60 kB |   139.71 kB |
+| Schema only (2 kB cap) |     136 B |              **60.77 kB** |   **136 B** |
+
+**Decision: hand-roll the placeholder as a decoration plugin**, 0.40 kB, no
+new import. The trailing node needed no new dependency either — StarterKit
+already ships `trailingNode`; it was simply never configured, and its default
+`notAfter: []` appends an empty paragraph after a _heading_, which then gets
+saved. The stored document is the product, so that default was never
+acceptable. It is now `['paragraph', 'heading']`, set in `createExtensions`.
+
+**The 2 kB budget earned its keep twice in one block.** It caught this, and it
+caught the unshakeable `new PluginKey` in F12. Nothing else in CI looks at
+what a server-side consumer actually downloads — the editor budget has 20 kB
+of headroom and would have absorbed both without a murmur.
+
+Two further things the measurement turned up, both fixed here:
+
+- `trailingNode` only appends from `appendTransaction`, which never runs for
+  the document the editor was _created_ with. A saved document ending in a
+  table opened with nowhere to click after it — the exact case the rule
+  exists for. `TrailingNodeOnLoad` runs the check once at startup.
+- That startup insert is not a user edit, but it reached `onChange`, so
+  merely opening a document reported it as changed and would have triggered
+  an autosave on load. It now carries `NORMALISATION_META` and
+  `addToHistory: false`, and `onUpdate` additionally ignores any transaction
+  with `docChanged === false` — ProseMirror appends an empty one after it,
+  and that is the transaction Tiptap actually hands the callback.
 
 ### F12 — The drag handle is hand-rolled; Tiptap's costs 32.87 kB · measured 2026-10-13
 

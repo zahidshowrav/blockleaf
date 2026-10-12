@@ -721,3 +721,17 @@
 .blockleaf-block-menu__item[data-danger] .blockleaf-block-menu__icon {
 	color: inherit;
 }
+
+/*
+ * Placeholder
+ */
+
+.blockleaf-editor .blockleaf-empty-node::before {
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	/* Decoration, not content: it must not be clickable or selectable. */
+	pointer-events: none;
+	user-select: none;
+	color: var(--bl-color-muted);
+}

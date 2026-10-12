@@ -2,11 +2,14 @@ export {
 	HEADING_LEVELS,
 	MAX_LIST_DEPTH,
 	DEFAULT_CHANGE_DEBOUNCE_MS,
-	EDITOR_CLASS_NAME
+	EDITOR_CLASS_NAME,
+	NORMALISATION_META
 } from './constants.js';
 export {
 	BLOCK_NODE_TYPES,
 	Shortcuts,
+	TRAILING_NODE_NOT_AFTER,
+	TrailingNodeOnLoad,
 	createExtensions,
 	presets,
 	type PresetName

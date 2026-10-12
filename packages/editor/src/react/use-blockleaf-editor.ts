@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
+	NORMALISATION_META,
 	createExtensions,
 	withSchemaVersion,
 	type BlockleafDocument,
@@ -61,7 +62,14 @@ export const useBlockleafEditor = ({
 		editorProps: {
 			attributes: { class: `${EDITOR_CLASS_NAME}__content` }
 		},
-		onUpdate: ({ editor: instance }) => {
+		onUpdate: ({ editor: instance, transaction }) => {
+			// Normalising the document on load is not a user edit. The meta
+			// catches the transaction itself; the step check catches the
+			// empty transaction ProseMirror appends after it, which is what
+			// Tiptap actually hands this callback.
+			if (transaction.getMeta(NORMALISATION_META)) return;
+			if (!transaction.docChanged) return;
+
 			// The one cast in the package, and the right place for it: Tiptap's
 			// JSONContent is `any`-typed, so this is where a loose shape becomes the
 			// documented contract. M1 validates here instead of asserting.
