@@ -58,7 +58,7 @@ issues off and routes questions to Discussions.
 Discussions was enabled in repository settings and initialized on 2026-10-11.
 SC-15 is complete.
 
-### F13 — `@tiptap/extensions` declares no `sideEffects`; the placeholder is hand-rolled · measured 2026-10-13
+### F13 — Tiptap and ProseMirror packages declare no `sideEffects` · measured 2026-10-13
 
 `Placeholder` lives in `@tiptap/extensions@3.31.4`, which is already in the
 dependency tree via StarterKit, so this looked free. It was not.
@@ -81,8 +81,15 @@ already ships `trailingNode`; it was simply never configured, and its default
 saved. The stored document is the product, so that default was never
 acceptable. It is now `['paragraph', 'heading']`, set in `createExtensions`.
 
-**The 2 kB budget earned its keep twice in one block.** It caught this, and it
-caught the unshakeable `new PluginKey` in F12. Nothing else in CI looks at
+It happened a third time in CH-08: importing `CellSelection` from
+`@tiptap/pm/tables` to write `selection instanceof CellSelection` put 15.16 kB
+into the same budget, because `prosemirror-tables` declares no `sideEffects`
+either. A cell selection is now identified by its shape — `$anchorCell` and
+`$headCell`, the two properties that define it, both of which survive
+minification. Less obvious than `instanceof`, and commented accordingly.
+
+**The 2 kB budget earned its keep three times in one block.** It caught both
+of those, and it caught the unshakeable `new PluginKey` in F12. Nothing else in CI looks at
 what a server-side consumer actually downloads — the editor budget has 20 kB
 of headroom and would have absorbed both without a murmur.
 

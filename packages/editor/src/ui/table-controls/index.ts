@@ -34,3 +34,11 @@ export type {
 	TableControlsOptions,
 	TableMenuProps
 } from './types.js';
+export {
+	CELL_MENU_PLUGIN_KEY,
+	cellMenuShouldShow,
+	isCellSelection,
+	createCellMenuExtension,
+	defaultCellActions,
+	type CellMenuOptions
+} from './cell-menu.js';

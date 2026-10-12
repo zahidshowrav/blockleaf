@@ -114,5 +114,11 @@ export {
 	type TableControlsComponentProps,
 	type TableControlsOptions,
 	type TableMenuProps,
-	type TablePlacement
+	type TablePlacement,
+	CELL_MENU_PLUGIN_KEY,
+	cellMenuShouldShow,
+	isCellSelection,
+	createCellMenuExtension,
+	defaultCellActions,
+	type CellMenuOptions
 } from './table-controls/index.js';

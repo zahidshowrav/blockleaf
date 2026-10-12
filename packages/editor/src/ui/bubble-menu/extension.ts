@@ -32,6 +32,12 @@ const defaultShouldShow: BubbleMenuShouldShow = ({
 	if (from === to) return false;
 	if (editor.isActive('codeBlock')) return false;
 
+	// A cell selection belongs to the cell menu (CH-08). Two toolbars
+	// fighting over the same selection is worse than either of them.
+	// Shape-checked rather than `instanceof CellSelection` — see
+	// `isCellSelection` for why that import is not worth its weight.
+	if ('$anchorCell' in state.selection) return false;
+
 	// An empty-but-not-collapsed range (a selected image, a gap) has no text
 	// to format.
 	return state.doc.textBetween(from, to, ' ').trim().length > 0;

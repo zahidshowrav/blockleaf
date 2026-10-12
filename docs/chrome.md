@@ -286,6 +286,25 @@ type TableAction = {
 };
 ```
 
+### The cell menu
+
+Select across cells and a second bubble menu appears, offering merge, split,
+toggle header cell, insert row or column, delete row, and delete table.
+
+| Prop          | Default | What it does                                     |
+| ------------- | ------- | ------------------------------------------------ |
+| `cellMenu`    | `true`  | Turns the cell toolbar off entirely.             |
+| `cellActions` | —       | An array of actions, or `(defaults) => actions`. |
+
+It is the same surface as the text bubble menu — a second instance with its
+own plugin key, its own actions and its own `shouldShow` — which is why
+CH-02's bubble menu was built around the framework-agnostic plugin rather
+than a fixed React component.
+
+The two never appear together. A cell selection belongs to the cell menu, and
+the text menu stands down for it; a caret inside a single cell is ordinary
+text editing, which the row and column handles already cover.
+
 ---
 
 ## Placeholder

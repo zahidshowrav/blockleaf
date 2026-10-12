@@ -69,6 +69,7 @@ export {
 	createBubbleMenuExtension,
 	createCommandRegistry,
 	createDragHandleExtension,
+	createCellMenuExtension,
 	createTableControlsExtension,
 	createPlaceholderExtension,
 	createSlashMenuExtension,
@@ -76,6 +77,8 @@ export {
 	defaultBubbleActions,
 	defaultPlaceholderLabels,
 	defaultSlashCommands,
+	defaultCellActions,
+	isCellSelection,
 	defaultTableActions,
 	resolveBlockActions,
 	resolveTableActions,
@@ -103,6 +106,7 @@ export {
 	type SlashPickerProps,
 	type TableAction,
 	type TableAxis,
+	type CellMenuOptions,
 	type TableControlsOptions,
 	type TableMenuProps
 } from './ui/index.js';

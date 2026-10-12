@@ -24,6 +24,7 @@ import {
 	type SlashCommand
 } from './slash-menu/index.js';
 import {
+	createCellMenuExtension,
 	createTableControlsExtension,
 	type TableAction
 } from './table-controls/index.js';
@@ -84,6 +85,15 @@ export type BlockleafEditorProps = Omit<
 	 */
 	tableActions?: TableAction[] | ((defaults: TableAction[]) => TableAction[]);
 	/**
+	 * Whether the in-table cell bubble menu is enabled. Defaults to `true`.
+	 */
+	cellMenu?: boolean;
+	/**
+	 * Custom cell menu actions array or a function receiving defaults.
+	 */
+	cellActions?:
+		BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]);
+	/**
 	 * Placeholder text for the focused empty block. A string applies to every
 	 * block; an object labels paragraphs and headings separately. `false`
 	 * turns the placeholder off.
@@ -107,6 +117,8 @@ export const BlockleafEditor = ({
 	insertButton = true,
 	tableControls = true,
 	tableActions,
+	cellMenu = true,
+	cellActions,
 	placeholder,
 	...rest
 }: BlockleafEditorProps) => {
@@ -154,6 +166,11 @@ export const BlockleafEditor = ({
 			);
 		}
 
+		const hasCellMenu = chrome.some((ext) => ext.name === 'cellMenu');
+		if (cellMenu && !hasCellMenu) {
+			chrome.push(createCellMenuExtension({ actions: cellActions }));
+		}
+
 		const hasPlaceholder = chrome.some((ext) => ext.name === 'placeholder');
 		if (placeholder !== false && !hasPlaceholder) {
 			chrome.push(createPlaceholderExtension({ placeholder }));
@@ -175,6 +192,8 @@ export const BlockleafEditor = ({
 		insertButton,
 		tableControls,
 		tableActions,
+		cellMenu,
+		cellActions,
 		placeholder
 	]);
 
