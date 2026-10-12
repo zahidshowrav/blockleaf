@@ -32,14 +32,14 @@
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"
 		},
-		"./styles.css": "./dist/styles.css"
+		"./styles.css": "./dist/blockleaf.css"
 	},
 	"publishConfig": {
 		"access": "public",
 		"provenance": true
 	},
 	"scripts": {
-		"build": "tsdown && cp src/styles/blockleaf.css dist/styles.css",
+		"build": "tsdown",
 		"dev": "tsdown --watch",
 		"typecheck": "tsc --noEmit",
 		"lint": "eslint .",

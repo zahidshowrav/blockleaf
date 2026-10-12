@@ -9,6 +9,11 @@ pnpm install
 pnpm dev
 ```
 
+`pnpm dev` builds `@blockleaf/editor` once, then runs it in watch mode
+alongside the sandbox at <http://localhost:5180>. The sandbox imports the
+package by name, through its `exports` map, so what you are testing is what a
+consumer gets — not the source behind an alias.
+
 Node 22.22.1+ (see `.nvmrc`) and pnpm 11. `lint-staged` requires that Node
 floor; below it the pre-commit hook will not run.
 
