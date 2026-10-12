@@ -59,7 +59,8 @@
 		"@tiptap/extension-unique-id": "3.31.4",
 		"@tiptap/pm": "3.31.4",
 		"@tiptap/react": "3.31.4",
-		"@tiptap/starter-kit": "3.31.4"
+		"@tiptap/starter-kit": "3.31.4",
+		"@tiptap/suggestion": "3.31.4"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0 || ^19.0.0",

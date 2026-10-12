@@ -1,4 +1,32 @@
-// The default chrome — slash menu, bubble menu, drag handle — lands in M2.
-// The folder exists now so the core → react → ui import boundary is enforced
-// by lint from the first commit rather than retrofitted. See PROJECT_PLAN §2.
-export {};
+export {
+	BlockleafEditor,
+	Editor,
+	type BlockleafEditorProps
+} from './editor.js';
+export {
+	BulletListIcon,
+	CalloutIcon,
+	CodeIcon,
+	CommandRegistry,
+	DividerIcon,
+	Heading1Icon,
+	Heading2Icon,
+	Heading3Icon,
+	OrderedListIcon,
+	QuoteIcon,
+	SlashMenu,
+	SlashMenuExtension,
+	TableIcon,
+	TaskListIcon,
+	TextIcon,
+	createCommandRegistry,
+	createSlashMenuExtension,
+	defaultSlashCommands,
+	type AddCommandOptions,
+	type IconProps,
+	type SlashCommand,
+	type SlashCommandGroup,
+	type SlashMenuOptions,
+	type SlashMenuProps,
+	type SlashMenuRef
+} from './slash-menu/index.js';

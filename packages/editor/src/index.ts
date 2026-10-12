@@ -40,8 +40,25 @@ export {
 	type TextNode,
 	type UnderlineMark
 } from './core/index.js';
-export { BlockleafEditor, useBlockleafEditor } from './react/index.js';
-export type {
-	BlockleafEditorProps,
-	UseBlockleafEditorOptions
+export {
+	useBlockleafEditor,
+	type UseBlockleafEditorOptions
 } from './react/index.js';
+export {
+	BlockleafEditor,
+	Editor,
+	CommandRegistry,
+	SlashMenu,
+	SlashMenuExtension,
+	createCommandRegistry,
+	createSlashMenuExtension,
+	defaultSlashCommands,
+	type AddCommandOptions,
+	type BlockleafEditorProps,
+	type IconProps,
+	type SlashCommand,
+	type SlashCommandGroup,
+	type SlashMenuOptions,
+	type SlashMenuProps,
+	type SlashMenuRef
+} from './ui/index.js';

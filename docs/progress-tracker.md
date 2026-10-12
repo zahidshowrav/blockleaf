@@ -20,10 +20,10 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `EC`. `SC` scaffold is closed and `@blockleaf/editor@0.0.2` is live
-on npm (SC-14 exit test proven).
+**Position:** `CH`. `EC` editing core is closed and `@blockleaf/editor@0.0.3` is live
+on npm.
 
-**Last verified:** 2026-10-11. `@blockleaf/editor@0.0.2` verified on npm registry.
+**Last verified:** 2026-10-12. `@blockleaf/editor@0.0.3` verified on npm registry.
 
 ---
 
@@ -115,16 +115,16 @@ command API, with no chrome rendered.
 `src/ui/` is an empty placeholder today, existing only so the import boundary is
 enforced from the first commit.
 
-| Id    | Task                                                                | Status      | Commit | Completed |
-| ----- | ------------------------------------------------------------------- | ----------- | ------ | --------- |
-| CH-01 | Slash menu backed by a command registry                             | Not started | —      | —         |
-| CH-02 | Bubble menu with a link editor                                      | Not started | —      | —         |
-| CH-03 | Drag handle and block menu                                          | Not started | —      | —         |
-| CH-04 | Placeholder and trailing node                                       | Not started | —      | —         |
-| CH-05 | Keyboard-complete and axe-clean                                     | Not started | —      | —         |
-| CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13      | Not started | —      | —         |
-| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15 | Not started | —      | —         |
-| CH-08 | Bubble menu, inside a table only, for cell-level actions            | Not started | —      | —         |
+| Id    | Task                                                                | Status      | Commit | Completed  |
+| ----- | ------------------------------------------------------------------- | ----------- | ------ | ---------- |
+| CH-01 | Slash menu backed by a command registry                             | Done        | —      | 2026-10-12 |
+| CH-02 | Bubble menu with a link editor                                      | Not started | —      | —          |
+| CH-03 | Drag handle and block menu                                          | Not started | —      | —          |
+| CH-04 | Placeholder and trailing node                                       | Not started | —      | —          |
+| CH-05 | Keyboard-complete and axe-clean                                     | Not started | —      | —          |
+| CH-06 | Slash menu "Table" item with a grid-size picker, calling EC-13      | Not started | —      | —          |
+| CH-07 | In-table controls — row and column handles, calling EC-14 and EC-15 | Not started | —      | —          |
+| CH-08 | Bubble menu, inside a table only, for cell-level actions            | Not started | —      | —          |
 
 ## MC — Media and code (1 week)
 
