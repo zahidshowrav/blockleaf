@@ -246,6 +246,48 @@ block at a time; multi-block range dragging is not implemented.
 
 ---
 
+## In-table controls
+
+Put the cursor in a table and two handles appear: one above the current
+column, one to the left of the current row. Each opens a menu of operations
+for that axis.
+
+| Prop            | Default | What it does                                     |
+| --------------- | ------- | ------------------------------------------------ |
+| `tableControls` | `true`  | Turns the handles off entirely.                  |
+| `tableActions`  | —       | An array of actions, or `(defaults) => actions`. |
+
+**Row menu:** insert above, insert below, toggle header row, merge cells,
+split cell, delete row, delete table.
+**Column menu:** insert left, insert right, toggle header column, merge cells,
+split cell, delete column, delete table.
+
+Every entry calls a command from EC-14 or EC-15, and asks that same command
+whether it can run — `editor.can().mergeCells()` rather than re-deriving the
+answer. Two implementations of "can you merge this" would eventually
+disagree, and the command is the one that is already tested. An entry whose
+command cannot run is removed from the menu rather than disabled.
+
+Only the current row and column get a handle, not a strip of one per row and
+column. A strip means measuring every cell on every selection change and
+re-measuring on every resize, and it sits on the table's edges in a way that
+fights text selection. The cursor already says which row and column the user
+means.
+
+```ts
+type TableAction = {
+	id: string;
+	title: string;
+	axis: 'row' | 'column' | 'both';
+	icon?: ReactNode | ComponentType<IconProps> | (() => ReactNode);
+	isAvailable?: (editor: Editor) => boolean;
+	danger?: boolean;
+	run: (editor: Editor) => void;
+};
+```
+
+---
+
 ## Placeholder
 
 The empty block the cursor is in gets a label. Only that one — labelling every

@@ -90,3 +90,29 @@ export {
 	type SlashMenuRef,
 	type SlashPickerProps
 } from './slash-menu/index.js';
+export {
+	TABLE_CONTROLS_PLUGIN_KEY,
+	DeleteTableIcon,
+	HeaderIcon,
+	InsertAboveIcon,
+	InsertBelowIcon,
+	InsertLeftIcon,
+	InsertRightIcon,
+	MergeIcon,
+	SplitIcon,
+	TableControls,
+	TableControlsExtension,
+	TableMenu,
+	actionsForAxis,
+	createTableControlsExtension,
+	createTableControlsPlugin,
+	defaultTableActions,
+	measurePlacement,
+	resolveTableActions,
+	type TableAction,
+	type TableAxis,
+	type TableControlsComponentProps,
+	type TableControlsOptions,
+	type TableMenuProps,
+	type TablePlacement
+} from './table-controls/index.js';

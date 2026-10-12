@@ -23,6 +23,10 @@ import {
 	type CommandRegistry,
 	type SlashCommand
 } from './slash-menu/index.js';
+import {
+	createTableControlsExtension,
+	type TableAction
+} from './table-controls/index.js';
 
 export type BlockleafEditorProps = Omit<
 	BaseBlockleafEditorProps,
@@ -72,6 +76,14 @@ export type BlockleafEditorProps = Omit<
 	 */
 	insertButton?: boolean;
 	/**
+	 * Whether in-table row and column handles are enabled. Defaults to `true`.
+	 */
+	tableControls?: boolean;
+	/**
+	 * Custom table actions array or a function receiving defaults.
+	 */
+	tableActions?: TableAction[] | ((defaults: TableAction[]) => TableAction[]);
+	/**
 	 * Placeholder text for the focused empty block. A string applies to every
 	 * block; an object labels paragraphs and headings separately. `false`
 	 * turns the placeholder off.
@@ -93,6 +105,8 @@ export const BlockleafEditor = ({
 	dragHandle = true,
 	blockActions,
 	insertButton = true,
+	tableControls = true,
+	tableActions,
 	placeholder,
 	...rest
 }: BlockleafEditorProps) => {
@@ -131,6 +145,15 @@ export const BlockleafEditor = ({
 			);
 		}
 
+		const hasTableControls = chrome.some(
+			(ext) => ext.name === 'tableControls'
+		);
+		if (tableControls && !hasTableControls) {
+			chrome.push(
+				createTableControlsExtension({ actions: tableActions })
+			);
+		}
+
 		const hasPlaceholder = chrome.some((ext) => ext.name === 'placeholder');
 		if (placeholder !== false && !hasPlaceholder) {
 			chrome.push(createPlaceholderExtension({ placeholder }));
@@ -150,6 +173,8 @@ export const BlockleafEditor = ({
 		dragHandle,
 		blockActions,
 		insertButton,
+		tableControls,
+		tableActions,
 		placeholder
 	]);
 
