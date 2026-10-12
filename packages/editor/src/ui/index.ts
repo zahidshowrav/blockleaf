@@ -64,6 +64,9 @@ export {
 	CalloutIcon,
 	CodeIcon,
 	CommandRegistry,
+	GridPicker,
+	MAX_TABLE_COLS,
+	MAX_TABLE_ROWS,
 	DividerIcon,
 	Heading1Icon,
 	Heading2Icon,
@@ -84,5 +87,6 @@ export {
 	type SlashCommandGroup,
 	type SlashMenuOptions,
 	type SlashMenuProps,
-	type SlashMenuRef
+	type SlashMenuRef,
+	type SlashPickerProps
 } from './slash-menu/index.js';

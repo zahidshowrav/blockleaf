@@ -14,24 +14,43 @@ import type { SlashCommand, SlashMenuProps, SlashMenuRef } from './types.js';
 export const SlashMenu = /* @__PURE__ */ forwardRef<
 	SlashMenuRef,
 	SlashMenuProps
->(function SlashMenu({ items, command, query }, ref) {
+>(function SlashMenu({ items, command, editor, range, query }, ref) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [pickerFor, setPickerFor] = useState<SlashCommand | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const pickerRef = useRef<SlashMenuRef>(null);
 
 	const selectItem = useCallback(
 		(index: number) => {
 			const item = items[index];
-			if (item) {
-				command(item);
+			if (!item) return;
+
+			// A command that needs an argument opens its picker instead of
+			// running. The suggestion range is left intact so the picker can
+			// replace it when it finally does run.
+			if (item.picker) {
+				setPickerFor(item);
+				return;
 			}
+
+			command(item);
 		},
 		[items, command]
 	);
 
+	const closePicker = useCallback(() => setPickerFor(null), []);
+
 	useImperativeHandle(
 		ref,
 		() => ({
-			onKeyDown: ({ event }: SuggestionKeyDownProps): boolean => {
+			onKeyDown: (props: SuggestionKeyDownProps): boolean => {
+				const { event } = props;
+
+				// While a picker is open it owns the keyboard.
+				if (pickerFor) {
+					return pickerRef.current?.onKeyDown(props) ?? false;
+				}
+
 				if (items.length === 0) {
 					return false;
 				}
@@ -56,7 +75,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 				return false;
 			}
 		}),
-		[items, selectedIndex, selectItem]
+		[items, selectedIndex, selectItem, pickerFor]
 	);
 
 	// Group all useEffect calls together per project conventions
@@ -96,6 +115,23 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 			items: groupItems
 		}));
 	}, [items]);
+
+	if (pickerFor?.picker) {
+		const Picker = pickerFor.picker;
+		return (
+			<div
+				className="blockleaf-slash-menu"
+				role="presentation"
+			>
+				<Picker
+					ref={pickerRef}
+					editor={editor}
+					range={range}
+					onCancel={closePicker}
+				/>
+			</div>
+		);
+	}
 
 	if (items.length === 0) {
 		return (

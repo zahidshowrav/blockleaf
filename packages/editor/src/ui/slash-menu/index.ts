@@ -19,6 +19,7 @@ export {
 	defaultSlashCommands,
 	type AddCommandOptions
 } from './registry.js';
+export { GridPicker, MAX_TABLE_COLS, MAX_TABLE_ROWS } from './grid-picker.js';
 export { SlashMenu } from './slash-menu.js';
 export { SlashMenuExtension, createSlashMenuExtension } from './extension.js';
 export type {
@@ -26,5 +27,6 @@ export type {
 	SlashCommandGroup,
 	SlashMenuOptions,
 	SlashMenuProps,
-	SlashMenuRef
+	SlashMenuRef,
+	SlashPickerProps
 } from './types.js';

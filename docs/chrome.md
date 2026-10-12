@@ -57,6 +57,27 @@ list, Quote, Code, Callout, Divider and Table.
 `CommandRegistry` gives you `add` (with `before`, `after` or `index`), `remove`,
 `reorder`, `filter`, `get`, `getAll` and `clone`.
 
+### Commands that need an argument
+
+A command can carry a `picker` — a component rendered in place of the list
+when the item is chosen, for when the command needs an argument before it can
+run. **Table** uses one: an 8 × 8 grid, driven by pointer or arrow key, with
+`Enter` to insert and `Escape` to go back to the list.
+
+```ts
+type SlashPickerProps = {
+	editor: Editor;
+	/** The `/query` text to replace when the command finally runs. */
+	range: Range;
+	/** Dismiss the picker and return to the list. */
+	onCancel: () => void;
+};
+```
+
+A picker replaces `run`, but `run` still has to exist. It is the path a host
+gets when it renders its own menu, and the path `Mod`+`Alt`+`T` already takes
+— the chrome may not be the only way to reach a command.
+
 ---
 
 ## Bubble menu

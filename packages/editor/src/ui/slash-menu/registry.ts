@@ -1,3 +1,4 @@
+import { GridPicker } from './grid-picker.js';
 import {
 	BulletListIcon,
 	CalloutIcon,
@@ -128,11 +129,14 @@ export const defaultSlashCommands: SlashCommand[] = [
 	{
 		id: 'table',
 		title: 'Table',
-		description: 'Insert a 3×3 table with a header row.',
+		description: 'Pick a size, with a header row.',
 		aliases: ['table', 'grid', '|||'],
 		group: 'Advanced',
 		icon: TableIcon,
 		keywords: ['table', 'grid', 'rows', 'columns'],
+		picker: GridPicker,
+		// Reachable without the picker: `run` is what a host gets if it
+		// renders its own menu, and what `Mod-Alt-T` already does.
 		run: (editor) =>
 			editor
 				.chain()

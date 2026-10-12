@@ -57,6 +57,9 @@ export {
 	DragHandleExtension,
 	Editor,
 	CommandRegistry,
+	GridPicker,
+	MAX_TABLE_COLS,
+	MAX_TABLE_ROWS,
 	LinkEditor,
 	SlashMenu,
 	SlashMenuExtension,
@@ -90,5 +93,6 @@ export {
 	type SlashCommandGroup,
 	type SlashMenuOptions,
 	type SlashMenuProps,
-	type SlashMenuRef
+	type SlashMenuRef,
+	type SlashPickerProps
 } from './ui/index.js';
