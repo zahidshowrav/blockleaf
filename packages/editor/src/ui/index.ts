@@ -1,4 +1,28 @@
 export {
+	BUBBLE_MENU_PLUGIN_KEY,
+	BoldIcon,
+	BubbleMenu,
+	BubbleMenuExtension,
+	CheckIcon,
+	ExternalLinkIcon,
+	HighlightIcon,
+	InlineCodeIcon,
+	ItalicIcon,
+	LinkEditor,
+	LinkIcon,
+	StrikeIcon,
+	UnderlineIcon,
+	UnlinkIcon,
+	createBubbleMenuExtension,
+	defaultBubbleActions,
+	resolveBubbleActions,
+	type BubbleAction,
+	type BubbleMenuOptions,
+	type BubbleMenuProps,
+	type BubbleMenuShouldShow,
+	type LinkEditorProps
+} from './bubble-menu/index.js';
+export {
 	BlockleafEditor,
 	Editor,
 	type BlockleafEditorProps
