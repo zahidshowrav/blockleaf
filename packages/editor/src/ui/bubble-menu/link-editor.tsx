@@ -58,33 +58,49 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 	}, [sanitized]);
 
 	useEffect(() => {
-		// Focusing here is a race on two fronts: ProseMirror takes focus back
-		// when the shortcut's transaction settles, and `Mod+K` pressed before
-		// the toolbar has finished its update delay tries to focus an element
-		// that is still hidden, where `focus()` silently does nothing.
+		// Claiming focus here is a race on two fronts. ProseMirror takes
+		// focus back when the shortcut's transaction settles, and `Mod+K`
+		// pressed before the toolbar has finished its update delay tries to
+		// focus an element that is still hidden, where `focus()` silently
+		// does nothing.
 		//
-		// So retry on a timer until it sticks, with a bound. A timer rather
-		// than `requestAnimationFrame` because a hidden subtree can have its
-		// frames throttled, which is exactly the case being waited on.
+		// So hold the claim rather than making it once: re-assert on a timer
+		// until the window closes. A timer rather than
+		// `requestAnimationFrame` because a hidden subtree can have its
+		// frames throttled, which is the case being waited on.
 		const deadline = Date.now() + 1200;
+		let selected = false;
 
-		const attempt = () => {
+		const holdFocus = () => {
 			const input = inputRef.current;
 			if (!input) return true;
 
-			input.focus();
-			if (document.activeElement === input) {
-				input.select();
-				return true;
+			const active = input.ownerDocument.activeElement;
+			if (active !== input) {
+				// Only take focus back from the editor or from nothing —
+				// never from another control the user has deliberately
+				// moved to.
+				const isEditor =
+					active === null ||
+					active === input.ownerDocument.body ||
+					active.classList.contains('blockleaf-editor__content');
+
+				if (!isEditor) return true;
+
+				input.focus();
+				if (!selected && input.ownerDocument.activeElement === input) {
+					input.select();
+					selected = true;
+				}
 			}
 
 			return Date.now() > deadline;
 		};
 
-		if (attempt()) return;
+		if (holdFocus()) return;
 
 		const timer = setInterval(() => {
-			if (attempt()) clearInterval(timer);
+			if (holdFocus()) clearInterval(timer);
 		}, 32);
 
 		return () => clearInterval(timer);

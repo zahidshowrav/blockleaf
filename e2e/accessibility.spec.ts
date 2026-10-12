@@ -215,8 +215,12 @@ test.describe('A document built without touching the mouse', () => {
 		await page.keyboard.type('Link this text');
 		await page.keyboard.press('Shift+Home');
 
-		// No wait: inside the toolbar's update delay, where `focus()` on a
-		// hidden field silently does nothing.
+		// Long enough for the selection transaction to land — `Mod+K` on an
+		// empty selection correctly does nothing — but well inside the
+		// toolbar's 250 ms update delay, where the field is created hidden
+		// and `focus()` on it silently does nothing. The field has to end up
+		// focused anyway, once the toolbar appears.
+		await page.waitForTimeout(50);
 		await page.keyboard.press('Control+k');
 
 		await expect(page.getByLabel('Link address')).toBeFocused();
