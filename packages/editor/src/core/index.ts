@@ -22,6 +22,13 @@ export {
 	isMarkdownText,
 	markdownToHTML
 } from './paste.js';
+export {
+	isAbortError,
+	isUploadResult,
+	type UploadAdapter,
+	type UploadContext,
+	type UploadResult
+} from './upload.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
 export { TableKit } from '@tiptap/extension-table';
 export {

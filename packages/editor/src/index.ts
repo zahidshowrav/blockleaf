@@ -7,7 +7,9 @@ export {
 	TRAILING_NODE_NOT_AFTER,
 	TrailingNodeOnLoad,
 	createEmptyDocument,
+	isAbortError,
 	isBlockleafDocument,
+	isUploadResult,
 	withSchemaVersion,
 	type BlockNode,
 	type BlockleafDocument,
@@ -40,7 +42,10 @@ export {
 	type TaskItemNode,
 	type TaskListNode,
 	type TextNode,
-	type UnderlineMark
+	type UnderlineMark,
+	type UploadAdapter,
+	type UploadContext,
+	type UploadResult
 } from './core/index.js';
 export {
 	useBlockleafEditor,
