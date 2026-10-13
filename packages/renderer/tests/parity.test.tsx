@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { docOf, paragraph, text } from './fixtures.js';
-import { canonical, editorHTML, reactHTML } from './html.js';
+import { canonical, editorHTML, reactHTML, stringHTML } from './html.js';
 import { type RenderableDocument } from '../src/types.js';
 
 /**
- * The renderer and the editor must write the same HTML for the same document,
+ * Three implementations, one output. The React target, the HTML-string target
+ * and the editor must write the same HTML for the same document,
  * or the one stylesheet they share stops fitting both. Nothing enforces that
  * except this file: the two implementations have no code in common and no
  * reason to move together.
@@ -123,6 +124,18 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'highlight',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('lit', [
+					{ type: 'highlight', attrs: { color: '#ffee00' } }
+				])
+			]
+		})
+	],
+	[
 		'stacked marks',
 		docOf({
 			type: 'paragraph',
@@ -134,8 +147,12 @@ const cases: Array<[string, RenderableDocument]> = [
 
 describe('parity with the editor', () => {
 	for (const [name, doc] of cases) {
-		it(`writes the same HTML as the editor for a ${name}`, () => {
+		it(`renders a ${name} as the editor does, from React`, () => {
 			expect(canonical(reactHTML(doc))).toBe(canonical(editorHTML(doc)));
+		});
+
+		it(`renders a ${name} as the editor does, as a string`, () => {
+			expect(canonical(stringHTML(doc))).toBe(canonical(editorHTML(doc)));
 		});
 	}
 });

@@ -24,6 +24,12 @@ export {
 } from './attrs.js';
 export { sanitizeHref, sanitizeSrc } from './sanitize.js';
 export {
+	extractHeadings,
+	toPlainText,
+	type DocumentHeading,
+	type PlainTextOptions
+} from './text.js';
+export {
 	type HeadingLevel,
 	type ImageAlign,
 	type RenderableDocument,

@@ -7,6 +7,18 @@
 		"ignore": ["react"]
 	},
 	{
+		"name": "renderToHTML (a string, no React at all)",
+		"path": "dist/html.js",
+		"import": "{ renderToHTML }",
+		"limit": "3 kB"
+	},
+	{
+		"name": "text extractors only",
+		"path": "dist/index.js",
+		"import": "{ toPlainText, extractHeadings }",
+		"limit": "1 kB"
+	},
+	{
 		"name": "sanitisers only",
 		"path": "dist/index.js",
 		"import": "{ sanitizeHref, sanitizeSrc }",
