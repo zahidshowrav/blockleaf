@@ -3,10 +3,14 @@
 `@blockleaf/editor` never talks to a storage provider. You implement one
 interface; the editor drives it.
 
-> **Status.** MC-01 defines the contract below and validates it. The editor
-> does not call an adapter yet — drop, paste and picker entry points are MC-02,
-> progress and abort are MC-03. The interface is stable; wire your adapter now
-> and it will be used as soon as those land.
+```tsx
+<BlockleafEditor upload={adapter} />
+```
+
+Give it an adapter and dropping, pasting or picking a file just works.
+**Without one the upload extension is not added at all**, so files fall
+through to the browser rather than being swallowed by an editor with nowhere
+to put them.
 
 ## Why you own storage
 
@@ -191,6 +195,62 @@ An adapter runs in the browser, which means it runs on the user's machine and
 nothing it returns can be trusted. Check the file type and size in your
 endpoint, not only in the adapter, and validate the stored document at the
 mutation boundary with [`@blockleaf/editor/validate`](./schema.md).
+
+## Entry points
+
+Three ways in, all of them the same pipeline:
+
+| How        | What triggers it                                      |
+| ---------- | ----------------------------------------------------- |
+| **Drop**   | Files dropped anywhere on the editor.                 |
+| **Paste**  | Files on the clipboard — a screenshot, a copied file. |
+| **Picker** | `editor.commands.openUploadPicker()`.                 |
+
+A drop lands the image where the pointer was, not where the caret was. A
+paste lands it at the caret.
+
+### Options
+
+| Option           | Default            | What it does                           |
+| ---------------- | ------------------ | -------------------------------------- |
+| `upload`         | —                  | The adapter. Without it, nothing runs. |
+| `uploadAccept`   | `['image/*']`      | MIME patterns accepted.                |
+| `uploadMaxBytes` | `10485760` (10 MB) | Largest file accepted.                 |
+| `onUploadError`  | —                  | Called per rejected or failed file.    |
+
+`uploadAccept` takes the two forms an `<input accept>` takes: an exact type
+(`image/png`) and a wildcard subtype (`image/*`). Extension entries (`.png`)
+are not supported, deliberately — the browser-reported MIME type is what a
+server should be checking, and a file named `photo.png` is not necessarily a
+PNG.
+
+### Screening happens before the upload
+
+Type and size are checked **in the browser, before the adapter is called**, so
+a 40 MB video dropped by accident never leaves the machine. Each rejection
+calls `onUploadError` with a reason:
+
+| `reason`     | Means                                          |
+| ------------ | ---------------------------------------------- |
+| `no-adapter` | No adapter configured; the file was discarded. |
+| `type`       | Not in `uploadAccept`.                         |
+| `size`       | Larger than `uploadMaxBytes`.                  |
+| `adapter`    | The adapter rejected.                          |
+| `result`     | The adapter resolved with something unusable.  |
+
+None of this replaces checking on the server. See the last section.
+
+### The placeholder is not a node
+
+While an upload runs, the spot it will fill is held by a **widget
+decoration**, not by a node in the document.
+
+That matters for two reasons. ProseMirror maps a decoration's position through
+every edit made while the upload is in flight, so an image dropped at the end
+of a paragraph still lands there after you type three lines above it. And
+because it is not a node, there is nothing to strip out of the document before
+saving — a document serialised mid-upload contains no trace of the pending
+one.
 
 ## The image block
 

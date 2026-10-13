@@ -135,7 +135,7 @@ navigation, and a failed upload is retryable.
 | Id    | Task                                                                  | Status      | Commit    | Completed  |
 | ----- | --------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | MC-01 | Upload adapter interface (§4)                                         | Done        | `b6f7882` | 2026-10-13 |
-| MC-02 | Drop, paste and picker entry points                                   | Not started | —         | —          |
+| MC-02 | Drop, paste and picker entry points — +1.24 kB                        | Done        | `05657cb` | 2026-10-13 |
 | MC-03 | Progress and abort                                                    | Not started | —         | —          |
 | MC-04 | Image block with alt text and alignment — hand-rolled, +1.02 kB       | Done        | `a114e5d` | 2026-10-13 |
 | MC-05 | Code block — `lowlight`, curated grammars only (F10), language picker | Not started | —         | —          |
