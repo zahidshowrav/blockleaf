@@ -1,5 +1,6 @@
 import {
 	useCallback,
+	useMemo,
 	useRef,
 	useState,
 	useSyncExternalStore,
@@ -8,7 +9,11 @@ import {
 
 import { LinkIcon } from './icons.js';
 import { LinkEditor } from './link-editor.js';
-import type { BubbleAction, BubbleMenuProps } from './types.js';
+import type {
+	BubbleAction,
+	BubbleMenuPanel,
+	BubbleMenuProps
+} from './types.js';
 
 const renderIcon = (icon: BubbleAction['icon']) => {
 	if (!icon) return null;
@@ -20,13 +25,29 @@ const renderIcon = (icon: BubbleAction['icon']) => {
 };
 
 /**
+ * The link editor, expressed as a panel like any other.
+ *
+ * It is built in rather than passed because `Mod-K` is a built-in shortcut
+ * and the extension needs to know which panel to open.
+ */
+const LINK_PANEL: BubbleMenuPanel = {
+	id: 'link',
+	label: (editor) => (editor.isActive('link') ? 'Edit link' : 'Add link'),
+	icon: LinkIcon,
+	shortcut: 'Mod+K',
+	isActive: (editor) => editor.isActive('link'),
+	component: LinkEditor
+};
+
+/**
  * Re-renders only when the active or available set actually changes, rather
  * than on every transaction. The toolbar is live while the user types, and a
  * re-render per keystroke is the easy way to make a long document feel slow.
  */
 const useActionSignature = (
 	editor: BubbleMenuProps['editor'],
-	actions: BubbleAction[]
+	actions: BubbleAction[],
+	panels: BubbleMenuPanel[]
 ): string => {
 	const subscribe = useCallback(
 		(onChange: () => void) => {
@@ -47,8 +68,17 @@ const useActionSignature = (
 							action.isAvailable?.(editor) === false ? '0' : '1'
 						}`
 				)
-				.join('|') + `|link:${editor.isActive('link') ? '1' : '0'}`,
-		[editor, actions]
+				.join('|') +
+			'|' +
+			panels
+				.map(
+					(panel) =>
+						`${panel.id}:${panel.isActive?.(editor) ? '1' : '0'}:${panel.label(
+							editor
+						)}`
+				)
+				.join('|'),
+		[editor, actions, panels]
 	);
 
 	return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
@@ -58,23 +88,36 @@ export const BubbleMenu = ({
 	editor,
 	actions,
 	link,
+	panel,
+	label = 'Text formatting',
 	openLinkRequest = 0
 }: BubbleMenuProps) => {
-	const [isEditingLink, setIsEditingLink] = useState(false);
+	const [openPanelId, setOpenPanelId] = useState<string | null>(null);
 	const [focusedIndex, setFocusedIndex] = useState(0);
 	const [seenLinkRequest, setSeenLinkRequest] = useState(openLinkRequest);
 	const toolbarRef = useRef<HTMLDivElement>(null);
-	const linkButtonRef = useRef<HTMLButtonElement>(null);
+	const panelButtonRefs = useRef(new Map<string, HTMLButtonElement | null>());
+	// Which panel button to focus once the toolbar comes back. A ref, not
+	// state: the button does not exist while its panel is open, so the
+	// focus has to be claimed when it mounts rather than when the panel
+	// closes — and that needs no re-render of its own.
+	const pendingFocusRef = useRef<string | null>(null);
+
+	const panels = useMemo(() => {
+		const resolved: BubbleMenuPanel[] = [];
+		if (link) resolved.push(LINK_PANEL);
+		if (panel) resolved.push(panel);
+		return resolved;
+	}, [link, panel]);
 
 	// Subscribing re-runs this component whenever the marks under the
 	// selection change, which is what keeps `aria-pressed` honest.
-	useActionSignature(editor, actions);
+	useActionSignature(editor, actions, panels);
 
 	const visibleActions = actions.filter(
 		(action) => action.isAvailable?.(editor) !== false
 	);
-	const isLinkActive = editor.isActive('link');
-	const buttonCount = visibleActions.length + (link ? 1 : 0);
+	const buttonCount = visibleActions.length + panels.length;
 	// Clamped during render rather than corrected in an effect: an action can
 	// disappear mid-selection, and a cascading re-render to fix the index
 	// would be a frame of focus pointing at nothing.
@@ -127,25 +170,27 @@ export const BubbleMenu = ({
 		[buttonCount, activeIndex, moveFocus, editor]
 	);
 
-	const closeLinkEditor = useCallback(() => {
-		setIsEditingLink(false);
-		linkButtonRef.current?.focus();
-	}, []);
+	const closePanel = useCallback(() => {
+		pendingFocusRef.current = openPanelId;
+		setOpenPanelId(null);
+	}, [openPanelId]);
 
 	// Adjusting state from a changed prop during render, rather than in an
 	// effect — the effect version renders the toolbar once before swapping to
 	// the link editor, which steals the focus the shortcut just placed.
 	if (openLinkRequest !== seenLinkRequest) {
 		setSeenLinkRequest(openLinkRequest);
-		setIsEditingLink(true);
+		setOpenPanelId(LINK_PANEL.id);
 	}
 
-	if (isEditingLink && link) {
+	const activePanel = panels.find((entry) => entry.id === openPanelId);
+	if (activePanel) {
+		const PanelComponent = activePanel.component;
 		return (
 			<div className="blockleaf-bubble-menu">
-				<LinkEditor
+				<PanelComponent
 					editor={editor}
-					onClose={closeLinkEditor}
+					onClose={closePanel}
 				/>
 			</div>
 		);
@@ -155,7 +200,7 @@ export const BubbleMenu = ({
 		<div
 			ref={toolbarRef}
 			role="toolbar"
-			aria-label="Text formatting"
+			aria-label={label}
 			aria-orientation="horizontal"
 			className="blockleaf-bubble-menu"
 			onKeyDown={onToolbarKeyDown}
@@ -182,28 +227,39 @@ export const BubbleMenu = ({
 				</button>
 			))}
 
-			{link && (
-				<button
-					ref={linkButtonRef}
-					type="button"
-					data-bubble-button=""
-					data-action="link"
-					className="blockleaf-bubble-menu__button"
-					aria-pressed={isLinkActive}
-					aria-label={isLinkActive ? 'Edit link' : 'Add link'}
-					aria-haspopup="dialog"
-					title={
-						isLinkActive ? 'Edit link (Mod+K)' : 'Add link (Mod+K)'
-					}
-					tabIndex={visibleActions.length === activeIndex ? 0 : -1}
-					onFocus={() => setFocusedIndex(visibleActions.length)}
-					onClick={() => setIsEditingLink(true)}
-				>
-					<span aria-hidden="true">
-						<LinkIcon />
-					</span>
-				</button>
-			)}
+			{panels.map((entry, offset) => {
+				const index = visibleActions.length + offset;
+				const entryLabel = entry.label(editor);
+				return (
+					<button
+						key={entry.id}
+						ref={(node) => {
+							panelButtonRefs.current.set(entry.id, node);
+							if (node && pendingFocusRef.current === entry.id) {
+								pendingFocusRef.current = null;
+								node.focus();
+							}
+						}}
+						type="button"
+						data-bubble-button=""
+						data-action={entry.id}
+						className="blockleaf-bubble-menu__button"
+						aria-pressed={entry.isActive?.(editor) ?? false}
+						aria-label={entryLabel}
+						aria-haspopup="dialog"
+						title={
+							entry.shortcut
+								? `${entryLabel} (${entry.shortcut})`
+								: entryLabel
+						}
+						tabIndex={index === activeIndex ? 0 : -1}
+						onFocus={() => setFocusedIndex(index)}
+						onClick={() => setOpenPanelId(entry.id)}
+					>
+						<span aria-hidden="true">{renderIcon(entry.icon)}</span>
+					</button>
+				);
+			})}
 		</div>
 	);
 };

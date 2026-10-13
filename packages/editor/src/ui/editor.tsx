@@ -15,6 +15,10 @@ import {
 	type BlockAction
 } from './drag-handle/index.js';
 import {
+	createImageMenuExtension,
+	type ImageMenuOptions
+} from './image/index.js';
+import {
 	createPlaceholderExtension,
 	type PlaceholderLabels
 } from './placeholder.js';
@@ -94,6 +98,15 @@ export type BlockleafEditorProps = Omit<
 	cellActions?:
 		BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]);
 	/**
+	 * Whether the bubble menu for a selected image is enabled. Defaults to
+	 * `true`.
+	 */
+	imageMenu?: boolean;
+	/**
+	 * Custom image menu actions array or a function receiving defaults.
+	 */
+	imageActions?: ImageMenuOptions['actions'];
+	/**
 	 * Placeholder text for the focused empty block. A string applies to every
 	 * block; an object labels paragraphs and headings separately. `false`
 	 * turns the placeholder off.
@@ -119,6 +132,8 @@ export const BlockleafEditor = ({
 	tableActions,
 	cellMenu = true,
 	cellActions,
+	imageMenu = true,
+	imageActions,
 	placeholder,
 	...rest
 }: BlockleafEditorProps) => {
@@ -171,6 +186,11 @@ export const BlockleafEditor = ({
 			chrome.push(createCellMenuExtension({ actions: cellActions }));
 		}
 
+		const hasImageMenu = chrome.some((ext) => ext.name === 'imageMenu');
+		if (imageMenu && !hasImageMenu) {
+			chrome.push(createImageMenuExtension({ actions: imageActions }));
+		}
+
 		const hasPlaceholder = chrome.some((ext) => ext.name === 'placeholder');
 		if (placeholder !== false && !hasPlaceholder) {
 			chrome.push(createPlaceholderExtension({ placeholder }));
@@ -194,6 +214,8 @@ export const BlockleafEditor = ({
 		tableActions,
 		cellMenu,
 		cellActions,
+		imageMenu,
+		imageActions,
 		placeholder
 	]);
 

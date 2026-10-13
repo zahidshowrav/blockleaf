@@ -17,11 +17,41 @@ export {
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
+	Image,
+	sanitizeSrc,
+	type ImageAlign,
+	type ImageAttributes,
+	type ImageOptions
+} from './nodes/image.js';
+export {
 	PasteNormalizer,
 	normalizePastedHTML,
 	isMarkdownText,
 	markdownToHTML
 } from './paste.js';
+export {
+	isAbortError,
+	isUploadResult,
+	type UploadAdapter,
+	type UploadContext,
+	type UploadResult
+} from './upload.js';
+export {
+	DEFAULT_MAX_UPLOAD_BYTES,
+	DEFAULT_UPLOAD_ACCEPT,
+	UPLOAD_PLUGIN_KEY,
+	UploadExtension,
+	createUploadExtension,
+	isAcceptedType,
+	matchesAccept,
+	screenFiles,
+	type PendingUpload,
+	type UploadExtensionOptions,
+	type UploadFailure,
+	type UploadFailureReason,
+	type UploadScreening,
+	type UploadState
+} from './upload-extension.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
 export { TableKit } from '@tiptap/extension-table';
 export {

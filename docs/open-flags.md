@@ -8,11 +8,60 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13 · **Last reviewed:** 2026-10-13
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14 · **Last reviewed:** 2026-10-13
 
 ---
 
 ## Settled
+
+### F14 — the code block ships as an opt-in subpath · measured 2026-10-13
+
+F10 chose a curated grammar set over `common` and recorded 26.37 kB of
+headroom left afterwards. That headroom no longer exists: `CH` spent roughly
+25 kB on the chrome, and `MC-01` to `MC-04` another 2.75 kB. The decision was
+not wrong — its margin was simply consumed by the work it was protecting.
+
+Re-measured against the real bundle rather than F10's three-day-old baseline:
+
+| Build                                |          Size | Headroom under 160 kB |
+| ------------------------------------ | ------------: | --------------------: |
+| Baseline, after MC-04                | **144.63 kB** |              15.37 kB |
+| + curated code block in `standard`   | **161.16 kB** |   **−1.16 kB — over** |
+| Opt-in subpath, main entry unchanged | **144.63 kB** |              15.37 kB |
+
+The marginal cost of the curated code block is **16.53 kB**, which confirms
+F10's 16.69 kB. What changed is what is left to pay it with: 15.37 kB. The
+default build does not merely get tight, it **breaches the ceiling by
+1.16 kB** — before `details`, before the renderer, before `HD`.
+
+**Decision: `@blockleaf/editor/code-block`, imported explicitly.**
+
+```ts
+import { createExtensions } from '@blockleaf/editor/extensions';
+import { createCodeBlock } from '@blockleaf/editor/code-block';
+
+const extensions = [...createExtensions('standard'), createCodeBlock()];
+```
+
+This is the shape F5 already chose for `@blockleaf/editor/validate`, for the
+same reason: a feature most consumers will not use does not get charged to all
+of them. A document with no code in it now costs nothing for syntax
+highlighting, and a host that wants it pays 16.53 kB knowingly.
+
+`StarterKit`'s plain `codeBlock` is untouched and still in the default build.
+Opting out of the subpath means code blocks without highlighting, not no code
+blocks — and the stored shape is identical either way, because `CodeBlockNode`
+has carried an optional `language` since the v0.1 schema. Nothing migrates.
+
+**Why not raise the ceiling instead.** It was already raised once, from 130 kB
+to 160 kB, by F10. A budget that moves whenever something does not fit is not
+a budget, and the thing asking for the increase is syntax highlighting — not
+the editor. 400 kB editors are built one justified 16 kB at a time.
+
+**Why not cut the grammar set further.** Seven is already the floor at which
+the feature is worth having. The cost is not the grammars alone; `lowlight`
+and `highlight.js`'s core carry most of it, so dropping to three would save
+far less than it looks and make the feature worse.
 
 ### F1 — `@blockleaf` claimed on npm · settled 2026-10-11
 

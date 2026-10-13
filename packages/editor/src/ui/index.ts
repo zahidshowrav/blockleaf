@@ -18,6 +18,8 @@ export {
 	resolveBubbleActions,
 	type BubbleAction,
 	type BubbleMenuOptions,
+	type BubbleMenuPanel,
+	type BubbleMenuPanelProps,
 	type BubbleMenuProps,
 	type BubbleMenuShouldShow,
 	type LinkEditorProps
@@ -45,6 +47,19 @@ export {
 	type DragHandleController,
 	type DragHandleOptions
 } from './drag-handle/index.js';
+export {
+	AlignCenterIcon,
+	AlignLeftIcon,
+	AlignRightIcon,
+	AltEditor,
+	AltTextIcon,
+	IMAGE_MENU_PLUGIN_KEY,
+	createImageMenuExtension,
+	defaultImageActions,
+	imageMenuShouldShow,
+	isImageSelection,
+	type ImageMenuOptions
+} from './image/index.js';
 export {
 	BlockleafEditor,
 	Editor,

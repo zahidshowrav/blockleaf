@@ -1,0 +1,113 @@
+# Code blocks
+
+Syntax highlighting ships as an opt-in subpath, not in the default bundle.
+
+```ts
+import { createExtensions } from '@blockleaf/editor/extensions';
+import { withCodeBlock } from '@blockleaf/editor/code-block';
+
+const extensions = withCodeBlock(createExtensions('standard'));
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+## Why it is a subpath
+
+`lowlight` and its grammars cost **16.53 kB**. The default bundle had
+**15.37 kB** left under its 160 kB ceiling, so shipping highlighting by
+default put the editor at 161.16 kB — over the line, before the renderer or
+any of the remaining nodes were built.
+
+Most documents contain no code at all. Charging every consumer for a feature
+most of them will not use is how a 400 kB editor happens, one justified 16 kB
+at a time. So importing from `@blockleaf/editor/code-block` is what adds the
+weight, and importing nothing adds nothing. The measurement is recorded as
+F14 in [`open-flags.md`](./open-flags.md); the same shape was chosen for
+`@blockleaf/editor/validate` in F5.
+
+**Without the subpath you still get code blocks** — `StarterKit`'s plain one,
+with ` ` ``` input rules and `Mod`+`Alt`+`C`. You get them without
+colours. The stored document is byte-identical either way, because
+`CodeBlockNode` has carried an optional `language` since the v0.1 schema.
+Adding or removing the subpath migrates nothing.
+
+## `withCodeBlock` versus `createCodeBlock`
+
+Both the plain and the highlighted extension are named `codeBlock`, and two
+Tiptap extensions sharing a name is a warning and an undefined winner.
+`withCodeBlock` filters the plain one out before adding the highlighted one,
+which makes the replacement explicit:
+
+```ts
+withCodeBlock(createExtensions('standard'));
+// ≡ [...extensions without codeBlock, createCodeBlock()]
+```
+
+Use `createCodeBlock()` directly only when you are assembling an extension
+array that never had a code block in it.
+
+For a non-React consumer, `createCodeBlockExtension()` is the same thing
+without the language picker — `src/core` cannot import React, so the picker is
+assembled a layer up.
+
+## The grammar set
+
+Seven languages ship by default:
+
+`bash` · `css` · `javascript` · `json` · `python` · `typescript` · `xml`
+
+`xml` covers HTML; highlight.js has no separate HTML grammar.
+
+Seven rather than lowlight's `common` set of thirty-seven, because `common`
+costs 39.27 kB against 16.53 kB curated. Syntax highlighting is not worth more
+of the budget than the rest of the editor.
+
+### Registering more
+
+```ts
+import rust from 'highlight.js/lib/languages/rust';
+import { withCodeBlock } from '@blockleaf/editor/code-block';
+
+withCodeBlock(createExtensions('standard'), {
+	additionalLanguages: { rust }
+});
+```
+
+`additionalLanguages` adds to the curated set. `languages` replaces it
+entirely, for hosts that want three languages rather than ten.
+
+Whatever is registered is what the picker offers — a language in the dropdown
+that no grammar backs would be a promise the editor cannot keep.
+
+## The language picker
+
+A dropdown in the block's top-right corner, visible on hover or focus,
+labelled `Code language` for screen readers and disabled in a read-only
+document. Choosing **Plain text** sets `language` to `null`.
+
+Turn it off with `createCodeBlock({ picker: false })` — you keep the
+highlighting and lose the dropdown.
+
+The picker is a React node view, which means the code block renders through
+React rather than through `renderHTML`. If you are reaching for the DOM in a
+test, assert on `editor.getJSON()` instead; the class names come from the node
+view, not the schema.
+
+## An unknown language does not break the document
+
+A document saved with `language: "rust"` by a host that registered Rust will
+be opened by hosts that did not.
+
+When that happens the block renders **unhighlighted**, and keeps its
+`language` attribute. It does not throw, and the attribute is not stripped —
+stripping it would quietly destroy the author's choice on the next save, which
+is worse than showing plain text.
+
+This needs saying because the upstream extension does throw: it guards the
+unregistered case against `highlight.js`'s module-level registry rather than
+the instance's, and those are two different registries. The throw happens
+while the plugin builds its first decorations, which is during editor
+construction — so the failure mode is a blank screen, not a dull code block.
+`createCodeBlock` wraps the lowlight instance to close that hole.

@@ -21,6 +21,7 @@
 	--bl-color-highlight: #fef08a;
 	--bl-color-table-border: #e2e8f0;
 	--bl-color-table-header-bg: #f8fafc;
+	--bl-color-danger: #b42318;
 
 	/* type */
 	--bl-font-body:
@@ -58,6 +59,7 @@
 		--bl-color-highlight: rgba(254, 240, 138, 0.25);
 		--bl-color-table-border: #30363d;
 		--bl-color-table-header-bg: #161b22;
+		--bl-color-danger: #ff7b72;
 	}
 }
 
@@ -75,6 +77,7 @@
 	--bl-color-highlight: rgba(254, 240, 138, 0.25);
 	--bl-color-table-border: #30363d;
 	--bl-color-table-header-bg: #161b22;
+	--bl-color-danger: #ff7b72;
 }
 
 .blockleaf-editor__content {
@@ -158,6 +161,35 @@
 	max-width: 100%;
 	height: auto;
 	border-radius: var(--bl-radius);
+}
+
+/* The image node. Alignment is an attribute rather than a wrapper element so
+   that the stored document stays a single node and the HTML round-trips. */
+.blockleaf-editor__content .blockleaf-image {
+	display: block;
+	margin-inline: 0 auto;
+}
+
+.blockleaf-editor__content .blockleaf-image[data-align='center'] {
+	margin-inline: auto;
+}
+
+.blockleaf-editor__content .blockleaf-image[data-align='right'] {
+	margin-inline: auto 0;
+}
+
+/* An atom node never shows a text selection, so a selected image needs an
+   outline of its own or there is no way to tell it is selected. */
+.blockleaf-editor__content .blockleaf-image.ProseMirror-selectednode {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 2px;
+}
+
+/* A broken or still-loading src must not collapse the block to nothing, or
+   the caret has no block to land beside. */
+.blockleaf-editor__content .blockleaf-image:not([src]) {
+	min-height: 2rem;
+	background: var(--bl-color-code-bg);
 }
 
 .blockleaf-editor__content mark {
@@ -522,7 +554,7 @@
 	outline-offset: -2px;
 }
 
-.blockleaf-bubble-menu__link-editor {
+.blockleaf-bubble-menu__panel {
 	display: flex;
 	align-items: center;
 	gap: 2px;
@@ -530,7 +562,7 @@
 	max-width: 320px;
 }
 
-.blockleaf-bubble-menu__link-input {
+.blockleaf-bubble-menu__panel-input {
 	flex: 1 1 200px;
 	min-width: 160px;
 	padding: 4px 8px;
@@ -542,21 +574,157 @@
 	font-size: inherit;
 }
 
-.blockleaf-bubble-menu__link-input:focus-visible {
+.blockleaf-bubble-menu__panel-input:focus-visible {
 	outline: 2px solid var(--bl-bubble-active-fg);
 	outline-offset: -1px;
 }
 
-.blockleaf-bubble-menu__link-input[aria-invalid='true'] {
+.blockleaf-bubble-menu__panel-input[aria-invalid='true'] {
 	border-color: var(--bl-bubble-danger);
 }
 
-.blockleaf-bubble-menu__link-error {
+.blockleaf-bubble-menu__panel-error {
 	flex: 1 0 100%;
 	margin: 2px 0 0;
 	padding: 0 2px;
 	color: var(--bl-bubble-danger);
 	font-size: 0.75rem;
+}
+
+/* Same slot as the error line, but advice rather than a failure — so it must
+   not borrow the danger colour. */
+.blockleaf-bubble-menu__panel-hint {
+	flex: 1 0 100%;
+	margin: 2px 0 0;
+	padding: 0 2px;
+	color: var(--bl-bubble-muted);
+	font-size: 0.75rem;
+}
+
+/*
+ * Code block — only rendered when the opt-in subpath is imported (F14)
+ */
+
+.blockleaf-code-block-wrapper {
+	position: relative;
+}
+
+/* The picker sits over the block's top-right corner. It is chrome around the
+   node, not content, so it must not take part in text layout. */
+.blockleaf-code-block__language {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	padding: 2px 4px;
+	border: 1px solid var(--bl-color-border);
+	border-radius: calc(var(--bl-radius) - 2px);
+	background: var(--bl-color-bg);
+	color: var(--bl-color-muted);
+	font-family: var(--bl-font-body);
+	font-size: 0.75rem;
+	opacity: 0;
+	transition: opacity 120ms ease;
+}
+
+.blockleaf-code-block-wrapper:hover .blockleaf-code-block__language,
+.blockleaf-code-block__language:focus-visible {
+	opacity: 1;
+}
+
+.blockleaf-code-block__language:focus-visible {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 1px;
+}
+
+/* Leave room for the picker so a long first line does not run under it. */
+.blockleaf-code-block-wrapper pre {
+	padding-right: 96px;
+}
+
+/*
+ * Upload placeholder
+ */
+
+/* A widget decoration, so it holds a position without being a node in the
+   saved document. */
+.blockleaf-upload {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: var(--bl-space-block) 0;
+	padding: 8px 12px;
+	border: 1px dashed var(--bl-color-border);
+	border-radius: var(--bl-radius);
+	background: var(--bl-color-code-bg);
+	color: var(--bl-color-muted);
+	font-size: 0.875rem;
+}
+
+.blockleaf-upload[data-state='error'] {
+	border-style: solid;
+	border-color: var(--bl-color-danger);
+	color: var(--bl-color-danger);
+}
+
+.blockleaf-upload__name {
+	flex: 0 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.blockleaf-upload__track {
+	flex: 1 1 80px;
+	height: 4px;
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--bl-color-border);
+}
+
+.blockleaf-upload__bar {
+	width: 0;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--bl-color-accent);
+	transition: width 120ms linear;
+}
+
+/* No measurable progress: a short bar sweeping the track says "working"
+   without claiming a percentage. */
+.blockleaf-upload__track[data-indeterminate='true'] .blockleaf-upload__bar {
+	width: 40%;
+	animation: blockleaf-upload-sweep 1.2s ease-in-out infinite;
+}
+
+@keyframes blockleaf-upload-sweep {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(250%);
+	}
+}
+
+.blockleaf-upload__action {
+	flex: 0 0 auto;
+	padding: 2px 8px;
+	border: 1px solid currentColor;
+	border-radius: calc(var(--bl-radius) - 2px);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 0.8125rem;
+	cursor: pointer;
+}
+
+.blockleaf-upload__action:hover {
+	background: var(--bl-color-bg);
+}
+
+.blockleaf-upload__action:focus-visible {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 1px;
 }
 
 /*

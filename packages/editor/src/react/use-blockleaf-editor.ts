@@ -7,9 +7,12 @@ import {
 	EDITOR_CLASS_NAME,
 	NORMALISATION_META,
 	createExtensions,
+	createUploadExtension,
 	withSchemaVersion,
 	type BlockleafDocument,
-	type PresetName
+	type PresetName,
+	type UploadAdapter,
+	type UploadFailure
 } from '../core/index.js';
 
 export type UseBlockleafEditorOptions = {
@@ -38,6 +41,18 @@ export type UseBlockleafEditorOptions = {
 	 * surface.
 	 */
 	label?: string;
+	/**
+	 * Where dropped, pasted and picked files go. Without it the editor has
+	 * nowhere to put a file, and discards it with an `onUploadError` of
+	 * `no-adapter` rather than failing silently.
+	 */
+	upload?: UploadAdapter;
+	/** MIME patterns accepted, e.g. `['image/png', 'image/*']`. */
+	uploadAccept?: string[];
+	/** Largest file accepted, in bytes. */
+	uploadMaxBytes?: number;
+	/** Called for every rejected file and every failed upload. */
+	onUploadError?: (failure: UploadFailure) => void;
 };
 
 export const useBlockleafEditor = ({
@@ -49,7 +64,11 @@ export const useBlockleafEditor = ({
 	debounceMs = DEFAULT_CHANGE_DEBOUNCE_MS,
 	editable = true,
 	autofocus = false,
-	label = 'Document'
+	label = 'Document',
+	upload,
+	uploadAccept,
+	uploadMaxBytes,
+	onUploadError
 }: UseBlockleafEditorOptions = {}): Editor | null => {
 	const onChangeRef = useRef(onChange);
 	const onChangeImmediateRef = useRef(onChangeImmediate);
@@ -57,10 +76,29 @@ export const useBlockleafEditor = ({
 		undefined
 	);
 
-	const resolvedExtensions = useMemo(
-		() => extensions ?? createExtensions(preset),
-		[extensions, preset]
-	);
+	const resolvedExtensions = useMemo(() => {
+		const base = extensions ?? createExtensions(preset);
+		if (!upload) return base;
+		// Only added when there is an adapter: the plugin's drop and
+		// paste handlers swallow files, and swallowing them with nowhere
+		// to put them would be worse than letting the browser refuse.
+		return [
+			...base,
+			createUploadExtension({
+				adapter: upload,
+				...(uploadAccept ? { accept: uploadAccept } : {}),
+				...(uploadMaxBytes ? { maxBytes: uploadMaxBytes } : {}),
+				onError: onUploadError
+			})
+		];
+	}, [
+		extensions,
+		preset,
+		upload,
+		uploadAccept,
+		uploadMaxBytes,
+		onUploadError
+	]);
 
 	const editor = useEditor({
 		extensions: resolvedExtensions,

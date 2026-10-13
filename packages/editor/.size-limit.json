@@ -12,5 +12,12 @@
 		"import": "{ createEmptyDocument, isBlockleafDocument, SCHEMA_VERSION }",
 		"limit": "2 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "code block subpath, standalone (shares the runtime in practice)",
+		"path": "dist/code-block.js",
+		"import": "{ createCodeBlock }",
+		"limit": "85 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

@@ -21,6 +21,8 @@ export { LinkEditor } from './link-editor.js';
 export type {
 	BubbleAction,
 	BubbleMenuOptions,
+	BubbleMenuPanel,
+	BubbleMenuPanelProps,
 	BubbleMenuProps,
 	BubbleMenuShouldShow,
 	LinkEditorProps
