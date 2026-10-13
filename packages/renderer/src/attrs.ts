@@ -150,3 +150,110 @@ export const highlightColor = (mark: RenderableMark): string | undefined => {
 	const color = mark.attrs?.color;
 	return typeof color === 'string' && color ? color : undefined;
 };
+
+/* -------------------------------------------------------------------------- */
+/* Tables                                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The width prosemirror-tables gives a column that has none. The editor writes
+ * it into its own `<colgroup>`, so the renderer matches it.
+ */
+const CELL_MIN_WIDTH = 25;
+
+const HEADER_CELL = 'tableHeader';
+
+const spanOf = (node: RenderableNode, name: 'colspan' | 'rowspan'): number => {
+	const value = node.attrs?.[name];
+	return typeof value === 'number' && Number.isInteger(value) && value > 1
+		? value
+		: 1;
+};
+
+export const colspan = (node: RenderableNode): number =>
+	spanOf(node, 'colspan');
+export const rowspan = (node: RenderableNode): number =>
+	spanOf(node, 'rowspan');
+
+export const tableRows = (table: RenderableNode): RenderableNode[] =>
+	(table.content ?? []).filter((row) => row.type === 'tableRow');
+
+/**
+ * How many rows from the top are made entirely of header cells.
+ *
+ * A row with a mix is not a header row — that is a header *column*, which
+ * prosemirror-tables also allows, and putting it in `<thead>` would claim the
+ * whole first row labels the ones below it.
+ */
+export const headerRowCount = (rows: RenderableNode[]): number => {
+	let count = 0;
+
+	for (const row of rows) {
+		const cells = row.content ?? [];
+		if (!cells.length) break;
+		if (!cells.every((cell) => cell.type === HEADER_CELL)) break;
+		count += 1;
+	}
+
+	return count;
+};
+
+export const isHeaderCell = (node: RenderableNode): boolean =>
+	node.type === HEADER_CELL;
+
+export interface TableColumn {
+	/** A stored pixel width, or `undefined` for a column that has none. */
+	width: number | undefined;
+}
+
+/**
+ * The column widths, read off the first row.
+ *
+ * `colwidth` is an array per cell because a cell spanning three columns
+ * carries all three widths. It is presentation stored in a document that
+ * otherwise stores meaning — see PROJECT_PLAN §3.1 — but prosemirror-tables
+ * writes it, so the renderer honours it rather than dropping the author's
+ * column sizing on the way out.
+ */
+export const tableColumns = (table: RenderableNode): TableColumn[] => {
+	const first = tableRows(table)[0];
+	if (!first) return [];
+
+	const columns: TableColumn[] = [];
+
+	for (const cell of first.content ?? []) {
+		const widths = cell.attrs?.colwidth;
+		const span = colspan(cell);
+
+		for (let index = 0; index < span; index += 1) {
+			const width = Array.isArray(widths) ? widths[index] : undefined;
+			columns.push({
+				width:
+					typeof width === 'number' && Number.isFinite(width)
+						? width
+						: undefined
+			});
+		}
+	}
+
+	return columns;
+};
+
+/**
+ * The table's minimum width: every column at its stored width, or at the
+ * default. Matches what the editor writes.
+ */
+export const tableMinWidth = (columns: TableColumn[]): number | undefined => {
+	if (!columns.length) return undefined;
+
+	return columns.reduce(
+		(total, column) => total + (column.width ?? CELL_MIN_WIDTH),
+		0
+	);
+};
+
+/** The `<col>` style for one column. */
+export const columnStyle = (column: TableColumn): string =>
+	column.width !== undefined
+		? `width: ${column.width}px`
+		: `min-width: ${CELL_MIN_WIDTH}px`;

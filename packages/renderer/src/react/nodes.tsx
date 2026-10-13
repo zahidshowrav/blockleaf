@@ -6,11 +6,19 @@ import {
 	calloutEmoji,
 	calloutTone,
 	codeLanguage,
+	colspan,
+	headerRowCount,
 	headingLevel,
 	imageAttributes,
 	isChecked,
-	listStart
+	isHeaderCell,
+	listStart,
+	rowspan,
+	tableColumns,
+	tableMinWidth,
+	tableRows
 } from '../attrs.js';
+import { type RenderableNode } from '../types.js';
 
 /**
  * The default node components.
@@ -151,6 +159,89 @@ const Text: NodeRenderer = ({ node }) => <>{node.text ?? ''}</>;
 const HardBreak: NodeRenderer = () => <br />;
 
 /**
+ * A real table, with a real `<thead>`.
+ *
+ * The editor writes every row into `<tbody>`, header cells included —
+ * prosemirror-tables has no concept of a table section. That is tolerable in a
+ * contenteditable surface the user is looking at, and not tolerable in output:
+ * an email client, an RSS reader and a screen reader all read `<thead>` and
+ * little else. This is the one node the renderer deliberately writes
+ * differently, and the parity suite excludes it on purpose.
+ *
+ * The stray `colwidth` attribute the editor emits on each cell goes too. It is
+ * not an HTML attribute; the widths belong in `<colgroup>`, which is where
+ * both put them.
+ */
+const Table: NodeRenderer = ({ node, renderNode, combine }) => {
+	const rows = tableRows(node);
+	const columns = tableColumns(node);
+	const headerCount = headerRowCount(rows);
+	const minWidth = tableMinWidth(columns);
+
+	const renderRows = (slice: RenderableNode[]) =>
+		combine(slice.map((row) => renderNode(row, node)));
+
+	return (
+		<table
+			data-id={blockId(node)}
+			style={minWidth ? { minWidth: `${minWidth}px` } : undefined}
+		>
+			{columns.length > 0 && (
+				<colgroup>
+					{columns.map((column, index) => (
+						<col
+							key={index}
+							style={{
+								...(column.width !== undefined
+									? { width: `${column.width}px` }
+									: { minWidth: '25px' })
+							}}
+						/>
+					))}
+				</colgroup>
+			)}
+			{headerCount > 0 && (
+				<thead>{renderRows(rows.slice(0, headerCount))}</thead>
+			)}
+			{rows.length > headerCount && (
+				<tbody>{renderRows(rows.slice(headerCount))}</tbody>
+			)}
+		</table>
+	);
+};
+
+const TableRow: NodeRenderer = ({ children }) => <tr>{children}</tr>;
+
+/**
+ * `scope` is set because a `<thead>` without it is a half-finished table: the
+ * element says a header row exists and nothing says what it heads. A header
+ * cell in a body row is heading that row, not the column.
+ */
+const TableHeader: NodeRenderer = ({ node, parent, children }) => (
+	<th
+		colSpan={colspan(node) > 1 ? colspan(node) : undefined}
+		rowSpan={rowspan(node) > 1 ? rowspan(node) : undefined}
+		scope={allHeaders(parent) ? 'col' : 'row'}
+	>
+		{children}
+	</th>
+);
+
+const TableCell: NodeRenderer = ({ node, children }) => (
+	<td
+		colSpan={colspan(node) > 1 ? colspan(node) : undefined}
+		rowSpan={rowspan(node) > 1 ? rowspan(node) : undefined}
+	>
+		{children}
+	</td>
+);
+
+/** Whether a row is made entirely of header cells, so its cells head columns. */
+const allHeaders = (row: RenderableNode | undefined): boolean =>
+	Boolean(row?.content?.length) &&
+	(row?.content ?? []).every((cell) => isHeaderCell(cell));
+
+/**
  * An unknown node renders its children and nothing else.
  *
  * Documents outlive the code that reads them: a server on an older renderer
@@ -177,6 +268,10 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	callout: Callout,
 	details: Details,
 	image: Image,
+	table: Table,
+	tableRow: TableRow,
+	tableHeader: TableHeader,
+	tableCell: TableCell,
 	text: Text,
 	hardBreak: HardBreak
 };

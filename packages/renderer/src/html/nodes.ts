@@ -4,11 +4,20 @@ import {
 	calloutEmoji,
 	calloutTone,
 	codeLanguage,
+	colspan,
+	columnStyle,
+	headerRowCount,
 	headingLevel,
 	imageAttributes,
 	isChecked,
-	listStart
+	isHeaderCell,
+	listStart,
+	rowspan,
+	tableColumns,
+	tableMinWidth,
+	tableRows
 } from '../attrs.js';
+import { type RenderableNode } from '../types.js';
 import { type NodeRender } from '../walk.js';
 
 /**
@@ -125,10 +134,80 @@ const defaults: Record<string, HtmlNodeRenderer> = {
 		});
 	},
 
+	// A real table with a real `<thead>`, the renderer's one deliberate
+	// departure from the editor's markup. See the React target for why.
+	table: ({ node, renderNode, combine }) => {
+		const rows = tableRows(node);
+		const columns = tableColumns(node);
+		const headerCount = headerRowCount(rows);
+		const minWidth = tableMinWidth(columns);
+
+		const renderRows = (slice: RenderableNode[]) =>
+			combine(slice.map((row) => renderNode(row, node)));
+
+		const colgroup = columns.length
+			? element(
+					'colgroup',
+					{},
+					columns
+						.map((column) =>
+							voidElement('col', { style: columnStyle(column) })
+						)
+						.join('')
+				)
+			: '';
+
+		const head = headerCount
+			? element('thead', {}, renderRows(rows.slice(0, headerCount)))
+			: '';
+
+		const body =
+			rows.length > headerCount
+				? element('tbody', {}, renderRows(rows.slice(headerCount)))
+				: '';
+
+		return element(
+			'table',
+			{
+				'data-id': blockId(node),
+				style: minWidth ? `min-width: ${minWidth}px` : undefined
+			},
+			colgroup + head + body
+		);
+	},
+
+	tableRow: ({ children }) => element('tr', {}, children),
+
+	tableHeader: ({ node, parent, children }) =>
+		element(
+			'th',
+			{
+				colspan: colspan(node) > 1 ? colspan(node) : undefined,
+				rowspan: rowspan(node) > 1 ? rowspan(node) : undefined,
+				scope: allHeaders(parent) ? 'col' : 'row'
+			},
+			children
+		),
+
+	tableCell: ({ node, children }) =>
+		element(
+			'td',
+			{
+				colspan: colspan(node) > 1 ? colspan(node) : undefined,
+				rowspan: rowspan(node) > 1 ? rowspan(node) : undefined
+			},
+			children
+		),
+
 	text: ({ node }) => escapeText(node.text ?? ''),
 
 	hardBreak: () => voidElement('br', {})
 };
+
+/** Whether a row is made entirely of header cells, so its cells head columns. */
+const allHeaders = (row: RenderableNode | undefined): boolean =>
+	Boolean(row?.content?.length) &&
+	(row?.content ?? []).every((cell) => isHeaderCell(cell));
 
 export const defaultHtmlNodes = defaults;
 
