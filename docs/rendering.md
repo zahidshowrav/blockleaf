@@ -1,0 +1,395 @@
+# Server rendering
+
+`@blockleaf/renderer` turns a stored document back into output. It is a
+separate package from the editor and shares no code with it: no ProseMirror, no
+Tiptap, no editor, and no runtime dependencies at all.
+
+```bash
+pnpm add @blockleaf/renderer
+```
+
+```tsx
+// app/articles/[slug]/page.tsx — a server component
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+export default async function Page({ params }) {
+	const article = await db.article.findBySlug(params.slug);
+
+	return (
+		<article className="blockleaf-editor">
+			<div className="blockleaf-editor__content">
+				<RenderDocument doc={article.body} />
+			</div>
+		</article>
+	);
+}
+```
+
+Content is read a thousand times for every time it is written, so the reading
+path is the one that should be cheap. `RenderDocument` measures **1.35 kB**
+minified and brotlied, and emits no client JavaScript of its own.
+
+## Why a separate package
+
+Importing the editor to display a document means shipping ProseMirror, the
+schema, every extension and the entire chrome to a page that will never accept
+a keystroke. The renderer exists so that never happens — and so that it
+_cannot_ happen by accident, since the editor is not in its dependency graph to
+begin with.
+
+## Passing a document
+
+`doc` takes the JSON you stored. If it came out of `@blockleaf/editor`, it
+already fits:
+
+```tsx
+import type { BlockleafDocument } from '@blockleaf/editor';
+
+const doc: BlockleafDocument = JSON.parse(row.body);
+<RenderDocument doc={doc} />;
+```
+
+There is no conversion step and no import from the editor. The `doc` prop is
+typed structurally, as `RenderableDocument`, which `BlockleafDocument`
+satisfies — a type import would be a dependency on the package this one exists
+to avoid. A test in the renderer asserts the two shapes stay compatible and
+fails if either drifts.
+
+## Styling
+
+The renderer writes the same elements and the same attributes as the editor,
+down to `data-id` on every block and `data-type="callout"` on a callout. One
+stylesheet fits both:
+
+```tsx
+import '@blockleaf/editor/styles.css';
+```
+
+A parity suite renders the same document through both packages and compares
+the HTML. It is not a convention that they match; it is a test that fails.
+
+The stylesheet needs **two** wrappers, because that is the shape the editor
+has:
+
+```tsx
+<div className="blockleaf-editor">
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={doc} />
+	</div>
+</div>
+```
+
+`.blockleaf-editor` defines the `--bl-*` custom properties and carries
+`data-theme`; `.blockleaf-editor__content` is what every prose rule is scoped
+to. One without the other gets you the colours with no typography, or the
+typography with no colours. Neither class carries any editor behaviour — they
+are styling hooks, and the same pair wraps `renderToHTML` output.
+
+## Tables
+
+Tables render as real table markup, which is the whole point of the HTML
+string: an email client, an RSS reader and a screen reader all understand
+`<thead>` and very little else.
+
+```html
+<table
+	data-id="t"
+	style="min-width: 145px"
+>
+	<colgroup>
+		<col style="width: 120px" />
+		<col style="min-width: 25px" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Role</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Ada</td>
+			<td>Engineer</td>
+		</tr>
+	</tbody>
+</table>
+```
+
+A leading row made entirely of header cells becomes `<thead>`. A row with a
+mix of headers and cells is a header _column_ — which the editor also allows —
+and stays in `<tbody>` rather than claiming to label everything below it.
+
+`scope` follows from that: `col` for a cell in a header row, `row` for a header
+cell leading a body row.
+
+This is the one place the renderer deliberately writes different markup from
+the editor, which puts every row in `<tbody>` because prosemirror-tables has no
+concept of a table section. The editor also writes a `colwidth` attribute on
+each cell, which is not an HTML attribute; the renderer drops it, since the
+width is already in the `<col>`.
+
+## Where it differs from the editor, on purpose
+
+**The task checkbox is disabled.** Rendered output is a record of what the
+document says, and nothing on the page can write a change back. A checkbox
+that invites a click and then silently discards it is worse than one that
+plainly cannot be clicked.
+
+**An unknown node renders its children.** Documents outlive the code that
+reads them, so a server running an older renderer will eventually meet a node
+type a newer editor wrote. Throwing there takes down the whole page for one
+unrecognised block, so the text inside survives and the wrapper does not. The
+same applies to an unknown mark, which renders as undecorated text.
+
+**Tables get a `<thead>`.** See above.
+
+**URLs are sanitised again.** See below.
+
+## Safety
+
+`src` and `href` are sanitised at render time, not trusted from the document.
+
+| Attribute | Allowed                                                |
+| --------- | ------------------------------------------------------ |
+| `href`    | `https:`, `mailto:`, site-relative paths, hash anchors |
+| `src`     | `https:`, relative paths, base64 raster data URLs      |
+
+Everything else is refused — `javascript:` above all, plus `http:`, `blob:`,
+protocol-relative `//`, and SVG data URLs.
+
+The editor applies the same rules when a document is written. The renderer
+applies them again because it reads documents the editor did not write: rows
+that predate the rule, rows an importer produced, rows a host's own API
+accepted. On the editor's side an unsafe URL is a broken link. Here it is
+stored markup being written into a server-rendered page, which is the
+definition of stored XSS.
+
+An image whose source is refused renders nothing at all, rather than an `<img>`
+with no `src` — a broken-image icon and a hole in the layout help nobody. A
+link whose href is refused keeps its text and loses the anchor: the words were
+written by a human and are worth preserving, the destination was not
+necessarily.
+
+## Overrides
+
+Replace the component used for any node or mark by name. Anything not named
+keeps its default, so an override is a patch rather than a whole mapping.
+
+```tsx
+import Image from 'next/image';
+import { RenderDocument, imageAttributes } from '@blockleaf/renderer/react';
+
+const components = {
+	image: ({ node }) => {
+		const attrs = imageAttributes(node);
+		if (!attrs) return null;
+
+		return (
+			<Image
+				src={attrs.src}
+				alt={attrs.alt}
+				width={attrs.width ?? 1200}
+				height={0}
+			/>
+		);
+	}
+};
+
+<RenderDocument
+	doc={doc}
+	components={components}
+/>;
+```
+
+`imageAttributes` is one of the helpers the default components use, exported
+so an override does not have to re-derive the rules — it returns a sanitised
+`src`, or `null` for a source that did not survive sanitisation. The others
+are `linkAttributes`, `headingLevel`, `blockId`, `codeLanguage`, `listStart`,
+`isChecked`, `calloutTone`, `calloutEmoji` and `highlightColor`.
+
+Marks work the same way, under `marks`:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	marks={{
+		link: ({ mark, children }) => (
+			<TrackedLink mark={mark}>{children}</TrackedLink>
+		)
+	}}
+/>
+```
+
+An override owns its decisions, sanitisation included. Nothing is applied
+behind it — if it writes `mark.attrs.href` straight into an `<a>`, that is
+what gets rendered. Call `linkAttributes(mark)` and it does not have to think
+about it.
+
+### Rendering a node type of your own
+
+A name the defaults do not know is rendered by the override, which is how a
+host adds a node the editor does not have:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	components={{ embed: ({ node }) => <Embed url={node.attrs?.url} /> }}
+/>
+```
+
+### Props an override receives
+
+| Prop         | What it is                            |
+| ------------ | ------------------------------------- |
+| `node`       | The stored node, attributes and all   |
+| `parent`     | Its parent, or `undefined` at the top |
+| `children`   | The node's content, already rendered  |
+| `renderNode` | Renders one child by hand             |
+| `combine`    | Joins rendered pieces                 |
+
+Most overrides need the first three. `renderNode` and `combine` are there for
+a component that has to group or reorder its children — a table splitting rows
+into `<thead>` and `<tbody>` — since `children` arrives already assembled in
+document order.
+
+### Performance
+
+Overrides are merged on every render, because `RenderDocument` has to work in
+a server component and hooks do not exist there. The merge is two object
+spreads and is cheap next to walking the document, but defining the map at
+module scope rather than inline in JSX avoids it entirely.
+
+## An HTML string
+
+For the places React cannot go — an email body, an RSS item, an OG image, a
+cached fragment:
+
+```ts
+import { renderToHTML } from '@blockleaf/renderer/html';
+
+const body = renderToHTML(article.body);
+```
+
+It writes the same markup the React target does, takes the same `components`
+and `marks` overrides, and imports nothing at all. The entry does not touch
+React, so a worker that renders digest emails installs no UI library to do it.
+
+Escaping here is this package's job rather than React's, so text and attribute
+values are escaped separately. A document whose stored `alt` is
+`" onerror="alert(1)` renders as an attribute value, not as a handler.
+
+An override for this target returns a string:
+
+```ts
+renderToHTML(doc, {
+	components: {
+		image: ({ node }) => {
+			const attrs = imageAttributes(node);
+			return attrs ? `<img src="${escapeAttribute(attrs.src)}">` : '';
+		}
+	}
+});
+```
+
+`escapeText`, `escapeAttribute`, `element` and `voidElement` are exported from
+`@blockleaf/renderer/html` so an override does not have to reimplement them.
+
+## Text, headings and excerpts
+
+Some jobs want the words and not the markup — a search index, a reading-time
+estimate, an excerpt, a table of contents. These walk the same JSON without
+building any output to throw away afterwards:
+
+```ts
+import { extractHeadings, toPlainText } from '@blockleaf/renderer';
+
+const excerpt = `${toPlainText(doc).slice(0, 200)}…`;
+const words = toPlainText(doc, { blockSeparator: ' ' }).split(/\s+/).length;
+const toc = extractHeadings(doc);
+```
+
+`toPlainText` separates blocks with a blank line by default; pass
+`blockSeparator: ' '` for a search index that wants one line. Code blocks are
+included — a search for a function name should find the page that documents
+it. Image alt text is left out unless you ask for it with
+`includeImageAlt: true`: it reads as an interruption in an excerpt and as
+useful signal in an index.
+
+`extractHeadings` returns `{ level, text, id }` in document order, where `id`
+is the block id.
+
+### Linking to a heading
+
+The block id is written as `data-id`, not as `id`, because that is what the
+editor writes and the two must match. An anchor link needs a real `id`, so add
+one with an override:
+
+```tsx
+const components = {
+	heading: ({ node, children }) => {
+		const Tag = `h${headingLevel(node)}` as const;
+		return (
+			<Tag
+				id={blockId(node)}
+				data-id={blockId(node)}
+			>
+				{children}
+			</Tag>
+		);
+	}
+};
+```
+
+Then `extractHeadings(doc)` gives you the list to link to.
+
+## Entry points
+
+| Import                      | Contains                                         | Needs React |
+| --------------------------- | ------------------------------------------------ | ----------- |
+| `@blockleaf/renderer`       | text extractors, sanitisers, attr helpers, types | no          |
+| `@blockleaf/renderer/react` | `RenderDocument`                                 | yes         |
+| `@blockleaf/renderer/html`  | `renderToHTML`, escaping helpers                 | no          |
+
+React is an **optional** peer dependency. A script that only needs the URL
+rules — validating a row before it goes into the database, say — imports the
+root entry and installs nothing else.
+
+| Entry                             |    Size |
+| --------------------------------- | ------: |
+| `RenderDocument`                  | 1.40 kB |
+| `renderToHTML`                    | 1.50 kB |
+| `toPlainText` + `extractHeadings` |   445 B |
+| `sanitizeHref` + `sanitizeSrc`    |   217 B |
+
+Minified and brotlied, with all dependencies.
+
+## Nodes
+
+Every node in [the schema](./schema.md) renders:
+
+| Node                         | Element                                               |
+| ---------------------------- | ----------------------------------------------------- |
+| `paragraph`                  | `<p>`                                                 |
+| `heading`                    | `<h1>`–`<h3>`, clamped into range                     |
+| `blockquote`                 | `<blockquote>`                                        |
+| `codeBlock`                  | `<pre><code class="language-…">`                      |
+| `horizontalRule`             | `<hr>`                                                |
+| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                 |
+| `listItem`                   | `<li>`                                                |
+| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox  |
+| `callout`                    | `<div data-type="callout" class="blockleaf-callout">` |
+| `details`                    | `<details open>`                                      |
+| `image`                      | `<img class="blockleaf-image">`                       |
+| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`  |
+| `tableRow`                   | `<tr>`                                                |
+| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                 |
+| `text` / `hardBreak`         | text / `<br>`                                         |
+
+Marks nest outwards from the first in the array, which is what the editor
+does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to
+any stylesheet with a descendant selector in it. See F15 in
+[`open-flags.md`](./open-flags.md) for why that sentence needed writing down.
+
+`codeBlock` renders a `language-…` class and no highlighting. Highlighting a
+block on the server means shipping a highlighter; pick your own and point it
+at that class, or render the block yourself.

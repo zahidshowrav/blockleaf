@@ -8,11 +8,57 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14 · **Last reviewed:** 2026-10-13
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15 · **Last reviewed:** 2026-10-13
 
 ---
 
 ## Settled
+
+### F15 — the renderer carries its own walker and its own URL rules · measured 2026-10-13
+
+PROJECT_PLAN §5 says `@blockleaf/renderer` is built on
+`@tiptap/static-renderer`. It is not, and the reason is a bug in the thing it
+would have been built on.
+
+**Mark nesting runs the wrong way.** `TiptapStaticRenderer` folds a node's
+`marks` array so the _first_ mark ends up innermost. The editor's own
+`getHTML` puts it outermost. The same stored node renders as
+`<em><strong>text</strong></em>` there and `<strong><em>text</em></strong>` in
+the editor:
+
+| Source                    | `marks: [bold, italic]` renders as |
+| ------------------------- | ---------------------------------- |
+| `@blockleaf/editor`       | `<strong><em>text</em></strong>`   |
+| `@tiptap/static-renderer` | `<em><strong>text</strong></em>`   |
+
+Identical to look at for bold and italic. Not identical to a stylesheet, and
+both packages are meant to share one — `a > code` matches in one and not the
+other. The parity suite caught it on the second test written.
+
+**The peer dependencies point the wrong way too.** The JSON entries import
+nothing at runtime, which is the whole appeal, but the package declares
+`@tiptap/pm`, `@tiptap/core` and `react-dom` as peers, and npm and pnpm both
+install peers by default. Depending on it would put ProseMirror in the
+`node_modules` of a package whose entire purpose is not to load ProseMirror.
+Bundling it instead would have fixed that and not the mark order.
+
+So the walker lives in `src/walk.ts`: about forty lines, target-agnostic, and
+correct about mark order. It also takes `renderNode` and `combine`, which
+RD-07 needs to split table rows into `<thead>` and `<tbody>` — grouping a flat
+`nodeMapping` cannot express.
+
+**The URL rules are duplicated on purpose.** `sanitizeHref` and `sanitizeSrc`
+are copied from the editor's schema rather than imported from it, because
+importing them would make the renderer depend on the editor. Sanitising in the
+editor protects what gets _written_; the renderer reads documents written by
+other versions, by a host's own API, or by an importer, and writes them into
+HTML where an unsafe URL is an XSS hole rather than a broken link.
+`tests/sanitize.test.ts` runs 29 vectors through both implementations and
+fails if they disagree, so the copies cannot drift quietly.
+
+Revisit if Tiptap fixes the mark order and drops the peers. Neither is likely
+to be treated as a bug upstream, since the ProseMirror renderers in the same
+package take their order from the schema and do not show it.
 
 ### F14 — the code block ships as an opt-in subpath · measured 2026-10-13
 
