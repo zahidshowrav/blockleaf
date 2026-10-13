@@ -149,15 +149,19 @@ default build: it costs 16.53 kB and there were 15.37 kB left. See F14.
 **Exit:** someone who has never seen the repo installs it from the docs alone
 and renders stored JSON on a server.
 
-| Id    | Task                                                                   | Status      | Commit | Completed |
-| ----- | ---------------------------------------------------------------------- | ----------- | ------ | --------- |
-| RD-01 | `@blockleaf/renderer` package                                          | Not started | —      | —         |
-| RD-02 | Component overrides                                                    | Not started | —      | —         |
-| RD-03 | HTML-string and plain-text exports                                     | Not started | —      | —         |
-| RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Not started | —      | —         |
-| RD-05 | README with a demo GIF                                                 | Not started | —      | —         |
-| RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —      | —         |
-| RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Not started | —      | —         |
+The renderer is built on its own walker rather than `@tiptap/static-renderer`,
+which nests marks in the opposite order to the editor and would have broken the
+stylesheet both packages share. See F15.
+
+| Id    | Task                                                                   | Status      | Commit    | Completed  |
+| ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| RD-01 | `@blockleaf/renderer` package                                          | Done        | `5da026d` | 2026-10-13 |
+| RD-02 | Component overrides                                                    | Not started | —         | —          |
+| RD-03 | HTML-string and plain-text exports                                     | Not started | —         | —          |
+| RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Not started | —         | —          |
+| RD-05 | README with a demo GIF                                                 | Not started | —         | —          |
+| RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —         | —          |
+| RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Not started | —         | —          |
 
 ## HD — Hardening (1–2 weeks)
 
