@@ -602,6 +602,46 @@
 }
 
 /*
+ * Code block — only rendered when the opt-in subpath is imported (F14)
+ */
+
+.blockleaf-code-block-wrapper {
+	position: relative;
+}
+
+/* The picker sits over the block's top-right corner. It is chrome around the
+   node, not content, so it must not take part in text layout. */
+.blockleaf-code-block__language {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	padding: 2px 4px;
+	border: 1px solid var(--bl-color-border);
+	border-radius: calc(var(--bl-radius) - 2px);
+	background: var(--bl-color-bg);
+	color: var(--bl-color-muted);
+	font-family: var(--bl-font-body);
+	font-size: 0.75rem;
+	opacity: 0;
+	transition: opacity 120ms ease;
+}
+
+.blockleaf-code-block-wrapper:hover .blockleaf-code-block__language,
+.blockleaf-code-block__language:focus-visible {
+	opacity: 1;
+}
+
+.blockleaf-code-block__language:focus-visible {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 1px;
+}
+
+/* Leave room for the picker so a long first line does not run under it. */
+.blockleaf-code-block-wrapper pre {
+	padding-right: 96px;
+}
+
+/*
  * Upload placeholder
  */
 

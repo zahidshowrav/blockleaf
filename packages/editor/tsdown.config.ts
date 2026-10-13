@@ -1,7 +1,12 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-	entry: ['src/index.ts', 'src/extensions.ts', 'src/validate.ts'],
+	entry: [
+		'src/index.ts',
+		'src/extensions.ts',
+		'src/validate.ts',
+		'src/code-block.ts'
+	],
 	format: ['esm'],
 	dts: true,
 	// Not in watch mode: `clean` wipes `dist/` when the watcher starts, and
