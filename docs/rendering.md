@@ -85,6 +85,49 @@ to. One without the other gets you the colours with no typography, or the
 typography with no colours. Neither class carries any editor behaviour — they
 are styling hooks, and the same pair wraps `renderToHTML` output.
 
+## Tables
+
+Tables render as real table markup, which is the whole point of the HTML
+string: an email client, an RSS reader and a screen reader all understand
+`<thead>` and very little else.
+
+```html
+<table
+	data-id="t"
+	style="min-width: 145px"
+>
+	<colgroup>
+		<col style="width: 120px" />
+		<col style="min-width: 25px" />
+	</colgroup>
+	<thead>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Role</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Ada</td>
+			<td>Engineer</td>
+		</tr>
+	</tbody>
+</table>
+```
+
+A leading row made entirely of header cells becomes `<thead>`. A row with a
+mix of headers and cells is a header _column_ — which the editor also allows —
+and stays in `<tbody>` rather than claiming to label everything below it.
+
+`scope` follows from that: `col` for a cell in a header row, `row` for a header
+cell leading a body row.
+
+This is the one place the renderer deliberately writes different markup from
+the editor, which puts every row in `<tbody>` because prosemirror-tables has no
+concept of a table section. The editor also writes a `colwidth` attribute on
+each cell, which is not an HTML attribute; the renderer drops it, since the
+width is already in the `<col>`.
+
 ## Where it differs from the editor, on purpose
 
 **The task checkbox is disabled.** Rendered output is a record of what the
@@ -97,6 +140,8 @@ reads them, so a server running an older renderer will eventually meet a node
 type a newer editor wrote. Throwing there takes down the whole page for one
 unrecognised block, so the text inside survives and the wrapper does not. The
 same applies to an unknown mark, which renders as undecorated text.
+
+**Tables get a `<thead>`.** See above.
 
 **URLs are sanitised again.** See below.
 
@@ -335,6 +380,9 @@ Every node in [the schema](./schema.md) renders:
 | `callout`                    | `<div data-type="callout" class="blockleaf-callout">` |
 | `details`                    | `<details open>`                                      |
 | `image`                      | `<img class="blockleaf-image">`                       |
+| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`  |
+| `tableRow`                   | `<tr>`                                                |
+| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                 |
 | `text` / `hardBreak`         | text / `<br>`                                         |
 
 Marks nest outwards from the first in the array, which is what the editor

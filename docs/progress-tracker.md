@@ -161,7 +161,7 @@ stylesheet both packages share. See F15.
 | RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Not started | —         | —          |
 | RD-05 | README with a demo GIF                                                 | Not started | —         | —          |
 | RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —         | —          |
-| RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Not started | —         | —          |
+| RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Done        | `b358752` | 2026-10-13 |
 
 ## HD — Hardening (1–2 weeks)
 
