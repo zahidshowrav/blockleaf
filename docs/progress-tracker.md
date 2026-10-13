@@ -130,7 +130,11 @@ enforced from the first commit.
 ## MC — Media and code (1 week)
 
 **Exit:** dragging a 5 MB image in works, shows progress, survives a mid-upload
-navigation, and a failed upload is retryable.
+navigation, and a failed upload is retryable. **Met** — `e2e/uploads.spec.ts`
+drops real files in a browser and asserts each of the four.
+
+Syntax highlighting ships from `@blockleaf/editor/code-block` rather than the
+default build: it costs 16.53 kB and there were 15.37 kB left. See F14.
 
 | Id    | Task                                                            | Status | Commit    | Completed  |
 | ----- | --------------------------------------------------------------- | ------ | --------- | ---------- |
