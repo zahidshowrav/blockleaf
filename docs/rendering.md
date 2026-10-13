@@ -17,7 +17,9 @@ export default async function Page({ params }) {
 
 	return (
 		<article className="blockleaf-editor">
-			<RenderDocument doc={article.body} />
+			<div className="blockleaf-editor__content">
+				<RenderDocument doc={article.body} />
+			</div>
 		</article>
 	);
 }
@@ -66,8 +68,22 @@ import '@blockleaf/editor/styles.css';
 A parity suite renders the same document through both packages and compares
 the HTML. It is not a convention that they match; it is a test that fails.
 
-Wrap the output in `.blockleaf-editor` to pick up the same typography the
-editor uses. The class carries no editor behaviour — it is a styling hook.
+The stylesheet needs **two** wrappers, because that is the shape the editor
+has:
+
+```tsx
+<div className="blockleaf-editor">
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={doc} />
+	</div>
+</div>
+```
+
+`.blockleaf-editor` defines the `--bl-*` custom properties and carries
+`data-theme`; `.blockleaf-editor__content` is what every prose rule is scoped
+to. One without the other gets you the colours with no typography, or the
+typography with no colours. Neither class carries any editor behaviour — they
+are styling hooks, and the same pair wraps `renderToHTML` output.
 
 ## Where it differs from the editor, on purpose
 
