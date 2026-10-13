@@ -1,5 +1,82 @@
 # @blockleaf/editor
 
+## 0.0.5
+
+### Patch Changes
+
+- b6f7882: Add the upload adapter interface (MC-01). Hosts implement `UploadAdapter` and
+  the editor drives it; no storage provider is baked in. The second argument is a
+  context object rather than a bare `AbortSignal` so adapters can report
+  determinate progress, and `isUploadResult` validates what an adapter resolves
+  with before it can reach the document.
+- 05657cb: Add drop, paste and picker entry points for uploads (MC-02). Dropping files on
+  the editor, pasting them from the clipboard, or calling `openUploadPicker`
+  screens each file for type and size **before** it leaves the browser, then
+  hands it to the adapter and inserts an image where it landed.
+  
+  The in-flight placeholder is a widget decoration rather than a node, so
+  ProseMirror maps its position through every edit made while the upload runs —
+  an image dropped at the end of a paragraph still lands there after typing
+  above it — and nothing has to be stripped out of the document before saving.
+  
+  `upload`, `uploadAccept`, `uploadMaxBytes` and `onUploadError` are new options
+  on `useBlockleafEditor` and `<BlockleafEditor>`. Without an adapter the
+  extension is not added at all, so files fall through to the browser rather
+  than being swallowed.
+- 5fa4e4c: Add upload progress, cancel and retry (MC-03). The in-flight placeholder now
+  shows a progress bar driven by the adapter's `onProgress`, with a Cancel
+  button that aborts the request through the signal.
+  
+  Progress is indeterminate until an adapter reports a fraction — `fetch` cannot
+  measure upload progress, so a bar claiming a percentage it does not have would
+  be a lie. An indeterminate `progressbar` omits `aria-valuenow` rather than
+  reporting zero.
+  
+  A failed upload no longer disappears. Its placeholder stays, holding the
+  position it has been mapping all along, and offers Retry and Dismiss — so a
+  retry puts the image where the user dropped it, even after editing above it.
+  A cancelled upload is not reported as a failure.
+- a114e5d: Add the image block with alt text and alignment (MC-04). The node is
+  hand-rolled rather than taken from `@tiptap/extension-image`, and `src` is
+  sanitised in the schema: `https:`, relative paths and raster data URLs are
+  allowed, while `javascript:`, `blob:`, `http:` and SVG data URLs are rejected.
+  An unsafe `<img>` arriving through a paste is dropped rather than stored with
+  a null source.
+  
+  Selecting an image opens a toolbar for alignment, alt text and delete. An
+  empty alt is kept rather than discarded, since that is how an image is marked
+  decorative.
+  
+  The bubble menu's link editor is now one of a general panel slot, so the
+  toolbar's keyboard handling lives in one place. Three CSS classes were
+  renamed to match: `blockleaf-bubble-menu__link-editor`, `__link-input` and
+  `__link-error` are now `__panel`, `__panel-input` and `__panel-error`.
+  Closing a panel now returns focus to the button that opened it, which the
+  link editor had never managed.
+- c004dfe: Add the syntax-highlighted code block with a language picker (MC-05), as the
+  new opt-in subpath `@blockleaf/editor/code-block`.
+  
+  ```ts
+  import { createExtensions } from '@blockleaf/editor/extensions';
+  import { withCodeBlock } from '@blockleaf/editor/code-block';
+  
+  const extensions = withCodeBlock(createExtensions('standard'));
+  ```
+  
+  It is a subpath rather than part of the default build because `lowlight` and
+  its grammars cost 16.53 kB and the default bundle had 15.37 kB left — shipping
+  it by default put the editor at 161.16 kB, over the ceiling. Importing nothing
+  costs nothing, and the main entry is unchanged at 144.63 kB. See F14.
+  
+  Seven grammars ship by default — bash, css, javascript, json, python,
+  typescript and xml — and hosts register more through `additionalLanguages`.
+  `StarterKit`'s plain code block is untouched for anyone who does not import
+  the subpath, and the stored shape is identical either way.
+  
+  A code block whose language this host has not registered now renders
+  unhighlighted instead of throwing during editor construction, and keeps its
+  `language` attribute rather than having it stripped on the next save.
+
 ## 0.0.4
 
 ### Patch Changes
