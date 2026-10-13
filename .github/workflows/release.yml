@@ -32,15 +32,24 @@ jobs:
             - name: Build
               run: pnpm build
 
+            # v2, not v1. v1 decides whether anything was published by
+            # grepping the publish script's stdout for `New tag:`, which
+            # `@changesets/cli` stopped printing in v3 — it now prints
+            # `Created git tags:`. The publish still succeeded, so the package
+            # reached npm, but the action saw no releases and therefore pushed
+            # no tag and created no GitHub release. That is why 0.0.4 is on
+            # npm with nothing on GitHub.
             - name: Create release PR or publish
-              uses: changesets/action@v1
+              uses: changesets/action@v2
               with:
-                  version: pnpm version-packages
-                  publish: pnpm release
-                  commit: 'chore: version packages'
-                  title: 'chore: version packages'
-                  createGithubReleases: true
+                  version-script: pnpm version-packages
+                  publish-script: pnpm release
+                  commit-message: 'chore: version packages'
+                  pr-title: 'chore: version packages'
+                  create-github-releases: true
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  # No GITHUB_TOKEN here: v2 reads the `github-token` input,
+                  # which defaults to the workflow token, and errors if the
+                  # environment variable is set to something different.
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
