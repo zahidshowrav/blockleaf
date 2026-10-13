@@ -252,6 +252,62 @@ because it is not a node, there is nothing to strip out of the document before
 saving — a document serialised mid-upload contains no trace of the pending
 one.
 
+## Progress, cancel and retry
+
+The placeholder shows a progress bar driven by whatever your adapter reports
+through `onProgress`, with a **Cancel** button that fires the `AbortSignal`.
+
+**Until an adapter reports a fraction, the bar is indeterminate** — a sweeping
+animation rather than a percentage. That is not a fallback, it is the correct
+state: `fetch` cannot measure upload progress, so a bar claiming 40% would be
+inventing it. An indeterminate `progressbar` omits `aria-valuenow` rather than
+reporting zero, because saying nothing is honest and saying zero is a claim.
+
+Progress updates are throttled to 5% steps. Each one is a ProseMirror
+transaction, and an adapter reporting every chunk of a 5 MB file would produce
+hundreds. They change no document, so they never reach `onChange` or the undo
+stack, but they are not free either.
+
+### A failed upload does not disappear
+
+When an adapter rejects, the placeholder **stays**, switches to an error
+state, and offers **Retry** and **Dismiss**.
+
+It stays for a specific reason: it is still mapping its position. Retry puts
+the image where the file was originally dropped, even if you have been editing
+above it for the last thirty seconds. A placeholder that vanished on failure
+would have nowhere to retry into.
+
+### Cancelling is not failing
+
+| Outcome                       | Placeholder           | `onUploadError` |
+| ----------------------------- | --------------------- | --------------- |
+| Resolved                      | Replaced by the image | —               |
+| Rejected with an `AbortError` | Removed               | Not called      |
+| Rejected with anything else   | Kept, in error state  | Called          |
+
+The editor unmounting mid-upload aborts every in-flight request through the
+same path, so an abandoned upload does not keep a request alive against an
+editor that no longer exists — and it is not announced as a failure, because
+nothing failed.
+
+### Driving it yourself
+
+```ts
+editor.commands.cancelUpload(id);
+editor.commands.retryUpload(id);
+editor.commands.dismissUpload(id);
+```
+
+`id` comes from the plugin state, if you are building your own surface:
+
+```ts
+import { UPLOAD_PLUGIN_KEY } from '@blockleaf/editor';
+
+const { pending } = UPLOAD_PLUGIN_KEY.getState(editor.state) ?? { pending: [] };
+// [{ id, name, pos, progress, error, file }]
+```
+
 ## The image block
 
 An uploaded image becomes an `image` node:
