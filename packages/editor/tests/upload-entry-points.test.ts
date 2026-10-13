@@ -214,7 +214,7 @@ describe('uploading through the adapter (MC-02)', () => {
 		expect(images(editor)).toHaveLength(0);
 	});
 
-	it('reports an adapter rejection and clears the placeholder', async () => {
+	it('reports an adapter rejection and keeps the placeholder for a retry', async () => {
 		const adapter: UploadAdapter = {
 			upload: async () => {
 				throw new Error('500');
@@ -228,7 +228,9 @@ describe('uploading through the adapter (MC-02)', () => {
 
 		expect(onError).toHaveBeenCalledTimes(1);
 		expect(onError.mock.calls[0]?.[0]?.reason).toBe('adapter');
-		expect(pendingCount(editor)).toBe(0);
+		// The entry stays, holding its position, so MC-03's Retry has
+		// somewhere to put the image.
+		expect(pendingCount(editor)).toBe(1);
 		expect(images(editor)).toHaveLength(0);
 	});
 

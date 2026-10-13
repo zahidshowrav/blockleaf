@@ -105,6 +105,19 @@ export type PendingUpload = {
 	name: string;
 	/** Where the image will land. Mapped through every transaction. */
 	pos: number;
+	/**
+	 * Fraction complete, or `null` when the adapter cannot measure it —
+	 * `fetch` cannot report upload progress, so an indeterminate state is the
+	 * honest default rather than a bar that lies.
+	 */
+	progress: number | null;
+	/**
+	 * Set when the upload failed. The entry stays in the document so the
+	 * failure is visible and retryable rather than vanishing silently.
+	 */
+	error: string | null;
+	/** Kept so a retry does not need the file handed to it again. */
+	file: File;
 };
 
 export type UploadState = {
@@ -112,7 +125,9 @@ export type UploadState = {
 };
 
 type UploadMeta =
-	| { type: 'start'; id: string; name: string; pos: number }
+	| { type: 'start'; id: string; name: string; pos: number; file: File }
+	| { type: 'progress'; id: string; progress: number }
+	| { type: 'fail'; id: string; message: string }
 	| { type: 'finish'; id: string };
 
 export interface UploadExtensionOptions {
@@ -129,6 +144,12 @@ declare module '@tiptap/core' {
 			uploadFiles: (files: File[] | FileList, at?: number) => ReturnType;
 			/** Opens the system file picker, then `uploadFiles`. */
 			openUploadPicker: () => ReturnType;
+			/** Aborts an in-flight upload. */
+			cancelUpload: (id: string) => ReturnType;
+			/** Runs a failed upload again, at the position it still holds. */
+			retryUpload: (id: string) => ReturnType;
+			/** Removes a failed upload's placeholder without retrying. */
+			dismissUpload: (id: string) => ReturnType;
 		};
 	}
 }
@@ -144,15 +165,97 @@ const nextUploadId = (): string => `upload-${++uploadCounter}`;
  * putting a placeholder into the document the host would then have to strip
  * before saving. MC-03 renders progress into this element.
  */
-const renderPlaceholder = (entry: PendingUpload) => (): HTMLElement => {
-	const element = document.createElement('div');
-	element.className = 'blockleaf-upload';
-	element.dataset.uploadId = entry.id;
-	element.setAttribute('role', 'status');
-	element.setAttribute('aria-live', 'polite');
-	element.textContent = `Uploading ${entry.name}…`;
+const button = (
+	label: string,
+	onClick: () => void,
+	variant: string
+): HTMLButtonElement => {
+	const element = document.createElement('button');
+	element.type = 'button';
+	element.className = 'blockleaf-upload__action';
+	element.dataset.action = variant;
+	element.textContent = label;
+	element.addEventListener('click', (event) => {
+		event.preventDefault();
+		onClick();
+	});
 	return element;
 };
+
+const renderPlaceholder =
+	(entry: PendingUpload, editor: Editor) => (): HTMLElement => {
+		const element = document.createElement('div');
+		element.className = 'blockleaf-upload';
+		element.dataset.uploadId = entry.id;
+		// Not contenteditable, and not part of the document — a widget the
+		// caret must skip rather than land inside.
+		element.contentEditable = 'false';
+
+		if (entry.error) {
+			element.dataset.state = 'error';
+			// `alert` rather than `status`: a failed upload is the one thing
+			// here a screen reader user must not miss.
+			element.setAttribute('role', 'alert');
+
+			const message = document.createElement('span');
+			message.className = 'blockleaf-upload__name';
+			message.textContent = entry.error;
+			element.append(
+				message,
+				button(
+					'Retry',
+					() => editor.commands.retryUpload(entry.id),
+					'retry'
+				),
+				button(
+					'Dismiss',
+					() => editor.commands.dismissUpload(entry.id),
+					'dismiss'
+				)
+			);
+			return element;
+		}
+
+		element.dataset.state = 'uploading';
+		element.setAttribute('role', 'status');
+		element.setAttribute('aria-live', 'polite');
+
+		const name = document.createElement('span');
+		name.className = 'blockleaf-upload__name';
+		name.textContent = `Uploading ${entry.name}…`;
+
+		const track = document.createElement('div');
+		track.className = 'blockleaf-upload__track';
+		track.setAttribute('role', 'progressbar');
+		track.setAttribute('aria-label', `Uploading ${entry.name}`);
+		track.setAttribute('aria-valuemin', '0');
+		track.setAttribute('aria-valuemax', '100');
+
+		const bar = document.createElement('div');
+		bar.className = 'blockleaf-upload__bar';
+
+		if (entry.progress === null) {
+			// An indeterminate progressbar omits `aria-valuenow`. Saying
+			// nothing is correct; saying zero would be a claim.
+			track.dataset.indeterminate = 'true';
+		} else {
+			const percent = Math.round(entry.progress * 100);
+			track.setAttribute('aria-valuenow', String(percent));
+			bar.style.width = `${percent}%`;
+		}
+
+		track.append(bar);
+		element.append(
+			name,
+			track,
+			button(
+				'Cancel',
+				() => editor.commands.cancelUpload(entry.id),
+				'cancel'
+			)
+		);
+		return element;
+	};
 
 const pendingPosition = (editor: Editor, id: string, fallback: number) => {
 	const state = UPLOAD_PLUGIN_KEY.getState(editor.state);
@@ -231,6 +334,63 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 					return true;
 				},
 
+			cancelUpload:
+				(id) =>
+				({ editor }) => {
+					const controller = this.storage.controllers.get(id);
+					if (controller) {
+						// The adapter's rejection drives the cleanup, so the
+						// cancelled and the never-started cases take the same
+						// path through `uploadOne`.
+						controller.abort();
+						return true;
+					}
+					return editor.commands.dismissUpload(id);
+				},
+
+			retryUpload:
+				(id) =>
+				({ editor }) => {
+					const { adapter } = this.options;
+					const entry = UPLOAD_PLUGIN_KEY.getState(
+						editor.state
+					)?.pending.find((pending) => pending.id === id);
+
+					if (!adapter || !entry || !entry.error) return false;
+
+					void uploadOne(
+						editor,
+						this.storage.controllers,
+						adapter,
+						entry.file,
+						entry.pos,
+						report,
+						// Same id, so the entry keeps the position it has been
+						// mapping all along.
+						id
+					);
+					return true;
+				},
+
+			dismissUpload:
+				(id) =>
+				({ editor, dispatch }) => {
+					const exists = UPLOAD_PLUGIN_KEY.getState(
+						editor.state
+					)?.pending.some((pending) => pending.id === id);
+					if (!exists) return false;
+
+					if (dispatch) {
+						editor.view.dispatch(
+							editor.view.state.tr.setMeta(UPLOAD_PLUGIN_KEY, {
+								type: 'finish',
+								id
+							})
+						);
+					}
+					return true;
+				},
+
 			openUploadPicker:
 				() =>
 				({ editor }) => {
@@ -285,9 +445,30 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 									{
 										id: meta.id,
 										name: meta.name,
-										pos: meta.pos
+										pos: meta.pos,
+										progress: null,
+										error: null,
+										file: meta.file
 									}
 								]
+							};
+						}
+						if (meta?.type === 'progress') {
+							return {
+								pending: pending.map((entry) =>
+									entry.id === meta.id
+										? { ...entry, progress: meta.progress }
+										: entry
+								)
+							};
+						}
+						if (meta?.type === 'fail') {
+							return {
+								pending: pending.map((entry) =>
+									entry.id === meta.id
+										? { ...entry, error: meta.message }
+										: entry
+								)
 							};
 						}
 						if (meta?.type === 'finish') {
@@ -312,8 +493,15 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 							pending.map((entry) =>
 								Decoration.widget(
 									entry.pos,
-									renderPlaceholder(entry),
-									{ side: -1, key: entry.id }
+									renderPlaceholder(entry, editor),
+									{
+										side: -1,
+										// A widget whose key is unchanged is reused
+										// as-is, so the key has to carry what is
+										// rendered or a progress tick never reaches
+										// the DOM.
+										key: `${entry.id}:${entry.error ? 'e' : entry.progress}`
+									}
 								)
 							)
 						);
@@ -365,45 +553,71 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 	}
 });
 
+/**
+ * Progress is only dispatched when the rounded percentage moves by this much.
+ *
+ * Every dispatch is a ProseMirror transaction, and an adapter reporting each
+ * chunk of a 5 MB file would produce hundreds. They change no document, so
+ * they never reach `onChange` or the undo stack, but they still cost a
+ * state recomputation each.
+ */
+const PROGRESS_STEP = 0.05;
+
 const uploadOne = async (
 	editor: Editor,
 	controllers: Map<string, AbortController>,
 	adapter: UploadAdapter,
 	file: File,
 	at: number,
-	report: (failure: UploadFailure) => void
+	report: (failure: UploadFailure) => void,
+	existingId?: string
 ): Promise<void> => {
-	const id = nextUploadId();
+	const id = existingId ?? nextUploadId();
 	const controller = new AbortController();
 	controllers.set(id, controller);
 
-	editor.view.dispatch(
-		editor.view.state.tr.setMeta(UPLOAD_PLUGIN_KEY, {
-			type: 'start',
-			id,
-			name: file.name,
-			pos: at
-		})
-	);
+	const dispatch = (meta: UploadMeta) => {
+		if (editor.isDestroyed) return;
+		editor.view.dispatch(
+			editor.view.state.tr.setMeta(UPLOAD_PLUGIN_KEY, meta)
+		);
+	};
+
+	if (existingId) {
+		// A retry reuses the entry, and so its mapped position, rather than
+		// starting a new one wherever the selection happens to be now.
+		dispatch({ type: 'progress', id, progress: 0 });
+	} else {
+		dispatch({ type: 'start', id, name: file.name, pos: at, file });
+	}
 
 	const finish = () => {
 		controllers.delete(id);
-		if (editor.isDestroyed) return;
-		editor.view.dispatch(
-			editor.view.state.tr.setMeta(UPLOAD_PLUGIN_KEY, {
-				type: 'finish',
-				id
-			})
-		);
+		dispatch({ type: 'finish', id });
+	};
+
+	let reported = -1;
+	const onProgress = (fraction: number) => {
+		// An adapter is host code: clamp rather than trust, or a bad number
+		// ends up in `aria-valuenow`.
+		const clamped = Math.min(1, Math.max(0, fraction));
+		if (reported >= 0 && Math.abs(clamped - reported) < PROGRESS_STEP) {
+			if (clamped !== 1) return;
+		}
+		reported = clamped;
+		dispatch({ type: 'progress', id, progress: clamped });
 	};
 
 	try {
 		const result = await adapter.upload(file, {
-			signal: controller.signal
+			signal: controller.signal,
+			onProgress
 		});
 
 		if (!isUploadResult(result)) {
-			finish();
+			controllers.delete(id);
+			const message = `Could not upload ${file.name}.`;
+			dispatch({ type: 'fail', id, message });
 			report({
 				file,
 				reason: 'result',
@@ -439,10 +653,22 @@ const uploadOne = async (
 			})
 			.run();
 	} catch (error) {
-		finish();
-		// A cancelled upload is not a failure and must not be reported as
-		// one. See `isAbortError`.
-		if (isAbortError(error)) return;
+		controllers.delete(id);
+
+		// A cancelled upload is not a failure. The placeholder goes away and
+		// nothing is reported — the user asked for this.
+		if (isAbortError(error)) {
+			dispatch({ type: 'finish', id });
+			return;
+		}
+
+		// A failure keeps its placeholder, holding the position so Retry has
+		// somewhere to put the image.
+		dispatch({
+			type: 'fail',
+			id,
+			message: `Could not upload ${file.name}.`
+		});
 		report({
 			file,
 			reason: 'adapter',
