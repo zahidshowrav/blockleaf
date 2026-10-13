@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import { createExtensions } from '@blockleaf/editor/extensions';
 
-import { RenderDocument } from '../src/react.js';
+import { RenderDocument, type RenderDocumentProps } from '../src/react.js';
 import { type RenderableDocument } from '../src/types.js';
 
 /** What the editor itself writes for a document. The parity target. */
@@ -17,8 +17,16 @@ export const editorHTML = (doc: RenderableDocument): string => {
 	return html;
 };
 
-export const reactHTML = (doc: RenderableDocument): string =>
-	renderToStaticMarkup(<RenderDocument doc={doc} />);
+export const reactHTML = (
+	doc: RenderableDocument,
+	options?: Omit<RenderDocumentProps, 'doc'>
+): string =>
+	renderToStaticMarkup(
+		<RenderDocument
+			doc={doc}
+			{...options}
+		/>
+	);
 
 /**
  * A canonical form for comparing two HTML strings.
