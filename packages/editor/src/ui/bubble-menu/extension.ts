@@ -55,6 +55,8 @@ export const BubbleMenuExtension =
 			return {
 				actions: undefined,
 				link: true,
+				panel: undefined,
+				label: undefined,
 				pluginKey: BUBBLE_MENU_PLUGIN_KEY,
 				updateDelay: undefined,
 				shouldShow: undefined,
@@ -106,6 +108,8 @@ export const BubbleMenuExtension =
 						editor: this.editor,
 						actions,
 						link,
+						panel: this.options.panel,
+						label: this.options.label,
 						openLinkRequest: 0
 					}
 				}

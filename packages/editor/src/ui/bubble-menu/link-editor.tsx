@@ -108,7 +108,7 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 
 	return (
 		<form
-			className="blockleaf-bubble-menu__link-editor"
+			className="blockleaf-bubble-menu__panel"
 			onSubmit={applyLink}
 			onKeyDown={(event) => {
 				if (event.key === 'Escape') {
@@ -122,7 +122,7 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 				ref={inputRef}
 				type="text"
 				inputMode="url"
-				className="blockleaf-bubble-menu__link-input"
+				className="blockleaf-bubble-menu__panel-input"
 				placeholder="Paste or type a link"
 				aria-label="Link address"
 				aria-invalid={rejected}
@@ -171,7 +171,7 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 				<p
 					id="blockleaf-link-error"
 					role="alert"
-					className="blockleaf-bubble-menu__link-error"
+					className="blockleaf-bubble-menu__panel-error"
 				>
 					Only https, mailto and relative links are allowed.
 				</p>

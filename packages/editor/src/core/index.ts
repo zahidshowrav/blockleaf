@@ -17,6 +17,13 @@ export {
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
+	Image,
+	sanitizeSrc,
+	type ImageAlign,
+	type ImageAttributes,
+	type ImageOptions
+} from './nodes/image.js';
+export {
 	PasteNormalizer,
 	normalizePastedHTML,
 	isMarkdownText,

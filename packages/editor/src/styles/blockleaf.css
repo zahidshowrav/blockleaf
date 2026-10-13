@@ -160,6 +160,35 @@
 	border-radius: var(--bl-radius);
 }
 
+/* The image node. Alignment is an attribute rather than a wrapper element so
+   that the stored document stays a single node and the HTML round-trips. */
+.blockleaf-editor__content .blockleaf-image {
+	display: block;
+	margin-inline: 0 auto;
+}
+
+.blockleaf-editor__content .blockleaf-image[data-align='center'] {
+	margin-inline: auto;
+}
+
+.blockleaf-editor__content .blockleaf-image[data-align='right'] {
+	margin-inline: auto 0;
+}
+
+/* An atom node never shows a text selection, so a selected image needs an
+   outline of its own or there is no way to tell it is selected. */
+.blockleaf-editor__content .blockleaf-image.ProseMirror-selectednode {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 2px;
+}
+
+/* A broken or still-loading src must not collapse the block to nothing, or
+   the caret has no block to land beside. */
+.blockleaf-editor__content .blockleaf-image:not([src]) {
+	min-height: 2rem;
+	background: var(--bl-color-code-bg);
+}
+
 .blockleaf-editor__content mark {
 	background-color: var(--bl-color-highlight);
 	border-radius: calc(var(--bl-radius) - 3px);
@@ -522,7 +551,7 @@
 	outline-offset: -2px;
 }
 
-.blockleaf-bubble-menu__link-editor {
+.blockleaf-bubble-menu__panel {
 	display: flex;
 	align-items: center;
 	gap: 2px;
@@ -530,7 +559,7 @@
 	max-width: 320px;
 }
 
-.blockleaf-bubble-menu__link-input {
+.blockleaf-bubble-menu__panel-input {
 	flex: 1 1 200px;
 	min-width: 160px;
 	padding: 4px 8px;
@@ -542,20 +571,30 @@
 	font-size: inherit;
 }
 
-.blockleaf-bubble-menu__link-input:focus-visible {
+.blockleaf-bubble-menu__panel-input:focus-visible {
 	outline: 2px solid var(--bl-bubble-active-fg);
 	outline-offset: -1px;
 }
 
-.blockleaf-bubble-menu__link-input[aria-invalid='true'] {
+.blockleaf-bubble-menu__panel-input[aria-invalid='true'] {
 	border-color: var(--bl-bubble-danger);
 }
 
-.blockleaf-bubble-menu__link-error {
+.blockleaf-bubble-menu__panel-error {
 	flex: 1 0 100%;
 	margin: 2px 0 0;
 	padding: 0 2px;
 	color: var(--bl-bubble-danger);
+	font-size: 0.75rem;
+}
+
+/* Same slot as the error line, but advice rather than a failure — so it must
+   not borrow the danger colour. */
+.blockleaf-bubble-menu__panel-hint {
+	flex: 1 0 100%;
+	margin: 2px 0 0;
+	padding: 0 2px;
+	color: var(--bl-bubble-muted);
 	font-size: 0.75rem;
 }
 

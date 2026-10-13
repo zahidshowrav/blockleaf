@@ -11,6 +11,7 @@ import { StarterKit } from '@tiptap/starter-kit';
 import { HEADING_LEVELS, NORMALISATION_META } from './constants.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
+import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
 
 export type PresetName = 'minimal' | 'standard';
@@ -27,6 +28,7 @@ export const BLOCK_NODE_TYPES = [
 	'taskList',
 	'taskItem',
 	'callout',
+	'image',
 	'table'
 ] as const;
 
@@ -200,6 +202,7 @@ export const createExtensions = (
 			nested: true
 		}),
 		Callout,
+		Image,
 		TableKit.configure({
 			table: {
 				resizable: false

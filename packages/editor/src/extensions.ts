@@ -8,6 +8,13 @@ export {
 export { Link, sanitizeHref } from './core/marks/link.js';
 export { Callout, type CalloutOptions } from './core/nodes/callout.js';
 export {
+	Image,
+	sanitizeSrc,
+	type ImageAlign,
+	type ImageAttributes,
+	type ImageOptions
+} from './core/nodes/image.js';
+export {
 	PasteNormalizer,
 	normalizePastedHTML,
 	isMarkdownText,
