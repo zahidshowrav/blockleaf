@@ -198,16 +198,109 @@ a server component and hooks do not exist there. The merge is two object
 spreads and is cheap next to walking the document, but defining the map at
 module scope rather than inline in JSX avoids it entirely.
 
+## An HTML string
+
+For the places React cannot go — an email body, an RSS item, an OG image, a
+cached fragment:
+
+```ts
+import { renderToHTML } from '@blockleaf/renderer/html';
+
+const body = renderToHTML(article.body);
+```
+
+It writes the same markup the React target does, takes the same `components`
+and `marks` overrides, and imports nothing at all. The entry does not touch
+React, so a worker that renders digest emails installs no UI library to do it.
+
+Escaping here is this package's job rather than React's, so text and attribute
+values are escaped separately. A document whose stored `alt` is
+`" onerror="alert(1)` renders as an attribute value, not as a handler.
+
+An override for this target returns a string:
+
+```ts
+renderToHTML(doc, {
+	components: {
+		image: ({ node }) => {
+			const attrs = imageAttributes(node);
+			return attrs ? `<img src="${escapeAttribute(attrs.src)}">` : '';
+		}
+	}
+});
+```
+
+`escapeText`, `escapeAttribute`, `element` and `voidElement` are exported from
+`@blockleaf/renderer/html` so an override does not have to reimplement them.
+
+## Text, headings and excerpts
+
+Some jobs want the words and not the markup — a search index, a reading-time
+estimate, an excerpt, a table of contents. These walk the same JSON without
+building any output to throw away afterwards:
+
+```ts
+import { extractHeadings, toPlainText } from '@blockleaf/renderer';
+
+const excerpt = `${toPlainText(doc).slice(0, 200)}…`;
+const words = toPlainText(doc, { blockSeparator: ' ' }).split(/\s+/).length;
+const toc = extractHeadings(doc);
+```
+
+`toPlainText` separates blocks with a blank line by default; pass
+`blockSeparator: ' '` for a search index that wants one line. Code blocks are
+included — a search for a function name should find the page that documents
+it. Image alt text is left out unless you ask for it with
+`includeImageAlt: true`: it reads as an interruption in an excerpt and as
+useful signal in an index.
+
+`extractHeadings` returns `{ level, text, id }` in document order, where `id`
+is the block id.
+
+### Linking to a heading
+
+The block id is written as `data-id`, not as `id`, because that is what the
+editor writes and the two must match. An anchor link needs a real `id`, so add
+one with an override:
+
+```tsx
+const components = {
+	heading: ({ node, children }) => {
+		const Tag = `h${headingLevel(node)}` as const;
+		return (
+			<Tag
+				id={blockId(node)}
+				data-id={blockId(node)}
+			>
+				{children}
+			</Tag>
+		);
+	}
+};
+```
+
+Then `extractHeadings(doc)` gives you the list to link to.
+
 ## Entry points
 
-| Import                      | Contains                             | Needs React |
-| --------------------------- | ------------------------------------ | ----------- |
-| `@blockleaf/renderer`       | `sanitizeHref`, `sanitizeSrc`, types | no          |
-| `@blockleaf/renderer/react` | `RenderDocument`                     | yes         |
+| Import                      | Contains                                         | Needs React |
+| --------------------------- | ------------------------------------------------ | ----------- |
+| `@blockleaf/renderer`       | text extractors, sanitisers, attr helpers, types | no          |
+| `@blockleaf/renderer/react` | `RenderDocument`                                 | yes         |
+| `@blockleaf/renderer/html`  | `renderToHTML`, escaping helpers                 | no          |
 
 React is an **optional** peer dependency. A script that only needs the URL
 rules — validating a row before it goes into the database, say — imports the
 root entry and installs nothing else.
+
+| Entry                             |    Size |
+| --------------------------------- | ------: |
+| `RenderDocument`                  | 1.40 kB |
+| `renderToHTML`                    | 1.50 kB |
+| `toPlainText` + `extractHeadings` |   445 B |
+| `sanitizeHref` + `sanitizeSrc`    |   217 B |
+
+Minified and brotlied, with all dependencies.
 
 ## Nodes
 

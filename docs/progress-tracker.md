@@ -157,7 +157,7 @@ stylesheet both packages share. See F15.
 | ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | RD-01 | `@blockleaf/renderer` package                                          | Done        | `5da026d` | 2026-10-13 |
 | RD-02 | Component overrides                                                    | Done        | `6d2770d` | 2026-10-13 |
-| RD-03 | HTML-string and plain-text exports                                     | Not started | —         | —          |
+| RD-03 | HTML-string and plain-text exports                                     | Done        | `a9c4af8` | 2026-10-13 |
 | RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Not started | —         | —          |
 | RD-05 | README with a demo GIF                                                 | Not started | —         | —          |
 | RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —         | —          |
