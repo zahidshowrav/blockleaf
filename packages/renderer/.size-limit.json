@@ -1,0 +1,15 @@
+[
+	{
+		"name": "RenderDocument (what a server component ships)",
+		"path": "dist/react.js",
+		"import": "{ RenderDocument }",
+		"limit": "3 kB",
+		"ignore": ["react"]
+	},
+	{
+		"name": "sanitisers only",
+		"path": "dist/index.js",
+		"import": "{ sanitizeHref, sanitizeSrc }",
+		"limit": "1 kB"
+	}
+]
