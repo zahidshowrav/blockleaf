@@ -132,13 +132,13 @@ enforced from the first commit.
 **Exit:** dragging a 5 MB image in works, shows progress, survives a mid-upload
 navigation, and a failed upload is retryable.
 
-| Id    | Task                                                                  | Status      | Commit | Completed |
-| ----- | --------------------------------------------------------------------- | ----------- | ------ | --------- |
-| MC-01 | Upload adapter interface (§4)                                         | Not started | —      | —         |
-| MC-02 | Drop, paste and picker entry points                                   | Not started | —      | —         |
-| MC-03 | Progress and abort                                                    | Not started | —      | —         |
-| MC-04 | Image block with alt text and alignment                               | Not started | —      | —         |
-| MC-05 | Code block — `lowlight`, curated grammars only (F10), language picker | Not started | —      | —         |
+| Id    | Task                                                                  | Status      | Commit    | Completed  |
+| ----- | --------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| MC-01 | Upload adapter interface (§4)                                         | Done        | `b6f7882` | 2026-10-13 |
+| MC-02 | Drop, paste and picker entry points                                   | Not started | —         | —          |
+| MC-03 | Progress and abort                                                    | Not started | —         | —          |
+| MC-04 | Image block with alt text and alignment                               | Not started | —         | —          |
+| MC-05 | Code block — `lowlight`, curated grammars only (F10), language picker | Not started | —         | —          |
 
 ## RD — Renderer + docs → public 0.1.0 (1½ weeks)
 
