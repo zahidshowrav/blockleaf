@@ -599,6 +599,25 @@
 }
 
 /*
+ * Upload placeholder
+ */
+
+/* A widget decoration, so it holds a position without being a node in the
+   saved document. */
+.blockleaf-upload {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: var(--bl-space-block) 0;
+	padding: 8px 12px;
+	border: 1px dashed var(--bl-color-border);
+	border-radius: var(--bl-radius);
+	background: var(--bl-color-code-bg);
+	color: var(--bl-color-muted);
+	font-size: 0.875rem;
+}
+
+/*
  * Drag handle and block menu
  */
 
