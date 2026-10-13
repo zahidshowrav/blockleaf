@@ -307,6 +307,48 @@ text editing, which the row and column handles already cover.
 
 ---
 
+## Image menu
+
+Select an image and a toolbar appears above it: align left, centre, right,
+alt text, delete.
+
+| Prop           | Default | What it does                                     |
+| -------------- | ------- | ------------------------------------------------ |
+| `imageMenu`    | `true`  | Turns the image toolbar off.                     |
+| `imageActions` | —       | An array of actions, or `(defaults) => actions`. |
+
+A keyboard reaches it the same way it reaches any atom block: arrowing onto
+an image selects the node, which is what the menu keys on. No extra shortcut
+is needed, and none is invented.
+
+This is a third instance of the bubble menu, after the text toolbar and the
+cell menu — same surface, own plugin key, own `shouldShow`. The text toolbar
+stands down automatically, because its `shouldShow` requires text in the
+range and an image has none.
+
+### Alt text
+
+The alt field writes directly to the node's `alt` attribute.
+
+**An empty field is an answer, not a blank.** Submitting it sets `alt` to the
+empty string, which is how HTML marks an image decorative so a screen reader
+skips it. That is different from an image with no `alt` at all, which a
+screen reader announces by reading the filename. The hint under the field
+says so, and the button says "Add alt text" or "Edit alt text" depending on
+which of the two states the image is in.
+
+### Alignment
+
+`left`, `center`, `right`, or unset. Unset renders flush left, so the align
+left button reports itself as pressed while the attribute is `null` — the
+toolbar agreeing with the page matters more than the toolbar agreeing with
+the attribute.
+
+Alignment is an attribute on the image node rather than a wrapper element, so
+the stored document stays one node and the HTML round-trips.
+
+---
+
 ## Placeholder
 
 The empty block the cursor is in gets a label. Only that one — labelling every

@@ -191,3 +191,58 @@ An adapter runs in the browser, which means it runs on the user's machine and
 nothing it returns can be trusted. Check the file type and size in your
 endpoint, not only in the adapter, and validate the stored document at the
 mutation boundary with [`@blockleaf/editor/validate`](./schema.md).
+
+## The image block
+
+An uploaded image becomes an `image` node:
+
+```json
+{
+	"type": "image",
+	"attrs": {
+		"id": "img-8f3a",
+		"src": "https://cdn.test/photo.png",
+		"alt": "A cat on a wall",
+		"width": 1200,
+		"align": "center"
+	}
+}
+```
+
+`id` is assigned by the editor, not by your adapter — it is the block id every
+other node carries. The `id` your adapter returns is the storage identifier,
+and it is what `remove` receives.
+
+### `src` is sanitised by the schema
+
+Allowed:
+
+- `https:`
+- site-relative and relative paths (`/uploads/a.png`, `img/a.png`)
+- base64 data URLs for raster formats — `png`, `jpeg`, `gif`, `webp`, `avif`
+
+Refused:
+
+- `javascript:`, and anything else carrying an unexpected scheme
+- `http:`, matching the link rule, and blocked as mixed content anyway
+- protocol-relative URLs (`//cdn.test/a.png`), which inherit the page scheme
+- `blob:`, which points into one browser session and is dead on reload
+- `data:image/svg+xml` — an SVG is a document, not a bitmap, and this one
+  would be attacker-authored markup stored in your database
+
+An `<img>` that arrives through a paste with an unsafe `src` is **dropped**,
+not stored with a null source. `setImage` and `updateImage` refuse the same
+sources, so host code calling the commands directly is held to the rule too.
+
+### Alt text
+
+`alt` has three states and they are not the same thing:
+
+| Value           | Means                                                 |
+| --------------- | ----------------------------------------------------- |
+| `null`          | Nobody has said. A screen reader reads the file name. |
+| `""`            | Decorative. A screen reader skips it.                 |
+| `"A cat on..."` | Described.                                            |
+
+The editor's alt field writes the second when submitted empty, so marking an
+image decorative is something a user can actually do.
