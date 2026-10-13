@@ -109,6 +109,95 @@ link whose href is refused keeps its text and loses the anchor: the words were
 written by a human and are worth preserving, the destination was not
 necessarily.
 
+## Overrides
+
+Replace the component used for any node or mark by name. Anything not named
+keeps its default, so an override is a patch rather than a whole mapping.
+
+```tsx
+import Image from 'next/image';
+import { RenderDocument, imageAttributes } from '@blockleaf/renderer/react';
+
+const components = {
+	image: ({ node }) => {
+		const attrs = imageAttributes(node);
+		if (!attrs) return null;
+
+		return (
+			<Image
+				src={attrs.src}
+				alt={attrs.alt}
+				width={attrs.width ?? 1200}
+				height={0}
+			/>
+		);
+	}
+};
+
+<RenderDocument
+	doc={doc}
+	components={components}
+/>;
+```
+
+`imageAttributes` is one of the helpers the default components use, exported
+so an override does not have to re-derive the rules — it returns a sanitised
+`src`, or `null` for a source that did not survive sanitisation. The others
+are `linkAttributes`, `headingLevel`, `blockId`, `codeLanguage`, `listStart`,
+`isChecked`, `calloutTone`, `calloutEmoji` and `highlightColor`.
+
+Marks work the same way, under `marks`:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	marks={{
+		link: ({ mark, children }) => (
+			<TrackedLink mark={mark}>{children}</TrackedLink>
+		)
+	}}
+/>
+```
+
+An override owns its decisions, sanitisation included. Nothing is applied
+behind it — if it writes `mark.attrs.href` straight into an `<a>`, that is
+what gets rendered. Call `linkAttributes(mark)` and it does not have to think
+about it.
+
+### Rendering a node type of your own
+
+A name the defaults do not know is rendered by the override, which is how a
+host adds a node the editor does not have:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	components={{ embed: ({ node }) => <Embed url={node.attrs?.url} /> }}
+/>
+```
+
+### Props an override receives
+
+| Prop         | What it is                            |
+| ------------ | ------------------------------------- |
+| `node`       | The stored node, attributes and all   |
+| `parent`     | Its parent, or `undefined` at the top |
+| `children`   | The node's content, already rendered  |
+| `renderNode` | Renders one child by hand             |
+| `combine`    | Joins rendered pieces                 |
+
+Most overrides need the first three. `renderNode` and `combine` are there for
+a component that has to group or reorder its children — a table splitting rows
+into `<thead>` and `<tbody>` — since `children` arrives already assembled in
+document order.
+
+### Performance
+
+Overrides are merged on every render, because `RenderDocument` has to work in
+a server component and hooks do not exist there. The merge is two object
+spreads and is cheap next to walking the document, but defining the map at
+module scope rather than inline in JSX avoids it entirely.
+
 ## Entry points
 
 | Import                      | Contains                             | Needs React |
