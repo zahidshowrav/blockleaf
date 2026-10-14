@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { LiveDemo } from '@/components/live-demo';
 
 const Page = () => (
-	<main className="flex flex-1 flex-col">
+	<div className="flex flex-1 flex-col">
 		<section className="mx-auto w-full max-w-6xl px-4 pt-10 pb-16">
 			<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
 				A block editor that hands you JSON.
@@ -57,7 +57,7 @@ const Page = () => (
 				</div>
 			</dl>
 		</section>
-	</main>
+	</div>
 );
 
 export default Page;
