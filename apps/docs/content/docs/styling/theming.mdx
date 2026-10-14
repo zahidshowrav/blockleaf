@@ -1,0 +1,183 @@
+---
+title: Theming
+description: Every --bl-* custom property, how dark mode is decided, and the one place a variable set on the editor does not reach.
+icon: SwatchBook
+---
+
+Fifty-seven custom properties, in six groups. Set the ones you care about and
+leave the rest; each has a default, and the menu groups fall back to the
+content colours so a two-line theme still looks deliberate.
+
+## Where to set them
+
+```css
+/* the whole application */
+:root {
+	--bl-color-accent: #3b82f6;
+}
+
+/* one editor */
+.blockleaf-editor.comment-box {
+	--bl-font-size: 0.9375rem;
+}
+```
+
+<Callout type="warn" title="The slash menu is mounted on document.body">
+
+Everything else — the bubble menu, the drag handle, the block menu, the
+table controls — is mounted inside `.blockleaf-editor` and inherits from
+it. The slash menu is not, so a variable set on `.blockleaf-editor` never
+reaches it. Set shared colours on `:root`, or target
+`.blockleaf-slash-menu` directly.
+
+</Callout>
+
+## Content
+
+The editing surface and everything the renderer produces.
+
+| Property                     | Default   | Used for                                |
+| ---------------------------- | --------- | --------------------------------------- |
+| `--bl-color-bg`              | `#ffffff` | Surface behind the document             |
+| `--bl-color-fg`              | `#1f2328` | Body text                               |
+| `--bl-color-muted`           | `#6b7280` | Placeholders, captions, the drag handle |
+| `--bl-color-border`          | `#e5e7eb` | Rules, dividers, menu borders           |
+| `--bl-color-accent`          | `#3b5bdb` | Links, selected menu items, focus       |
+| `--bl-color-code-bg`         | `#f4f4f5` | Inline code and code blocks             |
+| `--bl-color-quote-border`    | `#d1d5db` | Blockquote rule                         |
+| `--bl-color-selection`       | `#cfe0ff` | Text selection                          |
+| `--bl-color-callout-bg`      | `#f8fafc` | Callout background                      |
+| `--bl-color-callout-border`  | `#e2e8f0` | Callout border                          |
+| `--bl-color-highlight`       | `#fef08a` | The highlight mark                      |
+| `--bl-color-table-border`    | `#e2e8f0` | Table cell borders                      |
+| `--bl-color-table-header-bg` | `#f8fafc` | Table header row                        |
+| `--bl-color-danger`          | `#b42318` | Destructive actions, upload failures    |
+
+## Type and rhythm
+
+| Property               | Default           | Used for                                 |
+| ---------------------- | ----------------- | ---------------------------------------- |
+| `--bl-font-body`       | system sans stack | Everything but code                      |
+| `--bl-font-mono`       | system mono stack | Inline code and code blocks              |
+| `--bl-font-size`       | `1rem`            | Base size; block sizes are `em`-relative |
+| `--bl-line-height`     | `1.7`             | Body leading                             |
+| `--bl-space-block`     | `0.75em`          | Gap between sibling blocks               |
+| `--bl-radius`          | `6px`             | Corners, everywhere                      |
+| `--bl-content-padding` | `0`               | Inset on `.blockleaf-editor__content`    |
+
+Because headings and code are sized in `em`, changing `--bl-font-size`
+rescales the whole document proportionally. That is usually what you want
+for a comment box.
+
+## Slash menu
+
+Prefixed `--bl-slash-`. Remember that this menu does not inherit from
+`.blockleaf-editor`.
+
+| Property                 | Default                           |
+| ------------------------ | --------------------------------- |
+| `--bl-slash-bg`          | `var(--bl-color-bg, #ffffff)`     |
+| `--bl-slash-fg`          | `var(--bl-color-fg, #1f2328)`     |
+| `--bl-slash-muted`       | `#5f6673`                         |
+| `--bl-slash-border`      | `var(--bl-color-border, #e5e7eb)` |
+| `--bl-slash-hover`       | `#f3f4f6`                         |
+| `--bl-slash-selected`    | `#eef2ff`                         |
+| `--bl-slash-selected-fg` | `var(--bl-color-accent, #3b5bdb)` |
+| `--bl-slash-shadow`      | layered drop shadow               |
+
+## Bubble menu
+
+Prefixed `--bl-bubble-`: `bg`, `fg`, `muted`, `border`, `hover`, `active`,
+`active-fg`, `danger`, `shadow`. Same defaults and the same fallbacks to the
+content colours.
+
+## Block handle and block menu
+
+`--bl-handle-fg`, `--bl-handle-hover` and `--bl-handle-gap` (`4px`) style the
+drag handle. The menu it opens uses `--bl-block-` with the same nine names as
+the bubble menu.
+
+## Table menu
+
+`--bl-table-menu-` with the same nine names again.
+
+## Dark mode
+
+Out of the box the stylesheet follows the operating system:
+
+```css
+@media (prefers-color-scheme: dark) {
+	.blockleaf-editor:not([data-theme='light']) {
+		/* dark palette */
+	}
+}
+```
+
+Read that selector carefully, because it is the whole model:
+
+- **No `data-theme`** — follow the OS.
+- **`data-theme="light"`** — stay light even when the OS is dark.
+- **`data-theme="dark"`** — force dark regardless.
+
+### Forcing a theme
+
+On anything you render yourself — the renderer's wrapper, a read-only
+preview — put the attribute on the wrapper:
+
+```tsx
+<div
+	className="blockleaf-editor"
+	data-theme="dark"
+>
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={doc} />
+	</div>
+</div>
+```
+
+<Callout type="warn" title="The editor component does not forward it yet">
+
+`BlockleafEditor` writes its own wrapper and does not pass `data-theme`
+through, so an application with its own light/dark toggle cannot drive the
+editor from it today. Until it does, re-declare the palette under your own
+toggle's selector, which is one class more specific than the media query
+and therefore wins:
+
+```css
+html.dark .blockleaf-editor,
+html.dark .blockleaf-slash-menu {
+	--bl-color-bg: #0d1117;
+	--bl-color-fg: #e6edf3;
+	--bl-color-border: #30363d;
+	--bl-color-code-bg: #161b22;
+}
+```
+
+</Callout>
+
+### Your own palette
+
+A theme that ignores the OS entirely is two blocks:
+
+```css
+.blockleaf-editor,
+.blockleaf-slash-menu {
+	--bl-color-bg: #fffdf7;
+	--bl-color-fg: #2d2a26;
+	--bl-color-accent: #b45309;
+	--bl-color-code-bg: #f5efe2;
+	--bl-radius: 2px;
+}
+
+html.dark .blockleaf-editor,
+html.dark .blockleaf-slash-menu {
+	--bl-color-bg: #1c1917;
+	--bl-color-fg: #e7e5e4;
+	--bl-color-accent: #fbbf24;
+	--bl-color-code-bg: #292524;
+}
+```
+
+Everything downstream — menus, handles, table controls, the renderer's
+output — picks those up, because they all resolve through the same four or
+five content colours.

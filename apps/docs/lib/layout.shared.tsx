@@ -1,10 +1,10 @@
 import type { BaseLayoutProps, LinkItemType } from 'fumadocs-ui/layouts/shared';
 import {
 	Braces,
-	ImageUp,
+	CircleQuestionMark,
 	MousePointerClick,
-	Server,
-	SquareCode
+	Palette,
+	Server
 } from 'lucide-react';
 
 import { appName, docsRoute, gitConfig } from '@/lib/shared';
@@ -21,7 +21,7 @@ const documentation: LinkItemType = {
 	on: 'nav',
 	items: [
 		{
-			text: 'Getting started',
+			text: 'Quick start',
 			description:
 				'Install the editor, render it, and store what it hands you — in about ten lines.',
 			url: docsRoute,
@@ -39,6 +39,13 @@ const documentation: LinkItemType = {
 			}
 		},
 		{
+			icon: <CircleQuestionMark />,
+			text: 'What is Blockleaf',
+			description:
+				'Why it exists next to Tiptap and Novel, and what it refuses to decide for you.',
+			url: `${docsRoute}/what-is-blockleaf`
+		},
+		{
 			icon: <Braces />,
 			text: 'The JSON contract',
 			description:
@@ -53,13 +60,6 @@ const documentation: LinkItemType = {
 			url: `${docsRoute}/chrome`
 		},
 		{
-			icon: <ImageUp />,
-			text: 'Uploads and images',
-			description:
-				'Wire your own storage to drag, paste and the image block.',
-			url: `${docsRoute}/uploads`
-		},
-		{
 			icon: <Server />,
 			text: 'Server rendering',
 			description:
@@ -67,11 +67,11 @@ const documentation: LinkItemType = {
 			url: `${docsRoute}/rendering`
 		},
 		{
-			icon: <SquareCode />,
-			text: 'The code block',
+			icon: <Palette />,
+			text: 'The style guide',
 			description:
-				'Syntax highlighting, opt-in from its own entry point so nobody else pays for it.',
-			url: `${docsRoute}/code-block`,
+				'One stylesheet and fifty-seven custom properties — with Tailwind and shadcn/ui recipes.',
+			url: `${docsRoute}/styling`,
 			menu: {
 				className:
 					'md:col-span-2 lg:col-span-3 md:flex-row md:items-center'

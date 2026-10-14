@@ -1,4 +1,20 @@
 {
 	"title": "Documentation",
-	"pages": ["index", "schema", "chrome", "uploads", "code-block", "rendering"]
+	"pages": [
+		"---Introduction---",
+		"index",
+		"what-is-blockleaf",
+		"comparisons",
+		"---Documentation---",
+		"getting-started",
+		"schema",
+		"chrome",
+		"uploads",
+		"code-block",
+		"rendering",
+		"---Integration---",
+		"styling",
+		"extensions",
+		"custom-extensions"
+	]
 }

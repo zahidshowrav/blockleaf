@@ -1,0 +1,117 @@
+---
+title: With Tailwind
+description: Blockleaf needs no Tailwind, and does not fight it — how to drive the editor from your Tailwind theme tokens in one block of CSS.
+icon: Wind
+---
+
+Blockleaf ships plain CSS and requires nothing of your build. In a Tailwind
+project that means there is no plugin to add, no `content` path to register
+and no `prose` class to apply — you import the stylesheet and it works.
+
+This page is about making it look like the rest of _your_ application.
+
+## Import order
+
+```css title="app/global.css"
+@import 'tailwindcss';
+@import '@blockleaf/editor/styles.css';
+```
+
+Ours last, out of habit rather than necessity. Tailwind's Preflight resets
+bare element selectors — `h1 { font-size: inherit }` at specificity `0,0,1` —
+while every Blockleaf rule is scoped to a class, as in
+`.blockleaf-editor__content h1` at `0,1,1`. Specificity settles it either
+way; order only matters if you start writing bare-element rules of your own.
+
+<Callout title="Do not add a prose class">
+
+`@tailwindcss/typography` styles the same elements Blockleaf already styles,
+scoped to `.prose` at `0,1,1` — the same specificity, so the winner is
+whichever stylesheet loaded last. Pick one. If you want Tailwind Typography
+to own your article pages, use it on pages the renderer does not touch.
+
+</Callout>
+
+## Map your theme onto the editor
+
+Tailwind v4 exposes every theme value as a CSS variable, so a theme is one
+block that points `--bl-*` at `--color-*`:
+
+```css title="app/global.css"
+@theme {
+	--color-brand: oklch(62% 0.19 259);
+}
+
+.blockleaf-editor,
+.blockleaf-slash-menu {
+	--bl-color-accent: var(--color-brand);
+	--bl-color-fg: var(--color-gray-900);
+	--bl-color-muted: var(--color-gray-500);
+	--bl-color-border: var(--color-gray-200);
+	--bl-color-code-bg: var(--color-gray-100);
+	--bl-font-body: var(--font-sans);
+	--bl-font-mono: var(--font-mono);
+	--bl-radius: var(--radius-lg);
+}
+```
+
+Now a change to the design system changes the editor, and nobody has to
+remember that the editor exists.
+
+<Callout type="warn" title="Include the slash menu in the selector">
+
+The slash menu is mounted on `document.body`, outside `.blockleaf-editor`, so
+it does not inherit variables set there. Either list
+`.blockleaf-slash-menu` alongside it as above, or set the variables on
+`:root` and let both inherit.
+
+</Callout>
+
+## Dark mode
+
+Tailwind v4 projects usually toggle a `dark` class on `<html>`. Blockleaf's
+own dark palette is behind `prefers-color-scheme`, which does not know about
+that class, so point one at the other:
+
+```css title="app/global.css"
+@custom-variant dark (&:where(.dark, .dark *));
+
+html.dark .blockleaf-editor,
+html.dark .blockleaf-slash-menu {
+	--bl-color-bg: var(--color-gray-950);
+	--bl-color-fg: var(--color-gray-100);
+	--bl-color-muted: var(--color-gray-400);
+	--bl-color-border: var(--color-gray-800);
+	--bl-color-code-bg: var(--color-gray-900);
+}
+```
+
+`html.dark .blockleaf-editor` is `0,2,1` and the media-query rule inside the
+package is `0,2,0`, so yours wins whether or not the operating system agrees.
+See [theming](./theming.mdx#forcing-a-theme) for why the attribute route is
+not available on the editor component yet.
+
+## Utilities on the editor
+
+`className` lands on `.blockleaf-editor`, so Tailwind utilities are fine for
+the box — size, border, radius, overflow — and the custom properties remain
+the right tool for what is inside it:
+
+```tsx
+<BlockleafEditor
+	className="min-h-96 overflow-auto rounded-xl border border-gray-200"
+	defaultValue={doc}
+	onChange={save}
+/>
+```
+
+Reaching inside with arbitrary variants (`[&_h1]:text-3xl`) works, but it
+competes with the stylesheet on specificity for no benefit. `--bl-font-size`
+rescales the whole document in one declaration, because every block size is
+`em`-relative.
+
+## The renderer too
+
+The renderer writes the same markup, so the same block of CSS themes your
+published pages. Nothing extra to configure — see
+[server rendering](../rendering.mdx#styling).
