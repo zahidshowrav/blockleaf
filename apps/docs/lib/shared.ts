@@ -6,6 +6,7 @@ export const appDescription =
 export const docsRoute = '/docs';
 export const blogRoute = '/blog';
 export const changelogRoute = '/changelog';
+export const contributorsRoute = '/contributors';
 export const docsContentRoute = '/llms.mdx/docs';
 
 export const gitConfig = {
