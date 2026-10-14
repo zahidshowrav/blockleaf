@@ -162,6 +162,12 @@ RD-04 ships the site, the live demo and the pages that already existed. The
 prose §6 still calls for — recipes, the two migration guides and the
 comparison table — is not written, and the Vercel project is not connected.
 
+A later pass added the navbar (a Documentation dropdown, plus Examples and
+Blog as placeholder pages), moved the live demo into three full-width tabs —
+the editor, the renderer's output and the stored JSON — and switched the
+install commands to `package-install`, which Fumadocs expands into npm, pnpm,
+yarn and bun.
+
 | Id    | Task                                                                   | Status      | Commit    | Completed  |
 | ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | RD-01 | `@blockleaf/renderer` package                                          | Done        | `5da026d` | 2026-10-13 |
