@@ -42,7 +42,7 @@ export const demoDocument: BlockleafDocument = {
 					content: [
 						{
 							type: 'text',
-							text: 'Everything you do here changes the JSON on the right. That JSON is the product — it is what lands in your database.'
+							text: 'Everything you do here changes the other two tabs. That JSON is the product — it is what lands in your database.'
 						}
 					]
 				}
