@@ -15,7 +15,7 @@ import {
 } from '@/components/blog';
 import { getMDXComponents } from '@/components/mdx';
 import { findPost, getPosts } from '@/lib/blog';
-import { blogRoute } from '@/lib/shared';
+import { blogRoute, getPageImageUrl } from '@/lib/shared';
 import { blogAuthors, blogSource } from '@/lib/source';
 
 const find = async (slug: string) => {
@@ -72,7 +72,8 @@ export const generateMetadata = async (
 	const result = await find(slug);
 	if (!result) notFound();
 
-	const { post } = result;
+	const { page, post } = result;
+	const image = post.image ?? getPageImageUrl('blog', page).url;
 
 	return {
 		title: post.title,
@@ -85,7 +86,9 @@ export const generateMetadata = async (
 			url: post.url,
 			publishedTime: post.date?.toISOString(),
 			authors: post.authors.map((author) => author.name),
-			tags: post.tags.map((tag) => tag.name)
-		}
+			tags: post.tags.map((tag) => tag.name),
+			images: image
+		},
+		twitter: { card: 'summary_large_image', images: image }
 	};
 };

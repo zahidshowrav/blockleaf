@@ -11,7 +11,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { getMDXComponents } from '@/components/mdx';
-import { getPageMarkdownUrl, gitConfig } from '@/lib/shared';
+import { getPageImageUrl, getPageMarkdownUrl, gitConfig } from '@/lib/shared';
 import { source } from '@/lib/source';
 
 const Page = async (props: PageProps<'/docs/[[...slug]]'>) => {
@@ -60,8 +60,13 @@ export const generateMetadata = async (
 	const page = source.getPage(params.slug);
 	if (!page) notFound();
 
+	const image = getPageImageUrl('docs', page).url;
+
 	return {
 		title: page.data.title,
-		description: page.data.description
+		description: page.data.description,
+		alternates: { canonical: page.url },
+		openGraph: { url: page.url, images: image },
+		twitter: { card: 'summary_large_image', images: image }
 	};
 };
