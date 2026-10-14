@@ -8,11 +8,43 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15 · **Last reviewed:** 2026-10-13
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16 · **Last reviewed:** 2026-10-14
 
 ---
 
 ## Settled
+
+### F16 — the no-CSS-framework rule governs the packages, not the repo · decided 2026-10-14
+
+`conventions.md` says "No CSS framework, and no `!important`", and says it
+applies to `packages/*` **and** `apps/*`. `fumadocs-ui` depends on
+`@fumadocs/tailwind`, so building the docs site means Tailwind v4 in
+`apps/docs`. One of the two had to give.
+
+The rule stays, scoped to where it was always aimed. It is a **product
+promise**: install `@blockleaf/editor` and you are not made to adopt Tailwind,
+a `prose` class, or a build step. PROJECT_PLAN §2 calls it a differentiator,
+and it is about what a consumer is forced to install. `apps/docs` is never
+published and nobody installs it, so Tailwind there costs a consumer nothing.
+
+The choice was also already made. §6 specifies Fumadocs on Next.js, and F6
+closed the question of revisiting it. Fumadocs has required Tailwind
+throughout; adopting it and forbidding Tailwind was never coherent.
+
+So `conventions.md` now says the rule covers `packages/*`, and names the
+reason, instead of claiming a scope the repo visibly breaks. A rule that is
+quietly violated is worse than one that is accurately stated — it stops
+telling you anything.
+
+**What does not change:** `packages/editor` and `packages/renderer` ship no
+framework, one stylesheet, `--bl-*` custom properties, and no `!important`.
+The size budgets still gate the published bundles. `apps/sandbox` stays plain
+CSS, because nothing forces otherwise there.
+
+One consequence worth naming: the demo runs the editor _inside_ a Tailwind
+page, which is the first time the editor has met a CSS reset. It immediately
+found two stylesheet bugs — see the changeset for `fix(editor)` on this
+branch. That is the dogfooding working, not an argument against it.
 
 ### F15 — the renderer carries its own walker and its own URL rules · measured 2026-10-13
 
