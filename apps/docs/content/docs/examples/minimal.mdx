@@ -1,0 +1,63 @@
+---
+title: A comment box
+description: The minimal preset with the chrome turned down — the smallest useful Blockleaf editor.
+---
+
+Not every text box wants a table. The `minimal` preset is paragraphs and the
+inline marks: bold, italic, underline, strike, inline code and links. No
+headings, lists, quotes, code blocks, rules, images or tables, and nothing
+for the slash menu to offer.
+
+<MinimalExample />
+
+```tsx
+'use client';
+
+import { BlockleafEditor } from '@blockleaf/editor';
+
+export const CommentBox = () => (
+	<BlockleafEditor
+		preset="minimal"
+		placeholder="Leave a comment…"
+		label="Comment"
+		dragHandle={false}
+		slashMenu={false}
+	/>
+);
+```
+
+## What each line is doing
+
+- **`preset="minimal"`** picks the short extension set. See
+  [getting started](../getting-started.mdx#presets).
+- **`dragHandle={false}`** and **`slashMenu={false}`** remove chrome that has
+  nothing to do in a two-line box. The bubble menu stays, because selecting a
+  word and pressing bold is still the point.
+- **`label`** is the accessible name of the editing surface. A
+  `contenteditable` with no name is announced as nothing at all.
+- **`placeholder`** replaces the built-in hint. Pass an object to label
+  paragraphs and headings separately, or `false` to turn it off.
+
+## Sizing it
+
+The editor is as tall as its content. Give the box a height and let it
+scroll:
+
+```tsx
+<BlockleafEditor
+	className="comment-box"
+	preset="minimal"
+/>
+```
+
+```css
+.blockleaf-editor.comment-box {
+	max-height: 12rem;
+	overflow-y: auto;
+	--bl-font-size: 0.9375rem;
+	--bl-content-padding: 0.75rem;
+}
+```
+
+`className` lands on `.blockleaf-editor`, so one instance can be sized and
+themed without touching any other. See [the style guide](../styling/index.mdx).

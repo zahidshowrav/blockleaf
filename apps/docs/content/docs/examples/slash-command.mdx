@@ -1,0 +1,87 @@
+---
+title: A slash command
+description: Add one command and remove another without rebuilding the menu, and know when a command needs a picker instead.
+---
+
+Press `/` on an empty line. "Today's date" is new; "Callout" has been taken
+out.
+
+<SlashCommandExample />
+
+```tsx
+'use client';
+
+import { BlockleafEditor, type SlashCommand } from '@blockleaf/editor';
+
+const today: SlashCommand = {
+	id: 'today',
+	title: "Today's date",
+	description: 'Insert the date as plain text',
+	group: 'Advanced',
+	keywords: ['date', 'now'],
+	run: (editor) => editor.chain().focus().insertContent(formatToday()).run()
+};
+
+export const Editor = () => (
+	<BlockleafEditor
+		slashItems={(defaults) => [
+			...defaults.filter((command) => command.id !== 'callout'),
+			today
+		]}
+	/>
+);
+```
+
+## The function form matters
+
+`slashItems` takes either an array or `(defaults) => commands`. Taking the
+function keeps you on the defaults: when a release adds a block, your menu
+gets it. Passing a bare array pins the menu to whatever existed the day you
+wrote it.
+
+The twelve defaults are Text, Heading 1–3, Bullet list, Numbered list, To-do
+list, Quote, Code, Callout, Divider and Table.
+
+## What a command is
+
+| Field         | Required | What it does                                           |
+| ------------- | -------- | ------------------------------------------------------ |
+| `id`          | yes      | Stable identity — what `filter` matches on             |
+| `title`       | yes      | What the row says                                      |
+| `group`       | yes      | Section heading in the menu                            |
+| `run`         | yes      | `(editor) => void`, runs after the `/query` is deleted |
+| `description` | no       | Second line in the row                                 |
+| `keywords`    | no       | Extra search terms                                     |
+| `aliases`     | no       | Alternative titles to match                            |
+| `icon`        | no       | A node or a component                                  |
+| `picker`      | no       | See below                                              |
+
+Filtering searches titles, aliases, keywords and descriptions, so a command
+called "Today's date" with `keywords: ['date', 'now']` is found by typing
+`/now`.
+
+## Commands that need an argument
+
+`run` fires the moment the item is chosen, which is wrong for a command that
+needs input first — a table needs dimensions, an embed needs a URL. Those
+carry a `picker`: a component rendered in place of the list.
+
+```ts
+type SlashPickerProps = {
+	editor: Editor;
+	/** The `/query` text to replace when the command finally runs. */
+	range: Range;
+	/** Dismiss the picker and return to the list. */
+	onCancel: () => void;
+};
+```
+
+A picker replaces `run` in the menu, but `run` still has to exist: it is the
+path a keyboard shortcut takes, and the path a host that renders its own menu
+gets. The chrome must not be the only way to reach a command.
+
+## Full control
+
+For more than add and remove, `slashRegistry` takes a `CommandRegistry` with
+`add` (positioned with `before`, `after` or `index`), `remove`, `reorder`,
+`filter`, `get`, `getAll` and `clone`. See [the chrome](../chrome.mdx#slash-menu).

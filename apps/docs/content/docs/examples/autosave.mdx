@@ -1,0 +1,94 @@
+---
+title: Autosave
+description: A dirty indicator that reacts to the keystroke and a write that does not — the two change callbacks doing their separate jobs.
+---
+
+Type in this one and watch the counters. Every transaction moves the first
+number; the second only moves when a write actually happens.
+
+<AutosaveExample />
+
+```tsx
+'use client';
+
+import { useCallback, useRef, useState } from 'react';
+import { BlockleafEditor, type BlockleafDocument } from '@blockleaf/editor';
+
+type SaveState = 'saved' | 'dirty' | 'saving';
+
+export const Article = ({ initial }: { initial: BlockleafDocument }) => {
+	const [state, setState] = useState<SaveState>('saved');
+	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+	const onChangeImmediate = useCallback(() => {
+		setState((current) => (current === 'saving' ? current : 'dirty'));
+	}, []);
+
+	const onChange = useCallback(async (doc: BlockleafDocument) => {
+		setState('saving');
+		await fetch('/api/article', {
+			method: 'PUT',
+			body: JSON.stringify(doc)
+		});
+		setState('saved');
+	}, []);
+
+	return (
+		<>
+			<p aria-live="polite">{state}</p>
+			<BlockleafEditor
+				defaultValue={initial}
+				onChange={onChange}
+				onChangeImmediate={onChangeImmediate}
+			/>
+		</>
+	);
+};
+```
+
+## Why two callbacks
+
+`onChange` is debounced — 300 ms by default. `onChangeImmediate` fires on
+every transaction. Using one for the other's job is the most common mistake
+with this editor:
+
+|                     | Fires                     | Use it for                              |
+| ------------------- | ------------------------- | --------------------------------------- |
+| `onChangeImmediate` | Every transaction         | Dirty flags, word counts, live previews |
+| `onChange`          | 300 ms after the last one | Writing to your database                |
+
+Saving from `onChangeImmediate` is a network request per character. Driving a
+preview from `onChange` is a preview that lags a third of a second behind the
+caret.
+
+`debounceMs` moves the line. Two seconds is reasonable for a long document on
+a slow connection; do not go below about 150 ms or you are back to writing on
+the keystroke.
+
+## Announce it politely
+
+`aria-live="polite"` on the status element means a screen reader hears
+"saving", then "saved", at a natural pause rather than interrupting the
+sentence being typed. Without it the status changes silently and the only
+people who know the document is safe are the ones who can see the corner of
+the screen.
+
+## Unsaved changes on navigation
+
+The dirty flag is also what tells you it is unsafe to leave:
+
+```tsx
+useEffect(() => {
+	if (state === 'saved') return;
+
+	const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+	window.addEventListener('beforeunload', warn);
+	return () => window.removeEventListener('beforeunload', warn);
+}, [state]);
+```
+
+## What arrives
+
+Both callbacks hand you a `BlockleafDocument` with `attrs.schemaVersion`
+already stamped. There is nothing to serialise and nothing to strip before it
+goes into a `jsonb` column — see [the document](../schema.mdx).
