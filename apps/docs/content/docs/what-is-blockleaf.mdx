@@ -1,0 +1,123 @@
+---
+title: What is Blockleaf
+description: A Notion-style editor you install once instead of assembling again in every project — and the reasoning behind every default it ships with.
+icon: CircleQuestionMark
+---
+
+Blockleaf is a Notion-style block editor for React. It is built on
+[Tiptap](https://tiptap.dev) and ProseMirror, it ships the whole editing
+surface — slash menu, selection toolbar, drag handles, tables, uploads — and
+it hands your application a versioned JSON document.
+
+It exists because that last paragraph usually takes a week.
+
+## The problem it solves
+
+A rich text editor is never one decision. It is thirty: which extensions,
+which keyboard shortcuts, what a slash menu looks like, how drag-and-drop
+reorders a block, where an uploaded image goes while it is still uploading,
+what gets stored, and what happens to everything stored last year when the
+shape changes.
+
+Most teams make those thirty decisions once, get it roughly right, and then
+make them again — slightly differently — in the next project. The editor is
+never the product, and it never stops costing.
+
+Blockleaf makes those decisions once, in the open, with the reasoning written
+down. You install it and argue with the parts you disagree with.
+
+## Where it came from
+
+Two editors shaped it, and it is worth being precise about both.
+
+### Novel
+
+[Novel](https://github.com/steven-tey/novel) got the feel right. The slash
+menu, the bubble menu, the Notion-ness of it — a lot of what people like
+about this category, Novel demonstrated first, and it is Apache-2.0 with
+16,000-odd stars to show for it.
+
+It has also gone quiet. The last release, `novel@1.0.2`, went out in January
+2025, and the repository has had no pushes since. That is not a criticism of
+anyone — maintaining an editor is relentless, unpaid work — but a dependency
+that sits at the centre of your product and stops moving is a problem you
+inherit, not one you can wait out.
+
+### Tiptap
+
+[Tiptap](https://tiptap.dev) is excellent, and Blockleaf is built on it. The
+editor and its extensions are MIT-licensed and free, and `@tiptap/core` ships
+releases constantly.
+
+What Tiptap is not, deliberately, is finished. It is a toolkit: you choose the
+extensions, write the menus, decide the schema, style everything, and read a
+great deal of documentation to do it. That is the right design for a toolkit
+and the wrong starting point if what you wanted was an editor. Doing that
+assembly once is interesting; doing it in every project that needs a text box
+is the thing this package is tired of.
+
+Tiptap also sells a platform. The editor stays free, but real-time
+collaboration, comments, AI, version history and document conversion are
+features of a subscription that starts at $59 a month. For many teams that is
+a reasonable trade. It should be a trade you make knowingly, rather than one
+you discover after you have built on top of it.
+
+## What Blockleaf decides for you
+
+- **The schema.** A fixed, documented set of nodes and marks, versioned from
+  the first release. See [the document](./schema.mdx).
+- **The chrome.** Slash menu, selection toolbar, link editor, drag handles,
+  block menu, table controls and image controls, all working out of the box
+  and all replaceable. See [the chrome](./chrome.mdx).
+- **The paste behaviour.** Markdown and pasted HTML are normalised into the
+  schema rather than smuggled in as arbitrary markup.
+- **Uploads.** You supply one adapter function; the editor runs the
+  placeholder, the progress, the cancel, the retry and the failure. See
+  [uploads](./uploads.mdx).
+- **Reading.** `@blockleaf/renderer` turns stored JSON back into React or an
+  HTML string on a server, with no editor and no ProseMirror in the bundle.
+  See [server rendering](./rendering.mdx).
+
+## What it refuses to decide
+
+- **Where your content lives.** There is no backend, no sync service, no
+  account. The editor hands you JSON; the rest is your application.
+- **Your CSS framework.** One stylesheet of plain CSS driven by `--bl-*`
+  custom properties. No Tailwind, no `prose` class, no build step of its own.
+  Installing an editor should not change how you write styles.
+- **Your design.** Every default is a custom property or a replaceable
+  component. See [the style guide](./styling.mdx).
+- **Your extension set.** The Tiptap extension ecosystem is the point of
+  building on Tiptap. See [extensions](./extensions.mdx).
+
+## The promises
+
+Three things are load-bearing, and they are the reason to depend on this
+rather than fork it:
+
+1. **The stored document is the product.** It lives in your database, not
+   ours. The shape never changes without a `schemaVersion` bump and a
+   migration shipped in the same release.
+2. **Nothing is imposed on your build.** ESM only, no CSS framework, no
+   required bundler plugin, no postinstall step.
+3. **The expensive parts are opt-in.** Syntax highlighting lives behind its
+   own entry point so that an application with no code blocks never pays for
+   one. See [code blocks](./code-block.mdx).
+
+## When not to use it
+
+Honest cases where something else is the better answer:
+
+- **You need real-time collaboration today.** Blockleaf has no CRDT and no
+  sync layer. Tiptap's platform, or Yjs wired to Tiptap yourself, is the
+  shorter path.
+- **You are not using React.** The editing core is framework-agnostic by
+  design, but the only bindings that exist today are React ones.
+- **You want a Markdown editor.** Blockleaf stores structured JSON, not
+  Markdown. It understands pasted Markdown and can emit plain text and HTML,
+  but Markdown is not its storage format.
+- **You want to own every decision.** Then you want Tiptap directly, and you
+  should have it.
+
+[Comparisons](./comparisons.mdx) puts numbers and licences next to each of
+those alternatives.

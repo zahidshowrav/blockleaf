@@ -1,0 +1,224 @@
+---
+title: Custom extensions
+description: Adding a node of your own end to end — schema, stored shape, slash command, renderer override and the migration you now own.
+icon: Blocks
+---
+
+When no Tiptap extension does what you need, write one. This page follows a
+single example — a `callToAction` block with a label and a URL — all the way
+from the editor to the rendered page, because the halves people usually
+forget are the last two.
+
+## 1. Decide the stored shape first
+
+The editor is the easy part. What ends up in your database is the part you
+will live with:
+
+```json
+{
+	"type": "callToAction",
+	"attrs": {
+		"id": "k3Lp9",
+		"label": "Start a trial",
+		"href": "/signup"
+	}
+}
+```
+
+Three rules, learned the hard way by the built-in nodes:
+
+- **Attributes, not content**, for anything that is not editable rich text.
+  Content means a nested document and everything that comes with it.
+- **Nullable, with defaults.** A node written by an older build must still
+  parse. `href: null` is a shape; a missing key is a crash waiting for the
+  one row that has it.
+- **Sanitise on the way in.** A URL attribute is an injection vector. Use
+  `sanitizeHref` rather than writing your own.
+
+## 2. The extension
+
+An ordinary Tiptap node — nothing Blockleaf-specific:
+
+```ts title="lib/call-to-action.ts"
+import { Node, mergeAttributes } from '@tiptap/core';
+import { sanitizeHref } from '@blockleaf/editor/extensions';
+
+export const CallToAction = Node.create({
+	name: 'callToAction',
+	group: 'block',
+	atom: true,
+	draggable: true,
+
+	addAttributes() {
+		return {
+			id: { default: null },
+			label: { default: 'Get started' },
+			href: {
+				default: null,
+				parseHTML: (element) =>
+					sanitizeHref(element.getAttribute('href') ?? ''),
+				renderHTML: (attrs) => (attrs.href ? { href: attrs.href } : {})
+			}
+		};
+	},
+
+	parseHTML() {
+		return [{ tag: 'a[data-type="call-to-action"]' }];
+	},
+
+	renderHTML({ HTMLAttributes, node }) {
+		return [
+			'a',
+			mergeAttributes(HTMLAttributes, {
+				'data-type': 'call-to-action'
+			}),
+			node.attrs.label
+		];
+	}
+});
+```
+
+`atom: true` means the block has no editable interior, so the caret steps
+over it rather than into it. `draggable: true` lets the drag handle move it.
+
+## 3. Add it to the preset
+
+```tsx
+import {
+	presets,
+	UniqueID,
+	BLOCK_NODE_TYPES
+} from '@blockleaf/editor/extensions';
+
+import { CallToAction } from '@/lib/call-to-action';
+
+const extensions = [
+	...presets.standard().filter((ext) => ext.name !== 'uniqueID'),
+	UniqueID.configure({ types: [...BLOCK_NODE_TYPES, 'callToAction'] }),
+	CallToAction
+];
+```
+
+The `UniqueID` swap is the step everyone misses. It is configured with a
+fixed list of block types, so a node that is not on that list is stored with
+no `id` — which means the drag handle has nothing to key on and the renderer
+emits no `data-id` anchor for it. See [extensions](./extensions.mdx).
+
+## 4. Give it a slash command
+
+A block nobody can insert is a block nobody uses:
+
+```tsx
+<BlockleafEditor
+	extensions={extensions}
+	slashItems={(defaults) => [
+		...defaults,
+		{
+			id: 'call-to-action',
+			title: 'Call to action',
+			group: 'Advanced',
+			keywords: ['cta', 'button'],
+			run: (editor) =>
+				editor
+					.chain()
+					.focus()
+					.insertContent({
+						type: 'callToAction',
+						attrs: { label: 'Start a trial', href: '/signup' }
+					})
+					.run()
+		}
+	]}
+/>
+```
+
+If the block needs an argument before it can be inserted — a URL, a size —
+give the command a `picker` instead of making the user insert and then edit.
+[The chrome](./chrome.mdx#commands-that-need-an-argument) has the shape.
+
+## 5. Teach the renderer
+
+Without this step the block vanishes on every page that is not the editor.
+`@blockleaf/renderer` renders an unknown node's **children**, and an atom has
+none, so a `callToAction` renders as nothing at all:
+
+```tsx title="components/article.tsx"
+import { RenderDocument } from '@blockleaf/renderer/react';
+import { sanitizeHref } from '@blockleaf/renderer';
+
+const components = {
+	callToAction: ({ node }) => {
+		const href = sanitizeHref(String(node.attrs?.href ?? ''));
+		if (!href) return null;
+
+		return (
+			<a
+				className="cta"
+				href={href}
+			>
+				{String(node.attrs?.label ?? 'Get started')}
+			</a>
+		);
+	}
+};
+
+<RenderDocument
+	doc={doc}
+	components={components}
+/>;
+```
+
+Define the map at module scope, not inline in JSX — overrides are merged on
+every render because `RenderDocument` runs in server components where hooks
+do not exist.
+
+The HTML-string renderer takes the same map, so emails and feeds are one
+more entry rather than a second implementation. See
+[server rendering](./rendering.mdx#overrides).
+
+<Callout type="warn" title="An override owns its sanitisation">
+
+Nothing is applied behind an override. If it writes `node.attrs.href`
+straight into an `<a>`, that is exactly what is rendered — including
+`javascript:`. `sanitizeHref` is exported from the renderer for this.
+
+</Callout>
+
+## 6. Style it
+
+Your node, your CSS — but read from the same variables so it follows the
+theme:
+
+```css
+.blockleaf-editor__content .cta {
+	display: inline-block;
+	padding: 0.5em 1em;
+	border-radius: var(--bl-radius);
+	background: var(--bl-color-accent);
+	color: var(--bl-color-bg);
+}
+```
+
+See [theming](./styling/theming.mdx) for the full list.
+
+## 7. You now own a migration
+
+This is the obligation that comes with the node, and it does not go away.
+
+`schemaVersion` versions **Blockleaf's** nodes. Yours are invisible to it:
+no migration will ever be written for them, the snapshot test does not guard
+them, and the next version of Blockleaf has no idea they exist.
+
+So when you rename `label` to `text` in six months, the documents written
+before that change are yours to migrate. Three habits make it survivable:
+
+1. **Version your own attributes** if the shape is likely to move — a
+   `v: 1` attribute costs nothing now and is impossible to add later.
+2. **Read defensively in the override.** `node.attrs?.label ?? node.attrs?.text`
+   is two lines and covers the window where both shapes exist.
+3. **Migrate on write, not on read**, once you are confident: a background
+   job that rewrites stored documents beats a compatibility shim that lives
+   forever.
+
+[The document](./schema.mdx) explains what Blockleaf promises about its own
+nodes, which is the standard worth holding yours to.

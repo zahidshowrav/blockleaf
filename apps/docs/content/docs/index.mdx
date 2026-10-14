@@ -1,10 +1,12 @@
 ---
-title: Getting started
-description: Install the editor, render it, and store what it gives you — in about ten lines.
+title: Quick start
+description: A Notion-style block editor in React — one install, about ten lines, and a JSON document out the other end.
+icon: Rocket
 ---
 
-Blockleaf is a Notion-style block editor for React, built on Tiptap. It hands
-you a versioned JSON document and has no opinion about where you keep it.
+Blockleaf is a block editor for React built on Tiptap. You install one package,
+render one component, and get back a versioned JSON document that you store
+wherever you already store things.
 
 ## Install
 
@@ -14,7 +16,7 @@ you a versioned JSON document and has no opinion about where you keep it.
 
 React 18 or 19 is a peer dependency. The package is ESM-only.
 
-## The ten lines
+## Render it
 
 ```tsx
 'use client';
@@ -37,9 +39,10 @@ export const Editor = () => {
 };
 ```
 
-That is the whole integration. You get the slash menu, the selection toolbar,
-drag handles, tables, lists, callouts and keyboard shortcuts, and `onChange`
-hands you the document whenever the user stops typing.
+That is the whole integration. Out of it you get the slash menu, the selection
+toolbar, drag handles, tables, lists, task lists, callouts, images and the
+keyboard shortcuts people expect — and `onChange` hands you the document a
+moment after the user stops typing.
 
 ## What you store
 
@@ -59,29 +62,13 @@ hands you the document whenever the user stops typing.
 }
 ```
 
-Put it in a `jsonb` column, a document store, or a file. Nothing in the editor
-cares. The one rule is to **keep `schemaVersion`** — it is how a document
-written today stays readable after the shape changes. See
-[the document](./schema.mdx) for every node and mark, and for the versioning
-promise.
+Put it in a `jsonb` column, a document store, or a file on disk. Nothing in
+the editor cares where it goes. The one rule is to **keep `schemaVersion`** —
+it is how a document written today stays readable after the shape changes.
 
-### Two changes, not one
+## Show it again, without the editor
 
-`onChange` is debounced and is what you save. `onChangeImmediate` fires on
-every keystroke and is what you drive a live preview or a dirty indicator
-with. Saving on `onChangeImmediate` means a write per character.
-
-```tsx
-<BlockleafEditor
-	defaultValue={doc}
-	onChange={(next) => save(next)}
-	onChangeImmediate={() => setDirty(true)}
-/>
-```
-
-## Showing it again, on the server
-
-Do not mount the editor to display a document. There is a separate package for
+Do not mount an editor to display a document. There is a separate package for
 reading, with no editor and no ProseMirror in it:
 
 ```package-install
@@ -99,34 +86,15 @@ import { RenderDocument } from '@blockleaf/renderer/react';
 </div>;
 ```
 
-It writes the same markup the editor does, so the one stylesheet fits both.
-There is an HTML-string export too, for emails and feeds. See
-[server rendering](./rendering.mdx).
+It writes the same markup the editor does, so one stylesheet fits both.
 
-## Styling
+## Next
 
-One stylesheet, no framework:
-
-```ts
-import '@blockleaf/editor/styles.css';
-```
-
-Everything is a `--bl-*` custom property, so a theme is a handful of
-declarations rather than a config file. Dark mode follows
-`prefers-color-scheme`, or you can force it with `data-theme` on the wrapper.
-
-```css
-.blockleaf-editor {
-	--bl-color-accent: #3b82f6;
-	--bl-radius: 10px;
-}
-```
-
-## Where to go next
-
-- [The document](./schema.mdx) — every node and mark, and what is promised
-  about them.
-- [The chrome](./chrome.mdx) — the menus and handles, and how to replace them.
-- [Uploads](./uploads.mdx) — one adapter, and the editor drives the rest.
-- [Code blocks](./code-block.mdx) — syntax highlighting, opt-in.
-- [Server rendering](./rendering.mdx) — JSON back out, on a server.
+- [What is Blockleaf](./what-is-blockleaf.mdx) — why it exists, and what it
+  refuses to decide for you.
+- [Getting started](./getting-started.mdx) — saving properly, loading an
+  existing document, and the props you will actually reach for.
+- [The document](./schema.mdx) — every node and mark, and the versioning
+  promise.
+- [Comparisons](./comparisons.mdx) — Tiptap, Novel, BlockNote, Editor.js and
+  Lexical, and when each is the better answer.

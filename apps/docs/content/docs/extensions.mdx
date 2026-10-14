@@ -1,0 +1,170 @@
+---
+title: Extensions
+description: Blockleaf is Tiptap underneath, so the Tiptap extension ecosystem is yours — how to add one without losing the preset, and what it costs your stored documents.
+icon: Puzzle
+---
+
+Blockleaf is a configured Tiptap editor, not a wrapper that hides it. Any
+Tiptap v3 extension works, and the preset you are starting from is an
+ordinary array you can add to.
+
+## Add to a preset
+
+Do not rebuild the extension list by hand. Start from the preset and append:
+
+```tsx
+import { BlockleafEditor } from '@blockleaf/editor';
+import { presets } from '@blockleaf/editor/extensions';
+import { Mention } from '@tiptap/extension-mention';
+
+const extensions = [
+	...presets.standard(),
+	Mention.configure({ suggestion: mentionSuggestion })
+];
+
+<BlockleafEditor
+	extensions={extensions}
+	defaultValue={doc}
+	onChange={save}
+/>;
+```
+
+`presets.standard()` and `presets.minimal()` return a fresh array each call —
+Tiptap extensions carry per-editor state, so sharing one array between two
+editors is a bug waiting to happen. `createExtensions(preset)` is the same
+thing under a longer name.
+
+### The chrome still arrives
+
+Passing `extensions` replaces the **content** extensions, not the editing
+furniture. `BlockleafEditor` appends the slash menu, bubble menu, drag
+handle, table controls, image menu and placeholder afterwards, and skips any
+whose name is already in your array. Turn them off with the flags rather
+than by omission:
+
+```tsx
+<BlockleafEditor
+	extensions={extensions}
+	dragHandle={false}
+/>
+```
+
+`useBlockleafEditor` is the lower layer and adds none of it — see
+[the chrome](./chrome.mdx).
+
+## Reconfigure what is already there
+
+Most of the time you do not want a new extension, you want a different
+option on an existing one. Blockleaf re-exports the ones it configures:
+
+```ts
+import {
+	Callout,
+	Image,
+	Link,
+	PasteNormalizer,
+	TableKit,
+	UniqueID,
+	sanitizeHref
+} from '@blockleaf/editor/extensions';
+```
+
+So a preset with resizable tables is a filter and a replacement:
+
+```ts
+import { presets, TableKit } from '@blockleaf/editor/extensions';
+
+const extensions = [
+	...presets.standard().filter((ext) => ext.name !== 'tableKit'),
+	TableKit.configure({ table: { resizable: true } })
+];
+```
+
+<Callout type="warn" title="Link sanitisation is not optional">
+
+`Link` is pre-configured with `sanitizeHref`, which is where `javascript:`
+URLs are rejected. If you replace the link extension, keep the sanitiser —
+it belongs to the schema, not to the UI, and a document is stored with
+whatever href it was given. See [the document](./schema.mdx).
+
+</Callout>
+
+## Match the Tiptap version
+
+Blockleaf depends on Tiptap at an **exact** version — `3.31.4` today, pinned
+rather than ranged. Install your extension at the same one:
+
+```package-install
+@tiptap/extension-mention@3.31.4
+```
+
+Two different Tiptap or ProseMirror copies in one `node_modules` is the
+classic failure here, and it does not fail gracefully: plugin keys stop
+matching, `Unknown node type` appears at runtime, and the editor mounts
+empty. If you see that, check for duplicates first:
+
+```bash
+npm ls @tiptap/pm
+```
+
+With pnpm, `npm ls` has an equivalent in `pnpm why @tiptap/pm`. One copy is
+the answer you want.
+
+Extensions Blockleaf already depends on do not need installing at all —
+`TableKit` and `UniqueID` come out of `@blockleaf/editor/extensions`.
+
+## What it costs your documents
+
+This is the part worth thinking about before you add anything.
+
+A new node or mark stores shapes that are **not** in
+[the documented schema](./schema.mdx). `schemaVersion` says nothing about
+them, the migrations do not know them, and no test guards them. That is a
+reasonable trade — it is your application and your database — as long as you
+know you have made it.
+
+Three consequences:
+
+1. **The renderer does not know your node.** `@blockleaf/renderer` renders an
+   unknown node's children and drops an unknown mark's decoration rather than
+   throwing, so nothing breaks, but a mention renders as plain text until you
+   supply an override. See
+   [rendering a node type of your own](./rendering.mdx#rendering-a-node-type-of-your-own).
+2. **Block ids are not automatic.** `UniqueID` is configured with a fixed
+   list of types. A node of yours gets no `id` unless you add it:
+
+    ```ts
+    import { BLOCK_NODE_TYPES, UniqueID } from '@blockleaf/editor/extensions';
+
+    UniqueID.configure({ types: [...BLOCK_NODE_TYPES, 'mention'] });
+    ```
+
+    Without an id the drag handle has nothing to key a block on, and the
+    renderer emits no `data-id` for it.
+
+3. **Pasted content is normalised.** `PasteNormalizer` rewrites pasted HTML
+   and Markdown into the documented schema. It will not know how to produce
+   your node, so pasted markup that should become one will arrive as a
+   paragraph.
+
+## Extensions that are already handled
+
+Before adding one, check it is not already there:
+
+| You want            | It is already in                                            |
+| ------------------- | ----------------------------------------------------------- |
+| Tables              | `standard` — `TableKit`, non-resizable by default           |
+| Task lists          | `standard` — nested enabled                                 |
+| Highlight           | `standard` — multicolour                                    |
+| Underline, link     | Both presets                                                |
+| Stable block ids    | `UniqueID`, on every block type                             |
+| Syntax highlighting | A separate entry point, see [code blocks](./code-block.mdx) |
+| Uploads and images  | The `upload` prop, see [uploads](./uploads.mdx)             |
+| Placeholders        | The `placeholder` prop                                      |
+| Trailing paragraph  | `TrailingNodeOnLoad`, with headings excluded                |
+
+## Writing your own
+
+When no extension exists, [custom extensions](./custom-extensions.mdx) walks
+through a node of your own end to end — schema, storage, renderer override
+and slash command.

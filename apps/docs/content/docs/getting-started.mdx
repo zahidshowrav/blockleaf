@@ -1,0 +1,241 @@
+---
+title: Getting started
+description: The editor's model, how to save and load a document properly, and the props you will actually reach for.
+icon: BookOpen
+---
+
+[Quick start](./index.mdx) gets an editor on the screen. This page is the
+next hour: how the component thinks, how to save without writing on every
+keystroke, how to load a document back, and which props matter.
+
+## Two packages, two jobs
+
+| Package               | Use it for | Ships                                           |
+| --------------------- | ---------- | ----------------------------------------------- |
+| `@blockleaf/editor`   | Writing    | The editor, the chrome, the schema              |
+| `@blockleaf/renderer` | Reading    | JSON to React or an HTML string, no ProseMirror |
+
+A page that only displays a document should never import the editor. That
+separation is the whole reason the renderer exists — see
+[server rendering](./rendering.mdx).
+
+## The editor is uncontrolled
+
+`defaultValue` is read once, when the editor mounts. Changing it later does
+nothing.
+
+```tsx
+// This does NOT swap the document.
+<BlockleafEditor defaultValue={selectedDoc} />
+```
+
+That is deliberate, not an omission. A controlled ProseMirror fights its own
+transactions: every keystroke produces a transaction, re-rendering with a new
+`value` replaces the document underneath the caret, and the undo stack dies
+with it. Every editor on ProseMirror that offers a `value` prop is either
+doing something clever and fragile, or quietly doing this.
+
+To swap documents, remount:
+
+```tsx
+<BlockleafEditor
+	key={docId}
+	defaultValue={doc}
+/>
+```
+
+Or drive the instance directly with `useBlockleafEditor`, below.
+
+## Saving
+
+There are two change callbacks, and picking the wrong one is the most common
+mistake:
+
+```tsx
+<BlockleafEditor
+	defaultValue={doc}
+	onChange={(next) => save(next)}
+	onChangeImmediate={() => setDirty(true)}
+/>
+```
+
+- **`onChange`** is debounced — 300 ms by default, `debounceMs` to change it.
+  This is what you persist.
+- **`onChangeImmediate`** fires on every transaction. This is for a dirty
+  flag, an autosave indicator, a live preview or a word count.
+
+Saving from `onChangeImmediate` means a network write per character. Driving
+a live preview from `onChange` means a preview that lags a third of a second
+behind the caret. Each callback is cheap for its own job and expensive for
+the other one.
+
+### What arrives
+
+Both callbacks receive a `BlockleafDocument` — plain JSON, with
+`attrs.schemaVersion` already stamped on it. There is nothing to serialise
+and nothing to clean up before it goes into a column:
+
+```ts
+await db.article.update({
+	where: { id },
+	data: { body: doc } // a jsonb column
+});
+```
+
+## Loading
+
+Read the JSON back and hand it to `defaultValue`. The only thing worth
+checking first is that it is a Blockleaf document at all:
+
+```tsx
+import { createEmptyDocument, isBlockleafDocument } from '@blockleaf/editor';
+
+const doc = isBlockleafDocument(article.body)
+	? article.body
+	: createEmptyDocument();
+```
+
+`isBlockleafDocument` is a structural guard — it answers "did this come from
+Blockleaf?", not "is every node valid?". It is cheap enough to call on every
+load, and it imports without pulling the editor in, so a server route can use
+it too.
+
+## Read-only
+
+`editable={false}` keeps the editor mounted and turns off input. It is the
+right choice for a preview that toggles back into editing, and the wrong
+choice for a page that only ever displays content — that page should use
+[the renderer](./rendering.mdx) and ship no editor at all.
+
+```tsx
+<BlockleafEditor
+	defaultValue={doc}
+	editable={isEditing}
+/>
+```
+
+## Presets
+
+`preset` chooses the extension set:
+
+- **`standard`** (the default) — everything in [the schema](./schema.mdx):
+  headings, lists, task lists, tables, callouts, images, code blocks,
+  blockquotes, links, highlight.
+- **`minimal`** — paragraphs and the inline marks only: bold, italic,
+  underline, strike, inline code and links. No headings, lists, quotes, code
+  blocks, rules, tables or images. For comment boxes and short-form fields
+  where a table would be absurd.
+
+```tsx
+<BlockleafEditor preset="minimal" />
+```
+
+Passing your own `extensions` array replaces the preset entirely. See
+[extensions](./extensions.mdx) for adding to one instead.
+
+## The props you will reach for
+
+| Prop                | Type                        | Default        | What it does                                |
+| ------------------- | --------------------------- | -------------- | ------------------------------------------- |
+| `defaultValue`      | `BlockleafDocument`         | empty document | Initial content; read once                  |
+| `onChange`          | `(doc) => void`             | —              | Debounced. Persist from here                |
+| `onChangeImmediate` | `(doc) => void`             | —              | Every transaction. Dirty flags and previews |
+| `debounceMs`        | `number`                    | `300`          | How long `onChange` waits                   |
+| `preset`            | `'standard' \| 'minimal'`   | `'standard'`   | Which extension set                         |
+| `extensions`        | `Extensions`                | —              | Replaces the preset entirely                |
+| `editable`          | `boolean`                   | `true`         | Turns input off without unmounting          |
+| `autofocus`         | `boolean`                   | `false`        | Place the caret on mount                    |
+| `label`             | `string`                    | `'Document'`   | Accessible name for the editing surface     |
+| `placeholder`       | `string \| object \| false` | built-in       | Empty-block hint                            |
+| `className`         | `string`                    | —              | Added alongside `blockleaf-editor`          |
+| `fallback`          | `ReactNode`                 | `null`         | Rendered before the editor is ready         |
+
+Upload props are documented in [uploads](./uploads.mdx); every chrome prop —
+`slashItems`, `bubbleActions`, `blockActions`, `tableActions` and the rest —
+in [the chrome](./chrome.mdx).
+
+<Callout title="Give it a label">
+
+A `contenteditable` is an ARIA textbox, and an unnamed one is announced as
+nothing at all. `label` defaults to `Document`; set it to whatever the
+user thinks they are editing.
+
+</Callout>
+
+## Next.js
+
+The editor is a client component. Three things are already handled for you,
+and one is not:
+
+- **`'use client'`** goes at the top of the file that renders
+  `BlockleafEditor`, as with any interactive component.
+- **Hydration** — the editor does not render until it is on the client, which
+  is the single most common Tiptap and SSR mismatch. Nothing to configure.
+- **The stylesheet** can be imported from a server component, a client
+  component or your root layout. It is plain CSS.
+- **`fallback`** is yours to set. Until the editor is ready the component
+  renders `null`, which means the page is a little shorter for a frame. Pass
+  a skeleton of roughly the right height if that shift bothers you.
+
+```tsx
+<BlockleafEditor
+	fallback={<div style={{ minHeight: '24rem' }} />}
+	defaultValue={doc}
+	onChange={save}
+/>
+```
+
+## Dropping to the hook
+
+`BlockleafEditor` is a thin component over `useBlockleafEditor`. When you want
+the Tiptap instance — to run commands, to add a toolbar of your own, to call
+`setContent` — use the hook and render the chrome yourself:
+
+```tsx
+'use client';
+
+import { useBlockleafEditor } from '@blockleaf/editor';
+import { EditorContent } from '@tiptap/react';
+
+export const Editor = ({ doc }: { doc: BlockleafDocument }) => {
+	const editor = useBlockleafEditor({ defaultValue: doc });
+
+	if (!editor) return null;
+
+	return (
+		<div className="blockleaf-editor">
+			<button onClick={() => editor.commands.toggleBold()}>Bold</button>
+			<EditorContent editor={editor} />
+		</div>
+	);
+};
+```
+
+The hook returns a Tiptap `Editor` or `null`. It takes the same options as
+the component minus the chrome flags, so the default menus are not included
+— add them from [the chrome](./chrome.mdx), or build your own.
+
+## Where to go next
+
+<Cards>
+	<Card
+		title="The document"
+		href="/docs/schema"
+		description="Every node and mark, and what a version bump promises."
+	/>
+	<Card
+		title="The chrome"
+		href="/docs/chrome"
+		description="Slash menu, toolbars and handles — and how to replace them."
+	/>
+	<Card
+		title="The style guide"
+		href="/docs/styling"
+		description="Retheme with custom properties, Tailwind or shadcn tokens."
+	/>
+	<Card
+		title="Server rendering"
+		href="/docs/rendering"
+		description="Stored JSON back out, with no editor in the bundle."
+	/>
+</Cards>
