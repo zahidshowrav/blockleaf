@@ -158,15 +158,32 @@ published at `blockleaf.dev`; `docs/` keeps only the project's own records. The
 site runs Fumadocs, which requires Tailwind — see F16 for why that does not
 breach the no-CSS-framework rule.
 
-RD-04 ships the site, the live demo and the pages that already existed. The
-prose §6 still calls for — recipes, the two migration guides and the
-comparison table — is not written, and the Vercel project is not connected.
+RD-04 ships the site, the live demo and the pages that already existed.
 
 A later pass added the navbar (a Documentation dropdown, plus Examples and
 Blog as placeholder pages), moved the live demo into three full-width tabs —
 the editor, the renderer's output and the stored JSON — and switched the
 install commands to `package-install`, which Fumadocs expands into npm, pnpm,
 yarn and bun.
+
+A second pass rebuilt the information architecture around four sidebar
+sections — Introduction, Documentation, Integration and Resources — and
+pinned the sidebar to the left edge of the window, which the Fumadocs grid
+centres by default. It wrote what §6 was missing: `what-is-blockleaf`, the
+comparison table, a fuller `getting-started`, the style guide with its
+theming, Tailwind and shadcn/ui pages, and the two extension pages. Four live
+examples replaced the `/examples` placeholder, the Fumadocs blog replaced the
+`/blog` one and carries four posts, and `/changelog` and `/contributors` are
+read from the GitHub API at build time. Social cards, canonicals, JSON-LD, a
+sitemap and `robots.txt` are generated, and `llms.txt` and the Markdown
+representations now cover the blog as well as the docs.
+
+Two things from §6 are still unwritten: the recipes beyond those four
+examples, and the migration guides from Novel and from plain Tiptap. The
+Vercel project is still not connected. `fumadocs-page-history` would add
+per-page contributors and change history, but it requires Node 24.14 and a
+`satteri` peer dependency while this repository is pinned to 22.22.1, so
+`/contributors` is repository-wide instead.
 
 | Id    | Task                                                                   | Status      | Commit    | Completed  |
 | ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
@@ -183,16 +200,16 @@ yarn and bun.
 **Exit:** a 500-page document stays responsive; the editor is fully usable on a
 phone.
 
-| Id    | Task                                                            | Status      | Commit | Completed |
-| ----- | --------------------------------------------------------------- | ----------- | ------ | --------- |
-| HD-01 | Full accessibility pass                                         | Not started | —      | —         |
-| HD-02 | i18n via `labels`                                               | Not started | —      | —         |
-| HD-03 | Theming docs for the `--bl-*` custom properties                 | Not started | —      | —         |
-| HD-04 | Mobile and touch behaviour                                      | Not started | —      | —         |
-| HD-05 | Large-document performance — 10k+ blocks, virtualise if needed  | Not started | —      | —         |
-| HD-06 | `examples/vite-spa`                                             | Not started | —      | —         |
-| HD-07 | Table a11y — header `scope`, caption, announced cell position   | Not started | —      | —         |
-| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override | Not started | —      | —         |
+| Id    | Task                                                            | Status      | Commit    | Completed  |
+| ----- | --------------------------------------------------------------- | ----------- | --------- | ---------- |
+| HD-01 | Full accessibility pass                                         | Not started | —         | —          |
+| HD-02 | i18n via `labels`                                               | Not started | —         | —          |
+| HD-03 | Theming docs for the `--bl-*` custom properties                 | Done        | `f7108af` | 2026-10-14 |
+| HD-04 | Mobile and touch behaviour                                      | Not started | —         | —          |
+| HD-05 | Large-document performance — 10k+ blocks, virtualise if needed  | Not started | —         | —          |
+| HD-06 | `examples/vite-spa`                                             | Not started | —         | —          |
+| HD-07 | Table a11y — header `scope`, caption, announced cell position   | Not started | —         | —          |
+| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override | Not started | —         | —          |
 
 ## OP — Optional packages (ongoing)
 
