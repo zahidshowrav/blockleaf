@@ -27,3 +27,6 @@ blob-report/
 # agent local settings
 .claude/settings.local.json
 .gemini/settings.local.json
+
+# written and re-added by `next dev` on every run
+apps/docs/AGENTS.md
