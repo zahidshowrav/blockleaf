@@ -7,12 +7,18 @@ import {
 	Server
 } from 'lucide-react';
 
-import { appName, docsRoute, gitConfig } from '@/lib/shared';
+import {
+	appName,
+	blogRoute,
+	changelogRoute,
+	docsRoute,
+	gitConfig
+} from '@/lib/shared';
 
 /**
  * The navbar dropdown, which only exists on the navbar: on a docs page the
- * sidebar already carries the page tree, and in the mobile menu the plain
- * `Documentation` link below stands in for it.
+ * sidebar carries the whole tree, Resources section included, so repeating
+ * these as sidebar link items would list them twice.
  */
 const documentation: LinkItemType = {
 	type: 'menu',
@@ -91,13 +97,19 @@ export const baseOptions = (): BaseLayoutProps => ({
 	},
 	links: [
 		documentation,
-		{ text: 'Documentation', url: docsRoute, on: 'menu' },
 		{
 			text: 'Examples',
 			url: `${docsRoute}/examples`,
-			active: 'nested-url'
+			active: 'nested-url',
+			on: 'nav'
 		},
-		{ text: 'Blog', url: '/blog', active: 'nested-url' }
+		{ text: 'Blog', url: blogRoute, active: 'nested-url', on: 'nav' },
+		{
+			text: 'Changelog',
+			url: changelogRoute,
+			active: 'nested-url',
+			on: 'nav'
+		}
 	],
 	githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`
 });

@@ -17,6 +17,9 @@
 		"extensions",
 		"custom-extensions",
 		"---Resources---",
-		"examples"
+		"examples",
+		"[Newspaper][Blog](/blog)",
+		"[Tag][Changelog](/changelog)",
+		"[Users][Contributors](/contributors)"
 	]
 }
