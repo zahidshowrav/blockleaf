@@ -153,12 +153,21 @@ The renderer is built on its own walker rather than `@tiptap/static-renderer`,
 which nests marks in the opposite order to the editor and would have broken the
 stylesheet both packages share. See F15.
 
+User-facing documentation now lives in `apps/docs/content/docs/*.mdx` and is
+published at `blockleaf.dev`; `docs/` keeps only the project's own records. The
+site runs Fumadocs, which requires Tailwind — see F16 for why that does not
+breach the no-CSS-framework rule.
+
+RD-04 ships the site, the live demo and the pages that already existed. The
+prose §6 still calls for — recipes, the two migration guides and the
+comparison table — is not written, and the Vercel project is not connected.
+
 | Id    | Task                                                                   | Status      | Commit    | Completed  |
 | ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | RD-01 | `@blockleaf/renderer` package                                          | Done        | `5da026d` | 2026-10-13 |
 | RD-02 | Component overrides                                                    | Done        | `6d2770d` | 2026-10-13 |
 | RD-03 | HTML-string and plain-text exports                                     | Done        | `a9c4af8` | 2026-10-13 |
-| RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Not started | —         | —          |
+| RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Done        | `ff4045a` | 2026-10-14 |
 | RD-05 | README with a demo GIF                                                 | Not started | —         | —          |
 | RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —         | —          |
 | RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Done        | `b358752` | 2026-10-13 |
