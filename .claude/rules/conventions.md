@@ -44,7 +44,11 @@ live in `packages/eslint-config/react-library.js` as `no-restricted-imports`.
 - Remove dead/commented-out code; use `// TODO:` for anything intentionally deferred.
 - Type-only imports use the inline form (`import { type Foo }`), enforced by
   `@typescript-eslint/consistent-type-imports`.
-- No CSS framework, and no `!important`. One stylesheet, `--bl-*` custom properties.
+- No CSS framework, and no `!important`, **in `packages/*`**. One stylesheet,
+  `--bl-*` custom properties. This is a product promise — installing the editor
+  must not force Tailwind, a `prose` class or a build step on anyone — so it
+  binds what is published. `apps/docs` runs Fumadocs, which requires Tailwind
+  (PROJECT_PLAN §6, F16); nobody installs an app, so nothing is imposed there.
 
 ## Import order
 
