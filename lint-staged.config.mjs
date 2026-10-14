@@ -6,5 +6,6 @@ export default {
 	'**/*.{ts,tsx,js,jsx,mjs,cjs}': 'pnpm exec eslint',
 
 	// Format staged files
-	'**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,yml}': 'pnpm exec prettier --write'
+	'**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,mdx,yml}':
+		'pnpm exec prettier --write'
 };

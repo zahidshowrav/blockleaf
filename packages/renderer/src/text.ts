@@ -111,7 +111,7 @@ export interface DocumentHeading {
 	/**
 	 * The block id, which the renderers write as `data-id`. It is not an
 	 * `id` attribute — see the table-of-contents recipe in
-	 * `docs/rendering.md` for linking to one.
+	 * `apps/docs/content/docs/rendering.mdx` for linking to one.
 	 */
 	id: string | undefined;
 }

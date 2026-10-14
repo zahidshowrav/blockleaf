@@ -37,7 +37,7 @@ in `.claude/rules/conventions.md`. Follow them for all code in `packages/*` and
 
 - **The document schema is the product.** It lives in other people's databases.
   Never change the stored shape without bumping `SCHEMA_VERSION`, writing the
-  migration in the same PR, and updating `docs/schema.md`. The snapshot test exists
+  migration in the same PR, and updating `apps/docs/content/docs/schema.mdx`. The snapshot test exists
   to make an accidental change fail loudly.
 - **`src/core` must not import React**, and **`src/react` must not import `src/ui`**.
   Enforced by lint, not convention — extracting `@blockleaf/core` later must stay a `mv`.

@@ -8,12 +8,12 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 
 [Novel](https://github.com/steven-tey/novel), [BlockNote](https://www.blocknotejs.org/) and [Plate](https://platejs.org/) all exist and are good. Blockleaf holds four lines they don't all hold at once:
 
-|                                           |                                                                                                                                                                                                          |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No CSS framework coupling**             | One plain stylesheet driven by `--bl-*` custom properties. No Tailwind, no `prose`, no build-time config — so a Tailwind v4 app, a CSS-modules app and a styled-components app all consume it unchanged. |
-| **A documented, versioned JSON contract** | The stored document is the real API. It carries `schemaVersion`, it is snapshot-tested, and breaking it means a major plus a shipped migration. See [`docs/schema.md`](./docs/schema.md).                |
-| **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                         |
-| **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                        |
+|                                           |                                                                                                                                                                                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No CSS framework coupling**             | One plain stylesheet driven by `--bl-*` custom properties. No Tailwind, no `prose`, no build-time config — so a Tailwind v4 app, a CSS-modules app and a styled-components app all consume it unchanged.                        |
+| **A documented, versioned JSON contract** | The stored document is the real API. It carries `schemaVersion`, it is snapshot-tested, and breaking it means a major plus a shipped migration. See [`apps/docs/content/docs/schema.mdx`](./apps/docs/content/docs/schema.mdx). |
+| **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                                                |
+| **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                                               |
 
 Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose](#roadmap).
 
