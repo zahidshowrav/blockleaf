@@ -26,3 +26,21 @@ export const getPageMarkdownUrl = (page: {
 
 	return { segments, url: getContentUrl(segments, page.locale) };
 };
+
+const getImageUrl = createGetUrl('/og');
+
+/**
+ * The social card for a page, generated at build time by `app/og`.
+ *
+ * `image.png` is appended to the slugs so the route can take `[...slug]` and
+ * still produce a URL that ends in a real file extension — some scrapers
+ * will not look at an `og:image` that does not.
+ */
+export const getPageImageUrl = (
+	section: 'docs' | 'blog',
+	page: { slugs: string[]; locale?: string }
+) => {
+	const segments = [section, ...page.slugs, 'image.png'];
+
+	return { segments, url: getImageUrl(segments, page.locale) };
+};
