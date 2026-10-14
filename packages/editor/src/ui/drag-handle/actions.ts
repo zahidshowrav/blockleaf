@@ -7,6 +7,7 @@ import {
 	TrashIcon
 } from './icons.js';
 import type { BlockAction } from './types.js';
+import { whenNodeExists } from '../schema-guard.js';
 import {
 	BulletListIcon,
 	CodeIcon,
@@ -94,6 +95,7 @@ const turnInto = (
 	group: 'Turn into',
 	icon,
 	isActive: (editor, pos) => isBlockType(editor, pos, typeName, attrs),
+	isAvailable: whenNodeExists(typeName, () => true),
 	run: apply
 });
 

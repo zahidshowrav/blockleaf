@@ -7,6 +7,7 @@ import {
 	UnderlineIcon
 } from './icons.js';
 import type { BubbleAction } from './types.js';
+import { whenMarkExists } from '../schema-guard.js';
 
 /**
  * The default toolbar, in reading order. Every entry calls a command that
@@ -20,7 +21,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+B',
 		icon: BoldIcon,
 		isActive: (editor) => editor.isActive('bold'),
-		isAvailable: (editor) => editor.can().toggleBold(),
+		isAvailable: whenMarkExists('bold', (editor) =>
+			editor.can().toggleBold()
+		),
 		run: (editor) => editor.chain().focus().toggleBold().run()
 	},
 	{
@@ -29,7 +32,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+I',
 		icon: ItalicIcon,
 		isActive: (editor) => editor.isActive('italic'),
-		isAvailable: (editor) => editor.can().toggleItalic(),
+		isAvailable: whenMarkExists('italic', (editor) =>
+			editor.can().toggleItalic()
+		),
 		run: (editor) => editor.chain().focus().toggleItalic().run()
 	},
 	{
@@ -38,7 +43,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+U',
 		icon: UnderlineIcon,
 		isActive: (editor) => editor.isActive('underline'),
-		isAvailable: (editor) => editor.can().toggleUnderline(),
+		isAvailable: whenMarkExists('underline', (editor) =>
+			editor.can().toggleUnderline()
+		),
 		run: (editor) => editor.chain().focus().toggleUnderline().run()
 	},
 	{
@@ -47,7 +54,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+Shift+S',
 		icon: StrikeIcon,
 		isActive: (editor) => editor.isActive('strike'),
-		isAvailable: (editor) => editor.can().toggleStrike(),
+		isAvailable: whenMarkExists('strike', (editor) =>
+			editor.can().toggleStrike()
+		),
 		run: (editor) => editor.chain().focus().toggleStrike().run()
 	},
 	{
@@ -56,7 +65,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+E',
 		icon: InlineCodeIcon,
 		isActive: (editor) => editor.isActive('code'),
-		isAvailable: (editor) => editor.can().toggleCode(),
+		isAvailable: whenMarkExists('code', (editor) =>
+			editor.can().toggleCode()
+		),
 		run: (editor) => editor.chain().focus().toggleCode().run()
 	},
 	{
@@ -65,7 +76,9 @@ export const defaultBubbleActions: BubbleAction[] = [
 		shortcut: 'Mod+Shift+H',
 		icon: HighlightIcon,
 		isActive: (editor) => editor.isActive('highlight'),
-		isAvailable: (editor) => editor.can().toggleHighlight(),
+		isAvailable: whenMarkExists('highlight', (editor) =>
+			editor.can().toggleHighlight()
+		),
 		run: (editor) => editor.chain().focus().toggleHighlight().run()
 	}
 ];
