@@ -1,0 +1,135 @@
+---
+title: A Notion-style editor that does not bring a CSS framework
+description: Installing a rich text editor should not decide how your application is styled. How Blockleaf themes with fifty-seven custom properties, and why that still works inside Tailwind and shadcn/ui.
+date: 2026-10-14
+tags: [Styling, Architecture]
+authors: [zahid]
+---
+
+There is a line in a lot of editor documentation that reads roughly: _add
+`@tailwindcss/typography` and wrap the content in `prose`._
+
+It is a sensible instruction and it is also a dependency, a plugin, a build
+step and a set of opinions about type scale, arriving because you wanted a
+text box.
+
+Blockleaf ships one stylesheet of plain CSS.
+
+```ts
+import '@blockleaf/editor/styles.css';
+```
+
+No Tailwind, no `prose`, no PostCSS plugin, no `content` globs to register,
+nothing to configure. The package contains no `!important`, and the build
+fails if anyone adds one.
+
+## Why this is a product decision
+
+An editor is unusual among dependencies: it renders a large, visible surface
+in the middle of your application. A date picker can look a bit foreign in
+the corner. A page of body copy cannot.
+
+So an editor has three options. Ship no styles, and everyone writes a
+stylesheet from scratch. Ship styles coupled to a framework, and everyone
+adopts the framework. Or ship styles designed to be overridden, and make the
+overriding cheap.
+
+The third one is the only one that does not impose anything, and "cheap" is
+doing the work in that sentence. If re-theming means forking a stylesheet,
+you have shipped option one with extra steps.
+
+## Custom properties, not class names
+
+Every colour, size and radius in Blockleaf resolves through a `--bl-*`
+property. A theme is a declaration block:
+
+```css
+.blockleaf-editor {
+	--bl-color-accent: #3b82f6;
+	--bl-color-bg: #fbfbfd;
+	--bl-font-body: 'Inter', system-ui, sans-serif;
+	--bl-radius: 10px;
+}
+```
+
+Fifty-seven properties cover the content surface, the slash menu, the bubble
+menu, the block menu, the drag handle and the table controls. The menu groups
+fall back to the content colours, so changing four variables changes
+everything that should follow.
+
+Below that there are stable, BEM-flavoured class names —
+`.blockleaf-editor__content`, `.blockleaf-slash-menu__item`,
+`.blockleaf-bubble-menu__button` — at one class of specificity, so your own
+sheet wins on order. And below _that_, every piece of chrome is a React
+component you can replace outright.
+
+Three levels, and most people never leave the first.
+
+## This is not an anti-Tailwind position
+
+Half the people reading this use Tailwind, and the two things compose fine —
+this site is Fumadocs on Tailwind 4 with the editor's stylesheet imported
+next to it.
+
+The trick is that Tailwind 4 exposes its theme as CSS variables, so wiring
+the design system into the editor is one block:
+
+```css
+.blockleaf-editor,
+.blockleaf-slash-menu {
+	--bl-color-accent: var(--color-brand);
+	--bl-color-fg: var(--color-gray-900);
+	--bl-color-border: var(--color-gray-200);
+	--bl-font-body: var(--font-sans);
+	--bl-radius: var(--radius-lg);
+}
+```
+
+shadcn/ui is the same shape, pointing at `--primary`, `--foreground`,
+`--border` and `--radius`. Change the design system, and the editor changes
+with it, without anyone remembering that the editor exists.
+
+Full recipes: [with Tailwind](/docs/styling/tailwind), [with
+shadcn/ui](/docs/styling/shadcn).
+
+### Two details that cost people an afternoon
+
+**Do not also apply `prose`.** Tailwind Typography styles the same elements
+at the same specificity, so the winner is whichever stylesheet loaded last,
+which is not a stable way to run a design.
+
+**Include the slash menu in your selector.** It is mounted on
+`document.body` rather than inside the editor wrapper, so variables set on
+`.blockleaf-editor` do not reach it. Set them on `:root`, or list
+`.blockleaf-slash-menu` alongside. Everything else — the bubble menu, the
+drag handle, the table controls — lives inside the wrapper and inherits.
+
+## Preflight does not break it
+
+The other thing people expect to break is a CSS reset eating the editor's
+list markers and heading sizes. It does not, for a boring reason: the
+package's rules are scoped to a class, so
+`.blockleaf-editor__content h1` at specificity `0,1,1` beats Preflight's
+`h1` at `0,0,1` regardless of order.
+
+That one is not theory. An early version of this stylesheet inherited
+`list-style` from the user agent, which meant bullets vanished in any
+application with a reset — and "works without a CSS framework" should not
+mean "breaks with one". It is stated explicitly now.
+
+## Dark mode
+
+Out of the box the stylesheet follows `prefers-color-scheme`, and
+`data-theme="light"` or `data-theme="dark"` on the wrapper overrides it.
+
+One honest limitation while this is still `0.0.x`: the editor component
+writes its own wrapper and does not forward `data-theme` yet, so an
+application with a manual light/dark toggle has to re-declare the palette
+under its own selector. [Theming](/docs/styling/theming#forcing-a-theme) has
+the four lines, and it is a gap rather than a design.
+
+## Further reading
+
+- [The style guide](/docs/styling) — the three levels, with examples.
+- [Theming](/docs/styling/theming) — all fifty-seven properties.
+- [Why Blockleaf exists](/blog/why-blockleaf).

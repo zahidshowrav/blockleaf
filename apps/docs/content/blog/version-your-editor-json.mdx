@@ -1,0 +1,128 @@
+---
+title: Your editor's JSON is a database schema. Version it.
+description: Rich text editors emit JSON that lands in a jsonb column and outlives the code that wrote it. Treat that shape like a migration-bearing schema, or pay for it in three years.
+date: 2026-10-14
+tags: [Schema, Architecture]
+authors: [zahid]
+---
+
+Here is a bug that takes three years to appear.
+
+You ship a rich text editor. It stores JSON in a `jsonb` column, which feels
+pleasantly schemaless. Two years in you upgrade the editor; a release note
+mentions that nested lists are now represented differently. Nothing breaks,
+because nothing you can see is old enough to care. A year after that, someone
+opens a document from before the upgrade and the list is gone.
+
+Nobody wrote a migration, because nobody thought of the column as having a
+schema.
+
+## `jsonb` is not schemaless, it is schema-deferred
+
+A column with no constraints does not mean the data has no shape. It means
+the shape is enforced by whatever reads it, which is your rendering code, at
+runtime, in production, for the one row written in 2024.
+
+Everything true of a SQL schema is true of your document JSON:
+
+- Old rows exist and will be read.
+- A change to the shape is a change to every row ever written.
+- Readers and writers are deployed at different times.
+- The only way to change it safely is a migration.
+
+The difference is that your ORM will not remind you.
+
+## What goes wrong, specifically
+
+Four failure modes, all of which I have either caused or inherited:
+
+1. **Silent loss.** An unknown node renders as nothing, so a paragraph of
+   someone's content disappears and no exception is thrown. The user finds
+   out, not your error tracker.
+2. **The library decided for you.** You never changed anything; the editor's
+   dependency did. Node names, attribute names and nesting are part of the
+   stored shape whether or not anyone wrote that down.
+3. **Nothing to migrate from.** Migrating requires knowing which version a
+   row was written by. If the document carries no version, you are
+   pattern-matching on shape — guessing, in SQL.
+4. **The rendering fork.** The compatibility shim that was supposed to be
+   temporary becomes the renderer, and every new feature is written twice.
+
+## The fix is one attribute
+
+Stamp a version on the envelope:
+
+```json
+{
+	"type": "doc",
+	"attrs": { "schemaVersion": 1 },
+	"content": [
+		{
+			"type": "paragraph",
+			"attrs": { "id": "a7Fk2" },
+			"content": [{ "type": "text", "text": "Hello" }]
+		}
+	]
+}
+```
+
+It costs nothing, it cannot be added retroactively, and it converts "guess
+what wrote this" into a `switch`. In Blockleaf that attribute is not
+optional: `onChange` stamps `SCHEMA_VERSION` on every document it hands you,
+and [the document](/docs/schema) is a published list of every node and mark,
+not a description of what the editor happens to emit today.
+
+## Block ids are the other one
+
+Give every block a stable id while you are there:
+
+```json
+{ "type": "paragraph", "attrs": { "id": "a7Fk2" } }
+```
+
+Nothing needs it until something does, and then everything needs it at once:
+comment anchors, scroll-to-section, diffing two versions, collaborative
+cursors, deep links to a paragraph, analytics on which block people stop
+reading at. An id added later is only stable for documents written later,
+which is the same problem as the version.
+
+## Rules worth adopting
+
+These are the ones Blockleaf holds itself to, and they transfer to any editor:
+
+- **The stored shape never changes without a version bump and a migration in
+  the same release.** Not the next release. The same one.
+- **A snapshot test over a document containing every node type.** When
+  somebody changes the shape by accident — usually by upgrading a
+  dependency — the build fails with a diff instead of shipping.
+- **Additive changes are exempt, and only before 1.0.** A new optional
+  attribute breaks nothing. Renaming one breaks everything.
+- **Unknown nodes degrade, never throw.** Documents outlive the code that
+  wrote them, and a reader from the future should render an unknown node's
+  children rather than a stack trace.
+- **Sanitise in the schema, not the UI.** A `javascript:` href rejected only
+  by the link dialog is a `javascript:` href stored in your database, waiting
+  for a different renderer.
+
+## The one test that pays for itself
+
+```ts
+it('stores every node type the way it is documented', () => {
+	expect(serialise(documentWithEveryNode)).toMatchSnapshot();
+});
+```
+
+If that snapshot changes, one of two things happened: you meant it, and you
+owe a version bump and a migration; or you did not, and you just caught a
+dependency rewriting your customers' data.
+
+Do not update the snapshot to make the build green. That is the whole point
+of it.
+
+## Further reading
+
+- [The document](/docs/schema) — Blockleaf's node and mark set, and what a
+  version bump promises.
+- [Custom extensions](/docs/custom-extensions) — adding a node of your own,
+  and the migration you then own yourself.
+- [Why Blockleaf exists](/blog/why-blockleaf).

@@ -1,0 +1,128 @@
+---
+title: Novel stopped shipping and Tiptap is a toolkit, so I built Blockleaf
+description: Why a new Notion-style React editor exists in 2026 — what Novel got right before it went quiet, what Tiptap deliberately leaves to you, and what Blockleaf decides on your behalf.
+date: 2026-10-14
+tags: [Announcements, Editors]
+authors: [zahid]
+---
+
+I have built the same text editor four times. Different companies, different
+deadlines, same week of work: pick the extensions, write the slash menu, wire
+the upload placeholder, argue about what gets stored, style all of it, ship,
+move on. The editor was never the product in any of those projects. It cost a
+week in every one of them.
+
+Blockleaf is that week, done once, in the open.
+
+## What Novel got right
+
+[Novel](https://github.com/steven-tey/novel) deserves the credit for this
+category in React. It put a Notion-style slash menu and a selection toolbar
+on top of Tiptap, made it look like something you would actually want to type
+in, and gave it away under Apache-2.0. Sixteen thousand stars says people
+agreed.
+
+It has stopped moving. `novel@1.0.2` went to npm in January 2025, and the
+repository has had no pushes since. I want to be careful here, because this
+is not a criticism of anyone: maintaining an editor is relentless work and
+mostly unpaid, and the author shipped something good and then had a life.
+
+But the calculus for a _consumer_ is different from the calculus for a fan. An
+editor sits at the centre of your product and touches your database. When it
+stops moving, you have not chosen a dependency, you have inherited a fork you
+have not written yet. The first time a React major lands, or a ProseMirror
+security advisory does, the work is yours.
+
+## What Tiptap deliberately does not do
+
+Blockleaf is built on [Tiptap](https://tiptap.dev), so let me be precise about
+what I think is missing, because it is not quality. `@tiptap/core` shipped a
+release yesterday. The editor and its extensions are MIT. It is one of the
+best-run projects in this space.
+
+Tiptap is a **toolkit**, and that is a deliberate design, not a gap. You get
+extensions. You choose which ones, you write the menus, you decide the
+schema, you handle paste, you build the upload lifecycle, and you style every
+pixel. The documentation is large because the surface is large, and the
+surface is large because the point is that you can build anything.
+
+The first time you do that, it is interesting work. The fourth time, you are
+copying a folder between repositories and calling it architecture.
+
+Tiptap also sells a platform. The editor stays free; real-time collaboration,
+comments, AI, version history and document conversion are subscription
+features starting at $59 a month. That is a fair trade for a lot of teams —
+it is just a trade you want to make knowingly, rather than discover halfway
+through a sprint.
+
+## So what is Blockleaf
+
+An editor, not a toolkit. One install, one component:
+
+```package-install
+@blockleaf/editor
+```
+
+```tsx
+<BlockleafEditor
+	defaultValue={doc}
+	onChange={save}
+/>
+```
+
+Out of that you get the slash menu, the selection toolbar, the link editor,
+drag handles, block menu, tables with in-table controls, task lists,
+callouts, images with upload handling, and the keyboard shortcuts people
+expect. Nothing to assemble.
+
+Three decisions underneath it are the actual product.
+
+### The stored document is a contract
+
+`onChange` hands you JSON with a version stamped on it:
+
+```json
+{ "type": "doc", "attrs": { "schemaVersion": 1 }, "content": [] }
+```
+
+That JSON goes in your database and outlives every version of this package.
+So the stored shape never changes without a `schemaVersion` bump and a
+migration shipped in the same release, and a snapshot test fails loudly if
+anyone tries. [The document](/docs/schema) is the page I would read first.
+
+I wrote more about why this matters in
+[your editor's JSON is a database schema](/blog/version-your-editor-json).
+
+### Reading is a different package
+
+A page that displays an article should not download an editor.
+`@blockleaf/renderer` turns the same JSON into React or an HTML string, on a
+server, with no ProseMirror in it — **1.87 kB** against the editor's 145 kB,
+both measured in CI against a hard budget.
+
+### No CSS framework, ever
+
+One stylesheet of plain CSS, fifty-seven `--bl-*` custom properties, no
+Tailwind, no `prose` class, no build step. Installing a text editor should
+not decide how the rest of your application is styled. There are
+[Tailwind](/docs/styling/tailwind) and [shadcn/ui](/docs/styling/shadcn)
+recipes for the people who do use them, and they are both one block of CSS.
+
+## What it is not
+
+It is `0.0.5`. There is no collaboration — no CRDT, no presence, no sync. The
+bindings are React-only today, although the core is deliberately
+framework-free so that stays possible. And the plugin ecosystem is Tiptap's,
+which is a great deal, but there is no catalogue of Blockleaf-specific blocks
+to shop from.
+
+If you need collaborative editing this quarter, use Tiptap's platform or
+BlockNote and do not think about it again. If you want to own every decision,
+use Tiptap directly — you should. [Comparisons](/docs/comparisons) puts the
+licences and release dates side by side, including the parts where Blockleaf
+loses.
+
+If what you wanted was an editor that works, stores something sane, and does
+not ask you to adopt a design system — that is the one I was trying to build.
+
+[Quick start](/docs) is about ten lines.
