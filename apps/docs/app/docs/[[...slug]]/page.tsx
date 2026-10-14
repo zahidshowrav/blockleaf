@@ -11,6 +11,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { getMDXComponents } from '@/components/mdx';
+import { DocStructuredData } from '@/components/structured-data';
 import { getPageImageUrl, getPageMarkdownUrl, gitConfig } from '@/lib/shared';
 import { source } from '@/lib/source';
 
@@ -27,6 +28,11 @@ const Page = async (props: PageProps<'/docs/[[...slug]]'>) => {
 			toc={page.data.toc}
 			full={page.data.full}
 		>
+			<DocStructuredData
+				title={page.data.title}
+				description={page.data.description}
+				url={page.url}
+			/>
 			<DocsTitle>{page.data.title}</DocsTitle>
 			<DocsDescription className="mb-0">
 				{page.data.description}
