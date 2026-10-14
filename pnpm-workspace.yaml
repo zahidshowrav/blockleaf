@@ -1,18 +1,26 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+    - 'apps/*'
+    - 'packages/*'
 # Added by pnpm because these versions are newer than a `minimumReleaseAge`
 # policy configured locally. They are deliberate — the repo tracks current
 # tooling — so the exclusions are committed rather than re-prompted per machine.
 minimumReleaseAgeExclude:
-  - '@size-limit/file@14.2.0'
-  - '@size-limit/preset-big-lib@14.2.0'
-  - '@size-limit/time@14.2.0'
-  - '@size-limit/webpack@14.2.0'
-  - size-limit@14.2.0
-  - vite@8.3.4
+    - '@size-limit/file@14.2.0'
+    - '@size-limit/preset-big-lib@14.2.0'
+    - '@size-limit/time@14.2.0'
+    - '@size-limit/webpack@14.2.0'
+    - size-limit@14.2.0
+    - vite@8.3.4
+    - '@fumadocs/base-ui@16.17.2'
+    - fumadocs-core@16.17.2
+    - lucide-react@1.56.0
 # `eslint-plugin-import-x` pulls in `unrs-resolver`, which ships prebuilt platform
 # bindings as optional deps — the install script is only a fallback, so the lint
 # rules work without it. Answered here so pnpm stops prompting per machine.
 allowBuilds:
-  unrs-resolver: false
+    unrs-resolver: false
+    # `esbuild` arrived with vite, vitest and size-limit long before the docs
+    # site and has always run without its install script: pnpm links the platform
+    # binary through esbuild's optional deps, and the script is only a fallback.
+    # It started prompting when `fumadocs-mdx` made it a direct dependency.
+    esbuild: false

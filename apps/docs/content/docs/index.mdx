@@ -1,0 +1,132 @@
+---
+title: Getting started
+description: Install the editor, render it, and store what it gives you — in about ten lines.
+---
+
+Blockleaf is a Notion-style block editor for React, built on Tiptap. It hands
+you a versioned JSON document and has no opinion about where you keep it.
+
+## Install
+
+```bash
+pnpm add @blockleaf/editor
+```
+
+React 18 or 19 is a peer dependency. The package is ESM-only.
+
+## The ten lines
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { BlockleafEditor, createEmptyDocument } from '@blockleaf/editor';
+import type { BlockleafDocument } from '@blockleaf/editor';
+
+import '@blockleaf/editor/styles.css';
+
+export const Editor = () => {
+	const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
+
+	return (
+		<BlockleafEditor
+			defaultValue={doc}
+			onChange={setDoc}
+		/>
+	);
+};
+```
+
+That is the whole integration. You get the slash menu, the selection toolbar,
+drag handles, tables, lists, callouts and keyboard shortcuts, and `onChange`
+hands you the document whenever the user stops typing.
+
+## What you store
+
+`doc` is plain JSON with a version stamped on it:
+
+```json
+{
+	"type": "doc",
+	"attrs": { "schemaVersion": 1 },
+	"content": [
+		{
+			"type": "paragraph",
+			"attrs": { "id": "a7Fk2" },
+			"content": [{ "type": "text", "text": "Hello" }]
+		}
+	]
+}
+```
+
+Put it in a `jsonb` column, a document store, or a file. Nothing in the editor
+cares. The one rule is to **keep `schemaVersion`** — it is how a document
+written today stays readable after the shape changes. See
+[the document](./schema.mdx) for every node and mark, and for the versioning
+promise.
+
+### Two changes, not one
+
+`onChange` is debounced and is what you save. `onChangeImmediate` fires on
+every keystroke and is what you drive a live preview or a dirty indicator
+with. Saving on `onChangeImmediate` means a write per character.
+
+```tsx
+<BlockleafEditor
+	defaultValue={doc}
+	onChange={(next) => save(next)}
+	onChangeImmediate={() => setDirty(true)}
+/>
+```
+
+## Showing it again, on the server
+
+Do not mount the editor to display a document. There is a separate package for
+reading, with no editor and no ProseMirror in it:
+
+```bash
+pnpm add @blockleaf/renderer
+```
+
+```tsx
+// a server component
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+<div className="blockleaf-editor">
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={article.body} />
+	</div>
+</div>;
+```
+
+It writes the same markup the editor does, so the one stylesheet fits both.
+There is an HTML-string export too, for emails and feeds. See
+[server rendering](./rendering.mdx).
+
+## Styling
+
+One stylesheet, no framework:
+
+```ts
+import '@blockleaf/editor/styles.css';
+```
+
+Everything is a `--bl-*` custom property, so a theme is a handful of
+declarations rather than a config file. Dark mode follows
+`prefers-color-scheme`, or you can force it with `data-theme` on the wrapper.
+
+```css
+.blockleaf-editor {
+	--bl-color-accent: #3b82f6;
+	--bl-radius: 10px;
+}
+```
+
+## Where to go next
+
+- [The document](./schema.mdx) — every node and mark, and what is promised
+  about them.
+- [The chrome](./chrome.mdx) — the menus and handles, and how to replace them.
+- [Uploads](./uploads.mdx) — one adapter, and the editor drives the rest.
+- [Code blocks](./code-block.mdx) — syntax highlighting, opt-in.
+- [Server rendering](./rendering.mdx) — JSON back out, on a server.

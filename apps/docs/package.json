@@ -1,0 +1,38 @@
+{
+	"name": "docs",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "next dev --port 5181",
+		"build": "next build",
+		"start": "next start",
+		"typecheck": "next typegen && tsc --noEmit",
+		"lint": "eslint ."
+	},
+	"dependencies": {
+		"@blockleaf/editor": "workspace:*",
+		"@blockleaf/renderer": "workspace:*",
+		"cn": "0.4.0",
+		"fumadocs-core": "16.17.2",
+		"fumadocs-mdx": "15.4.7",
+		"fumadocs-ui": "npm:@fumadocs/base-ui@16.17.2",
+		"lucide-react": "1.56.0",
+		"next": "16.4.0",
+		"react": "19.3.0",
+		"react-dom": "19.3.0"
+	},
+	"devDependencies": {
+		"@blockleaf/eslint-config": "workspace:*",
+		"@blockleaf/tsconfig": "workspace:*",
+		"@tailwindcss/postcss": "4.3.3",
+		"@types/mdx": "2.0.14",
+		"@types/node": "26.6.5",
+		"@types/react": "19.3.0",
+		"@types/react-dom": "19.3.0",
+		"eslint": "10.12.0",
+		"postcss": "8.5.30",
+		"tailwindcss": "4.3.3",
+		"typescript": "6.0.3"
+	}
+}

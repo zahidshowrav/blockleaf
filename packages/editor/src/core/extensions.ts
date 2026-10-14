@@ -154,7 +154,7 @@ export const Shortcuts = Extension.create({
  *
  * - `minimal`: Inline and micro-content editing (paragraphs, text, bold, italic,
  *   strike, underline, code, sanitised links, and stable paragraph IDs).
- * - `standard`: Full Notion-style document core per docs/schema.md (StarterKit with
+ * - `standard`: Full Notion-style document core per apps/docs/content/docs/schema.mdx (StarterKit with
  *   capped heading levels 1–3, Underline, Link, Highlight, TaskList, TaskItem,
  *   Callout, and UniqueID for stable block IDs).
  */

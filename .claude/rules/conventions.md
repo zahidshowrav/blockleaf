@@ -78,11 +78,11 @@ each sorted alphabetically:
 The document schema is the product — it lives in other people's databases.
 
 - Never change the stored shape without bumping `SCHEMA_VERSION`, writing the
-  migration in the same PR, and updating `docs/schema.md`.
+  migration in the same PR, and updating `apps/docs/content/docs/schema.mdx`.
 - The snapshot test exists to make an accidental change fail loudly. Do not update
   the snapshot to make a failure go away; write the migration.
 - Link `href` sanitisation belongs in the schema, never only in the UI.
-- Before `0.1.0`, purely additive changes are exempt — see `docs/schema.md`.
+- Before `0.1.0`, purely additive changes are exempt — see `apps/docs/content/docs/schema.mdx`.
 
 ## Testing
 
@@ -113,5 +113,15 @@ The document schema is the product — it lives in other people's databases.
 ## Documentation
 
 Docs ship in the same PR as the feature — documentation written "later" is never
-written. The build plan and milestones live in `docs/PROJECT_PLAN.md`; read the
-relevant section before starting work rather than re-deriving decisions.
+written.
+
+Two places, and they are not interchangeable:
+
+- **`apps/docs/content/docs/*.mdx`** — everything a user reads. This is the
+  published site at `blockleaf.dev`. A feature is not finished until its page
+  is here.
+- **`docs/`** — the project's own record: `PROJECT_PLAN.md`, `progress-tracker.md`
+  and `open-flags.md`. Nobody outside the repo reads these.
+
+The build plan and milestones live in `docs/PROJECT_PLAN.md`; read the relevant
+section before starting work rather than re-deriving decisions.

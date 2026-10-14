@@ -1,7 +1,7 @@
 /**
  * The stored document shape. This is the product's real API — it lives in other
  * people's databases, so it is versioned from the first release and every bump
- * ships a migration. See docs/schema.md.
+ * ships a migration. See apps/docs/content/docs/schema.mdx.
  */
 export const SCHEMA_VERSION = 1;
 
@@ -261,7 +261,7 @@ export type BlockNode =
 	| TableCellNode;
 
 /**
- * Discriminated union over the complete Blockleaf node set defined in docs/schema.md.
+ * Discriminated union over the complete Blockleaf node set defined in apps/docs/content/docs/schema.mdx.
  */
 export type BlockleafNode = BlockNode | InlineNode;
 

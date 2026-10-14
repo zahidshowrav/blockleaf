@@ -36,7 +36,7 @@ describe('document schema', () => {
 	/**
 	 * Guards the one decision that cannot be refactored: the version is part of
 	 * the contract, so bumping it must be deliberate and must come with a
-	 * migration. See docs/schema.md.
+	 * migration. See apps/docs/content/docs/schema.mdx.
 	 */
 	it('has not changed version by accident', () => {
 		expect(SCHEMA_VERSION).toBe(1);

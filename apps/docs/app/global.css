@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+@import '@blockleaf/editor/styles.css';
+
+html {
+	scrollbar-gutter: stable;
+}
+
+/* The demo's two panes, which are chrome around the editor, not editor styling. */
+.bl-demo-pane {
+	border: 1px solid var(--color-fd-border);
+	border-radius: 0.75rem;
+	background: var(--color-fd-card);
+	padding: 0.5rem 0.75rem;
+}
