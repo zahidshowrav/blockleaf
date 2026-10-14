@@ -1,8 +1,17 @@
 import { createGetUrl } from 'fumadocs-core/source';
 
 export const appName = 'Blockleaf';
+export const appTagline = 'The Notion-style block editor for React';
 export const appDescription =
 	'A Notion-style block editor on Tiptap. Headless-first, no CSS framework, versioned JSON out.';
+
+/**
+ * Absolute origin, used for `metadataBase`, canonicals and the sitemap.
+ * Overridable so preview deployments do not advertise production URLs.
+ */
+export const siteUrl = new URL(
+	process.env.NEXT_PUBLIC_SITE_URL ?? 'https://blockleaf.dev'
+);
 export const docsRoute = '/docs';
 export const blogRoute = '/blog';
 export const changelogRoute = '/changelog';

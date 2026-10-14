@@ -14,6 +14,7 @@ import {
 	BlogTitle
 } from '@/components/blog';
 import { getMDXComponents } from '@/components/mdx';
+import { PostStructuredData } from '@/components/structured-data';
 import { findPost, getPosts } from '@/lib/blog';
 import { blogRoute, getPageImageUrl } from '@/lib/shared';
 import { blogAuthors, blogSource } from '@/lib/source';
@@ -41,6 +42,14 @@ const Page = async (props: PageProps<'/blog/[slug]'>) => {
 
 	return (
 		<BlogPage toc={page.data.toc}>
+			<PostStructuredData
+				title={post.title}
+				description={post.description}
+				url={post.url}
+				image={post.image ?? getPageImageUrl('blog', page).url}
+				datePublished={post.date?.toISOString()}
+				authors={post.authors}
+			/>
 			<BlogHeader>
 				<BlogBackLink href={blogRoute} />
 				<BlogTitle>{post.title}</BlogTitle>
