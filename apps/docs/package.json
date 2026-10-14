@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@blockleaf/editor": "workspace:*",
 		"@blockleaf/renderer": "workspace:*",
+		"@fumadocs/changelog": "0.1.0",
 		"cn": "0.4.0",
 		"fumadocs-core": "16.17.2",
 		"fumadocs-mdx": "15.4.7",
