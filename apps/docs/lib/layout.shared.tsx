@@ -92,7 +92,11 @@ export const baseOptions = (): BaseLayoutProps => ({
 	links: [
 		documentation,
 		{ text: 'Documentation', url: docsRoute, on: 'menu' },
-		{ text: 'Examples', url: '/examples', active: 'nested-url' },
+		{
+			text: 'Examples',
+			url: `${docsRoute}/examples`,
+			active: 'nested-url'
+		},
 		{ text: 'Blog', url: '/blog', active: 'nested-url' }
 	],
 	githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`
