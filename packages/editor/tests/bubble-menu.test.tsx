@@ -8,7 +8,10 @@ import {
 	BubbleMenu,
 	LinkEditor,
 	createBubbleMenuExtension,
+	defaultBlockActions,
 	defaultBubbleActions,
+	defaultCellActions,
+	defaultTableActions,
 	resolveBubbleActions,
 	type BubbleAction
 } from '../src/ui/index.js';
@@ -36,6 +39,97 @@ afterEach(() => {
 	while (editors.length) {
 		editors.pop()?.destroy();
 	}
+});
+
+describe('Bubble menu on a preset without every mark', () => {
+	it('reports a toggle unavailable instead of throwing', () => {
+		const editor = track(
+			new Editor({
+				extensions: createExtensions('minimal'),
+				content: '<p>Hello world</p>'
+			})
+		);
+		selectAll(editor);
+
+		const highlight = defaultBubbleActions.find(
+			(a) => a.id === 'highlight'
+		);
+		expect(highlight).toBeDefined();
+		expect('highlight' in editor.schema.marks).toBe(false);
+		expect(() => highlight?.isAvailable?.(editor)).not.toThrow();
+		expect(highlight?.isAvailable?.(editor)).toBe(false);
+	});
+
+	it('still offers the marks the preset does have', () => {
+		const editor = track(
+			new Editor({
+				extensions: createExtensions('minimal'),
+				content: '<p>Hello world</p>'
+			})
+		);
+		selectAll(editor);
+
+		for (const id of ['bold', 'italic', 'underline', 'strike', 'code']) {
+			const action = defaultBubbleActions.find((a) => a.id === id);
+			expect(action?.isAvailable?.(editor)).toBe(true);
+		}
+	});
+
+	it('reports table actions unavailable when there is no table node', () => {
+		const editor = track(
+			new Editor({
+				extensions: createExtensions('minimal'),
+				content: '<p>Hello world</p>'
+			})
+		);
+
+		expect('table' in editor.schema.nodes).toBe(false);
+		for (const action of [...defaultCellActions, ...defaultTableActions]) {
+			expect(() => action.isAvailable?.(editor)).not.toThrow();
+			expect(action.isAvailable?.(editor)).toBe(false);
+		}
+	});
+
+	it('hides a block menu entry whose node type is missing', () => {
+		const editor = track(
+			new Editor({
+				extensions: createExtensions('minimal'),
+				content: '<p>Hello world</p>'
+			})
+		);
+
+		const heading = defaultBlockActions.find(
+			(a) => a.id === 'turn-heading-1'
+		);
+		const paragraph = defaultBlockActions.find(
+			(a) => a.id === 'turn-paragraph'
+		);
+
+		expect(heading?.isAvailable?.(editor, 0)).toBe(false);
+		expect(paragraph?.isAvailable?.(editor, 0)).toBe(true);
+	});
+
+	it('renders the toolbar without the missing toggle', () => {
+		const editor = track(
+			new Editor({
+				extensions: createExtensions('minimal'),
+				content: '<p>Hello world</p>'
+			})
+		);
+		selectAll(editor);
+
+		expect(() =>
+			render(
+				<BubbleMenu
+					editor={editor}
+					actions={defaultBubbleActions}
+					link={false}
+				/>
+			)
+		).not.toThrow();
+		expect(screen.queryByRole('button', { name: /highlight/i })).toBeNull();
+		expect(screen.getByRole('button', { name: /bold/i })).toBeTruthy();
+	});
 });
 
 describe('Bubble menu actions (CH-02)', () => {

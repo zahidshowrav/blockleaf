@@ -10,6 +10,7 @@ import {
 } from './icons.js';
 import type { TableAction } from './types.js';
 import { TrashIcon } from '../drag-handle/icons.js';
+import { whenNodeExists } from '../schema-guard.js';
 
 /**
  * Row and column operations, in the order the handle menus show them.
@@ -25,7 +26,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Insert row above',
 		axis: 'row',
 		icon: InsertAboveIcon,
-		isAvailable: (editor) => editor.can().addRowBefore(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addRowBefore()
+		),
 		run: (editor) => editor.chain().focus().addRowBefore().run()
 	},
 	{
@@ -33,7 +36,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Insert row below',
 		axis: 'row',
 		icon: InsertBelowIcon,
-		isAvailable: (editor) => editor.can().addRowAfter(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addRowAfter()
+		),
 		run: (editor) => editor.chain().focus().addRowAfter().run()
 	},
 	{
@@ -41,7 +46,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Insert column left',
 		axis: 'column',
 		icon: InsertLeftIcon,
-		isAvailable: (editor) => editor.can().addColumnBefore(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addColumnBefore()
+		),
 		run: (editor) => editor.chain().focus().addColumnBefore().run()
 	},
 	{
@@ -49,7 +56,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Insert column right',
 		axis: 'column',
 		icon: InsertRightIcon,
-		isAvailable: (editor) => editor.can().addColumnAfter(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addColumnAfter()
+		),
 		run: (editor) => editor.chain().focus().addColumnAfter().run()
 	},
 	{
@@ -57,7 +66,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Toggle header row',
 		axis: 'row',
 		icon: HeaderIcon,
-		isAvailable: (editor) => editor.can().toggleHeaderRow(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().toggleHeaderRow()
+		),
 		run: (editor) => editor.chain().focus().toggleHeaderRow().run()
 	},
 	{
@@ -65,7 +76,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Toggle header column',
 		axis: 'column',
 		icon: HeaderIcon,
-		isAvailable: (editor) => editor.can().toggleHeaderColumn(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().toggleHeaderColumn()
+		),
 		run: (editor) => editor.chain().focus().toggleHeaderColumn().run()
 	},
 	{
@@ -73,7 +86,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Merge cells',
 		axis: 'both',
 		icon: MergeIcon,
-		isAvailable: (editor) => editor.can().mergeCells(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().mergeCells()
+		),
 		run: (editor) => editor.chain().focus().mergeCells().run()
 	},
 	{
@@ -81,7 +96,9 @@ export const defaultTableActions: TableAction[] = [
 		title: 'Split cell',
 		axis: 'both',
 		icon: SplitIcon,
-		isAvailable: (editor) => editor.can().splitCell(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().splitCell()
+		),
 		run: (editor) => editor.chain().focus().splitCell().run()
 	},
 	{
@@ -90,7 +107,9 @@ export const defaultTableActions: TableAction[] = [
 		axis: 'row',
 		icon: TrashIcon,
 		danger: true,
-		isAvailable: (editor) => editor.can().deleteRow(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().deleteRow()
+		),
 		run: (editor) => editor.chain().focus().deleteRow().run()
 	},
 	{
@@ -99,7 +118,9 @@ export const defaultTableActions: TableAction[] = [
 		axis: 'column',
 		icon: TrashIcon,
 		danger: true,
-		isAvailable: (editor) => editor.can().deleteColumn(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().deleteColumn()
+		),
 		run: (editor) => editor.chain().focus().deleteColumn().run()
 	},
 	{
@@ -108,7 +129,9 @@ export const defaultTableActions: TableAction[] = [
 		axis: 'both',
 		icon: DeleteTableIcon,
 		danger: true,
-		isAvailable: (editor) => editor.can().deleteTable(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().deleteTable()
+		),
 		run: (editor) => editor.chain().focus().deleteTable().run()
 	}
 ];
