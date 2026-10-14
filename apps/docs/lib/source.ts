@@ -25,21 +25,32 @@ export const source = loader({
 	plugins: [lucideIconsPlugin()]
 });
 
-export const docsLlms = llms(source, {
-	renderPage: async (page) => `# ${page.data.title} (${page.url})
+const renderPage = async (page: {
+	url: string;
+	data: { title: string; getText: (type: 'processed') => Promise<string> };
+}) => `# ${page.data.title} (${page.url})
 
-${await page.data.getText('processed')}`
-});
+${await page.data.getText('processed')}`;
+
+export const docsLlms = llms(source, { renderPage });
 
 const blog = defineCollections({
 	type: 'doc',
 	dir: 'content/blog',
-	schema: blogPageSchema
+	schema: blogPageSchema,
+	postprocess: {
+		includeProcessedMarkdown: true
+	}
 });
 
 export const blogSource = loader({
 	baseUrl: blogRoute,
-	source: blog.toFumadocsSource()
+	source: blog.toFumadocsSource(),
+	pageTree: {
+		// A `doc` collection carries no meta file, so the tree root would be
+		// named `Docs` — which is the heading `llms.txt` prints for it.
+		transformers: [{ root: (root) => ({ ...root, name: 'Blog' }) }]
+	}
 });
 
 /**
@@ -55,3 +66,5 @@ export const blogAuthors: Record<string, BlogAuthor> = {
 		image: 'https://avatars.githubusercontent.com/u/26140192?v=4'
 	}
 };
+
+export const blogLlms = llms(blogSource, { renderPage });

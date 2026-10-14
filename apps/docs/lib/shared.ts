@@ -17,6 +17,7 @@ export const blogRoute = '/blog';
 export const changelogRoute = '/changelog';
 export const contributorsRoute = '/contributors';
 export const docsContentRoute = '/llms.mdx/docs';
+export const blogContentRoute = '/llms.mdx/blog';
 
 export const gitConfig = {
 	user: 'zahidshowrav',
@@ -24,16 +25,19 @@ export const gitConfig = {
 	branch: 'main'
 };
 
-const getContentUrl = createGetUrl(docsContentRoute);
+const contentUrl = {
+	docs: createGetUrl(docsContentRoute),
+	blog: createGetUrl(blogContentRoute)
+};
 
 /** The plain-markdown representation of a page, for humans and for models. */
-export const getPageMarkdownUrl = (page: {
-	slugs: string[];
-	locale?: string;
-}) => {
+export const getPageMarkdownUrl = (
+	page: { slugs: string[]; locale?: string },
+	section: 'docs' | 'blog' = 'docs'
+) => {
 	const segments = [...page.slugs, 'content.md'];
 
-	return { segments, url: getContentUrl(segments, page.locale) };
+	return { segments, url: contentUrl[section](segments, page.locale) };
 };
 
 const getImageUrl = createGetUrl('/og');
