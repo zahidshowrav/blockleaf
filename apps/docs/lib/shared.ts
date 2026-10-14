@@ -4,6 +4,7 @@ export const appName = 'Blockleaf';
 export const appDescription =
 	'A Notion-style block editor on Tiptap. Headless-first, no CSS framework, versioned JSON out.';
 export const docsRoute = '/docs';
+export const blogRoute = '/blog';
 export const docsContentRoute = '/llms.mdx/docs';
 
 export const gitConfig = {
