@@ -20,9 +20,40 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 	const containerRef = useRef<HTMLDivElement>(null);
 	const pickerRef = useRef<SlashMenuRef>(null);
 
+	/**
+	 * The commands bucketed for display, and the flat order that matches what
+	 * is on screen.
+	 *
+	 * Selection indexes `ordered`, never `items`. The registry declares
+	 * commands interleaved across groups — Text, then the headings, then the
+	 * lists, then Quote and Code back in Basic blocks — so stepping through
+	 * `items` moved the highlight to a different row than the next one down.
+	 */
+	const { groups, ordered } = useMemo(() => {
+		const byGroup = new Map<string, SlashCommand[]>();
+		for (const command of items) {
+			const list = byGroup.get(command.group) ?? [];
+			list.push(command);
+			byGroup.set(command.group, list);
+		}
+
+		const ordered: SlashCommand[] = [];
+		const groups = Array.from(byGroup.entries()).map(
+			([group, groupItems]) => ({
+				group,
+				items: groupItems.map((command) => {
+					ordered.push(command);
+					return { command, index: ordered.length - 1 };
+				})
+			})
+		);
+
+		return { groups, ordered };
+	}, [items]);
+
 	const selectItem = useCallback(
 		(index: number) => {
-			const item = items[index];
+			const item = ordered[index];
 			if (!item) return;
 
 			// A command that needs an argument opens its picker instead of
@@ -35,7 +66,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 
 			command(item);
 		},
-		[items, command]
+		[ordered, command]
 	);
 
 	const closePicker = useCallback(() => setPickerFor(null), []);
@@ -51,18 +82,18 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 					return pickerRef.current?.onKeyDown(props) ?? false;
 				}
 
-				if (items.length === 0) {
+				if (ordered.length === 0) {
 					return false;
 				}
 
 				if (event.key === 'ArrowDown') {
-					setSelectedIndex((prev) => (prev + 1) % items.length);
+					setSelectedIndex((prev) => (prev + 1) % ordered.length);
 					return true;
 				}
 
 				if (event.key === 'ArrowUp') {
 					setSelectedIndex(
-						(prev) => (prev - 1 + items.length) % items.length
+						(prev) => (prev - 1 + ordered.length) % ordered.length
 					);
 					return true;
 				}
@@ -75,7 +106,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 				return false;
 			}
 		}),
-		[items, selectedIndex, selectItem, pickerFor]
+		[ordered, selectedIndex, selectItem, pickerFor]
 	);
 
 	// Group all useEffect calls together per project conventions
@@ -99,22 +130,6 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 			});
 		}
 	}, [selectedIndex]);
-
-	const groups = useMemo(() => {
-		const map = new Map<
-			string,
-			Array<{ command: SlashCommand; index: number }>
-		>();
-		items.forEach((cmd, idx) => {
-			const list = map.get(cmd.group) ?? [];
-			list.push({ command: cmd, index: idx });
-			map.set(cmd.group, list);
-		});
-		return Array.from(map.entries()).map(([group, groupItems]) => ({
-			group,
-			items: groupItems
-		}));
-	}, [items]);
 
 	if (pickerFor?.picker) {
 		const Picker = pickerFor.picker;
@@ -147,7 +162,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 		);
 	}
 
-	const activeCommand = items[selectedIndex];
+	const activeCommand = ordered[selectedIndex];
 
 	return (
 		<div
