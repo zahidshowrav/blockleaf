@@ -754,16 +754,26 @@
  * Drag handle and block menu
  */
 
+/*
+ * The element the drag-handle plugin positions, against `.blockleaf-editor`.
+ * It is the wrapper `ReactRenderer` creates, so the handle itself lays out
+ * normally inside it and the plugin only has one box to place.
+ */
+.blockleaf-block-handle-anchor {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
 .blockleaf-block-handle {
 	--bl-handle-fg: var(--bl-color-muted, #6b7280);
 	--bl-handle-hover: #f3f4f6;
-	--bl-handle-gap: 4px;
 
-	position: absolute;
+	/* Positioned so `z-index` applies and the block menu anchors to it. */
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 1px;
-	transform: translateX(calc(-100% - var(--bl-handle-gap)));
 	color: var(--bl-handle-fg);
 	z-index: 40;
 }

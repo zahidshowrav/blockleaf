@@ -4,6 +4,21 @@ import type { EditorView } from '@tiptap/pm/view';
 /** Horizontal probe into the content area, in px from its left edge. */
 const PROBE_INSET = 24;
 
+/**
+ * Marks the element the plugin positions.
+ *
+ * `ReactRenderer` hands back a plain wrapper, and a `top`/`left` written to a
+ * statically positioned element does nothing — so the class the stylesheet
+ * makes absolute has to be on that wrapper, not on the handle inside it.
+ */
+const ANCHOR_CLASS = 'blockleaf-block-handle-anchor';
+
+/** Space between the handle and the block it belongs to, in px. */
+const HANDLE_GAP = 4;
+
+/** Used until the handle has been laid out and can report its own width. */
+const FALLBACK_HANDLE_WIDTH = 46;
+
 export type DragHandleController = {
 	/** Keeps the handle visible while its menu is open. */
 	setLocked: (locked: boolean) => void;
@@ -70,6 +85,7 @@ class DragHandleView implements PluginView {
 			(view.dom.closest('.blockleaf-editor') as HTMLElement | null) ??
 			(view.dom.parentElement as HTMLElement);
 
+		this.element.classList.add(ANCHOR_CLASS);
 		this.container.appendChild(this.element);
 		this.container.addEventListener('mousemove', this.onMouseMove);
 		this.container.addEventListener('mouseleave', this.onMouseLeave);
@@ -99,16 +115,34 @@ class DragHandleView implements PluginView {
 			return;
 		}
 
-		const blockRect = blockDOM.getBoundingClientRect();
-		const containerRect = this.container.getBoundingClientRect();
-		this.element.style.top = `${blockRect.top - containerRect.top}px`;
-		this.element.style.left = `${blockRect.left - containerRect.left}px`;
+		this.place(blockDOM);
 
 		if (pos !== this.currentPos) {
 			this.currentPos = pos;
 			this.onChange(pos);
 		}
 	};
+
+	/**
+	 * Puts the handle in the gutter beside the block.
+	 *
+	 * The shift is applied here rather than with a CSS `translateX`, because
+	 * the gutter is whatever padding the host gave the content and
+	 * `--bl-content-padding` is `0` by default. A transform cannot know that,
+	 * so it pushed the handle outside the editor on every default setup — and
+	 * any ancestor with `overflow: auto` then clipped it. Clamping to the
+	 * container's left edge keeps it reachable in a narrow gutter; it overlaps
+	 * the text rather than disappearing.
+	 */
+	private place(blockDOM: HTMLElement) {
+		const blockRect = blockDOM.getBoundingClientRect();
+		const containerRect = this.container.getBoundingClientRect();
+		const width = this.element.offsetWidth || FALLBACK_HANDLE_WIDTH;
+		const gutter = blockRect.left - containerRect.left;
+
+		this.element.style.top = `${blockRect.top - containerRect.top}px`;
+		this.element.style.left = `${Math.max(0, gutter - width - HANDLE_GAP)}px`;
+	}
 
 	private onMouseLeave = () => {
 		if (this.locked) return;
