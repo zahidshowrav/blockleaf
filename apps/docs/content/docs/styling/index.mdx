@@ -1,0 +1,117 @@
+---
+title: Style guide
+description: How Blockleaf is styled, what you are expected to override, and why installing an editor does not change how you write CSS.
+icon: Palette
+---
+
+Blockleaf ships one stylesheet. It is plain CSS, it is driven by `--bl-*`
+custom properties, and it has no build step, no `prose` class and no
+framework underneath it.
+
+```ts
+import '@blockleaf/editor/styles.css';
+```
+
+That is a product promise rather than a preference. Installing a text editor
+should not decide how the rest of your application is styled, so nothing
+here requires Tailwind, and nothing here fights it either.
+
+## The two wrappers
+
+Every rule is scoped to one of two classes, and both the editor and
+[the renderer](../rendering.mdx) produce the same pair:
+
+```html
+<div class="blockleaf-editor">
+	<div class="blockleaf-editor__content">
+		<!-- blocks -->
+	</div>
+</div>
+```
+
+- **`.blockleaf-editor`** declares the custom properties, the background and
+  the base type. It is also the positioning context the drag handle is
+  measured against.
+- **`.blockleaf-editor__content`** is what every prose rule is scoped to —
+  `h1`, `ul`, `blockquote`, `table` and the rest.
+
+The editor component writes both for you. When you render a stored document
+with `RenderDocument` or `renderToHTML` you write them yourself. One without
+the other gets you the colours with no typography, or the typography with no
+colours.
+
+## Three levels of change
+
+Pick the shallowest one that does the job.
+
+### 1. Custom properties
+
+Most themes are a handful of declarations:
+
+```css
+.blockleaf-editor {
+	--bl-color-accent: #3b82f6;
+	--bl-color-bg: #fbfbfd;
+	--bl-font-body: 'Inter', system-ui, sans-serif;
+	--bl-radius: 10px;
+}
+```
+
+Fifty-seven properties cover the content surface, the slash menu, the bubble
+menu, the block menu, the drag handle and the table menu. The full list is in
+[theming](./theming.mdx).
+
+### 2. Class selectors
+
+Class names are stable and BEM-flavoured, so your own stylesheet can target
+them directly:
+
+```css
+.blockleaf-editor__content blockquote {
+	border-inline-start-width: 4px;
+	font-style: normal;
+}
+```
+
+A single class is specificity `0,1,0` and the scoped prose rules are `0,1,1`,
+so `.blockleaf-editor__content blockquote` in your own sheet, loaded after
+ours, wins on order. No `!important` is needed anywhere, and the package
+contains none.
+
+### 3. Replace the component
+
+The chrome is a set of React components, and every one of them is
+replaceable without touching CSS at all. See [the chrome](../chrome.mdx).
+
+## Scoping to one editor
+
+`className` is appended to `.blockleaf-editor`, so one instance can be
+themed without touching the others:
+
+```tsx
+<BlockleafEditor className="comment-box" />
+```
+
+```css
+.blockleaf-editor.comment-box {
+	--bl-font-size: 0.9375rem;
+	--bl-content-padding: 0.75rem;
+}
+```
+
+## Dark mode
+
+The stylesheet follows `prefers-color-scheme` out of the box, and
+`data-theme="dark"` or `data-theme="light"` on `.blockleaf-editor` overrides
+it. The mechanics, and the one place it does not reach yet, are in
+[theming](./theming.mdx#forcing-a-theme).
+
+## With a framework
+
+Blockleaf has no opinion, but the two questions that come up are always the
+same:
+
+- [With Tailwind](./tailwind.mdx) — mapping your theme tokens onto `--bl-*`,
+  and why Preflight does not fight the stylesheet.
+- [With shadcn/ui](./shadcn.mdx) — one block of CSS that makes the editor
+  read from the same variables your buttons do.

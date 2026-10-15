@@ -1,4 +1,8 @@
-# Code blocks
+---
+title: Code blocks
+description: Syntax highlighting, shipped as an opt-in subpath rather than in the default bundle.
+icon: SquareCode
+---
 
 Syntax highlighting ships as an opt-in subpath, not in the default bundle.
 
@@ -24,13 +28,13 @@ Most documents contain no code at all. Charging every consumer for a feature
 most of them will not use is how a 400 kB editor happens, one justified 16 kB
 at a time. So importing from `@blockleaf/editor/code-block` is what adds the
 weight, and importing nothing adds nothing. The measurement is recorded as
-F14 in [`open-flags.md`](./open-flags.md); the same shape was chosen for
+F14 in [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md); the same shape was chosen for
 `@blockleaf/editor/validate` in F5.
 
 **Without the subpath you still get code blocks** — `StarterKit`'s plain one,
-with ` ` ``` input rules and `Mod`+`Alt`+`C`. You get them without
+with ` ` ```input rules and`Mod`+`Alt`+`C`. You get them without
 colours. The stored document is byte-identical either way, because
-`CodeBlockNode` has carried an optional `language` since the v0.1 schema.
+`CodeBlockNode`has carried an optional`language` since the v0.1 schema.
 Adding or removing the subpath migrates nothing.
 
 ## `withCodeBlock` versus `createCodeBlock`

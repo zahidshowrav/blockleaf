@@ -1,0 +1,120 @@
+---
+title: With shadcn/ui
+description: One block of CSS that makes the editor read from the same tokens your buttons and cards do, including the dark class.
+icon: Component
+---
+
+shadcn/ui is a set of components you own, themed by a fixed list of CSS
+variables on `:root` and `.dark`. Blockleaf is themed by a fixed list of CSS
+variables too. Connecting them is a mapping, not an integration.
+
+## The mapping
+
+Drop this after your shadcn theme block:
+
+```css title="app/globals.css"
+.blockleaf-editor,
+.blockleaf-slash-menu,
+.blockleaf-bubble-menu,
+.blockleaf-block-menu,
+.blockleaf-table-menu {
+	--bl-color-bg: var(--background);
+	--bl-color-fg: var(--foreground);
+	--bl-color-muted: var(--muted-foreground);
+	--bl-color-border: var(--border);
+	--bl-color-accent: var(--primary);
+	--bl-color-code-bg: var(--muted);
+	--bl-color-callout-bg: var(--muted);
+	--bl-color-callout-border: var(--border);
+	--bl-color-quote-border: var(--border);
+	--bl-color-table-border: var(--border);
+	--bl-color-table-header-bg: var(--muted);
+	--bl-color-danger: var(--destructive);
+	--bl-font-body: var(--font-sans);
+	--bl-font-mono: var(--font-mono);
+	--bl-radius: var(--radius);
+}
+```
+
+That is the whole thing. Because the variables are listed on the menus as
+well as the editor, the slash menu picks them up too — it is mounted on
+`document.body` and does not inherit from `.blockleaf-editor`.
+
+<Callout title="--primary, not --accent">
+
+In shadcn's vocabulary `--accent` is a surface colour, used for hover
+backgrounds; the brand colour is `--primary`. Blockleaf's
+`--bl-color-accent` is the brand colour — links, the selected slash command,
+focus rings. Mapping it to shadcn's `--accent` gives you grey links.
+
+</Callout>
+
+## Dark mode comes free
+
+shadcn redefines its variables under `.dark`, and the mapping above is a
+reference rather than a copy, so the editor follows the class automatically.
+
+One thing to override, because Blockleaf also responds to the operating
+system on its own:
+
+```css title="app/globals.css"
+html.dark .blockleaf-editor,
+html.dark .blockleaf-slash-menu {
+	color-scheme: dark;
+}
+
+html:not(.dark) .blockleaf-editor,
+html:not(.dark) .blockleaf-slash-menu {
+	--bl-color-selection: color-mix(in oklch, var(--primary) 25%, transparent);
+}
+```
+
+The second rule is the only hand-written colour worth keeping: shadcn has no
+token for a text selection, and the editor's default (`#cfe0ff`) is a blue
+that will not match a non-blue theme.
+
+## Matching the chrome
+
+The menus are already styled — rounded, bordered, shadowed — and the mapping
+above lines their colours up with your popovers. If you want them to match
+exactly, the remaining knobs are per-menu:
+
+```css
+.blockleaf-slash-menu,
+.blockleaf-bubble-menu,
+.blockleaf-block-menu,
+.blockleaf-table-menu {
+	--bl-slash-bg: var(--popover);
+	--bl-slash-fg: var(--popover-foreground);
+	--bl-slash-hover: var(--accent);
+	--bl-slash-selected: var(--accent);
+	--bl-slash-selected-fg: var(--accent-foreground);
+	--bl-bubble-bg: var(--popover);
+	--bl-bubble-fg: var(--popover-foreground);
+	--bl-bubble-hover: var(--accent);
+	--bl-bubble-active: var(--accent);
+	--bl-bubble-active-fg: var(--accent-foreground);
+}
+```
+
+Here `--accent` _is_ the right token, because these are hover and selection
+surfaces.
+
+## Replacing a menu with your components
+
+Colour matching only goes so far. If you want the slash menu to be a real
+`Command` from shadcn, or the bubble menu to be your `Button` and
+`Tooltip`, the chrome is replaceable component by component — see
+[the chrome](../chrome.mdx#replacing-it). The editor keeps working with none
+of it.
+
+## What not to do
+
+- **Do not wrap the editor in `prose`.** See
+  [with Tailwind](./tailwind.mdx) — the two stylesheets style the same
+  elements at the same specificity.
+- **Do not fork the stylesheet** to change four colours. Every colour in it
+  resolves through the variables above.
+- **Do not reach for `!important`.** The package contains none, and every
+  selector in it is a single class or a class plus an element, so your own
+  sheet wins on order.

@@ -1,0 +1,72 @@
+---
+title: Editor and renderer
+description: One document through both packages at once — the write path on the left, what a server would send on the right.
+---
+
+The left pane is the editor. The right pane is `@blockleaf/renderer` on the
+same document: no editor, no ProseMirror, nothing that would ship to a reader
+who is only reading. Type on the left.
+
+<ReadOnlyExample />
+
+They look identical, which is the point — the renderer writes the same
+elements and the same attributes the editor does, down to `data-id` on every
+block, and a parity test fails if they ever diverge.
+
+```tsx
+// the write path — a client component
+'use client';
+
+import { BlockleafEditor } from '@blockleaf/editor';
+
+export const Edit = ({ doc }) => (
+	<BlockleafEditor
+		defaultValue={doc}
+		onChange={save}
+	/>
+);
+```
+
+```tsx
+// the read path — a server component
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+export const Read = ({ doc }) => (
+	<div className="blockleaf-editor">
+		<div className="blockleaf-editor__content">
+			<RenderDocument doc={doc} />
+		</div>
+	</div>
+);
+```
+
+## Why not `editable={false}`
+
+Because it still mounts an editor. `editable={false}` is right when the same
+component toggles between reading and writing — a preview button, a draft
+view the author flips in and out of. It is wrong for a page that will only
+ever display content, because every reader then downloads ProseMirror to look
+at a paragraph.
+
+| Situation                                | Use                   |
+| ---------------------------------------- | --------------------- |
+| A page that only displays content        | `@blockleaf/renderer` |
+| A preview that toggles back into editing | `editable={false}`    |
+| An email, an RSS item, a cached fragment | `renderToHTML`        |
+
+## The two wrappers are yours to write
+
+`RenderDocument` emits the blocks and nothing around them, so the renderer
+can sit inside your own layout. The stylesheet needs both classes:
+`.blockleaf-editor` declares the custom properties,
+`.blockleaf-editor__content` is what every prose rule is scoped to. One
+without the other gets you colours with no typography.
+
+This is also where `data-theme` works, because you own the element — see
+[theming](../styling/theming.mdx#forcing-a-theme).
+
+## Read more
+
+[Server rendering](../rendering.mdx) covers overrides, the HTML-string
+export, heading extraction for a table of contents, and what the renderer
+deliberately does differently.

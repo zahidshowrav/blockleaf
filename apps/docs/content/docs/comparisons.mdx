@@ -1,0 +1,127 @@
+---
+title: Comparisons
+description: Blockleaf next to Tiptap, Novel, BlockNote, Editor.js and Lexical — what each one is for, and when it is the better answer.
+icon: Scale
+---
+
+Every editor on this page is a good piece of software. They are not
+interchangeable, because they are not solving the same problem: some are
+frameworks you build an editor with, and some are editors you install.
+
+Blockleaf is the second kind, built on the first kind.
+
+<Callout title="Checked on 14 October 2026">
+
+Versions, dates and licences below were read from npm and GitHub on that
+day. Everything else is a judgement, and other people's judgements
+reasonably differ.
+
+</Callout>
+
+## At a glance
+
+|               | Kind      | Stored output       | Licence                | Latest release                        |
+| ------------- | --------- | ------------------- | ---------------------- | ------------------------------------- |
+| **Blockleaf** | Editor    | Versioned JSON      | MIT                    | `@blockleaf/editor@0.0.5`             |
+| **Tiptap**    | Framework | Whatever you define | MIT (platform is paid) | `@tiptap/core@3.32.0`, Oct 2026       |
+| **Novel**     | Editor    | Tiptap JSON         | Apache-2.0             | `novel@1.0.2`, Jan 2025               |
+| **BlockNote** | Editor    | Its own block JSON  | MPL-2.0                | `@blocknote/core@0.55.0`, Sep 2026    |
+| **Editor.js** | Editor    | Its own block JSON  | Apache-2.0             | `@editorjs/editorjs@2.31.7`, Sep 2026 |
+| **Lexical**   | Framework | Whatever you define | MIT                    | `lexical@0.52.0`, Sep 2026            |
+
+## Tiptap
+
+**Choose Tiptap when you want to own the decisions.** It is the headless
+ProseMirror toolkit Blockleaf is built on, it is MIT-licensed, and it is
+maintained at a pace nothing else here matches.
+
+The cost is that an editor is not what you get. You get extensions, and you
+assemble the schema, the menus, the shortcuts, the paste handling, the upload
+lifecycle and the styling yourself. That is the correct design for a toolkit.
+It is simply a lot of work to repeat, and repeating it is what Blockleaf
+exists to stop.
+
+Collaboration, comments, AI, version history and document conversion are
+features of Tiptap's hosted platform rather than the MIT package, and start
+at $59 a month. If you need those, Tiptap's own stack is the shortest route
+to them and Blockleaf has no answer.
+
+## Novel
+
+**Choose Novel if you like it as it stands today.** It is an Apache-2.0
+Notion-style editor on Tiptap, it got the feel right earlier than anyone, and
+the code is pleasant to read.
+
+It has stopped moving. `novel@1.0.2` was published in January 2025 and the
+repository has had no pushes since. For a dependency that owns your content
+surface, that matters: unmaintained is a decision you inherit, not one you
+make. Blockleaf covers much the same ground and intends to keep shipping.
+
+## BlockNote
+
+**Choose BlockNote if its block model fits your product.** It is the closest
+thing on this list to a direct alternative — a Notion-style block editor,
+also on ProseMirror, under active development, with collaboration and an
+AI extension already in the box.
+
+Two differences worth weighing. It is MPL-2.0 rather than MIT, which is
+permissive but file-level copyleft, so check it against your own licence
+policy. And it ships its own block document format and its own component
+styling; Blockleaf's bet is a smaller, explicitly versioned schema and a
+stylesheet of plain custom properties that imposes nothing on your build.
+
+## Editor.js
+
+**Choose Editor.js if you want clean block JSON without React.** It is
+framework-agnostic, Apache-2.0, has a large plugin ecosystem, and its output
+is about as tidy as block JSON gets.
+
+It is not a ProseMirror editor, and it shows in the things ProseMirror is
+good at: rich inline marks, selection across blocks, input rules, and
+collaborative editing primitives. If your content is mostly structured blocks
+with light inline formatting, that trade is fine. If people will be writing
+prose in it all day, it is less fine.
+
+## Lexical
+
+**Choose Lexical if you are building an editor, not installing one.** It is
+Meta's editor framework — MIT, fast, well-tested, framework-agnostic with
+React bindings.
+
+Like Tiptap, it is a framework: the comparison is Lexical versus Tiptap, and
+then whatever you build on top versus Blockleaf. If you are comparing against
+Blockleaf directly, you are comparing a weekend of integration against
+several weeks of construction.
+
+## Where Blockleaf is weaker
+
+For symmetry, the honest list:
+
+- **No collaboration.** No CRDT, no presence, no sync. BlockNote and Tiptap's
+  platform both have it.
+- **Young.** `0.0.5`, with the schema still pre-`0.1.0`. The versioning
+  promise is real, but the track record behind it is short.
+- **React only.** The core is deliberately framework-free so that other
+  bindings stay possible, but today React is the only one shipped.
+- **Smaller plugin ecosystem.** It is Tiptap's ecosystem underneath, which
+  helps a great deal — but there is no catalogue of Blockleaf-specific blocks
+  to shop from.
+
+## Where it is stronger
+
+- **The stored shape is a contract**, versioned and migrated rather than
+  whatever the editor happened to emit. See [the document](./schema.mdx).
+- **Reading is a separate package.** `@blockleaf/renderer` renders stored
+  JSON on a server with no editor and no ProseMirror — the read path of a
+  content site does not ship an editor at all. See
+  [server rendering](./rendering.mdx).
+- **No CSS framework, ever.** One stylesheet, `--bl-*` custom properties, no
+  `prose` class and no build step. See [the style guide](./styling.mdx).
+- **The expensive parts are opt-in.** Syntax highlighting sits behind its own
+  entry point. See [code blocks](./code-block.mdx).
+- **Bundle size is a budget, not a hope.** The published bundle is measured
+  in CI against a hard limit and the build fails when it grows past it.
+
+We have not measured anyone else's bundle for this page, and you should not
+trust a number we did not produce. Measure the editor you are considering
+with the extension set you will actually ship.

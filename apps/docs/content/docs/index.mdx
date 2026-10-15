@@ -1,0 +1,100 @@
+---
+title: Quick start
+description: A Notion-style block editor in React — one install, about ten lines, and a JSON document out the other end.
+icon: Rocket
+---
+
+Blockleaf is a block editor for React built on Tiptap. You install one package,
+render one component, and get back a versioned JSON document that you store
+wherever you already store things.
+
+## Install
+
+```package-install
+@blockleaf/editor
+```
+
+React 18 or 19 is a peer dependency. The package is ESM-only.
+
+## Render it
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { BlockleafEditor, createEmptyDocument } from '@blockleaf/editor';
+import type { BlockleafDocument } from '@blockleaf/editor';
+
+import '@blockleaf/editor/styles.css';
+
+export const Editor = () => {
+	const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
+
+	return (
+		<BlockleafEditor
+			defaultValue={doc}
+			onChange={setDoc}
+		/>
+	);
+};
+```
+
+That is the whole integration. Out of it you get the slash menu, the selection
+toolbar, drag handles, tables, lists, task lists, callouts, images and the
+keyboard shortcuts people expect — and `onChange` hands you the document a
+moment after the user stops typing.
+
+## What you store
+
+`doc` is plain JSON with a version stamped on it:
+
+```json
+{
+	"type": "doc",
+	"attrs": { "schemaVersion": 1 },
+	"content": [
+		{
+			"type": "paragraph",
+			"attrs": { "id": "a7Fk2" },
+			"content": [{ "type": "text", "text": "Hello" }]
+		}
+	]
+}
+```
+
+Put it in a `jsonb` column, a document store, or a file on disk. Nothing in
+the editor cares where it goes. The one rule is to **keep `schemaVersion`** —
+it is how a document written today stays readable after the shape changes.
+
+## Show it again, without the editor
+
+Do not mount an editor to display a document. There is a separate package for
+reading, with no editor and no ProseMirror in it:
+
+```package-install
+@blockleaf/renderer
+```
+
+```tsx
+// a server component
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+<div className="blockleaf-editor">
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={article.body} />
+	</div>
+</div>;
+```
+
+It writes the same markup the editor does, so one stylesheet fits both.
+
+## Next
+
+- [What is Blockleaf](./what-is-blockleaf.mdx) — why it exists, and what it
+  refuses to decide for you.
+- [Getting started](./getting-started.mdx) — saving properly, loading an
+  existing document, and the props you will actually reach for.
+- [The document](./schema.mdx) — every node and mark, and the versioning
+  promise.
+- [Comparisons](./comparisons.mdx) — Tiptap, Novel, BlockNote, Editor.js and
+  Lexical, and when each is the better answer.

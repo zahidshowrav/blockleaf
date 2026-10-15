@@ -1,4 +1,8 @@
-# Uploads
+---
+title: Uploads
+description: Implement one adapter; the editor drives drops, pastes, progress, cancel and retry.
+icon: ImageUp
+---
 
 `@blockleaf/editor` never talks to a storage provider. You implement one
 interface; the editor drives it.
@@ -194,7 +198,7 @@ cleanly. Neither reports progress — see above.
 An adapter runs in the browser, which means it runs on the user's machine and
 nothing it returns can be trusted. Check the file type and size in your
 endpoint, not only in the adapter, and validate the stored document at the
-mutation boundary with [`@blockleaf/editor/validate`](./schema.md).
+mutation boundary with [`@blockleaf/editor/validate`](./schema.mdx).
 
 ## Entry points
 

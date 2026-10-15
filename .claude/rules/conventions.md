@@ -44,7 +44,11 @@ live in `packages/eslint-config/react-library.js` as `no-restricted-imports`.
 - Remove dead/commented-out code; use `// TODO:` for anything intentionally deferred.
 - Type-only imports use the inline form (`import { type Foo }`), enforced by
   `@typescript-eslint/consistent-type-imports`.
-- No CSS framework, and no `!important`. One stylesheet, `--bl-*` custom properties.
+- No CSS framework, and no `!important`, **in `packages/*`**. One stylesheet,
+  `--bl-*` custom properties. This is a product promise — installing the editor
+  must not force Tailwind, a `prose` class or a build step on anyone — so it
+  binds what is published. `apps/docs` runs Fumadocs, which requires Tailwind
+  (PROJECT_PLAN §6, F16); nobody installs an app, so nothing is imposed there.
 
 ## Import order
 
@@ -74,11 +78,11 @@ each sorted alphabetically:
 The document schema is the product — it lives in other people's databases.
 
 - Never change the stored shape without bumping `SCHEMA_VERSION`, writing the
-  migration in the same PR, and updating `docs/schema.md`.
+  migration in the same PR, and updating `apps/docs/content/docs/schema.mdx`.
 - The snapshot test exists to make an accidental change fail loudly. Do not update
   the snapshot to make a failure go away; write the migration.
 - Link `href` sanitisation belongs in the schema, never only in the UI.
-- Before `0.1.0`, purely additive changes are exempt — see `docs/schema.md`.
+- Before `0.1.0`, purely additive changes are exempt — see `apps/docs/content/docs/schema.mdx`.
 
 ## Testing
 
@@ -109,5 +113,15 @@ The document schema is the product — it lives in other people's databases.
 ## Documentation
 
 Docs ship in the same PR as the feature — documentation written "later" is never
-written. The build plan and milestones live in `docs/PROJECT_PLAN.md`; read the
-relevant section before starting work rather than re-deriving decisions.
+written.
+
+Two places, and they are not interchangeable:
+
+- **`apps/docs/content/docs/*.mdx`** — everything a user reads. This is the
+  published site at `blockleaf.dev`. A feature is not finished until its page
+  is here.
+- **`docs/`** — the project's own record: `PROJECT_PLAN.md`, `progress-tracker.md`
+  and `open-flags.md`. Nobody outside the repo reads these.
+
+The build plan and milestones live in `docs/PROJECT_PLAN.md`; read the relevant
+section before starting work rather than re-deriving decisions.

@@ -1,4 +1,8 @@
-# The chrome
+---
+title: The chrome
+description: The slash menu, bubble menu, drag handle and table controls — and how to replace any of them.
+icon: MousePointerClick
+---
 
 The default menus, toolbars and handles that `@blockleaf/editor` ships with.
 
@@ -10,7 +14,7 @@ your own surface.
 **The chrome never owns logic.** Each button calls a command that already
 exists in `src/core` and already has tests. If a menu needs behaviour the
 command API cannot express, the command is what is missing — see "How a feature
-that spans blocks is split" in [`progress-tracker.md`](./progress-tracker.md).
+that spans blocks is split" in [`progress-tracker.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/progress-tracker.md).
 
 ```tsx
 import { BlockleafEditor } from '@blockleaf/editor';
@@ -144,7 +148,7 @@ link the field is pre-filled and buttons to open and remove it appear.
 the schema calls, only so it can say _why_ an href will not stick. A
 `javascript:` URL typed here is rejected twice: once with a message, and once
 by the schema, which would have rejected it regardless of what the UI did. See
-[`schema.md`](./schema.md).
+[`schema.md`](./schema.mdx).
 
 Allowed: `https:`, `mailto:`, site-relative paths and hash anchors. Everything
 else is refused.
@@ -241,7 +245,7 @@ type BlockAction = {
 `@tiptap/y-tiptap` and `@tiptap/extension-collaboration` at module scope, so a
 document that will never be collaborative would still ship yjs — 32.87 kB,
 which is over the whole bundle ceiling. See F12 in
-[`open-flags.md`](./open-flags.md). The trade is that this handle moves one
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md). The trade is that this handle moves one
 block at a time; multi-block range dragging is not implemented.
 
 ---
@@ -449,6 +453,34 @@ Conventions the chrome holds to:
 Known and deferred to HD-01: the slash menu is a listbox driven by
 `aria-activedescendant` on itself rather than on the editor that holds focus.
 The full combobox pattern wants the relationship expressed on the textbox.
+
+---
+
+## Actions follow the extension set
+
+Every default action declares `isAvailable`, and the first thing it checks is
+whether the command exists at all. With `preset="minimal"` there is no
+highlight mark, so the bubble menu simply has five toggles instead of six;
+with an `extensions` array of your own that omits headings, the block menu's
+"Turn into → Heading 1" is not offered.
+
+An action of yours should do the same — the chrome is rendered against
+whatever schema it is handed, not against the standard preset:
+
+```ts
+{
+	id: 'mention',
+	title: 'Mention',
+	group: 'Insert',
+	isActive: (editor) => editor.isActive('mention'),
+	isAvailable: (editor) => 'mention' in editor.schema.nodes,
+	run: (editor) => editor.chain().focus().insertMention().run()
+}
+```
+
+Without the guard, `editor.can().insertMention()` throws rather than
+returning `false`: `editor.can()` only carries the commands the loaded
+extensions registered. See [extensions](./extensions.mdx).
 
 ---
 

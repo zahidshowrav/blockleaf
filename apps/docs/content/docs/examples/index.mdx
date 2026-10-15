@@ -1,0 +1,40 @@
+---
+title: Examples
+description: Working editors you can type into, each one the shortest honest version of a thing people actually build.
+icon: FlaskConical
+---
+
+Every example on these pages is a real editor running in your browser, not a
+screenshot. The code beside it is the whole component — no omitted imports,
+no `...rest`.
+
+<Cards>
+	<Card
+		title="A comment box"
+		href="/docs/examples/minimal"
+		description="The minimal preset with the chrome turned down: paragraphs, marks, nothing else."
+	/>
+	<Card
+		title="Autosave"
+		href="/docs/examples/autosave"
+		description="A dirty indicator on the keystroke and a debounced write, from the two change callbacks."
+	/>
+	<Card
+		title="Editor and renderer"
+		href="/docs/examples/read-only"
+		description="One document, both packages, side by side — the write path and the read path."
+	/>
+	<Card
+		title="A slash command"
+		href="/docs/examples/slash-command"
+		description="Add one command, remove another, without rebuilding the menu."
+	/>
+</Cards>
+
+## Still to come
+
+The list the roadmap is working through: wiring uploads to S3 with a
+presigned adapter, replacing the bubble menu with your own components,
+migrating a document set from Novel, and a Postgres `jsonb` round trip with
+a real schema. Until those land, [uploads](../uploads.mdx) and
+[the chrome](../chrome.mdx) carry working code for each of them.

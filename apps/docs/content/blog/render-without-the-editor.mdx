@@ -1,0 +1,134 @@
+---
+title: Stop shipping ProseMirror to people who are only reading
+description: Mounting a read-only rich text editor to display an article sends an editing engine to every reader. Render the stored JSON on the server instead — in Blockleaf that is 1.87 kB against 145 kB.
+date: 2026-10-14
+tags: [Performance, Rendering]
+authors: [zahid]
+---
+
+Most rich text content is written once and read thousands of times. Most
+rich text integrations ship the same JavaScript to both audiences.
+
+The pattern is so common it looks like good practice:
+
+```tsx
+// the article page
+<Editor
+	value={article.body}
+	editable={false}
+/>
+```
+
+One component for writing and reading, no duplicated rendering logic, no
+second implementation to keep in sync. It is a reasonable instinct and it is
+expensive.
+
+## What `editable={false}` actually ships
+
+It is not a display mode. It is the whole editor, mounted, with input turned
+off. Every reader of that page downloads, parses and executes:
+
+- ProseMirror's model, state, view and transform packages
+- The schema, every extension, every input rule and keyboard shortcut
+- Your slash menu, toolbar and drag handles, bundled whether or not they can
+  ever appear
+- The React bindings that glue it together
+
+Then the browser builds a `contenteditable`, installs document-level event
+listeners, and runs a reconciliation loop for a document nobody will edit.
+
+For Blockleaf that is about **145 kB** brotlied, and it is not meaningfully
+different for any ProseMirror, Lexical or Slate editor — the engine is the
+engine.
+
+## What reading actually needs
+
+A walk over a tree, emitting elements:
+
+```tsx
+// a server component
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+<div className="blockleaf-editor">
+	<div className="blockleaf-editor__content">
+		<RenderDocument doc={article.body} />
+	</div>
+</div>;
+```
+
+That is **1.87 kB**, it runs on the server, and it ships no client JavaScript
+at all. The HTML-string export is 1.97 kB and does not even import React:
+
+```ts
+import { renderToHTML } from '@blockleaf/renderer/html';
+
+const html = renderToHTML(article.body);
+```
+
+Both numbers are measured in CI against a hard budget. The build fails when
+they grow.
+
+## Why it has to be a separate package
+
+A subpath export would not have worked. Tree-shaking across a package that
+also contains ProseMirror depends on every link in the chain declaring
+`sideEffects: false`, and ProseMirror does not. One import of the wrong
+module drags the editing engine back in, silently, in a bundle you will not
+look at again.
+
+A separate package cannot make that mistake. `@blockleaf/renderer` does not
+depend on `@blockleaf/editor`; it does not depend on ProseMirror or Tiptap at
+all. It takes JSON and returns elements.
+
+## Keeping the two in step
+
+The usual objection to a second renderer is that it drifts: the editor adds a
+node, the renderer shows nothing, and someone finds out in production.
+
+The answer is a parity test rather than discipline. The same document goes
+through both packages and the HTML is compared, attribute for attribute,
+including `data-id` on every block and `data-type` on a callout. It is not a
+convention that the editor and renderer agree. It is a test that fails.
+
+That is also why one stylesheet covers both. The markup is the same markup.
+
+## When you do want the editor mounted
+
+Read-only is still the right answer sometimes, and the line is about whether
+the page can become an editing page:
+
+| Situation                                | Use                                                  |
+| ---------------------------------------- | ---------------------------------------------------- |
+| A page that only displays content        | `@blockleaf/renderer`                                |
+| A preview that toggles back into editing | `editable={false}`                                   |
+| An email, an RSS item, a cached fragment | `renderToHTML`                                       |
+| A comment thread rendered under a form   | The renderer for the thread, the editor for the form |
+
+The last row is the one people get wrong most often: a page with one editor
+on it does not need twenty.
+
+## Unknown nodes, three years later
+
+The renderer renders an unknown node's children and drops an unknown mark's
+decoration rather than throwing. Documents outlive the code that wrote them,
+and a reader built today will meet a document written by a version of your
+application that no longer exists. Degrading beats a stack trace on an
+article page.
+
+If you add a node of your own, hand the renderer a component for it — the
+override map is a patch, not a full mapping:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	components={{ embed: ({ node }) => <Embed url={node.attrs?.url} /> }}
+/>
+```
+
+## Further reading
+
+- [Server rendering](/docs/rendering) — overrides, the HTML export, heading
+  extraction and what the renderer does differently on purpose.
+- [Editor and renderer, side by side](/docs/examples/read-only) — the same
+  document through both, live.
+- [Your editor's JSON is a database schema](/blog/version-your-editor-json).

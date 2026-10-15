@@ -1,11 +1,15 @@
-# Server rendering
+---
+title: Server rendering
+description: Turn stored JSON into React or an HTML string, with no editor and no ProseMirror.
+icon: Server
+---
 
 `@blockleaf/renderer` turns a stored document back into output. It is a
 separate package from the editor and shares no code with it: no ProseMirror, no
 Tiptap, no editor, and no runtime dependencies at all.
 
-```bash
-pnpm add @blockleaf/renderer
+```package-install
+@blockleaf/renderer
 ```
 
 ```tsx
@@ -26,7 +30,7 @@ export default async function Page({ params }) {
 ```
 
 Content is read a thousand times for every time it is written, so the reading
-path is the one that should be cheap. `RenderDocument` measures **1.35 kB**
+path is the one that should be cheap. `RenderDocument` measures **1.87 kB**
 minified and brotlied, and emits no client JavaScript of its own.
 
 ## Why a separate package
@@ -356,8 +360,8 @@ root entry and installs nothing else.
 
 | Entry                             |    Size |
 | --------------------------------- | ------: |
-| `RenderDocument`                  | 1.40 kB |
-| `renderToHTML`                    | 1.50 kB |
+| `RenderDocument`                  | 1.87 kB |
+| `renderToHTML`                    | 1.97 kB |
 | `toPlainText` + `extractHeadings` |   445 B |
 | `sanitizeHref` + `sanitizeSrc`    |   217 B |
 
@@ -365,7 +369,7 @@ Minified and brotlied, with all dependencies.
 
 ## Nodes
 
-Every node in [the schema](./schema.md) renders:
+Every node in [the schema](./schema.mdx) renders:
 
 | Node                         | Element                                               |
 | ---------------------------- | ----------------------------------------------------- |
@@ -388,7 +392,7 @@ Every node in [the schema](./schema.md) renders:
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to
 any stylesheet with a descendant selector in it. See F15 in
-[`open-flags.md`](./open-flags.md) for why that sentence needed writing down.
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md) for why that sentence needed writing down.
 
 `codeBlock` renders a `language-…` class and no highlighting. Highlighting a
 block on the server means shipping a highlighter; pick your own and point it

@@ -1,0 +1,5 @@
+{
+	"title": "Examples",
+	"icon": "FlaskConical",
+	"pages": ["minimal", "autosave", "read-only", "slash-command"]
+}
