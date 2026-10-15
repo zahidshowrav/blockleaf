@@ -455,6 +455,34 @@ The full combobox pattern wants the relationship expressed on the textbox.
 
 ---
 
+## Actions follow the extension set
+
+Every default action declares `isAvailable`, and the first thing it checks is
+whether the command exists at all. With `preset="minimal"` there is no
+highlight mark, so the bubble menu simply has five toggles instead of six;
+with an `extensions` array of your own that omits headings, the block menu's
+"Turn into → Heading 1" is not offered.
+
+An action of yours should do the same — the chrome is rendered against
+whatever schema it is handed, not against the standard preset:
+
+```ts
+{
+	id: 'mention',
+	title: 'Mention',
+	group: 'Insert',
+	isActive: (editor) => editor.isActive('mention'),
+	isAvailable: (editor) => 'mention' in editor.schema.nodes,
+	run: (editor) => editor.chain().focus().insertMention().run()
+}
+```
+
+Without the guard, `editor.can().insertMention()` throws rather than
+returning `false`: `editor.can()` only carries the commands the loaded
+extensions registered. See [extensions](./extensions.mdx).
+
+---
+
 ## Styling
 
 Both menus read the editor's `--bl-*` variables and define their own scoped
