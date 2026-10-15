@@ -47,4 +47,10 @@ export type BlockMenuProps = {
 	actions: BlockAction[];
 	pos: number;
 	onClose: () => void;
+	/**
+	 * The handle the menu hangs from. The menu renders in a portal on
+	 * `document.body`, so it needs the element's viewport rect rather than
+	 * being able to position itself against a parent.
+	 */
+	anchor?: HTMLElement | null;
 };

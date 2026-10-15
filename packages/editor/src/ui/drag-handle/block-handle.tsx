@@ -61,6 +61,10 @@ export const BlockHandle = ({
 	openMenuRequest = 0
 }: BlockHandleComponentProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
+	// A callback ref in state, not a `useRef`: the menu needs the element
+	// during render to position itself, and reading a ref there is not
+	// allowed.
+	const [handleEl, setHandleEl] = useState<HTMLDivElement | null>(null);
 	const [seenMenuRequest, setSeenMenuRequest] = useState(openMenuRequest);
 
 	// Adjusting state from a changed prop during render rather than in an
@@ -112,7 +116,10 @@ export const BlockHandle = ({
 	}
 
 	return (
-		<div className="blockleaf-block-handle">
+		<div
+			ref={setHandleEl}
+			className="blockleaf-block-handle"
+		>
 			{insertButton && (
 				<button
 					type="button"
@@ -145,6 +152,7 @@ export const BlockHandle = ({
 					actions={actions}
 					pos={pos}
 					onClose={closeMenu}
+					anchor={handleEl}
 				/>
 			)}
 		</div>

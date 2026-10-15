@@ -217,6 +217,17 @@ Move up on the first block, and move down on the last, are _removed_ rather
 than disabled, on the same reasoning as the bubble menu: a control that is
 never enabled is noise for a screen reader.
 
+It renders in a portal on `document.body`, positioned against the handle, and
+closes when you press anywhere outside it. That is what keeps it out of a host
+container with `overflow: auto` — inside one it was both clipped and counted
+towards the scroll height. Two consequences worth knowing:
+
+- Style it with `.blockleaf-block-menu`, not with a descendant selector under
+  your editor wrapper. It is not inside it.
+- It carries the editor's `data-theme` across, like the slash menu, but it
+  cannot inherit `--bl-*` custom properties set on the wrapper. Set those on
+  `:root` if you want them to reach it.
+
 | Key            | Does                      |
 | -------------- | ------------------------- |
 | `↑` / `↓`      | Move through the entries. |
