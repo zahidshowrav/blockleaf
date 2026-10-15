@@ -14,6 +14,7 @@ import {
 	type BubbleMenuShouldShow
 } from '../bubble-menu/index.js';
 import { TrashIcon } from '../drag-handle/icons.js';
+import { whenNodeExists } from '../schema-guard.js';
 
 export const CELL_MENU_PLUGIN_KEY = 'blockleafCellMenu';
 
@@ -52,7 +53,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Merge cells',
 		icon: MergeIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().mergeCells(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().mergeCells()
+		),
 		run: (editor) => editor.chain().focus().mergeCells().run()
 	},
 	{
@@ -60,7 +63,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Split cell',
 		icon: SplitIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().splitCell(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().splitCell()
+		),
 		run: (editor) => editor.chain().focus().splitCell().run()
 	},
 	{
@@ -68,7 +73,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Toggle header cell',
 		icon: HeaderIcon,
 		isActive: (editor) => editor.isActive('tableHeader'),
-		isAvailable: (editor) => editor.can().toggleHeaderCell(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().toggleHeaderCell()
+		),
 		run: (editor) => editor.chain().focus().toggleHeaderCell().run()
 	},
 	{
@@ -76,7 +83,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Insert row below',
 		icon: InsertAboveIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().addRowAfter(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addRowAfter()
+		),
 		run: (editor) => editor.chain().focus().addRowAfter().run()
 	},
 	{
@@ -84,7 +93,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Insert column right',
 		icon: InsertLeftIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().addColumnAfter(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().addColumnAfter()
+		),
 		run: (editor) => editor.chain().focus().addColumnAfter().run()
 	},
 	{
@@ -92,7 +103,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Delete row',
 		icon: TrashIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().deleteRow(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().deleteRow()
+		),
 		run: (editor) => editor.chain().focus().deleteRow().run()
 	},
 	{
@@ -100,7 +113,9 @@ export const defaultCellActions: BubbleAction[] = [
 		title: 'Delete table',
 		icon: DeleteTableIcon,
 		isActive: () => false,
-		isAvailable: (editor) => editor.can().deleteTable(),
+		isAvailable: whenNodeExists('table', (editor) =>
+			editor.can().deleteTable()
+		),
 		run: (editor) => editor.chain().focus().deleteTable().run()
 	}
 ];

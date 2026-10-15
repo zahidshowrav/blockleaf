@@ -143,9 +143,23 @@
 	color: var(--bl-color-muted);
 }
 
+/*
+ * `list-style` is stated rather than inherited from the user agent. Every CSS
+ * reset in common use — Tailwind's preflight, normalize, a hand-rolled one —
+ * strips list markers, and "works without a CSS framework" must not mean
+ * "breaks with one".
+ */
 .blockleaf-editor__content ul,
 .blockleaf-editor__content ol {
 	padding-left: 1.3em;
+}
+
+.blockleaf-editor__content ul {
+	list-style: disc;
+}
+
+.blockleaf-editor__content ol {
+	list-style: decimal;
 }
 
 .blockleaf-editor__content li > * + * {
@@ -203,19 +217,28 @@
 	padding-left: 0;
 }
 
-.blockleaf-editor__content li[data-type='taskItem'] {
+/*
+ * Matched through the parent list, not `li[data-type='taskItem']`.
+ *
+ * Tiptap's task item builds its live DOM in `addNodeView`, which applies the
+ * node's own attributes — `data-checked`, `data-id` — and never the
+ * `data-type` that `renderHTML` merges in. So the attribute exists in
+ * serialised output and not in the editor, and a selector keyed to it styles
+ * every rendered page and no actual editor.
+ */
+.blockleaf-editor__content ul[data-type='taskList'] > li {
 	display: flex;
 	align-items: flex-start;
 	gap: 0.5em;
 }
 
-.blockleaf-editor__content li[data-type='taskItem'] > label {
+.blockleaf-editor__content ul[data-type='taskList'] > li > label {
 	user-select: none;
 	margin-top: 0.2em;
 	cursor: pointer;
 }
 
-.blockleaf-editor__content li[data-type='taskItem'] > div {
+.blockleaf-editor__content ul[data-type='taskList'] > li > div {
 	flex: 1 1 auto;
 }
 
