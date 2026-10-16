@@ -155,6 +155,47 @@ describe('Block actions (CH-03)', () => {
 });
 
 describe('Block menu', () => {
+	/**
+	 * The menu used to render inside the handle. Any ancestor with
+	 * `overflow: auto` — which is how most hosts size an editor — clipped it,
+	 * and because an absolutely positioned descendant still counts towards a
+	 * scroll container's `scrollHeight`, opening it grew the scrollbar.
+	 */
+	it('renders outside the editor, on the body', () => {
+		const editor = createEditor('<p>A</p><p>B</p>');
+		const { container } = render(
+			<BlockMenu
+				editor={editor}
+				actions={defaultBlockActions}
+				pos={blockPos(editor, 1)}
+				onClose={vi.fn()}
+			/>
+		);
+
+		const menu = screen.getByRole('menu', { name: 'Block actions' });
+		expect(container.contains(menu)).toBe(false);
+		expect(menu.parentElement).toBe(document.body);
+	});
+
+	it('closes when something outside it is pressed', () => {
+		const editor = createEditor('<p>A</p><p>B</p>');
+		const onClose = vi.fn();
+		render(
+			<BlockMenu
+				editor={editor}
+				actions={defaultBlockActions}
+				pos={blockPos(editor, 1)}
+				onClose={onClose}
+			/>
+		);
+
+		fireEvent.pointerDown(screen.getByRole('menuitem', { name: 'Delete' }));
+		expect(onClose).not.toHaveBeenCalled();
+
+		fireEvent.pointerDown(document.body);
+		expect(onClose).toHaveBeenCalledTimes(1);
+	});
+
 	it('renders a labelled menu grouped into Turn into and Actions', () => {
 		const editor = createEditor('<p>A</p><p>B</p>');
 		render(
