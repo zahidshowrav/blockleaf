@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState
+} from 'react';
+import { createPortal } from 'react-dom';
 
 import type { BlockAction, BlockMenuProps } from './types.js';
 
@@ -11,13 +18,24 @@ const renderIcon = (icon: BlockAction['icon']) => {
 	return icon;
 };
 
+/** Space between the handle and the menu, in px. */
+const MENU_GAP = 4;
+
+/** Keeps the menu off the very edge of the window, in px. */
+const VIEWPORT_MARGIN = 8;
+
 export const BlockMenu = ({
 	editor,
 	actions,
 	pos,
-	onClose
+	onClose,
+	anchor
 }: BlockMenuProps) => {
 	const [activeIndex, setActiveIndex] = useState(0);
+	const [placement, setPlacement] = useState<{
+		top: number;
+		left: number;
+	} | null>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const visible = actions.filter(
@@ -90,13 +108,84 @@ export const BlockMenu = ({
 		}
 	};
 
+	/**
+	 * Positions the menu against the handle's rect in viewport coordinates.
+	 *
+	 * It is portalled to `document.body` rather than rendered inside the
+	 * handle because the editor is routinely given a box with
+	 * `overflow: auto`, which clipped the menu — and, since an absolutely
+	 * positioned descendant still counts towards a scroll container's
+	 * `scrollHeight`, opening it grew the scrollbar.
+	 */
+	const place = useCallback(() => {
+		const menu = menuRef.current;
+		if (!anchor || !menu) return;
+
+		const rect = anchor.getBoundingClientRect();
+		const { offsetHeight, offsetWidth } = menu;
+		const below = rect.bottom + MENU_GAP;
+		const flip =
+			below + offsetHeight > window.innerHeight - VIEWPORT_MARGIN;
+
+		setPlacement({
+			top: flip
+				? Math.max(VIEWPORT_MARGIN, rect.top - MENU_GAP - offsetHeight)
+				: below,
+			left: Math.max(
+				VIEWPORT_MARGIN,
+				Math.min(
+					rect.left,
+					window.innerWidth - offsetWidth - VIEWPORT_MARGIN
+				)
+			)
+		});
+	}, [anchor]);
+
+	// Grouped together per project conventions.
+	useLayoutEffect(() => {
+		place();
+	}, [place]);
+
 	useEffect(() => {
 		menuRef.current?.focus();
 	}, []);
 
+	useEffect(() => {
+		const reposition = () => place();
+		// Capturing, so a scroll inside the editor's own box is seen too.
+		window.addEventListener('scroll', reposition, true);
+		window.addEventListener('resize', reposition);
+		return () => {
+			window.removeEventListener('scroll', reposition, true);
+			window.removeEventListener('resize', reposition);
+		};
+	}, [place]);
+
+	useEffect(() => {
+		const onPointerDown = (event: PointerEvent) => {
+			const target = event.target as Node | null;
+			if (!target) return;
+			if (menuRef.current?.contains(target)) return;
+			if (anchor?.contains(target)) return;
+			onClose();
+		};
+
+		document.addEventListener('pointerdown', onPointerDown, true);
+		return () =>
+			document.removeEventListener('pointerdown', onPointerDown, true);
+	}, [anchor, onClose]);
+
 	const active = visible[activeIndex];
 
-	return (
+	if (typeof document === 'undefined') return null;
+
+	// Mounted on the body, so the editor's `data-theme` has to be carried
+	// over — the same thing the slash menu does for the same reason.
+	const theme = anchor
+		?.closest('.blockleaf-editor')
+		?.getAttribute('data-theme');
+
+	const menu = (
 		<div
 			ref={menuRef}
 			role="menu"
@@ -106,6 +195,11 @@ export const BlockMenu = ({
 			}
 			tabIndex={-1}
 			className="blockleaf-block-menu"
+			data-theme={theme ?? undefined}
+			// `useLayoutEffect` sets these before the browser paints, so the
+			// menu never shows at the fallback origin. It is not hidden until
+			// then, because that would take it out of the accessibility tree.
+			style={{ top: placement?.top ?? 0, left: placement?.left ?? 0 }}
 			onKeyDown={onKeyDown}
 		>
 			{groups.map(({ group, items }) => (
@@ -157,4 +251,6 @@ export const BlockMenu = ({
 			))}
 		</div>
 	);
+
+	return createPortal(menu, document.body);
 };
