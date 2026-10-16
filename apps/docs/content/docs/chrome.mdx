@@ -43,6 +43,11 @@ keywords and descriptions; `↑`/`↓` move, `Enter` runs, `Escape` dismisses.
 The twelve defaults are Text, Heading 1–3, Bullet list, Numbered list, To-do
 list, Quote, Code, Callout, Divider and Table.
 
+They are displayed grouped by their `group` — Basic blocks, Headings, Lists,
+Advanced — which is not the order the array is in. `↑` and `↓` follow the rows
+as rendered, so a command's place in `slashItems` decides which group heading
+it lands under, not where the arrow keys reach it.
+
 ```tsx
 <BlockleafEditor
 	slashItems={(defaults) => [
