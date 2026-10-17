@@ -1,67 +1,36 @@
-import Link from 'next/link';
-
-import { LiveDemo } from '@/components/live-demo';
+import { DemoPanel } from '@/components/landing/demo-panel';
+import { Hero } from '@/components/landing/hero';
+import { Packages } from '@/components/landing/packages';
+import { Why } from '@/components/landing/why';
 import { SiteStructuredData } from '@/components/structured-data';
 import { gitConfig } from '@/lib/shared';
 
 const repoUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 
+/**
+ * The landing page sits on a fixed plate — two emerald washes over a 32px
+ * grid, with a blurred orb behind the hero — so the background stays put
+ * while the sections scroll over it.
+ */
 const Page = () => (
-	<div className="flex flex-1 flex-col">
+	<div className="relative flex flex-1 flex-col overflow-x-hidden">
 		<SiteStructuredData repoUrl={repoUrl} />
-		<section className="mx-auto w-full max-w-6xl px-4 pt-10 pb-16">
-			<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-				A block editor that hands you JSON.
-			</h1>
-			<p className="text-fd-muted-foreground mt-3 max-w-2xl text-base sm:text-lg">
-				Notion-style editing on Tiptap — slash menu, drag handles,
-				tables, uploads. No CSS framework, no opinion about where your
-				content lives, and a renderer for the server in the box.
-			</p>
 
-			<div className="mt-6 flex flex-wrap gap-3">
-				<Link
-					href="/docs"
-					className="bg-fd-primary text-fd-primary-foreground rounded-lg px-4 py-2 text-sm font-medium"
-				>
-					Get started
-				</Link>
-				<Link
-					href="/docs/schema"
-					className="border-fd-border rounded-lg border px-4 py-2 text-sm font-medium"
-				>
-					The JSON contract
-				</Link>
-			</div>
+		<div
+			aria-hidden="true"
+			className="bl-backdrop pointer-events-none fixed inset-0 z-0"
+		/>
+		<div
+			aria-hidden="true"
+			className="bl-orb pointer-events-none fixed top-20 left-1/2 z-0 h-[340px] w-[720px] -translate-x-1/2 rounded-full"
+		/>
 
-			<div className="mt-10">
-				<LiveDemo />
-			</div>
-
-			<dl className="mt-12 grid gap-6 sm:grid-cols-3">
-				<div>
-					<dt className="font-medium">Versioned JSON</dt>
-					<dd className="text-fd-muted-foreground mt-1 text-sm">
-						Every document carries a schema version, and every
-						change to the stored shape ships a migration.
-					</dd>
-				</div>
-				<div>
-					<dt className="font-medium">Server rendering included</dt>
-					<dd className="text-fd-muted-foreground mt-1 text-sm">
-						<code>@blockleaf/renderer</code> turns stored JSON into
-						React or HTML with no editor and no ProseMirror.
-					</dd>
-				</div>
-				<div>
-					<dt className="font-medium">One stylesheet</dt>
-					<dd className="text-fd-muted-foreground mt-1 text-sm">
-						Custom properties, no Tailwind, no <code>prose</code>,
-						no build step of its own.
-					</dd>
-				</div>
-			</dl>
-		</section>
+		<div className="relative z-10 space-y-28 pb-24">
+			<Hero />
+			<DemoPanel />
+			<Why />
+			<Packages />
+		</div>
 	</div>
 );
 

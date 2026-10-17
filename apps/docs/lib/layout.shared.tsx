@@ -7,12 +7,15 @@ import {
 	Server
 } from 'lucide-react';
 
+import { BlockleafLogo } from '@/components/brand/blockleaf-logo';
+import { NpmIcon } from '@/components/icons/npm';
 import {
 	appName,
 	blogRoute,
 	changelogRoute,
 	docsRoute,
-	gitConfig
+	gitConfig,
+	npmScopeUrl
 } from '@/lib/shared';
 
 /**
@@ -89,10 +92,13 @@ const documentation: LinkItemType = {
 export const baseOptions = (): BaseLayoutProps => ({
 	nav: {
 		title: (
-			<>
-				<span aria-hidden="true">🍃</span>
+			<div className="flex items-center gap-2">
+				<BlockleafLogo
+					size={30}
+					priority
+				/>
 				<span className="font-semibold">{appName}</span>
-			</>
+			</div>
 		)
 	},
 	links: [
@@ -109,6 +115,14 @@ export const baseOptions = (): BaseLayoutProps => ({
 			url: changelogRoute,
 			active: 'nested-url',
 			on: 'nav'
+		},
+		{
+			type: 'icon',
+			label: 'Blockleaf on npm',
+			text: 'npm',
+			url: npmScopeUrl,
+			icon: <NpmIcon className="w-5" />,
+			external: true
 		}
 	],
 	githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`

@@ -1,6 +1,17 @@
 import { ImageResponse } from 'next/og';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { appName } from '@/lib/shared';
+
+/**
+ * The mark, inlined as a data URI. Satori has no way to resolve a relative
+ * `/logo/...` URL while the cards are being generated at build time, and the
+ * dark cut is the right one here — the card is always on #0b0d12.
+ */
+const mark = `data:image/png;base64,${readFileSync(
+	join(process.cwd(), 'public/logo/logo-icon-dark.png')
+).toString('base64')}`;
 
 const WIDTH = 1200;
 const HEIGHT = 630;
@@ -30,7 +41,7 @@ export interface OGImageOptions {
 	section?: string;
 }
 
-const accent = '#6d8bff';
+const accent = '#34d399';
 
 /** The social card. 1200×630, the size every scraper expects. */
 export const renderOGImage = ({
@@ -61,19 +72,12 @@ export const renderOGImage = ({
 					color: accent
 				}}
 			>
-				<svg
-					width="40"
-					height="40"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke={accent}
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				>
-					<path d="M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20" />
-					<path d="M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13" />
-				</svg>
+				<img
+					src={mark}
+					width={44}
+					height={44}
+					alt=""
+				/>
 				<span>{appName}</span>
 				{section ? (
 					<span style={{ color: 'rgba(255,255,255,0.35)' }}>
