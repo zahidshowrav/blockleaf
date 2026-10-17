@@ -155,6 +155,47 @@ describe('Block actions (CH-03)', () => {
 });
 
 describe('Block menu', () => {
+	/**
+	 * The menu used to render inside the handle. Any ancestor with
+	 * `overflow: auto` — which is how most hosts size an editor — clipped it,
+	 * and because an absolutely positioned descendant still counts towards a
+	 * scroll container's `scrollHeight`, opening it grew the scrollbar.
+	 */
+	it('renders outside the editor, on the body', () => {
+		const editor = createEditor('<p>A</p><p>B</p>');
+		const { container } = render(
+			<BlockMenu
+				editor={editor}
+				actions={defaultBlockActions}
+				pos={blockPos(editor, 1)}
+				onClose={vi.fn()}
+			/>
+		);
+
+		const menu = screen.getByRole('menu', { name: 'Block actions' });
+		expect(container.contains(menu)).toBe(false);
+		expect(menu.parentElement).toBe(document.body);
+	});
+
+	it('closes when something outside it is pressed', () => {
+		const editor = createEditor('<p>A</p><p>B</p>');
+		const onClose = vi.fn();
+		render(
+			<BlockMenu
+				editor={editor}
+				actions={defaultBlockActions}
+				pos={blockPos(editor, 1)}
+				onClose={onClose}
+			/>
+		);
+
+		fireEvent.pointerDown(screen.getByRole('menuitem', { name: 'Delete' }));
+		expect(onClose).not.toHaveBeenCalled();
+
+		fireEvent.pointerDown(document.body);
+		expect(onClose).toHaveBeenCalledTimes(1);
+	});
+
 	it('renders a labelled menu grouped into Turn into and Actions', () => {
 		const editor = createEditor('<p>A</p><p>B</p>');
 		render(
@@ -299,5 +340,84 @@ describe('Drag handle extension wiring', () => {
 			)
 		).toBe(true);
 		expect(() => editor.destroy()).not.toThrow();
+	});
+});
+
+/**
+ * The handle is positioned by the plugin against `.blockleaf-editor`. Nothing
+ * asserted that before, and it had never worked: the offsets were written to
+ * the `ReactRenderer` wrapper, which is `position: static`, so the handle sat
+ * at the end of the content flow for every block.
+ */
+describe('Drag handle placement', () => {
+	const hosts: HTMLElement[] = [];
+	const realElementsFromPoint = document.elementsFromPoint;
+
+	afterEach(() => {
+		document.elementsFromPoint = realElementsFromPoint;
+		while (hosts.length) hosts.pop()?.remove();
+	});
+
+	const rect = (left: number, top: number) =>
+		({
+			left,
+			top,
+			right: left,
+			bottom: top,
+			width: 0,
+			height: 0,
+			x: left,
+			y: top,
+			toJSON: () => ({})
+		}) as DOMRect;
+
+	/** Hovers a block whose left edge sits `gutter` px inside the editor. */
+	const hoverWithGutter = (gutter: number) => {
+		const host = document.createElement('div');
+		host.className = 'blockleaf-editor';
+		document.body.appendChild(host);
+		hosts.push(host);
+
+		const editor = new Editor({
+			element: host,
+			extensions: [
+				...createExtensions('standard'),
+				createDragHandleExtension()
+			],
+			content: '<p>Hello</p>'
+		});
+		editors.push(editor);
+
+		const block = host.querySelector('p');
+		if (!block) throw new Error('the paragraph did not render');
+
+		host.getBoundingClientRect = () => rect(0, 0);
+		editor.view.dom.getBoundingClientRect = () => rect(gutter, 0);
+		block.getBoundingClientRect = () => rect(gutter, 40);
+		document.elementsFromPoint = () => [block];
+
+		fireEvent.mouseMove(host, { clientY: 40 });
+
+		return host.querySelector<HTMLElement>(
+			'.blockleaf-block-handle-anchor'
+		);
+	};
+
+	it('positions the element the stylesheet makes absolute', () => {
+		const anchor = hoverWithGutter(100);
+
+		expect(anchor).not.toBeNull();
+		expect(anchor?.style.top).toBe('40px');
+	});
+
+	it('sits in the gutter, clear of the block', () => {
+		// 100px gutter, 46px fallback handle width, 4px gap.
+		expect(hoverWithGutter(100)?.style.left).toBe('50px');
+	});
+
+	it('clamps into the content rather than outside a clipping ancestor', () => {
+		// --bl-content-padding is 0 by default, so there is routinely no room.
+		// Overlapping the text beats being clipped away by `overflow: auto`.
+		expect(hoverWithGutter(16)?.style.left).toBe('0px');
 	});
 });

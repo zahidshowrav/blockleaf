@@ -333,10 +333,12 @@ describe('<SlashMenu /> UI Component', () => {
 			});
 			expect(arrowDownHandled).toBe(true);
 
+			// The second row on screen, which is Quote — the registry declares
+			// Heading 1 second, but it renders under a later group heading.
 			const selectedOption = container.querySelector(
 				'[aria-selected="true"]'
 			);
-			expect(selectedOption?.id).toBe('blockleaf-slash-item-heading-1');
+			expect(selectedOption?.id).toBe('blockleaf-slash-item-blockquote');
 
 			// Press Enter on current option
 			let enterHandled = false;
@@ -347,7 +349,65 @@ describe('<SlashMenu /> UI Component', () => {
 					} as SuggestionKeyDownProps) ?? false;
 			});
 			expect(enterHandled).toBe(true);
-			expect(mockCommand).toHaveBeenCalledWith(defaultSlashCommands[1]);
+			expect(mockCommand).toHaveBeenCalledWith(
+				defaultSlashCommands.find((cmd) => cmd.id === 'blockquote')
+			);
+		} finally {
+			editor.destroy();
+		}
+	});
+
+	/**
+	 * Arrow keys used to step through the registry's declaration order while
+	 * the list rendered in group order, so the highlight jumped: Text ->
+	 * Heading 1 -> ... -> Quote -> Code -> Callout -> Divider -> Table.
+	 */
+	it('walks the rows in the order they are rendered', () => {
+		const ref = createRef<SlashMenuRef>();
+		const editor = new Editor({
+			extensions: createExtensions('standard'),
+			content: '<p></p>'
+		});
+
+		try {
+			const { container } = render(
+				<SlashMenu
+					ref={ref}
+					items={defaultSlashCommands}
+					command={vi.fn()}
+					editor={editor}
+					range={{ from: 1, to: 2 }}
+					query=""
+				/>
+			);
+
+			const rendered = [
+				...container.querySelectorAll('.blockleaf-slash-menu__item')
+			].map((item) => item.id);
+			const press = (key: string) =>
+				act(() => {
+					ref.current?.onKeyDown({
+						event: new KeyboardEvent('keydown', { key })
+					} as SuggestionKeyDownProps);
+				});
+			const selected = () =>
+				container.querySelector('[aria-selected="true"]')?.id;
+
+			expect(selected()).toBe(rendered[0]);
+
+			const down: (string | undefined)[] = [];
+			for (let i = 1; i < rendered.length; i++) {
+				press('ArrowDown');
+				down.push(selected());
+			}
+			expect(down).toEqual(rendered.slice(1));
+
+			// Past the end it wraps to the first row, not to a stray index.
+			press('ArrowDown');
+			expect(selected()).toBe(rendered[0]);
+
+			press('ArrowUp');
+			expect(selected()).toBe(rendered[rendered.length - 1]);
 		} finally {
 			editor.destroy();
 		}

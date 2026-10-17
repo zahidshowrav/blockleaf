@@ -1,5 +1,71 @@
 # @blockleaf/editor
 
+## 0.0.9
+
+### Patch Changes
+
+- cc50bbd: Stop the block menu being clipped by the container the editor is in.
+  
+  It rendered inside the handle, so an ancestor with `overflow: auto` — which is
+  how most hosts give an editor a fixed height — cut it off, and because an
+  absolutely positioned descendant still counts towards a scroll container's
+  `scrollHeight`, opening it lengthened the scrollbar and shifted the content
+  underneath.
+  
+  The menu now renders in a portal on `document.body`, positioned `fixed`
+  against the handle's viewport rect. It flips above the handle when there is no
+  room below, follows the handle on scroll and resize, and closes when a press
+  lands outside it — which also stops it sitting open behind the slash menu.
+  
+  Two things change for anyone styling it. It is no longer a descendant of the
+  editor wrapper, so target `.blockleaf-block-menu` directly; and like the slash
+  menu it carries `data-theme` across but cannot inherit `--bl-*` properties set
+  on the wrapper.
+
+## 0.0.8
+
+### Patch Changes
+
+- 7dc27ac: Fix the slash menu's arrow keys selecting a different row than the one they
+  move to.
+  
+  The list renders grouped by `group`, but `ArrowDown` and `ArrowUp` stepped
+  through the flat `items` array. The default registry declares commands
+  interleaved across groups, so the two orders disagreed and the highlight
+  jumped: from Text it went to Heading 1, ran down to To-do list, then back up
+  to Quote, Code, Callout and Divider before reaching Table. `Enter` then ran
+  whichever command that index happened to hit.
+  
+  Selection now indexes the same order the rows are rendered in, so `↑` and `↓`
+  move to the row above and below, and wrapping goes from the last row to the
+  first.
+
+## 0.0.7
+
+### Patch Changes
+
+- 7c1bbcb: Fix the drag handle never appearing beside the block it belongs to.
+  
+  The plugin computed the right offset and wrote it to the wrong element. It set
+  `top` and `left` on the wrapper `ReactRenderer` creates, which is
+  `position: static`, so both were inert — while the handle inside it was
+  `position: absolute` with no offsets of its own and therefore fell back to its
+  static position at the end of the content flow. Every block produced the same
+  place: the bottom of the editor.
+  
+  A CSS `transform: translateX(calc(-100% - 4px))` then shifted it into the
+  gutter, except `--bl-content-padding` is `0` by default, so there is usually no
+  gutter and the handle landed outside the editor box — where any ancestor with
+  `overflow: auto` clipped it. In the documentation site's demo, 33 of its 45
+  pixels were cut off.
+  
+  The stylesheet now makes the wrapper the positioned box, and the plugin places
+  it with the handle's own width accounted for and clamped to the editor's left
+  edge. With room it sits in the gutter; without room it overlaps the text rather
+  than vanishing.
+  
+  `--bl-handle-gap` is gone, since the offset is no longer a CSS transform.
+
 ## 0.0.6
 
 ### Patch Changes
