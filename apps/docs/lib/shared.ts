@@ -19,6 +19,13 @@ export const contributorsRoute = '/contributors';
 export const docsContentRoute = '/llms.mdx/docs';
 export const blogContentRoute = '/llms.mdx/blog';
 
+/**
+ * The published scope's package list. npm has no stable public URL for a
+ * scope's packages that works for both user and org scopes, so this is kept
+ * as one constant rather than assembled at each call site.
+ */
+export const npmScopeUrl = 'https://www.npmjs.com/org/blockleaf';
+
 export const gitConfig = {
 	user: 'zahidshowrav',
 	repo: 'blockleaf',
