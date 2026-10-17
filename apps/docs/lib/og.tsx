@@ -10,7 +10,7 @@ import { appName } from '@/lib/shared';
  * dark cut is the right one here — the card is always on #0b0d12.
  */
 const mark = `data:image/png;base64,${readFileSync(
-	join(process.cwd(), 'public/logo/logo-icon-1.png')
+	join(process.cwd(), 'public/logo/logo-icon-dark.png')
 ).toString('base64')}`;
 
 const WIDTH = 1200;

@@ -8,8 +8,8 @@ import { cn } from '@/lib/cn';
  * exists.
  */
 const sources = {
-	light: '/logo/logo-icon-2.png',
-	dark: '/logo/logo-icon-1.png'
+	light: '/logo/logo-icon-light.png',
+	dark: '/logo/logo-icon-dark.png'
 };
 
 export interface BlockleafLogoProps {
