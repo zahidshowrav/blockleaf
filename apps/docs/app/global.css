@@ -4,6 +4,135 @@
 
 @import '@blockleaf/editor/styles.css';
 
+/*
+ * The palette is the prototype's, to the hex. Dark is the designed state —
+ * near-black slate with a mint-emerald accent — and the Fumadocs tokens are
+ * re-pointed at it so the navbar, the sidebar and the search dialog match
+ * the landing page instead of sitting on a different grey.
+ *
+ * Light mode is the same layout on paper: the surfaces inverted and the
+ * accent dropped to emerald-700, because mint on white fails contrast.
+ */
+@theme {
+	--color-fd-primary: hsl(161 94% 24%);
+	--color-fd-ring: hsl(160 84% 39%);
+
+	--color-bl-bg: #ffffff;
+	--color-bl-panel: #ffffff;
+	--color-bl-head: #f6f9f8;
+	--color-bl-deep: #f2f6f5;
+	--color-bl-line: #e2e8e6;
+	--color-bl-line-soft: #eef2f1;
+	--color-bl-text: #0f172a;
+	--color-bl-dim: #475569;
+	--color-bl-faint: #64748b;
+	--color-bl-accent: #047857;
+	--color-bl-accent-soft: #065f46;
+	--color-bl-accent-bg: #ecfdf5;
+	--color-bl-accent-edge: #a7f3d0;
+}
+
+:root {
+	--bl-mark-base: #065f46;
+	--bl-mark-mid: #059669;
+	--bl-mark-tip: #34d399;
+	--bl-mark-rib: #064e3b;
+	--bl-mark-cut: #ffffff;
+
+	--bl-grid: rgba(148, 163, 184, 0.35);
+	--bl-wash-1: rgba(16, 185, 129, 0.1);
+	--bl-wash-2: rgba(52, 211, 153, 0.06);
+	--bl-orb: rgba(16, 185, 129, 0.1);
+	--bl-backdrop-opacity: 0.5;
+}
+
+.dark {
+	--color-fd-primary: hsl(158 64% 52%);
+	--color-fd-ring: hsl(158 64% 52%);
+	--color-fd-background: #070b10;
+	--color-fd-card: #0c121b;
+	--color-fd-border: rgba(30, 41, 59, 0.8);
+	--color-fd-muted-foreground: #94a3b8;
+
+	--color-bl-bg: #070b10;
+	--color-bl-panel: #0c121b;
+	--color-bl-head: #080d14;
+	--color-bl-deep: #05090f;
+	--color-bl-line: #1e293b;
+	--color-bl-line-soft: rgba(30, 41, 59, 0.6);
+	--color-bl-text: #e2e8f0;
+	--color-bl-dim: #cbd5e1;
+	--color-bl-faint: #94a3b8;
+	--color-bl-accent: #34d399;
+	--color-bl-accent-soft: #6ee7b7;
+	--color-bl-accent-bg: rgba(2, 44, 34, 0.7);
+	--color-bl-accent-edge: rgba(16, 185, 129, 0.4);
+
+	--bl-mark-base: #0e9f6e;
+	--bl-mark-mid: #34d399;
+	--bl-mark-tip: #d1fae5;
+	--bl-mark-rib: #ecfdf5;
+	--bl-mark-cut: #070b10;
+
+	--bl-grid: rgba(30, 41, 59, 0.45);
+	--bl-wash-1: rgba(16, 185, 129, 0.16);
+	--bl-wash-2: rgba(52, 211, 153, 0.08);
+	--bl-orb: rgba(16, 185, 129, 0.1);
+	--bl-backdrop-opacity: 0.4;
+}
+
 html {
 	scrollbar-gutter: stable;
+}
+
+/* The fixed plate behind the landing page: two emerald washes on a 32px grid. */
+.bl-backdrop {
+	opacity: var(--bl-backdrop-opacity);
+	background-image:
+		radial-gradient(circle at 50% 0%, var(--bl-wash-1) 0%, transparent 60%),
+		radial-gradient(
+			circle at 85% 30%,
+			var(--bl-wash-2) 0%,
+			transparent 40%
+		),
+		linear-gradient(to right, var(--bl-grid) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--bl-grid) 1px, transparent 1px);
+	background-size:
+		100% 100%,
+		100% 100%,
+		32px 32px,
+		32px 32px;
+}
+
+.bl-orb {
+	background: var(--bl-orb);
+	filter: blur(120px);
+}
+
+/* JSON specimen colouring, as the prototype tints its output pane. */
+:root {
+	--bl-json-key: #0f766e;
+	--bl-json-str: #15803d;
+	--bl-json-num: #b45309;
+	--bl-json-lit: #0369a1;
+}
+
+.dark {
+	--bl-json-key: #5eead4;
+	--bl-json-str: #86efac;
+	--bl-json-num: #fcd34d;
+	--bl-json-lit: #7dd3fc;
+}
+
+.bl-json-key {
+	color: var(--bl-json-key);
+}
+.bl-json-str {
+	color: var(--bl-json-str);
+}
+.bl-json-num {
+	color: var(--bl-json-num);
+}
+.bl-json-lit {
+	color: var(--bl-json-lit);
 }
