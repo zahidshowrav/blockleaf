@@ -4,15 +4,17 @@
 
 ## Workspace layout
 
-- **`packages/editor`** (`@blockleaf/editor`) — the published package. Built with
-  tsdown to `dist/`, ESM only.
+- **`packages/editor`** (`@blockleaf/editor`) — the editor. Built with tsdown to
+  `dist/`, ESM only. Subpaths: `./extensions`, `./code-block`, `./validate`.
+- **`packages/renderer`** (`@blockleaf/renderer`) — stored JSON to React or an
+  HTML string, with no editor and no ProseMirror. Its own workspace, never a
+  subpath of the editor. Subpaths: `./react`, `./html`.
 - **`packages/eslint-config`** (`@blockleaf/eslint-config`) — shared flat configs,
   exported as `./base` and `./react-library`. Private.
 - **`packages/tsconfig`** (`@blockleaf/tsconfig`) — shared `tsconfig` presets. Private.
+- **`apps/docs`** — the Fumadocs site published at `blockleaf.dev`. Never published
+  to npm.
 - **`apps/sandbox`** — Vite playground for developing against the editor. Never published.
-
-A future `@blockleaf/renderer` package lands here as its own workspace, not as a
-subpath of the editor.
 
 ## The three source layers
 

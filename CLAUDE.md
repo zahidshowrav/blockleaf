@@ -5,7 +5,7 @@ Guidance for Claude Code working in this repository.
 ## What this is
 
 `blockleaf` — a Notion-style block editor on Tiptap v3, published to npm as
-`@blockleaf/editor` (and later `@blockleaf/renderer`). pnpm + Turborepo. The full
+`@blockleaf/editor` and `@blockleaf/renderer`. pnpm + Turborepo. The full
 build plan, milestones and rationale live in `docs/PROJECT_PLAN.md`; read the
 relevant section before starting work rather than re-deriving decisions.
 
