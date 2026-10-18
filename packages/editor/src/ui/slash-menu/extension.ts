@@ -54,8 +54,13 @@ export const SlashMenuExtension =
 						}
 						return true;
 					},
-					items: ({ query }) => {
-						return registry.filter(query);
+					items: ({ editor, query }) => {
+						return registry
+							.filter(query)
+							.filter(
+								(command) =>
+									command.isAvailable?.(editor) ?? true
+							);
 					},
 					command: ({ editor, range, props }) => {
 						editor.chain().focus().deleteRange(range).run();

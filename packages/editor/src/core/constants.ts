@@ -16,3 +16,10 @@ export const EDITOR_CLASS_NAME = 'blockleaf-editor';
  * changed, and telling the host otherwise triggers an autosave on load.
  */
 export const NORMALISATION_META = 'blockleafNormalisation';
+
+/**
+ * The upload extension's name. The slash menu checks for it to decide
+ * whether to offer the image item: without an upload adapter the extension
+ * is never added, so `openUploadPicker` would not exist.
+ */
+export const UPLOAD_EXTENSION_NAME = 'blockleafUpload';
