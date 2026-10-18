@@ -2,7 +2,9 @@
 
 A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3. Headless-first, with default chrome you can swap out, no CSS framework, and a versioned JSON document you can actually depend on.
 
-> **Status: pre-alpha (`0.0.x`).** The editor renders and types; the chrome, the full node set and the renderer package are not built yet. The document schema **will** change before `1.0`, and migrations will ship with every bump. Don't put it in production yet.
+> **Status: pre-alpha (`0.0.x`).** The editor, the default chrome, the full node set and `@blockleaf/renderer` are all built and on npm. What is not done is hardening — accessibility, i18n, mobile and large-document performance. The document schema **will** change before `1.0`, and migrations ship with every bump. Don't put it in production yet.
+>
+> Full documentation: **[blockleaf.dev](https://blockleaf.dev)**
 
 ## Why another editor
 
@@ -20,7 +22,8 @@ Where it loses today: no collaboration, no comments, no mentions. Those are [out
 ## Install
 
 ```bash
-pnpm add @blockleaf/editor
+pnpm add @blockleaf/editor    # writing
+pnpm add @blockleaf/renderer  # reading, on the server
 ```
 
 ```tsx
@@ -36,6 +39,18 @@ export const Composer = () => (
 ```
 
 React 18 or 19, ESM only. CJS is not supported — if that blocks you, open an issue and say what for.
+
+A page that only displays a document should never import the editor. That is what the renderer is for:
+
+```tsx
+import { RenderDocument } from '@blockleaf/renderer/react';
+
+export const Article = ({ doc }) => <RenderDocument doc={doc} />;
+```
+
+No editor, no ProseMirror, no client JavaScript. There is an HTML-string export at `@blockleaf/renderer/html` for emails, RSS and OG images.
+
+Two things are deliberately opt-in subpaths, so consumers who never use them pay nothing: `@blockleaf/editor/code-block` adds syntax highlighting (16.53 kB), and `@blockleaf/editor/validate` adds deep schema validation behind an optional Zod peer.
 
 ## The editor is uncontrolled
 
@@ -69,7 +84,9 @@ pnpm + Turborepo.
 | Path                                          | What                                                                     |
 | --------------------------------------------- | ------------------------------------------------------------------------ |
 | `packages/editor`                             | `@blockleaf/editor` — schema, extensions, React bindings, default chrome |
+| `packages/renderer`                           | `@blockleaf/renderer` — stored JSON to React or an HTML string           |
 | `packages/tsconfig`, `packages/eslint-config` | shared presets (private)                                                 |
+| `apps/docs`                                   | the Fumadocs site published at `blockleaf.dev`; not published to npm     |
 | `apps/sandbox`                                | Vite SPA for fast extension work; not published                          |
 
 Inside `packages/editor`, `src/core` → `src/react` → `src/ui` is a one-way import boundary enforced by lint, so pulling `@blockleaf/core` out later stays a `mv` rather than a refactor.
@@ -80,16 +97,24 @@ pnpm dev          # sandbox + editor in watch mode
 pnpm test
 pnpm build
 pnpm check:packaging   # publint + are-the-types-wrong
+pnpm size              # size-limit, hard budget
 ```
 
 ## Roadmap
 
+Done:
+
 - **EC** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
 - **CH** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
 - **MC** — upload adapter, images, code blocks with highlighting
-- **RD** — `@blockleaf/renderer` + docs site → public `0.1.0`
+- **RD** — `@blockleaf/renderer` and the docs site
+
+Next:
+
 - **HD** — accessibility pass, i18n, mobile, large-document performance
 - **Later** — collaboration, AI commands, markdown import/export, comments
+
+`0.1.0` is the first release the schema is meant to be depended on; `0.0.x` is what is on npm today.
 
 Collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
 
