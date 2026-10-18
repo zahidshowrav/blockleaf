@@ -7,6 +7,7 @@ import {
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
+	ImageIcon,
 	OrderedListIcon,
 	QuoteIcon,
 	TableIcon,
@@ -14,6 +15,7 @@ import {
 	TextIcon
 } from './icons.js';
 import type { SlashCommand } from './types.js';
+import { UPLOAD_EXTENSION_NAME } from '../../core/constants.js';
 
 export const defaultSlashCommands: SlashCommand[] = [
 	{
@@ -143,6 +145,22 @@ export const defaultSlashCommands: SlashCommand[] = [
 				.focus()
 				.insertTable({ rows: 3, cols: 3, withHeaderRow: true })
 				.run()
+	},
+	{
+		id: 'image',
+		title: 'Image',
+		description: 'Upload an image from your device.',
+		aliases: ['image', 'img', 'photo'],
+		group: 'Advanced',
+		icon: ImageIcon,
+		keywords: ['image', 'img', 'photo', 'picture', 'upload', 'media'],
+		// Drop and paste already work without the menu. This is the third
+		// entry point MC-02 names, and the only one a keyboard can reach.
+		isAvailable: (editor) =>
+			editor.extensionManager.extensions.some(
+				(extension) => extension.name === UPLOAD_EXTENSION_NAME
+			),
+		run: (editor) => editor.chain().focus().openUploadPicker().run()
 	}
 ];
 

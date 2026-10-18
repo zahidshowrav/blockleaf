@@ -266,3 +266,31 @@ export const TableIcon = (props: IconProps) => (
 		<path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
 	</svg>
 );
+
+export const ImageIcon = (props: IconProps) => (
+	<svg
+		viewBox="0 0 24 24"
+		width="16"
+		height="16"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<rect
+			width="18"
+			height="18"
+			x="3"
+			y="3"
+			rx="2"
+		/>
+		<circle
+			cx="9"
+			cy="9"
+			r="2"
+		/>
+		<path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21" />
+	</svg>
+);

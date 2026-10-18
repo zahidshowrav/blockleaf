@@ -2,6 +2,7 @@ import { Extension, type Editor } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
+import { UPLOAD_EXTENSION_NAME } from './constants.js';
 import { isAbortError, isUploadResult, type UploadAdapter } from './upload.js';
 
 export const UPLOAD_PLUGIN_KEY = /* @__PURE__ */ new PluginKey<UploadState>(
@@ -266,7 +267,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 	UploadExtensionOptions,
 	{ controllers: Map<string, AbortController> }
 >({
-	name: 'blockleafUpload',
+	name: UPLOAD_EXTENSION_NAME,
 
 	// Above PasteNormalizer, so a pasted file is taken before the plain-text
 	// branch has a chance to look at an empty clipboard string.

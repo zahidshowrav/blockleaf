@@ -4,7 +4,11 @@ import type { SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createExtensions, createEmptyDocument } from '../src/core/index.js';
+import {
+	createExtensions,
+	createEmptyDocument,
+	createUploadExtension
+} from '../src/core/index.js';
 import {
 	BlockleafEditor,
 	SlashMenu,
@@ -15,11 +19,11 @@ import {
 } from '../src/ui/index.js';
 
 describe('Slash menu command registry (CH-01)', () => {
-	it('initializes with all 12 default commands', () => {
+	it('initializes with all 13 default commands', () => {
 		const registry = createCommandRegistry();
 		const commands = registry.getAll();
 
-		expect(commands).toHaveLength(12);
+		expect(commands).toHaveLength(13);
 		const ids = commands.map((c) => c.id);
 		expect(ids).toEqual([
 			'paragraph',
@@ -33,7 +37,8 @@ describe('Slash menu command registry (CH-01)', () => {
 			'code-block',
 			'callout',
 			'divider',
-			'table'
+			'table',
+			'image'
 		]);
 	});
 
@@ -73,7 +78,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		registry.remove('divider');
 		expect(registry.get('divider')).toBeUndefined();
-		expect(registry.getAll()).toHaveLength(11);
+		expect(registry.getAll()).toHaveLength(12);
 	});
 
 	it('reorders commands given an array of ids', () => {
@@ -82,15 +87,15 @@ describe('Slash menu command registry (CH-01)', () => {
 		const ids = registry.getAll().map((c) => c.id);
 		expect(ids[0]).toBe('table');
 		expect(ids[1]).toBe('task-list');
-		expect(ids).toHaveLength(12);
+		expect(ids).toHaveLength(13);
 	});
 
 	it('filters commands by query across titles, aliases, keywords, and descriptions', () => {
 		const registry = createCommandRegistry();
 
 		// Empty query returns all commands
-		expect(registry.filter('')).toHaveLength(12);
-		expect(registry.filter('   ')).toHaveLength(12);
+		expect(registry.filter('')).toHaveLength(13);
+		expect(registry.filter('   ')).toHaveLength(13);
 
 		// Exact title matches rank highest
 		const textResults = registry.filter('text');
@@ -292,7 +297,7 @@ describe('<SlashMenu /> UI Component', () => {
 
 			// Options
 			const options = screen.getAllByRole('option');
-			expect(options).toHaveLength(12);
+			expect(options).toHaveLength(13);
 			expect(options[0]?.getAttribute('aria-selected')).toBe('true');
 			expect(options[1]?.getAttribute('aria-selected')).toBe('false');
 		} finally {
@@ -514,5 +519,79 @@ describe('<BlockleafEditor /> Slash menu integration', () => {
 			/>
 		);
 		expect(container.querySelector('.blockleaf-editor')).not.toBeNull();
+	});
+});
+
+describe('Image slash command', () => {
+	/** The upload extension is only added when a host supplies an adapter. */
+	const makeEditor = (withUpload: boolean) => {
+		const editor = new Editor({
+			extensions: [
+				...createExtensions('standard'),
+				...(withUpload
+					? [
+							createUploadExtension({
+								adapter: {
+									upload: async () => ({
+										id: 'a',
+										src: 'https://cdn.test/a.png'
+									})
+								}
+							})
+						]
+					: [])
+			],
+			content: createEmptyDocument()
+		});
+		return editor;
+	};
+
+	it('is registered, grouped under Advanced, and reachable by alias', () => {
+		const registry = createCommandRegistry();
+		const image = registry.get('image');
+
+		expect(image?.title).toBe('Image');
+		expect(image?.group).toBe('Advanced');
+
+		for (const query of ['image', 'img', 'photo', 'upload']) {
+			expect(registry.filter(query).map((c) => c.id)).toContain('image');
+		}
+	});
+
+	it('is available only when an upload adapter is configured', () => {
+		const image = createCommandRegistry().get('image');
+		const withUpload = makeEditor(true);
+		const withoutUpload = makeEditor(false);
+
+		expect(image?.isAvailable?.(withUpload)).toBe(true);
+		expect(image?.isAvailable?.(withoutUpload)).toBe(false);
+
+		withUpload.destroy();
+		withoutUpload.destroy();
+	});
+
+	it('opens the file picker rather than inserting an empty node', () => {
+		const editor = makeEditor(true);
+		// jsdom would otherwise try to open a real dialog.
+		const click = vi
+			.spyOn(HTMLInputElement.prototype, 'click')
+			.mockImplementation(() => {});
+
+		createCommandRegistry().get('image')?.run(editor);
+
+		expect(click).toHaveBeenCalled();
+
+		const input =
+			document.querySelector<HTMLInputElement>('input[type="file"]');
+		expect(input).not.toBeNull();
+		expect(input?.accept).toContain('image/');
+
+		// The command uploads; it must not leave an empty image node behind.
+		const types = (editor.getJSON().content ?? []).map((n) => n.type);
+		expect(types).not.toContain('image');
+
+		input?.remove();
+		click.mockRestore();
+		editor.destroy();
 	});
 });

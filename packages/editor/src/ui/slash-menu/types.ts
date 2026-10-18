@@ -24,6 +24,13 @@ export type SlashCommand = {
 	 * picker is chrome, and `EC` must stay reachable without it.
 	 */
 	picker?: ComponentType<SlashPickerProps & { ref?: Ref<SlashMenuRef> }>;
+	/**
+	 * Hides the item when it returns false. For commands whose extension is
+	 * optional: the image item is not offered unless an upload adapter is
+	 * configured, because without one the command does not exist. Items
+	 * without it are always shown.
+	 */
+	isAvailable?: (editor: Editor) => boolean;
 	run: (editor: Editor) => void;
 };
 
