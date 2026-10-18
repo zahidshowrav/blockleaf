@@ -9,6 +9,7 @@ import { RenderDocument } from '@blockleaf/renderer/react';
 import { BlockleafLogo } from '@/components/brand/blockleaf-logo';
 import { CopyButton } from '@/components/copy-button';
 import { demoDocument } from '@/components/demo-document';
+import { demoUpload } from '@/components/landing/demo-upload';
 import { JsonPane } from '@/components/landing/json-pane';
 
 const panes = [
@@ -86,6 +87,7 @@ export const DemoPanel = () => {
 								className="min-h-full px-6 py-4 sm:px-8"
 								defaultValue={demoDocument}
 								onChangeImmediate={setDoc}
+								upload={demoUpload}
 							/>
 						</div>
 
