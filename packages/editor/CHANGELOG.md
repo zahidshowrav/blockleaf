@@ -1,5 +1,13 @@
 # @blockleaf/editor
 
+## 0.1.0
+
+### Minor Changes
+
+- c8a31a2: Add an Image item to the slash menu, and an `isAvailable` predicate to `SlashCommand`.
+  
+  `/image` opens the file picker and runs the upload adapter, so uploading no longer requires a drop or a paste. The item hides itself when no `upload` adapter is configured, because the command it calls does not exist without one.
+
 ## 0.0.9
 
 ### Patch Changes
