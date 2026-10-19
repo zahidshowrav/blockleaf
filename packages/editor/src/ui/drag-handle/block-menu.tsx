@@ -193,7 +193,10 @@ export const BlockMenu = ({
 			aria-activedescendant={
 				active ? `blockleaf-block-action-${active.id}` : undefined
 			}
-			tabIndex={-1}
+			// In the tab order, not merely focusable in script: the menu is a
+			// scroll container, and a keyboard user who cannot reach it cannot
+			// scroll it. `aria-activedescendant` still drives what is announced.
+			tabIndex={0}
 			className="blockleaf-block-menu"
 			data-theme={theme ?? undefined}
 			// `useLayoutEffect` sets these before the browser paints, so the
