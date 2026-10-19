@@ -24,9 +24,10 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 next. `@blockleaf/editor@0.1.0` and `@blockleaf/renderer@0.0.1` are live on npm,
 and the docs site is deployed at `blockleaf.dev`.
 
-**Last verified:** 2026-10-18. All gates green on `main`: 326 editor unit tests,
-149 renderer, bundle at 145.1 kB of 160 kB, schema entry at 350 B of 2 kB, code
-block subpath at 79.29 kB of 85 kB.
+**Last verified:** 2026-10-19: 329 editor unit tests, 149 renderer, bundle at
+145.39 kB of 160 kB, schema entry at 350 B of 2 kB, code block subpath at
+79.29 kB of 85 kB. Playwright is 20 of 21 — the upload cancel spec fails under
+parallel load until the placeholder fix lands.
 
 ---
 
