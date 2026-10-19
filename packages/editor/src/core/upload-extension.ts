@@ -183,80 +183,107 @@ const button = (
 	return element;
 };
 
-const renderPlaceholder =
-	(entry: PendingUpload, editor: Editor) => (): HTMLElement => {
-		const element = document.createElement('div');
-		element.className = 'blockleaf-upload';
-		element.dataset.uploadId = entry.id;
-		// Not contenteditable, and not part of the document — a widget the
-		// caret must skip rather than land inside.
-		element.contentEditable = 'false';
+/**
+ * A placeholder's element, together with the means to move its progress bar
+ * without rebuilding it.
+ */
+type PlaceholderHandle = {
+	element: HTMLElement;
+	/** Absent on the error placeholder, which has no progress to move. */
+	update?: (entry: PendingUpload) => void;
+};
 
-		if (entry.error) {
-			element.dataset.state = 'error';
-			// `alert` rather than `status`: a failed upload is the one thing
-			// here a screen reader user must not miss.
-			element.setAttribute('role', 'alert');
+/**
+ * The key a placeholder's widget is reused under.
+ *
+ * It carries the entry's *shape*, not its progress. The error placeholder and
+ * the uploading one are genuinely different elements, but a progress tick is
+ * the same element with a wider bar — so keying on progress would throw that
+ * element away on every tick, taking the Cancel button, and any click already
+ * on its way to it, with it.
+ */
+const placeholderKey = (entry: PendingUpload): string =>
+	`${entry.id}:${entry.error ? 'e' : 'u'}`;
 
-			const message = document.createElement('span');
-			message.className = 'blockleaf-upload__name';
-			message.textContent = entry.error;
-			element.append(
-				message,
-				button(
-					'Retry',
-					() => editor.commands.retryUpload(entry.id),
-					'retry'
-				),
-				button(
-					'Dismiss',
-					() => editor.commands.dismissUpload(entry.id),
-					'dismiss'
-				)
-			);
-			return element;
-		}
+const createPlaceholder = (
+	entry: PendingUpload,
+	editor: Editor
+): PlaceholderHandle => {
+	const element = document.createElement('div');
+	element.className = 'blockleaf-upload';
+	element.dataset.uploadId = entry.id;
+	// Not contenteditable, and not part of the document — a widget the
+	// caret must skip rather than land inside.
+	element.contentEditable = 'false';
 
-		element.dataset.state = 'uploading';
-		element.setAttribute('role', 'status');
-		element.setAttribute('aria-live', 'polite');
+	if (entry.error) {
+		element.dataset.state = 'error';
+		// `alert` rather than `status`: a failed upload is the one thing
+		// here a screen reader user must not miss.
+		element.setAttribute('role', 'alert');
 
-		const name = document.createElement('span');
-		name.className = 'blockleaf-upload__name';
-		name.textContent = `Uploading ${entry.name}…`;
+		const message = document.createElement('span');
+		message.className = 'blockleaf-upload__name';
+		message.textContent = entry.error;
+		element.append(
+			message,
+			button(
+				'Retry',
+				() => editor.commands.retryUpload(entry.id),
+				'retry'
+			),
+			button(
+				'Dismiss',
+				() => editor.commands.dismissUpload(entry.id),
+				'dismiss'
+			)
+		);
+		return { element };
+	}
 
-		const track = document.createElement('div');
-		track.className = 'blockleaf-upload__track';
-		track.setAttribute('role', 'progressbar');
-		track.setAttribute('aria-label', `Uploading ${entry.name}`);
-		track.setAttribute('aria-valuemin', '0');
-		track.setAttribute('aria-valuemax', '100');
+	element.dataset.state = 'uploading';
+	element.setAttribute('role', 'status');
+	element.setAttribute('aria-live', 'polite');
 
-		const bar = document.createElement('div');
-		bar.className = 'blockleaf-upload__bar';
+	const name = document.createElement('span');
+	name.className = 'blockleaf-upload__name';
+	name.textContent = `Uploading ${entry.name}…`;
 
-		if (entry.progress === null) {
+	const track = document.createElement('div');
+	track.className = 'blockleaf-upload__track';
+	track.setAttribute('role', 'progressbar');
+	track.setAttribute('aria-label', `Uploading ${entry.name}`);
+	track.setAttribute('aria-valuemin', '0');
+	track.setAttribute('aria-valuemax', '100');
+
+	const bar = document.createElement('div');
+	bar.className = 'blockleaf-upload__bar';
+
+	const update = (next: PendingUpload): void => {
+		if (next.progress === null) {
 			// An indeterminate progressbar omits `aria-valuenow`. Saying
 			// nothing is correct; saying zero would be a claim.
 			track.dataset.indeterminate = 'true';
-		} else {
-			const percent = Math.round(entry.progress * 100);
-			track.setAttribute('aria-valuenow', String(percent));
-			bar.style.width = `${percent}%`;
+			track.removeAttribute('aria-valuenow');
+			bar.style.width = '';
+			return;
 		}
-
-		track.append(bar);
-		element.append(
-			name,
-			track,
-			button(
-				'Cancel',
-				() => editor.commands.cancelUpload(entry.id),
-				'cancel'
-			)
-		);
-		return element;
+		delete track.dataset.indeterminate;
+		const percent = Math.round(next.progress * 100);
+		track.setAttribute('aria-valuenow', String(percent));
+		bar.style.width = `${percent}%`;
 	};
+
+	update(entry);
+
+	track.append(bar);
+	element.append(
+		name,
+		track,
+		button('Cancel', () => editor.commands.cancelUpload(entry.id), 'cancel')
+	);
+	return { element, update };
+};
 
 const pendingPosition = (editor: Editor, id: string, fallback: number) => {
 	const state = UPLOAD_PLUGIN_KEY.getState(editor.state);
@@ -265,7 +292,10 @@ const pendingPosition = (editor: Editor, id: string, fallback: number) => {
 
 export const UploadExtension = /* @__PURE__ */ Extension.create<
 	UploadExtensionOptions,
-	{ controllers: Map<string, AbortController> }
+	{
+		controllers: Map<string, AbortController>;
+		placeholders: Map<string, PlaceholderHandle>;
+	}
 >({
 	name: UPLOAD_EXTENSION_NAME,
 
@@ -283,7 +313,10 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 	},
 
 	addStorage() {
-		return { controllers: new Map<string, AbortController>() };
+		return {
+			controllers: new Map<string, AbortController>(),
+			placeholders: new Map<string, PlaceholderHandle>()
+		};
 	},
 
 	addCommands() {
@@ -422,7 +455,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 	},
 
 	addProseMirrorPlugins() {
-		const { editor } = this;
+		const { editor, storage } = this;
 
 		return [
 			new Plugin<UploadState>({
@@ -485,27 +518,43 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 
 				props: {
 					decorations(state) {
+						const { placeholders } = storage;
 						const pending =
 							UPLOAD_PLUGIN_KEY.getState(state)?.pending ?? [];
-						if (pending.length === 0) return DecorationSet.empty;
+						if (pending.length === 0) {
+							placeholders.clear();
+							return DecorationSet.empty;
+						}
 
-						return DecorationSet.create(
-							state.doc,
-							pending.map((entry) =>
-								Decoration.widget(
-									entry.pos,
-									renderPlaceholder(entry, editor),
-									{
-										side: -1,
-										// A widget whose key is unchanged is reused
-										// as-is, so the key has to carry what is
-										// rendered or a progress tick never reaches
-										// the DOM.
-										key: `${entry.id}:${entry.error ? 'e' : entry.progress}`
-									}
-								)
-							)
-						);
+						const live = new Set<string>();
+						const widgets = pending.map((entry) => {
+							const key = placeholderKey(entry);
+							live.add(key);
+
+							const existing = placeholders.get(key);
+							// A widget whose key is unchanged is reused as-is and
+							// `toDOM` never runs again, so this is the only place a
+							// progress tick can reach the element.
+							const handle =
+								existing ?? createPlaceholder(entry, editor);
+							if (existing) existing.update?.(entry);
+							else placeholders.set(key, handle);
+
+							return Decoration.widget(
+								entry.pos,
+								() => handle.element,
+								{
+									side: -1,
+									key
+								}
+							);
+						});
+
+						for (const key of placeholders.keys()) {
+							if (!live.has(key)) placeholders.delete(key);
+						}
+
+						return DecorationSet.create(state.doc, widgets);
 					},
 
 					handleDrop(view, event) {
@@ -551,6 +600,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 			controller.abort();
 		}
 		this.storage.controllers.clear();
+		this.storage.placeholders.clear();
 	}
 });
 
