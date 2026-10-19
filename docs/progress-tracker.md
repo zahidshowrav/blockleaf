@@ -20,13 +20,14 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `MC` and `RD` are closed apart from `RD-05` and `RD-06`. `HD` is
-next. `@blockleaf/editor@0.0.9` and `@blockleaf/renderer@0.0.1` are live on npm,
+**Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is
+next. `@blockleaf/editor@0.1.0` and `@blockleaf/renderer@0.0.1` are live on npm,
 and the docs site is deployed at `blockleaf.dev`.
 
-**Last verified:** 2026-10-18. All gates green on `main`: 326 editor unit tests,
-149 renderer, bundle at 145.1 kB of 160 kB, schema entry at 350 B of 2 kB, code
-block subpath at 79.29 kB of 85 kB.
+**Last verified:** 2026-10-19: 329 editor unit tests, 149 renderer, bundle at
+145.39 kB of 160 kB, schema entry at 350 B of 2 kB, code block subpath at
+79.29 kB of 85 kB. Playwright is 20 of 21 — the upload cancel spec fails under
+parallel load until the placeholder fix lands.
 
 ---
 
@@ -163,9 +164,13 @@ breach the no-CSS-framework rule.
 RD-04 ships the site, the live demo and the pages that already existed. It is
 deployed on Vercel and serving `blockleaf.dev`.
 
-`RD-05` is part done: the README now describes the shipped state rather than
-claiming the chrome and the renderer are unbuilt. The demo GIF it also asks
-for is still missing, so the task stays open.
+`RD-05` is done. The README describes the shipped state and now leads with the
+demo GIF: a heading, a paragraph, a bullet list chosen from the slash menu, and
+bold applied from the bubble menu. `scripts/record-demo.ts` records it —
+Playwright drives the sandbox and `gifenc` encodes the frames — so
+`pnpm demo:gif` regenerates the GIF when the chrome changes, rather than
+someone re-recording it by hand. No ffmpeg and no system binary, so it runs
+wherever the test suite does.
 
 A third pass rebuilt the landing page on the brand prototype — a centred hero,
 the editor panel with the real editor beside its stored JSON, the
@@ -205,7 +210,7 @@ per-page contributors and change history, but it requires Node 24.14 and a
 | RD-02 | Component overrides                                                    | Done        | `6d2770d` | 2026-10-13 |
 | RD-03 | HTML-string and plain-text exports                                     | Done        | `a9c4af8` | 2026-10-13 |
 | RD-04 | Fumadocs on Next.js in `apps/docs`, live demo                          | Done        | `ff4045a` | 2026-10-14 |
-| RD-05 | README with a demo GIF                                                 | In progress | —         | —          |
+| RD-05 | README with a demo GIF                                                 | Done        | `dfe0b71` | 2026-10-19 |
 | RD-06 | Dogfood in a real app (§10); target unnamed, F7                        | Not started | —         | —          |
 | RD-07 | Table rendering — real `<table>`/`<thead>`, both React and HTML string | Done        | `b358752` | 2026-10-13 |
 
