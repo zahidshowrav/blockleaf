@@ -163,6 +163,45 @@ describe('upload progress (MC-03)', () => {
 		expect(bar?.hasAttribute('aria-valuenow')).toBe(false);
 		expect(bar?.getAttribute('data-indeterminate')).toBe('true');
 	});
+
+	// The placeholder used to be thrown away and rebuilt on every tick, which
+	// is a race anything mid-click loses — the Cancel button most of all. The
+	// element has to survive a tick; only the bar inside it moves.
+	it('keeps the placeholder element across progress ticks', async () => {
+		const deferred = deferredAdapter();
+		const { editor, container } = mount(deferred.adapter);
+
+		editor.commands.uploadFiles([png()]);
+		const first = placeholder(container);
+		const cancel = container.querySelector('[data-action="cancel"]');
+
+		deferred.report(0.3);
+		await flush();
+		deferred.report(0.7);
+		await flush();
+
+		expect(placeholder(container)).toBe(first);
+		expect(container.querySelector('[data-action="cancel"]')).toBe(cancel);
+		expect(cancel?.isConnected).toBe(true);
+	});
+
+	// Holding the node across the tick is the point: a rebuilt track would
+	// leave this reference detached and still reading indeterminate.
+	it('drops the indeterminate flag in place once a measurement arrives', async () => {
+		const deferred = deferredAdapter();
+		const { editor, container } = mount(deferred.adapter);
+
+		editor.commands.uploadFiles([png()]);
+		const track = container.querySelector('[role="progressbar"]');
+		expect(track?.getAttribute('data-indeterminate')).toBe('true');
+
+		deferred.report(0.25);
+		await flush();
+
+		expect(track?.isConnected).toBe(true);
+		expect(track?.hasAttribute('data-indeterminate')).toBe(false);
+		expect(track?.getAttribute('aria-valuenow')).toBe('25');
+	});
 });
 
 describe('cancelling an upload (MC-03)', () => {
