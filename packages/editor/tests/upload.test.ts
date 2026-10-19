@@ -25,6 +25,16 @@ describe('upload result validation (MC-01)', () => {
 		).toBe(true);
 	});
 
+	it('rejects alt text that is not a string', () => {
+		expect(
+			isUploadResult({
+				id: 'abc',
+				src: 'https://cdn.test/a.png',
+				alt: 42
+			})
+		).toBe(false);
+	});
+
 	it('accepts a richer object than the interface describes', () => {
 		expect(
 			isUploadResult({

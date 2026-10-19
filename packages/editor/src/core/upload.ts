@@ -28,6 +28,15 @@ export interface UploadResult {
 	width?: number;
 	/** Intrinsic height in pixels, if the host knows it. */
 	height?: number;
+	/**
+	 * Alternative text for the image.
+	 *
+	 * A host that already has a description — a CMS field, a caption, a
+	 * vision model — passes it here. Without one the editor falls back to
+	 * the file's own name, which is a poor description but better than an
+	 * image a screen reader can only announce by its URL.
+	 */
+	alt?: string;
 }
 
 /**
@@ -77,6 +86,9 @@ export interface UploadAdapter {
 const isNonEmptyString = (value: unknown): value is string =>
 	typeof value === 'string' && value.trim().length > 0;
 
+const isOptionalString = (value: unknown): boolean =>
+	value === undefined || typeof value === 'string';
+
 const isValidDimension = (value: unknown): boolean =>
 	value === undefined ||
 	(typeof value === 'number' && Number.isFinite(value) && value > 0);
@@ -103,7 +115,8 @@ export const isUploadResult = (value: unknown): value is UploadResult => {
 		isNonEmptyString(candidate.id) &&
 		isNonEmptyString(candidate.src) &&
 		isValidDimension(candidate.width) &&
-		isValidDimension(candidate.height)
+		isValidDimension(candidate.height) &&
+		isOptionalString(candidate.alt)
 	);
 };
 
