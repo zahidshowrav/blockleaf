@@ -242,6 +242,20 @@
 	flex: 1 1 auto;
 }
 
+/*
+ * The item's content lives in a `div` the node view owns, which sits outside
+ * the `> * + *` rule that spaces top-level blocks — so its paragraph keeps the
+ * browser's own `1em` margin and drops the first line below the checkbox it is
+ * meant to sit beside.
+ */
+.blockleaf-editor__content ul[data-type='taskList'] > li > div > :first-child {
+	margin-top: 0;
+}
+
+.blockleaf-editor__content ul[data-type='taskList'] > li > div > :last-child {
+	margin-bottom: 0;
+}
+
 .blockleaf-editor__content .blockleaf-callout {
 	display: flex;
 	position: relative;
