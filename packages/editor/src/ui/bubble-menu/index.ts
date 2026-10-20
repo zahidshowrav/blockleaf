@@ -1,4 +1,8 @@
-export { defaultBubbleActions, resolveBubbleActions } from './actions.js';
+export {
+	createBubbleActions,
+	defaultBubbleActions,
+	resolveBubbleActions
+} from './actions.js';
 export { BubbleMenu } from './bubble-menu.js';
 export {
 	BUBBLE_MENU_PLUGIN_KEY,

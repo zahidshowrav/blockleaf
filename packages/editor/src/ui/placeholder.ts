@@ -3,29 +3,18 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-import { HEADING_LEVELS } from '../core/index.js';
+import {
+	defaultPlaceholderLabels,
+	type PlaceholderLabels
+} from '../core/index.js';
+
+// Re-exported from their old home: the definitions moved to `src/core` when
+// HD-02 gathered every label in one place, and the public surface did not.
+export { defaultPlaceholderLabels, type PlaceholderLabels };
 
 export const PLACEHOLDER_PLUGIN_KEY = /* @__PURE__ */ new PluginKey(
 	'blockleafPlaceholder'
 );
-
-export type PlaceholderLabels = {
-	/** Shown in an empty paragraph. */
-	paragraph?: string;
-	/** Shown in an empty heading, by level. */
-	heading?: (level: number) => string;
-	/** Shown in any other empty block that has no label of its own. */
-	fallback?: string;
-};
-
-export const defaultPlaceholderLabels: Required<PlaceholderLabels> = {
-	paragraph: "Type '/' for commands",
-	heading: (level) =>
-		HEADING_LEVELS.includes(level as (typeof HEADING_LEVELS)[number])
-			? `Heading ${level}`
-			: 'Heading',
-	fallback: ''
-};
 
 export type PlaceholderExtensionOptions = {
 	/** A single string for every empty block, or per-node labels. */

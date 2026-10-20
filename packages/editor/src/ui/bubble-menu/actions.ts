@@ -7,6 +7,7 @@ import {
 	UnderlineIcon
 } from './icons.js';
 import type { BubbleAction } from './types.js';
+import { defaultLabels, type BubbleMenuLabels } from '../../core/labels.js';
 import { whenMarkExists } from '../schema-guard.js';
 
 /**
@@ -14,10 +15,13 @@ import { whenMarkExists } from '../schema-guard.js';
  * `EC` already ships and already tests — see the block split in
  * `docs/progress-tracker.md`.
  */
-export const defaultBubbleActions: BubbleAction[] = [
+/** The default mark actions, built against a label set. */
+export const createBubbleActions = (
+	labels: BubbleMenuLabels = defaultLabels.bubbleMenu
+): BubbleAction[] => [
 	{
 		id: 'bold',
-		title: 'Bold',
+		title: labels.actions['bold'],
 		shortcut: 'Mod+B',
 		icon: BoldIcon,
 		isActive: (editor) => editor.isActive('bold'),
@@ -28,7 +32,7 @@ export const defaultBubbleActions: BubbleAction[] = [
 	},
 	{
 		id: 'italic',
-		title: 'Italic',
+		title: labels.actions['italic'],
 		shortcut: 'Mod+I',
 		icon: ItalicIcon,
 		isActive: (editor) => editor.isActive('italic'),
@@ -39,7 +43,7 @@ export const defaultBubbleActions: BubbleAction[] = [
 	},
 	{
 		id: 'underline',
-		title: 'Underline',
+		title: labels.actions['underline'],
 		shortcut: 'Mod+U',
 		icon: UnderlineIcon,
 		isActive: (editor) => editor.isActive('underline'),
@@ -50,7 +54,7 @@ export const defaultBubbleActions: BubbleAction[] = [
 	},
 	{
 		id: 'strike',
-		title: 'Strikethrough',
+		title: labels.actions['strike'],
 		shortcut: 'Mod+Shift+S',
 		icon: StrikeIcon,
 		isActive: (editor) => editor.isActive('strike'),
@@ -61,7 +65,7 @@ export const defaultBubbleActions: BubbleAction[] = [
 	},
 	{
 		id: 'code',
-		title: 'Inline code',
+		title: labels.actions['code'],
 		shortcut: 'Mod+E',
 		icon: InlineCodeIcon,
 		isActive: (editor) => editor.isActive('code'),
@@ -72,7 +76,7 @@ export const defaultBubbleActions: BubbleAction[] = [
 	},
 	{
 		id: 'highlight',
-		title: 'Highlight',
+		title: labels.actions['highlight'],
 		shortcut: 'Mod+Shift+H',
 		icon: HighlightIcon,
 		isActive: (editor) => editor.isActive('highlight'),
@@ -83,14 +87,18 @@ export const defaultBubbleActions: BubbleAction[] = [
 	}
 ];
 
+export const defaultBubbleActions: BubbleAction[] =
+	/* @__PURE__ */ createBubbleActions();
+
 export const resolveBubbleActions = (
-	actions?: BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[])
+	actions?: BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]),
+	defaults: BubbleAction[] = defaultBubbleActions
 ): BubbleAction[] => {
 	if (typeof actions === 'function') {
-		return actions(defaultBubbleActions);
+		return actions(defaults);
 	}
 	if (Array.isArray(actions)) {
 		return actions;
 	}
-	return defaultBubbleActions;
+	return defaults;
 };

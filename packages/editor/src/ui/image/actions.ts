@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/core';
 
 import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon } from './icons.js';
+import { defaultLabels, type ImageLabels } from '../../core/labels.js';
 import type { BubbleAction } from '../bubble-menu/types.js';
 import { TrashIcon } from '../drag-handle/icons.js';
 
@@ -13,10 +14,13 @@ const alignOf = (editor: Editor): string | null => {
  * Every entry calls a command the image node already ships. The toolbar is
  * affordance, never logic.
  */
-export const defaultImageActions: BubbleAction[] = [
+/** The default image actions, built against a label set. */
+export const createImageActions = (
+	labels: ImageLabels = defaultLabels.image
+): BubbleAction[] => [
 	{
 		id: 'align-left',
-		title: 'Align left',
+		title: labels.actions['align-left'],
 		icon: AlignLeftIcon,
 		// An unset alignment renders flush left, so reporting it as inactive
 		// would make the pressed state disagree with what is on the page.
@@ -28,23 +32,26 @@ export const defaultImageActions: BubbleAction[] = [
 	},
 	{
 		id: 'align-center',
-		title: 'Align centre',
+		title: labels.actions['align-center'],
 		icon: AlignCenterIcon,
 		isActive: (editor) => alignOf(editor) === 'center',
 		run: (editor) => editor.chain().focus().setImageAlign('center').run()
 	},
 	{
 		id: 'align-right',
-		title: 'Align right',
+		title: labels.actions['align-right'],
 		icon: AlignRightIcon,
 		isActive: (editor) => alignOf(editor) === 'right',
 		run: (editor) => editor.chain().focus().setImageAlign('right').run()
 	},
 	{
 		id: 'delete-image',
-		title: 'Delete image',
+		title: labels.actions['delete-image'],
 		icon: TrashIcon,
 		isActive: () => false,
 		run: (editor) => editor.chain().focus().deleteSelection().run()
 	}
 ];
+
+export const defaultImageActions: BubbleAction[] =
+	/* @__PURE__ */ createImageActions();

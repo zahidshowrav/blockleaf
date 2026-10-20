@@ -1,4 +1,4 @@
-export { defaultImageActions } from './actions.js';
+export { createImageActions, defaultImageActions } from './actions.js';
 export { AltEditor } from './alt-editor.js';
 export {
 	AlignCenterIcon,

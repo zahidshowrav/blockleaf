@@ -4,11 +4,13 @@ import { useCallback, useState } from 'react';
 import type { TablePlacement } from './plugin.js';
 import { TableMenu } from './table-menu.js';
 import type { TableAction, TableAxis } from './types.js';
+import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 import { GripIcon } from '../drag-handle/icons.js';
 
 export type TableControlsComponentProps = {
 	editor: Editor;
 	actions: TableAction[];
+	labels?: ResolvedLabels;
 	/** `null` when the selection is not inside a table. */
 	placement: TablePlacement | null;
 	/** Told when a menu opens, so the handles stop tracking the selection. */
@@ -28,6 +30,7 @@ const HANDLE_THICKNESS = 14;
 export const TableControls = ({
 	editor,
 	actions,
+	labels = defaultLabels,
 	placement,
 	onLockChange,
 	openRequest = 0,
@@ -70,10 +73,10 @@ export const TableControls = ({
 				type="button"
 				className="blockleaf-table-controls__handle"
 				data-axis="column"
-				aria-label="Column actions"
+				aria-label={labels.table.columnActions}
 				aria-haspopup="menu"
 				aria-expanded={openAxis === 'column'}
-				title="Column actions"
+				title={labels.table.columnActions}
 				style={{
 					left: `${placement.columnLeft}px`,
 					top: `${placement.tableTop - HANDLE_THICKNESS - 2}px`,
@@ -95,10 +98,10 @@ export const TableControls = ({
 				type="button"
 				className="blockleaf-table-controls__handle"
 				data-axis="row"
-				aria-label="Row actions"
+				aria-label={labels.table.rowActions}
 				aria-haspopup="menu"
 				aria-expanded={openAxis === 'row'}
-				title="Row actions"
+				title={labels.table.rowActions}
 				style={{
 					top: `${placement.rowTop}px`,
 					left: `${placement.tableLeft - HANDLE_THICKNESS - 2}px`,
@@ -132,6 +135,7 @@ export const TableControls = ({
 					<TableMenu
 						editor={editor}
 						actions={actions}
+						labels={labels}
 						axis={openAxis}
 						onClose={close}
 					/>

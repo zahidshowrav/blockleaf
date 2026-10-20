@@ -4,6 +4,8 @@ import {
 	type NodeViewProps
 } from '@tiptap/react';
 
+import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
+
 const PLAIN = '';
 
 /**
@@ -19,7 +21,10 @@ export const CodeBlockView = ({
 	updateAttributes,
 	editor
 }: NodeViewProps) => {
-	const { languageNames } = extension.options as { languageNames?: string[] };
+	const { languageNames, labels = defaultLabels } = extension.options as {
+		languageNames?: string[];
+		labels?: ResolvedLabels;
+	};
 	const languages = languageNames ?? [];
 	const current =
 		typeof node.attrs.language === 'string' ? node.attrs.language : PLAIN;
@@ -28,7 +33,7 @@ export const CodeBlockView = ({
 		<NodeViewWrapper className="blockleaf-code-block-wrapper">
 			<select
 				className="blockleaf-code-block__language"
-				aria-label="Code language"
+				aria-label={labels.codeBlock.language}
 				value={current}
 				disabled={!editor.isEditable}
 				// The select is chrome around the node, not part of it. Without
@@ -44,7 +49,7 @@ export const CodeBlockView = ({
 					});
 				}}
 			>
-				<option value={PLAIN}>Plain text</option>
+				<option value={PLAIN}>{labels.codeBlock.plainText}</option>
 				{languages.map((language) => (
 					<option
 						key={language}

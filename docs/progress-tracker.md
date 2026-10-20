@@ -21,12 +21,12 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
-`HD-01` is done. `@blockleaf/editor@0.1.1` and `@blockleaf/renderer@0.0.1` are
+`HD-01`, `HD-02` and `HD-04` are done. `@blockleaf/editor@0.1.1` and `@blockleaf/renderer@0.0.1` are
 live on npm, and the docs site is deployed at `blockleaf.dev`.
 
-**Last verified:** 2026-10-20: 335 editor unit tests, 149 renderer, 29
-Playwright. Bundle at 145.5 kB of 160 kB, schema entry at 350 B of 2 kB, code
-block subpath at 79.29 kB of 85 kB.
+**Last verified:** 2026-10-20: 344 editor unit tests, 149 renderer, 42
+Playwright across two projects — 34 on desktop Chrome, 8 on an emulated Pixel 7. Bundle at 146.71 kB of 160 kB, schema entry at 136 B of 2 kB, code block
+subpath at 80.37 kB of 85 kB.
 
 ---
 
@@ -228,6 +228,29 @@ only in script, so its items below the fold could not be reached. Alt text now
 comes from the upload adapter when it supplies one and from the file name
 otherwise.
 
+`HD-02` put every string the chrome renders into one typed label set on
+`BlockleafEditor`, grouped by surface and merged a level at a time, so
+overriding one group heading does not mean restating the others. `blockTypes`
+names each block once — the slash menu's items and the block menu's "Turn
+into" group both read it, so the two cannot drift apart. Each default registry
+became a function of a label set, with the old `default*` arrays kept as those
+functions called with English. A misspelled key is a compile error, which is
+the whole reason the set is shaped rather than a flat key space.
+
+`HD-04` found the editor's worst mobile defect by running the suite against
+an emulated phone: the drag handle only ever appeared on `mousemove`, which a
+touch device never fires, so every block action — turn into, move, duplicate,
+delete — was unreachable. On a coarse pointer the handle now follows the caret
+instead. A touch press on it also had to stop blurring the editor, which was
+unmounting the handle under the finger before the click landed; mouse presses
+are left alone, because preventing their default would stop `dragstart` too.
+Targets grow to 44px under `@media (pointer: coarse)`.
+
+A second Playwright project runs `e2e/touch.spec.ts` on a Pixel 7, because a
+phone is not a narrow desktop. Still open there and belonging to `HD-08`: a
+table wider than the screen, and the layout shift when the virtual keyboard
+opens over a toolbar near the bottom of the viewport.
+
 One finding is deliberately left: a brand-new table's `th` cells are empty
 until somebody types in them, which axe reports as minor. The header
 semantics that answer it are `HD-07`, so the table scan fills its headers
@@ -236,9 +259,9 @@ first and says why.
 | Id    | Task                                                            | Status      | Commit    | Completed  |
 | ----- | --------------------------------------------------------------- | ----------- | --------- | ---------- |
 | HD-01 | Full accessibility pass                                         | Done        | `61d82a8` | 2026-10-20 |
-| HD-02 | i18n via `labels`                                               | Not started | —         | —          |
+| HD-02 | i18n via `labels`                                               | Done        | `52aa00f` | 2026-10-20 |
 | HD-03 | Theming docs for the `--bl-*` custom properties                 | Done        | `f7108af` | 2026-10-14 |
-| HD-04 | Mobile and touch behaviour                                      | Not started | —         | —          |
+| HD-04 | Mobile and touch behaviour                                      | Done        | `fe25a20` | 2026-10-20 |
 | HD-05 | Large-document performance — 10k+ blocks, virtualise if needed  | Not started | —         | —          |
 | HD-06 | `examples/vite-spa`                                             | Not started | —         | —          |
 | HD-07 | Table a11y — header `scope`, caption, announced cell position   | Not started | —         | —          |

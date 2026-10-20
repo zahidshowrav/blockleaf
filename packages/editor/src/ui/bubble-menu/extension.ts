@@ -2,13 +2,14 @@ import { Extension } from '@tiptap/core';
 import { BubbleMenuPlugin } from '@tiptap/extension-bubble-menu';
 import { ReactRenderer } from '@tiptap/react';
 
-import { resolveBubbleActions } from './actions.js';
+import { createBubbleActions, resolveBubbleActions } from './actions.js';
 import { BubbleMenu } from './bubble-menu.js';
 import type {
 	BubbleMenuOptions,
 	BubbleMenuProps,
 	BubbleMenuShouldShow
 } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 export const BUBBLE_MENU_PLUGIN_KEY = 'blockleafBubbleMenu';
 
@@ -54,6 +55,7 @@ export const BubbleMenuExtension =
 		addOptions() {
 			return {
 				actions: undefined,
+				labels: undefined,
 				link: true,
 				panel: undefined,
 				label: undefined,
@@ -97,7 +99,11 @@ export const BubbleMenuExtension =
 
 		addProseMirrorPlugins() {
 			const storage = this.storage as BubbleMenuStorage;
-			const actions = resolveBubbleActions(this.options.actions);
+			const labels = this.options.labels ?? defaultLabels;
+			const actions = resolveBubbleActions(
+				this.options.actions,
+				createBubbleActions(labels.bubbleMenu)
+			);
 			const link = this.options.link !== false;
 
 			const renderer = new ReactRenderer<unknown, BubbleMenuProps>(
@@ -107,6 +113,7 @@ export const BubbleMenuExtension =
 					props: {
 						editor: this.editor,
 						actions,
+						labels,
 						link,
 						panel: this.options.panel,
 						label: this.options.label,

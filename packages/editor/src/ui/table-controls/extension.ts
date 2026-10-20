@@ -1,13 +1,14 @@
 import { Extension } from '@tiptap/core';
 import { ReactRenderer } from '@tiptap/react';
 
-import { resolveTableActions } from './actions.js';
+import { createTableActions, resolveTableActions } from './actions.js';
 import { createTableControlsPlugin } from './plugin.js';
 import {
 	TableControls,
 	type TableControlsComponentProps
 } from './table-controls.js';
 import type { TableControlsOptions } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 type TableControlsStorage = {
 	renderer: ReactRenderer<unknown, TableControlsComponentProps> | null;
@@ -20,7 +21,7 @@ export const TableControlsExtension =
 		name: 'tableControls',
 
 		addOptions() {
-			return { actions: undefined };
+			return { actions: undefined, labels: undefined };
 		},
 
 		addStorage(): TableControlsStorage {
@@ -57,7 +58,11 @@ export const TableControlsExtension =
 
 		addProseMirrorPlugins() {
 			const storage = this.storage as TableControlsStorage;
-			const actions = resolveTableActions(this.options.actions);
+			const labels = this.options.labels ?? defaultLabels;
+			const actions = resolveTableActions(
+				this.options.actions,
+				createTableActions(labels.table)
+			);
 
 			const renderer = new ReactRenderer<
 				unknown,
@@ -67,6 +72,7 @@ export const TableControlsExtension =
 				props: {
 					editor: this.editor,
 					actions,
+					labels,
 					placement: null,
 					openRequest: 0,
 					openAxis: 'row',

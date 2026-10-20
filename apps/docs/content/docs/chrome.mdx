@@ -552,3 +552,37 @@ Class names are stable and BEM-flavoured — `.blockleaf-bubble-menu`,
 `.blockleaf-bubble-menu__button`, `.blockleaf-slash-menu__item`,
 `.blockleaf-block-handle__button`, `.blockleaf-block-menu__item` — so a
 stylesheet of your own can target them without `!important`.
+
+## On a phone
+
+A touch device never fires `mousemove`. A drag handle that appears on hover is
+therefore a handle that never appears, and with it goes every block action —
+turn into, move, duplicate, delete — on a phone.
+
+So on a coarse pointer the handle **follows the caret** instead of the
+pointer. Tap into a block and it appears beside that block; tap its grip and
+the block menu opens. Nothing changes for a mouse, and the pointer is watched
+rather than decided once, so a laptop with a touchscreen behaves as whichever
+the reader last used.
+
+<Callout title="Give the content a gutter">
+	The handle sits in the padding to the left of the content, which is
+	`--bl-content-padding` and is `0` by default. With no gutter it is clamped
+	to the editor's edge and overlaps the first characters — survivable while it
+	only appears on hover, permanent once it follows the caret. Set
+	`--bl-content-padding` to something like `0 0 0 2.5rem` on a touch layout;
+	see [styling](/docs/styling).
+</Callout>
+
+**Reordering without a drag.** Dragging needs a pointer. The block menu's
+_Move up_ and _Move down_ do the same job with a thumb, which is why they are
+in the default action set rather than left to the drag.
+
+**Target sizes.** WCAG 2.5.8 asks for 24×24 CSS px and the compact chrome
+already clears it, but 24px is a floor, not a thumb. Under
+`@media (pointer: coarse)` the handle, the bubble menu's buttons and the menu
+rows grow to 44px. A mouse keeps the compact chrome — neither pointer pays for
+the other.
+
+Not addressed yet: a table wider than the screen, and the layout shift when
+the virtual keyboard opens over a toolbar near the bottom of the viewport.

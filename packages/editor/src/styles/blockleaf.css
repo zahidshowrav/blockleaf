@@ -1152,3 +1152,44 @@
 .blockleaf-table-menu__item[data-danger] .blockleaf-table-menu__icon {
 	color: inherit;
 }
+
+/*
+ * Touch
+ *
+ * WCAG 2.5.8 asks for 24×24 CSS px and the compact chrome already clears it,
+ * but 24px is the floor, not what a thumb wants. 44px is, and it is only paid
+ * for where there is a thumb — a mouse keeps the chrome it had.
+ *
+ * The handle itself is grown rather than shown differently: on a coarse
+ * pointer it follows the caret instead of the pointer, so it is on screen
+ * whenever the editor has focus and never waits to be hovered.
+ */
+@media (pointer: coarse) {
+	.blockleaf-block-handle__button {
+		width: 44px;
+		height: 44px;
+		opacity: 1;
+	}
+
+	.blockleaf-bubble-menu__button {
+		width: 44px;
+		height: 44px;
+	}
+
+	.blockleaf-slash-menu__item,
+	.blockleaf-block-menu__item,
+	.blockleaf-table-menu__item {
+		padding-top: 11px;
+		padding-bottom: 11px;
+	}
+
+	.blockleaf-upload__action {
+		padding: 10px 14px;
+	}
+
+	.blockleaf-table-controls__handle {
+		min-width: 24px;
+		min-height: 24px;
+		opacity: 1;
+	}
+}

@@ -6,6 +6,7 @@ import {
 	type FormEvent
 } from 'react';
 
+import { defaultLabels } from '../../core/labels.js';
 import { CheckIcon } from '../bubble-menu/icons.js';
 import type { BubbleMenuPanelProps } from '../bubble-menu/types.js';
 
@@ -16,7 +17,11 @@ import type { BubbleMenuPanelProps } from '../bubble-menu/types.js';
  * string, which is how HTML marks an image decorative so a screen reader
  * skips it. That is a real answer, and the only way to give it deliberately.
  */
-export const AltEditor = ({ editor, onClose }: BubbleMenuPanelProps) => {
+export const AltEditor = ({
+	editor,
+	labels = defaultLabels,
+	onClose
+}: BubbleMenuPanelProps) => {
 	const existing = editor.getAttributes('image').alt;
 	const [value, setValue] = useState(
 		typeof existing === 'string' ? existing : ''
@@ -56,8 +61,8 @@ export const AltEditor = ({ editor, onClose }: BubbleMenuPanelProps) => {
 				ref={inputRef}
 				type="text"
 				className="blockleaf-bubble-menu__panel-input"
-				placeholder="Describe this image"
-				aria-label="Alt text"
+				placeholder={labels.image.altPlaceholder}
+				aria-label={labels.image.altText}
 				aria-describedby="blockleaf-alt-hint"
 				value={value}
 				onChange={(event) => setValue(event.target.value)}
@@ -66,8 +71,8 @@ export const AltEditor = ({ editor, onClose }: BubbleMenuPanelProps) => {
 			<button
 				type="submit"
 				className="blockleaf-bubble-menu__button"
-				title="Apply alt text"
-				aria-label="Apply alt text"
+				title={labels.image.applyAlt}
+				aria-label={labels.image.applyAlt}
 			>
 				<CheckIcon aria-hidden="true" />
 			</button>

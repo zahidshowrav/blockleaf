@@ -14,6 +14,25 @@ export {
 	presets,
 	type PresetName
 } from './extensions.js';
+export {
+	defaultLabels,
+	defaultPlaceholderLabels,
+	resolveLabels,
+	type BlockMenuLabels,
+	type BlockTypeId,
+	type BlockTypeLabels,
+	type BlockleafLabels,
+	type BubbleMenuLabels,
+	type CodeBlockLabels,
+	type ImageLabels,
+	type LinkLabels,
+	type PlaceholderLabels,
+	type ResolvedLabels,
+	type SlashMenuLabels,
+	type TableActionId,
+	type TableLabels,
+	type UploadLabels
+} from './labels.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {

@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/core';
 import type { ComponentType, ReactNode } from 'react';
 
+import { type ResolvedLabels } from '../../core/labels.js';
 import type { IconProps } from '../slash-menu/icons.js';
 
 export type TableAxis = 'row' | 'column';
@@ -25,6 +26,8 @@ export type TableAction = {
 };
 
 export type TableControlsOptions = {
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 	/** Custom table actions, or a function receiving the defaults. */
 	actions?: TableAction[] | ((defaults: TableAction[]) => TableAction[]);
 };
@@ -42,6 +45,7 @@ export type TableHandleGeometry = {
 
 export type TableControlsProps = {
 	editor: Editor;
+	labels?: ResolvedLabels;
 	actions: TableAction[];
 	/** `null` when the selection is not inside a table. */
 	geometry: TableHandleGeometry | null;
@@ -52,6 +56,7 @@ export type TableControlsProps = {
 
 export type TableMenuProps = {
 	editor: Editor;
+	labels?: ResolvedLabels;
 	actions: TableAction[];
 	axis: TableAxis;
 	onClose: () => void;

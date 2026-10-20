@@ -1,4 +1,8 @@
-export { defaultBlockActions, resolveBlockActions } from './actions.js';
+export {
+	createBlockActions,
+	defaultBlockActions,
+	resolveBlockActions
+} from './actions.js';
 export { BlockHandle, type BlockHandleComponentProps } from './block-handle.js';
 export { BlockMenu } from './block-menu.js';
 export {

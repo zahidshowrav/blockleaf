@@ -6,6 +6,7 @@ import {
 } from 'react';
 
 import type { SlashMenuRef, SlashPickerProps } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 export const MAX_TABLE_ROWS = 8;
 export const MAX_TABLE_COLS = 8;
@@ -21,7 +22,10 @@ const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
 export const GridPicker = /* @__PURE__ */ forwardRef<
 	SlashMenuRef,
 	SlashPickerProps
->(function GridPicker({ editor, range: commandRange, onCancel }, ref) {
+>(function GridPicker(
+	{ editor, range: commandRange, onCancel, labels = defaultLabels },
+	ref
+) {
 	const [rows, setRows] = useState(3);
 	const [cols, setCols] = useState(3);
 
@@ -77,13 +81,13 @@ export const GridPicker = /* @__PURE__ */ forwardRef<
 		onKeyDown: ({ event }) => handleKey(event.key)
 	}));
 
-	const label = `Insert a ${rows} by ${cols} table`;
+	const label = labels.slashMenu.tableSizeSummary(rows, cols);
 
 	return (
 		<div
 			className="blockleaf-grid-picker"
 			role="application"
-			aria-label="Table size"
+			aria-label={labels.slashMenu.tableSize}
 			onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
 				if (handleKey(event.key)) {
 					event.preventDefault();
@@ -108,7 +112,10 @@ export const GridPicker = /* @__PURE__ */ forwardRef<
 								data-row={row}
 								data-col={col}
 								data-selected={row <= rows && col <= cols}
-								aria-label={`${row} by ${col}`}
+								aria-label={labels.slashMenu.tableSizeCell(
+									row,
+									col
+								)}
 								className="blockleaf-grid-picker__cell"
 								onMouseEnter={() => {
 									setRows(row);
