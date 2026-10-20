@@ -111,6 +111,48 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} table`)).toEqual([]);
 	});
 
+	// The renderer has always emitted `scope`; the editor did not, so the same
+	// document announced one way while it was edited and another once it was
+	// published. Both now decide it the same way.
+	test("a table's header cells carry scope", async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('||| ');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+
+		await expect(page.locator(`${EDITOR} th`).first()).toHaveAttribute(
+			'scope',
+			'col'
+		);
+	});
+
+	// A scroll container nobody can focus is one nobody without a pointer can
+	// scroll. prosemirror-tables owns the wrapper, so this is set on the DOM.
+	test('a table sits in a reachable scroll region', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('||| ');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+
+		const wrapper = page.locator(`${EDITOR} .tableWrapper`);
+		await expect(wrapper).toHaveAttribute('tabindex', '0');
+		await expect(wrapper).toHaveAttribute('role', 'region');
+		await expect(wrapper).toHaveAttribute(
+			'aria-label',
+			'Table, scrollable'
+		);
+
+		// `empty-table-header` is excepted, and only it. A header cell in a
+		// table nobody has typed in yet is genuinely empty, and the editor
+		// cannot invent its text. It carries an `aria-label` instead, which a
+		// screen reader announces — axe's rule checks visible text only, so it
+		// reports a cell that is in fact named. See table-a11y.test.ts.
+		const results = await new AxeBuilder({ page })
+			.include(`${EDITOR} .tableWrapper`)
+			.disableRules(['empty-table-header'])
+			.analyze();
+
+		expect(results.violations).toEqual([]);
+	});
+
 	test('the row menu has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');
