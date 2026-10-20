@@ -1,5 +1,26 @@
 # @blockleaf/editor
 
+## 0.3.0
+
+### Minor Changes
+
+- 27fffcc: Translate the chrome through a single `labels` prop.
+  
+  Every string the editor and its default menus render now comes from one typed label set, grouped by surface — `blockTypes`, `slashMenu`, `bubbleMenu`, `blockMenu`, `table`, `image`, `link`, `upload`, `codeBlock` and `placeholder`. Anything a host leaves out keeps its English default at every level, so a partial translation is a valid one, and a misspelled key is a compile error rather than a silently English menu item.
+  
+  `blockTypes` names each block once: the slash menu's items and the block menu's "Turn into" group both read from it, so the two cannot drift apart.
+  
+  Each default registry is now a function of a label set — `createSlashCommands`, `createBubbleActions`, `createBlockActions`, `createTableActions`, `createCellActions`, `createImageActions` — and the `default*` arrays are those functions called with the English defaults, unchanged. `resolveBubbleActions`, `resolveBlockActions` and `resolveTableActions` take an optional second argument for the defaults an override builds on.
+  
+  `PlaceholderLabels` and `defaultPlaceholderLabels` now live in `src/core` with the rest; they are still exported from the same places.
+- 1605175: Make the block menu reachable on a phone.
+  
+  A touch device never fires `mousemove`, so a drag handle that appears on hover never appears at all — and every block action went with it. On a coarse pointer the handle now follows the caret instead of the pointer: tap into a block and it is beside that block, tap its grip and the menu opens. The pointer is watched rather than read once, so a laptop with a touchscreen behaves as whichever the reader last used, and a mouse is unaffected.
+  
+  A touch press on the handle no longer blurs the editor. It used to take the caret away before the click landed, which unmounted the handle under the finger and sent the tap to the page behind it. Mouse presses are untouched, because preventing their default would also stop `dragstart`.
+  
+  Under `@media (pointer: coarse)` the handle, the bubble menu's buttons and the slash, block and table menu rows grow to 44px. WCAG 2.5.8's 24px was already met; 24px is a floor, not a thumb.
+
 ## 0.2.0
 
 ### Minor Changes

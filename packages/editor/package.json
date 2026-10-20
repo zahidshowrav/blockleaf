@@ -1,6 +1,6 @@
 {
 	"name": "@blockleaf/editor",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "A Notion-style block editor on Tiptap. Headless-first, no CSS framework, versioned JSON out.",
 	"license": "MIT",
 	"homepage": "https://blockleaf.dev",
