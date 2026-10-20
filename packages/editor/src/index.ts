@@ -12,6 +12,8 @@ export {
 	TrailingNodeOnLoad,
 	createEmptyDocument,
 	createUploadExtension,
+	defaultLabels,
+	resolveLabels,
 	isAbortError,
 	isAcceptedType,
 	isBlockleafDocument,
@@ -61,7 +63,20 @@ export {
 	type UploadScreening,
 	type UploadState,
 	type UploadContext,
-	type UploadResult
+	type UploadResult,
+	type BlockMenuLabels,
+	type BlockTypeId,
+	type BlockTypeLabels,
+	type BlockleafLabels,
+	type BubbleMenuLabels,
+	type CodeBlockLabels,
+	type ImageLabels,
+	type LinkLabels,
+	type ResolvedLabels,
+	type SlashMenuLabels,
+	type TableActionId,
+	type TableLabels,
+	type UploadLabels
 } from './core/index.js';
 export {
 	useBlockleafEditor,
