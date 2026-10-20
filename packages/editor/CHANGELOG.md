@@ -1,5 +1,19 @@
 # @blockleaf/editor
 
+## 0.2.0
+
+### Minor Changes
+
+- e2a4dd6: Never insert an uploaded image without alt text.
+  
+  An image with no `alt` is the one critical accessibility failure an editor can hand a screen reader, which falls back to announcing the URL. `UploadResult` now takes an optional `alt`, and an upload that does not supply one gets the file's own name with the extension dropped and `-`/`_` turned into spaces — `red-balloon_02.png` becomes `red balloon 02`. An empty string is kept as given, because that marks the image decorative and is a different statement from having no description.
+
+### Patch Changes
+
+- da5329e: Put the block menu in the tab order.
+  
+  The menu is a scroll container that was only focusable in script, so a keyboard user could reach its items through the menu's own arrow handling but had no way to scroll to the ones below the fold. It is now tabbable; `aria-activedescendant` still drives what is announced.
+
 ## 0.1.2
 
 ### Patch Changes
