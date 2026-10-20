@@ -146,6 +146,54 @@ describe('uploading through the adapter (MC-02)', () => {
 		expect(images(editor)[0]?.width).toBe(1200);
 	});
 
+	// A missing `alt` is the one critical axe finding an uploaded image can
+	// carry: a screen reader falls back to announcing the URL.
+	it('falls back to the file name for alt text', async () => {
+		const adapter: UploadAdapter = {
+			upload: async () => ({ id: 'a', src: 'https://cdn.test/a.png' })
+		};
+		const editor = createEditor(adapter);
+
+		editor.commands.uploadFiles([png('red-balloon_02.png')]);
+		await flush();
+
+		expect(images(editor)[0]?.alt).toBe('red balloon 02');
+	});
+
+	it('prefers alt text the adapter supplies', async () => {
+		const adapter: UploadAdapter = {
+			upload: async () => ({
+				id: 'a',
+				src: 'https://cdn.test/a.png',
+				alt: 'A red balloon over a field'
+			})
+		};
+		const editor = createEditor(adapter);
+
+		editor.commands.uploadFiles([png('DSC_0001.png')]);
+		await flush();
+
+		expect(images(editor)[0]?.alt).toBe('A red balloon over a field');
+	});
+
+	// An empty alt is not a missing one — it marks the image decorative, and
+	// the file name would talk over that.
+	it('keeps an empty alt the adapter supplies', async () => {
+		const adapter: UploadAdapter = {
+			upload: async () => ({
+				id: 'a',
+				src: 'https://cdn.test/a.png',
+				alt: ''
+			})
+		};
+		const editor = createEditor(adapter);
+
+		editor.commands.uploadFiles([png('divider.png')]);
+		await flush();
+
+		expect(images(editor)[0]?.alt).toBe('');
+	});
+
 	it('shows a placeholder while in flight and clears it after', async () => {
 		let release: ((result: UploadResult) => void) | undefined;
 		const adapter: UploadAdapter = {

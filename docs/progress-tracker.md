@@ -20,14 +20,13 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is
-next. `@blockleaf/editor@0.1.0` and `@blockleaf/renderer@0.0.1` are live on npm,
-and the docs site is deployed at `blockleaf.dev`.
+**Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
+`HD-01` is done. `@blockleaf/editor@0.1.1` and `@blockleaf/renderer@0.0.1` are
+live on npm, and the docs site is deployed at `blockleaf.dev`.
 
-**Last verified:** 2026-10-19: 329 editor unit tests, 149 renderer, bundle at
-145.39 kB of 160 kB, schema entry at 350 B of 2 kB, code block subpath at
-79.29 kB of 85 kB. Playwright is 20 of 21 — the upload cancel spec fails under
-parallel load until the placeholder fix lands.
+**Last verified:** 2026-10-20: 335 editor unit tests, 149 renderer, 29
+Playwright. Bundle at 145.5 kB of 160 kB, schema entry at 350 B of 2 kB, code
+block subpath at 79.29 kB of 85 kB.
 
 ---
 
@@ -219,9 +218,24 @@ per-page contributors and change history, but it requires Node 24.14 and a
 **Exit:** a 500-page document stays responsive; the editor is fully usable on a
 phone.
 
+`HD-01` widened the browser a11y suite from four surfaces to twelve — the
+block menu, drag handle, table and its controls, row menu, callout, link
+editor, upload placeholder and image joined the editor at rest, the slash
+menu, the bubble menu and the grid picker. Two real findings came out of it
+and are fixed: an uploaded image carried no `alt`, which makes a screen reader
+announce the URL instead, and the block menu was a scroll container focusable
+only in script, so its items below the fold could not be reached. Alt text now
+comes from the upload adapter when it supplies one and from the file name
+otherwise.
+
+One finding is deliberately left: a brand-new table's `th` cells are empty
+until somebody types in them, which axe reports as minor. The header
+semantics that answer it are `HD-07`, so the table scan fills its headers
+first and says why.
+
 | Id    | Task                                                            | Status      | Commit    | Completed  |
 | ----- | --------------------------------------------------------------- | ----------- | --------- | ---------- |
-| HD-01 | Full accessibility pass                                         | Not started | —         | —          |
+| HD-01 | Full accessibility pass                                         | Done        | `61d82a8` | 2026-10-20 |
 | HD-02 | i18n via `labels`                                               | Not started | —         | —          |
 | HD-03 | Theming docs for the `--bl-*` custom properties                 | Done        | `f7108af` | 2026-10-14 |
 | HD-04 | Mobile and touch behaviour                                      | Not started | —         | —          |

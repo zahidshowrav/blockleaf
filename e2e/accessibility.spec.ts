@@ -1,74 +1,161 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+import { EDITOR, dropFile } from './helpers.js';
 
 /**
- * The browser half of CH-05.
+ * The browser half of CH-05, widened by HD-01 to every surface the chrome
+ * puts on screen.
  *
  * The unit suite runs axe over each surface in jsdom, which has no layout —
  * so colour contrast, focus visibility and anything that depends on where an
  * element actually ends up can only be checked here.
  */
 
-const EDITOR = '.tiptap.ProseMirror';
+const violations = async (page: Page, selector: string) =>
+	(await new AxeBuilder({ page }).include(selector).analyze()).violations;
+
+const openEditor = async (page: Page) => {
+	await page.goto('/');
+	await page.locator(EDITOR).click();
+};
 
 test.describe('Chrome accessibility in a real browser', () => {
 	test('the editor at rest has no violations', async ({ page }) => {
-		await page.goto('/');
-		await page.locator(EDITOR).click();
+		await openEditor(page);
 
-		const results = await new AxeBuilder({ page })
-			.include('.blockleaf-editor')
-			.analyze();
-
-		expect(results.violations).toEqual([]);
+		expect(await violations(page, '.blockleaf-editor')).toEqual([]);
 	});
 
 	test('the slash menu has no violations, contrast included', async ({
 		page
 	}) => {
-		await page.goto('/');
-		await page.locator(EDITOR).click();
+		await openEditor(page);
 		await page.keyboard.type('/');
-
 		await expect(page.locator('.blockleaf-slash-menu')).toBeVisible();
 
-		const results = await new AxeBuilder({ page })
-			.include('.blockleaf-slash-menu')
-			.analyze();
-
-		expect(results.violations).toEqual([]);
+		expect(await violations(page, '.blockleaf-slash-menu')).toEqual([]);
 	});
 
 	test('the bubble menu has no violations, contrast included', async ({
 		page
 	}) => {
-		await page.goto('/');
-		await page.locator(EDITOR).click();
+		await openEditor(page);
 		await page.keyboard.type('Some text to format');
 		await page.keyboard.press('Shift+Home');
-
 		await expect(page.locator('.blockleaf-bubble-menu')).toBeVisible();
 
-		const results = await new AxeBuilder({ page })
-			.include('.blockleaf-bubble-menu')
-			.analyze();
+		expect(await violations(page, '.blockleaf-bubble-menu')).toEqual([]);
+	});
 
-		expect(results.violations).toEqual([]);
+	test('the link editor has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('Link this text');
+		await page.keyboard.press('Shift+Home');
+		await expect(page.locator('.blockleaf-bubble-menu')).toBeVisible();
+		await page.keyboard.press('Control+k');
+		await expect(page.getByLabel('Link address')).toBeFocused();
+
+		expect(await violations(page, '.blockleaf-bubble-menu')).toEqual([]);
 	});
 
 	test('the table grid picker has no violations', async ({ page }) => {
-		await page.goto('/');
-		await page.locator(EDITOR).click();
+		await openEditor(page);
 		await page.keyboard.type('/table');
 		await page.keyboard.press('Enter');
-
 		await expect(page.locator('.blockleaf-grid-picker')).toBeVisible();
 
-		const results = await new AxeBuilder({ page })
-			.include('.blockleaf-grid-picker')
-			.analyze();
+		expect(await violations(page, '.blockleaf-grid-picker')).toEqual([]);
+	});
 
-		expect(results.violations).toEqual([]);
+	// The menu is a scroll container, so axe wants it reachable by keyboard
+	// rather than merely focusable in script — otherwise a keyboard user can
+	// reach the items but never scroll to the ones below the fold.
+	test('the block menu has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('A block to act on');
+		await page.keyboard.press('Shift+F10');
+		await expect(
+			page.getByRole('menu', { name: 'Block actions' })
+		).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-block-menu')).toEqual([]);
+	});
+
+	test('the drag handle has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('Hover me');
+		await page.locator(`${EDITOR} p`).first().hover();
+		await expect(page.locator('.blockleaf-block-handle')).toBeVisible();
+
+		expect(
+			await violations(page, '.blockleaf-block-handle-anchor')
+		).toEqual([]);
+	});
+
+	test('the table and its controls have no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('||| ');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+
+		// The header cells are filled first on purpose. An empty `th` is a real
+		// axe finding, but it is also a brand-new table's honest state, and the
+		// header semantics that answer it belong to HD-07.
+		await page.keyboard.type('Name');
+		await page.keyboard.press('Tab');
+		await page.keyboard.type('Role');
+		await page.keyboard.press('Tab');
+		await page.keyboard.type('Since');
+
+		expect(await violations(page, '.blockleaf-table-controls')).toEqual([]);
+		expect(await violations(page, `${EDITOR} table`)).toEqual([]);
+	});
+
+	test('the row menu has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('||| ');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+		await page.keyboard.press('Control+Alt+r');
+		await expect(
+			page.getByRole('menu', { name: 'Row actions' })
+		).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-table-menu')).toEqual([]);
+	});
+
+	test('the callout has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('/callout');
+		await page.keyboard.press('Enter');
+		await page.keyboard.type('Worth knowing');
+		await expect(page.locator('.blockleaf-callout')).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-callout')).toEqual([]);
+	});
+
+	test("a failed upload's placeholder has no violations", async ({
+		page
+	}) => {
+		await openEditor(page);
+		await dropFile(page, 'fail.png');
+		await expect(
+			page.locator('.blockleaf-upload[data-state="error"]')
+		).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-upload')).toEqual([]);
+	});
+
+	// A missing `alt` is the one critical finding an uploaded image can carry:
+	// a screen reader falls back to announcing the URL.
+	test('an uploaded image carries alt text', async ({ page }) => {
+		await openEditor(page);
+		await dropFile(page, 'red-balloon.png');
+
+		const image = page.locator(`${EDITOR} img`);
+		await expect(image).toBeVisible();
+		await expect(image).toHaveAttribute('alt', 'red balloon');
+
+		expect(await violations(page, `${EDITOR} img`)).toEqual([]);
 	});
 });
 

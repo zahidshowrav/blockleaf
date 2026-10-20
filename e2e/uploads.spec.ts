@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { EDITOR, dropFile } from './helpers.js';
 
 /**
  * The MC exit condition, in a browser: dropping an image works, shows
@@ -7,45 +9,12 @@ import { test, expect, type Page } from '@playwright/test';
  * that a real `drop` event with real files reaches it.
  */
 
-const dropFile = async (
-	page: Page,
-	name: string,
-	where: 'start' | 'end' = 'start'
-) => {
-	const editor = page.locator('.tiptap.ProseMirror');
-
-	const dataTransfer = await page.evaluateHandle((fileName: string) => {
-		const transfer = new DataTransfer();
-		transfer.items.add(
-			new File([new Uint8Array([137, 80, 78, 71])], fileName, {
-				type: 'image/png'
-			})
-		);
-		return transfer;
-	}, name);
-
-	// Coordinates are not optional. prosemirror-view resolves the drop
-	// position with `posAtCoords` *before* it consults `handleDrop`, so an
-	// event defaulting to 0,0 resolves to nothing and returns early — the
-	// plugin never sees it.
-	const box = await editor.boundingBox();
-	if (!box) throw new Error('the editor has no box to drop onto');
-
-	await editor.dispatchEvent('drop', {
-		dataTransfer,
-		clientX: Math.round(box.x + box.width / 2),
-		clientY: Math.round(
-			where === 'start' ? box.y + 12 : box.y + box.height - 12
-		)
-	});
-};
-
 test.describe('Uploads in a real browser', () => {
 	test('a dropped image uploads, shows progress, and lands in the document', async ({
 		page
 	}) => {
 		await page.goto('/');
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		await dropFile(page, 'photo.png');
 
@@ -66,7 +35,7 @@ test.describe('Uploads in a real browser', () => {
 		page
 	}) => {
 		await page.goto('/');
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		await dropFile(page, 'slow.png');
 
@@ -80,7 +49,7 @@ test.describe('Uploads in a real browser', () => {
 		page
 	}) => {
 		await page.goto('/');
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		await dropFile(page, 'cancel-me.png');
 
@@ -99,7 +68,7 @@ test.describe('Uploads in a real browser', () => {
 		page
 	}) => {
 		await page.goto('/');
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		await dropFile(page, 'fail-once.png');
 
@@ -121,7 +90,7 @@ test.describe('Uploads in a real browser', () => {
 		page
 	}) => {
 		await page.goto('/');
-		const editor = page.locator('.tiptap.ProseMirror');
+		const editor = page.locator(EDITOR);
 		await expect(editor).toBeVisible();
 
 		await editor.click();
@@ -161,14 +130,14 @@ test.describe('Uploads in a real browser', () => {
 		page.on('pageerror', (error) => failures.push(error.message));
 
 		await page.goto('/');
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		await dropFile(page, 'abandoned.png');
 		await expect(page.locator('.blockleaf-upload')).toBeVisible();
 
 		// The editor unmounts with a request still in flight.
 		await page.reload();
-		await expect(page.locator('.tiptap.ProseMirror')).toBeVisible();
+		await expect(page.locator(EDITOR)).toBeVisible();
 
 		expect(failures).toEqual([]);
 	});

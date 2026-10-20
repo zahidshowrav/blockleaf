@@ -285,6 +285,21 @@ const createPlaceholder = (
 	return { element, update };
 };
 
+/**
+ * A file's own name, as a last-resort description.
+ *
+ * A filename is a poor `alt`, but a missing one is worse: a screen reader
+ * falls back to announcing the URL. The image's own alt editor is where this
+ * gets replaced with something true — this is the floor, not the answer.
+ */
+const altFromFileName = (name: string): string => {
+	const base = name
+		.replace(/\.[^./\\]+$/, '')
+		.replace(/[_-]+/g, ' ')
+		.trim();
+	return base.length > 0 ? base : name;
+};
+
 const pendingPosition = (editor: Editor, id: string, fallback: number) => {
 	const state = UPLOAD_PLUGIN_KEY.getState(editor.state);
 	return state?.pending.find((entry) => entry.id === id)?.pos ?? fallback;
@@ -699,7 +714,7 @@ const uploadOne = async (
 					// stylesheet's `height: auto` reserves the right box
 					// without storing a number that a re-encode can falsify.
 					width: result.width ?? null,
-					alt: null
+					alt: result.alt ?? altFromFileName(file.name)
 				}
 			})
 			.run();

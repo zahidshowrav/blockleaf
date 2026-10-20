@@ -1,0 +1,103 @@
+---
+title: Accessibility
+description: What the editor guarantees for keyboard and screen-reader users, what it asks of you, and how it is checked.
+icon: Accessibility
+---
+
+Blockleaf's chrome is built to be used without a mouse and announced
+correctly by a screen reader. That is a tested claim, not an aspiration: every
+surface the editor puts on screen is scanned with
+[axe-core](https://github.com/dequelabs/axe-core) in a real browser on every
+commit, and the suite fails on a single violation.
+
+## What is checked
+
+`e2e/accessibility.spec.ts` opens each surface and runs axe over it:
+
+| Surface                 | How it is opened                       |
+| ----------------------- | -------------------------------------- |
+| The editor at rest      | —                                      |
+| Slash menu              | `/`                                    |
+| Bubble menu             | a text selection                       |
+| Link editor             | <kbd>Mod</kbd> + <kbd>K</kbd>          |
+| Block menu              | <kbd>Shift</kbd> + <kbd>F10</kbd>      |
+| Drag handle             | hovering a block                       |
+| Table, and its controls | `\|\|\| `                              |
+| Row menu                | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + `R` |
+| Grid picker             | `/table`                               |
+| Callout                 | `/callout`                             |
+| Upload placeholder      | a failed upload                        |
+| Image                   | a finished upload                      |
+
+A second suite builds a whole document — heading, list, table, link — without
+touching the mouse, because a surface that passes axe while being unreachable
+from the keyboard has passed nothing.
+
+Colour contrast is checked here rather than in the unit suite on purpose. The
+jsdom tests have no layout, so contrast, focus visibility and anything that
+depends on where an element actually lands can only be seen in a browser.
+
+## Keyboard
+
+Every menu opens, moves and closes from the keyboard.
+
+| Keys                                            | What happens                               |
+| ----------------------------------------------- | ------------------------------------------ |
+| <kbd>Shift</kbd> + <kbd>F10</kbd>               | Block menu for the block holding the caret |
+| <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>R</kbd> | Row menu, inside a table                   |
+| <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> | Column menu, inside a table                |
+| <kbd>Mod</kbd> + <kbd>K</kbd>                   | Link editor, on a selection                |
+| <kbd>↑</kbd> <kbd>↓</kbd>                       | Move within a menu                         |
+| <kbd>Enter</kbd>                                | Run the active item                        |
+| <kbd>Escape</kbd>                               | Close the menu and return the caret        |
+
+Menus keep focus on the menu element and point at the active item with
+`aria-activedescendant`, so the caret's position in the document is never
+lost. Each menu is also in the tab order: a menu that scrolls has to be
+reachable, or the items below the fold cannot be read.
+
+## Images and alt text
+
+An image with no `alt` is the one critical failure an editor can hand a screen
+reader — it falls back to announcing the URL. So an uploaded image is never
+inserted without one.
+
+The order is:
+
+1. `alt` from the [upload adapter's](/docs/uploads) result, if it returns one.
+2. Otherwise, the file's own name, with the extension dropped and `-` and `_`
+   turned into spaces — `red-balloon_02.png` becomes `red balloon 02`.
+
+```ts
+const adapter: UploadAdapter = {
+	upload: async (file) => {
+		const stored = await putSomewhere(file);
+		return {
+			id: stored.id,
+			src: stored.url,
+			// Pass one whenever you have it. A filename is a floor, not an answer.
+			alt: stored.description
+		};
+	}
+};
+```
+
+<Callout title="An empty alt is not a missing one">
+	Returning `alt: ''` marks the image decorative and screen readers skip it,
+	which is sometimes exactly right. The editor keeps an empty string as given
+	and does not fill it in from the filename.
+</Callout>
+
+Authors can change any image's alt text from the image's own toolbar, and the
+value is stored on the node — see [the schema](/docs/schema).
+
+## What is still open
+
+- **Empty table headers.** A brand-new table has empty `th` cells until
+  someone types in them, which axe reports as a minor finding. Header
+  semantics — `scope`, a caption, announced cell position — are being
+  addressed separately.
+- **Translating the chrome.** Every label the chrome renders is currently
+  English.
+- **Touch.** Target sizes and touch behaviour on a phone are not yet part of
+  this suite.
