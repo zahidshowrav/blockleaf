@@ -35,14 +35,55 @@ const FRENCH: BlockleafLabels = {
 	upload: { cancel: 'Annuler' }
 };
 
-const labels =
-	typeof window === 'undefined' ||
-	!new URLSearchParams(window.location.search).has('fr')
-		? undefined
-		: FRENCH;
+const params =
+	typeof window === 'undefined'
+		? new URLSearchParams()
+		: new URLSearchParams(window.location.search);
+
+const labels = params.has('fr') ? FRENCH : undefined;
+
+/**
+ * A table whose columns are wider than a phone, reached with `?wide`.
+ *
+ * Stored `colwidth` is the author's and a narrow screen does not get to
+ * overrule it, so proving the table scrolls instead of cutting the document
+ * off needs a document that is genuinely too wide to start with.
+ */
+const COLUMN_WIDTH = 260;
+
+const wideTableDocument = (): BlockleafDocument => ({
+	...createEmptyDocument(),
+	content: [
+		{
+			type: 'table',
+			content: [0, 1].map((row) => ({
+				type: 'tableRow' as const,
+				content: [0, 1, 2].map((column) => ({
+					type: (row === 0 ? 'tableHeader' : 'tableCell') as
+						'tableHeader' | 'tableCell',
+					attrs: { colwidth: [COLUMN_WIDTH] },
+					content: [
+						{
+							type: 'paragraph' as const,
+							content: [
+								{
+									type: 'text' as const,
+									text: `r${row + 1}c${column + 1}`
+								}
+							]
+						}
+					]
+				}))
+			}))
+		}
+	]
+});
+
+const initialDocument = () =>
+	params.has('wide') ? wideTableDocument() : createEmptyDocument();
 
 export const App = () => {
-	const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
+	const [doc, setDoc] = useState<BlockleafDocument>(initialDocument);
 	const [dirty, setDirty] = useState(false);
 	const [uploadError, setUploadError] = useState<string | null>(null);
 
