@@ -84,6 +84,17 @@ export type TableActionId =
 export type TableLabels = {
 	rowActions: string;
 	columnActions: string;
+	/** Announced as the caret moves from one cell to another. */
+	cellPosition: (
+		row: number,
+		column: number,
+		rows: number,
+		columns: number
+	) => string;
+	/** Accessible name of the scrollable box a table sits in. */
+	scrollRegion: string;
+	/** Accessible name of a header cell nobody has typed in yet. */
+	emptyHeader: string;
 	/** Accessible name of the toolbar shown over selected cells. */
 	cellMenu: string;
 	actions: Record<TableActionId, string>;
@@ -261,6 +272,10 @@ export const defaultLabels: ResolvedLabels = {
 	table: {
 		rowActions: 'Row actions',
 		columnActions: 'Column actions',
+		cellPosition: (row, column, rows, columns) =>
+			`Row ${row} of ${rows}, column ${column} of ${columns}`,
+		scrollRegion: 'Table, scrollable',
+		emptyHeader: 'Empty header',
 		cellMenu: 'Cell actions',
 		actions: {
 			'add-row-before': 'Insert row above',

@@ -23,3 +23,12 @@ export const NORMALISATION_META = 'blockleafNormalisation';
  * is never added, so `openUploadPicker` would not exist.
  */
 export const UPLOAD_EXTENSION_NAME = 'blockleafUpload';
+
+/**
+ * The table accessibility extension's name.
+ *
+ * Named so `BlockleafEditor` can hand it the resolved label set: it is built
+ * by `createExtensions`, which knows nothing about labels, and the strings it
+ * announces have to be translatable like the rest of the chrome.
+ */
+export const TABLE_A11Y_EXTENSION_NAME = 'blockleafTableAccessibility';

@@ -3,6 +3,7 @@ export {
 	MAX_LIST_DEPTH,
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
+	TABLE_A11Y_EXTENSION_NAME,
 	NORMALISATION_META
 } from './constants.js';
 export {
@@ -33,6 +34,12 @@ export {
 	type TableLabels,
 	type UploadLabels
 } from './labels.js';
+export {
+	TABLE_A11Y_PLUGIN_KEY,
+	TableAccessibility,
+	cellPositionAt,
+	type TableAccessibilityOptions
+} from './table-a11y.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
