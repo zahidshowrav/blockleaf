@@ -21,12 +21,13 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
-`HD-01`, `HD-02` and `HD-04` are done. `@blockleaf/editor@0.1.1` and `@blockleaf/renderer@0.0.1` are
-live on npm, and the docs site is deployed at `blockleaf.dev`.
+`HD-01`, `HD-02`, `HD-04`, `HD-07` and `HD-08` are done, leaving `HD-05` and
+`HD-06`. `@blockleaf/editor@0.3.0` and `@blockleaf/renderer@0.0.1` are live on
+npm, and the docs site is deployed at `blockleaf.dev`.
 
-**Last verified:** 2026-10-20: 344 editor unit tests, 149 renderer, 42
-Playwright across two projects — 34 on desktop Chrome, 8 on an emulated Pixel 7. Bundle at 146.71 kB of 160 kB, schema entry at 136 B of 2 kB, code block
-subpath at 80.37 kB of 85 kB.
+**Last verified:** 2026-10-21: 354 editor unit tests, 149 renderer, 44
+Playwright across two projects — 35 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.23 kB of 160 kB, schema entry at 136 B of 2 kB, code block
+subpath at 80.44 kB of 85 kB.
 
 ---
 
@@ -251,21 +252,48 @@ phone is not a narrow desktop. Still open there and belonging to `HD-08`: a
 table wider than the screen, and the layout shift when the virtual keyboard
 opens over a toolbar near the bottom of the viewport.
 
-One finding is deliberately left: a brand-new table's `th` cells are empty
-until somebody types in them, which axe reports as minor. The header
-semantics that answer it are `HD-07`, so the table scan fills its headers
-first and says why.
+`HD-07` and `HD-08` closed both IOUs the earlier tasks wrote. Header cells now
+carry `scope`, decided from the document's shape exactly as the renderer
+decides it — the editor had been emitting a bare `<th>`, so a document
+announced one way while it was edited and another once it was published. The
+caret's cell is announced through a live region, counted with `TableMap` so a
+merged cell reports the first column it really occupies. An empty header is
+named rather than silent; axe still reports `empty-table-header` on it because
+that rule checks visible text, so the scan excepts that one rule by name.
 
-| Id    | Task                                                            | Status      | Commit    | Completed  |
-| ----- | --------------------------------------------------------------- | ----------- | --------- | ---------- |
-| HD-01 | Full accessibility pass                                         | Done        | `61d82a8` | 2026-10-20 |
-| HD-02 | i18n via `labels`                                               | Done        | `52aa00f` | 2026-10-20 |
-| HD-03 | Theming docs for the `--bl-*` custom properties                 | Done        | `f7108af` | 2026-10-14 |
-| HD-04 | Mobile and touch behaviour                                      | Done        | `fe25a20` | 2026-10-20 |
-| HD-05 | Large-document performance — 10k+ blocks, virtualise if needed  | Not started | —         | —          |
-| HD-06 | `examples/vite-spa`                                             | Not started | —         | —          |
-| HD-07 | Table a11y — header `scope`, caption, announced cell position   | Not started | —         | —          |
-| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override | Not started | —         | —          |
+`HD-08` turned on a CSS detail worth keeping: `overflow-x` on the table
+wrapper did nothing on its own. A grid or flex item defaults to
+`min-width: auto`, so a 780px table pushed the _host's_ layout wider than the
+screen and the wrapper inherited that width with nothing left to scroll. The
+wrapper uses `contain: inline-size`, which keeps the table's width out of the
+host's layout — the alternative was asking every consumer to set
+`min-width: 0` on whatever box they put the editor in. The sandbox serves such
+a document at `?wide`, because a stored `colwidth` cannot be typed.
+
+The table `<caption>` that `HD-07` also named is **not** done, and the reason
+is worth recording. It would be stored content, the pre-`0.1.0` additive
+exemption expired when `0.1.0` was published on 2026-10-18, and there is no
+migration runner to hang a migration on: `withSchemaVersion` stamps the
+current version onto a document without transforming it, so after a bump it
+would relabel a version 1 document as version 2 and change nothing. That
+machinery is `HD-09` and the caption is `HD-10`, in that order. Worth doing
+soon rather than late: `@blockleaf/editor` had 1198 downloads across five
+days last month, every one of them a publish day with nothing in between —
+registry mirrors, not consumers. The schema is as cheap to change now as it
+will ever be.
+
+| Id    | Task                                                                   | Status      | Commit    | Completed  |
+| ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| HD-01 | Full accessibility pass                                                | Done        | `61d82a8` | 2026-10-20 |
+| HD-02 | i18n via `labels`                                                      | Done        | `52aa00f` | 2026-10-20 |
+| HD-03 | Theming docs for the `--bl-*` custom properties                        | Done        | `f7108af` | 2026-10-14 |
+| HD-04 | Mobile and touch behaviour                                             | Done        | `fe25a20` | 2026-10-20 |
+| HD-05 | Large-document performance — 10k+ blocks, virtualise if needed         | Not started | —         | —          |
+| HD-06 | `examples/vite-spa`                                                    | Not started | —         | —          |
+| HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10) | Done        | `316b929` | 2026-10-21 |
+| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override        | Done        | `316b929` | 2026-10-21 |
+| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable           | Not started | —         | —          |
+| HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump             | Not started | —         | —          |
 
 ## OP — Optional packages (ongoing)
 
