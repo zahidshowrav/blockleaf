@@ -1,11 +1,29 @@
 import type { Editor } from '@tiptap/core';
 import { NodeSelection } from '@tiptap/pm/state';
-import { useCallback, useState, type DragEvent } from 'react';
+import {
+	useCallback,
+	useState,
+	type DragEvent,
+	type PointerEvent as ReactPointerEvent
+} from 'react';
 
 import { BlockMenu } from './block-menu.js';
 import { GripIcon, PlusIcon } from './icons.js';
 import type { BlockHandleProps } from './types.js';
 import { defaultLabels } from '../../core/labels.js';
+
+/**
+ * Stops a finger on the handle from blurring the editor.
+ *
+ * The handle is only on screen while the editor holds the caret, so a tap
+ * that takes the caret away unmounts the thing being tapped and the click
+ * lands on the page behind it. Mouse presses are left alone: preventing their
+ * default would also stop `dragstart`, and dragging is how the handle works
+ * on a desktop.
+ */
+const keepEditorFocused = (event: ReactPointerEvent<HTMLButtonElement>) => {
+	if (event.pointerType !== 'mouse') event.preventDefault();
+};
 
 /**
  * Hands the drag to ProseMirror rather than implementing one.
@@ -126,6 +144,7 @@ export const BlockHandle = ({
 				<button
 					type="button"
 					className="blockleaf-block-handle__button"
+					onPointerDown={keepEditorFocused}
 					aria-label={labels.blockMenu.insert}
 					title={labels.blockMenu.insert}
 					onClick={insertBelow}
@@ -138,6 +157,7 @@ export const BlockHandle = ({
 				type="button"
 				draggable
 				className="blockleaf-block-handle__button"
+				onPointerDown={keepEditorFocused}
 				aria-label={labels.blockMenu.handle}
 				aria-haspopup="menu"
 				aria-expanded={menuOpen}

@@ -29,6 +29,9 @@ commit, and the suite fails on a single violation.
 | Upload placeholder      | a failed upload                        |
 | Image                   | a finished upload                      |
 
+A second Playwright project runs against an emulated phone, where nothing
+hovers — see [On a phone](/docs/chrome#on-a-phone).
+
 A second suite builds a whole document — heading, list, table, link — without
 touching the mouse, because a surface that passes axe while being unreachable
 from the keyboard has passed nothing.
@@ -97,5 +100,5 @@ value is stored on the node — see [the schema](/docs/schema).
   someone types in them, which axe reports as a minor finding. Header
   semantics — `scope`, a caption, announced cell position — are being
   addressed separately.
-- **Touch.** Target sizes and touch behaviour on a phone are not yet part of
-  this suite.
+- **Right-to-left layout.** The stylesheet uses logical properties in places
+  and physical ones in others, and no suite checks it.
