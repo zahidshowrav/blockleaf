@@ -14,7 +14,15 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices['Desktop Chrome'] }
+			use: { ...devices['Desktop Chrome'] },
+			testIgnore: /touch\.spec\.ts/
+		},
+		{
+			// HD-04. A phone is not a narrow desktop: it never fires
+			// `mousemove`, so anything hover-driven has to be proven another way.
+			name: 'mobile-chrome',
+			use: { ...devices['Pixel 7'] },
+			testMatch: /touch\.spec\.ts/
 		}
 	],
 	webServer: {
