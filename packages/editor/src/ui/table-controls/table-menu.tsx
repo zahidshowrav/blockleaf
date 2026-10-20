@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { actionsForAxis } from './actions.js';
 import type { TableAction, TableMenuProps } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: TableAction['icon']) => {
 	if (!icon) return null;
@@ -15,6 +16,7 @@ const renderIcon = (icon: TableAction['icon']) => {
 export const TableMenu = ({
 	editor,
 	actions,
+	labels = defaultLabels,
 	axis,
 	onClose
 }: TableMenuProps) => {
@@ -77,7 +79,11 @@ export const TableMenu = ({
 		<div
 			ref={menuRef}
 			role="menu"
-			aria-label={axis === 'row' ? 'Row actions' : 'Column actions'}
+			aria-label={
+				axis === 'row'
+					? labels.table.rowActions
+					: labels.table.columnActions
+			}
 			aria-activedescendant={
 				active ? `blockleaf-table-action-${active.id}` : undefined
 			}

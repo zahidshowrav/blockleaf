@@ -16,124 +16,139 @@ import {
 } from './icons.js';
 import type { SlashCommand } from './types.js';
 import { UPLOAD_EXTENSION_NAME } from '../../core/constants.js';
+import {
+	defaultLabels,
+	type BlockTypeLabels,
+	type SlashMenuLabels
+} from '../../core/labels.js';
 
-export const defaultSlashCommands: SlashCommand[] = [
+/**
+ * The default command list, built against a label set.
+ *
+ * Titles come from `blockTypes` rather than from the slash menu's own
+ * labels, because the block menu's "Turn into" group names the same blocks
+ * and nobody should have to translate `Heading 1` twice.
+ */
+export const createSlashCommands = (
+	labels: SlashMenuLabels = defaultLabels.slashMenu,
+	blockTypes: BlockTypeLabels = defaultLabels.blockTypes
+): SlashCommand[] => [
 	{
 		id: 'paragraph',
-		title: 'Text',
-		description: 'Just start typing with plain text.',
+		title: blockTypes['paragraph'],
+		description: labels.descriptions['paragraph'],
 		aliases: ['p', 'text', 'normal'],
-		group: 'Basic blocks',
+		group: labels.groups.basic,
 		icon: TextIcon,
 		keywords: ['paragraph', 'text', 'plain'],
 		run: (editor) => editor.chain().focus().setParagraph().run()
 	},
 	{
 		id: 'heading-1',
-		title: 'Heading 1',
-		description: 'Large section heading.',
+		title: blockTypes['heading-1'],
+		description: labels.descriptions['heading-1'],
 		aliases: ['h1', '#'],
-		group: 'Headings',
+		group: labels.groups.headings,
 		icon: Heading1Icon,
 		keywords: ['h1', 'heading', 'title', 'large'],
 		run: (editor) => editor.chain().focus().setHeading({ level: 1 }).run()
 	},
 	{
 		id: 'heading-2',
-		title: 'Heading 2',
-		description: 'Medium section heading.',
+		title: blockTypes['heading-2'],
+		description: labels.descriptions['heading-2'],
 		aliases: ['h2', '##'],
-		group: 'Headings',
+		group: labels.groups.headings,
 		icon: Heading2Icon,
 		keywords: ['h2', 'heading', 'subtitle', 'medium'],
 		run: (editor) => editor.chain().focus().setHeading({ level: 2 }).run()
 	},
 	{
 		id: 'heading-3',
-		title: 'Heading 3',
-		description: 'Small section heading.',
+		title: blockTypes['heading-3'],
+		description: labels.descriptions['heading-3'],
 		aliases: ['h3', '###'],
-		group: 'Headings',
+		group: labels.groups.headings,
 		icon: Heading3Icon,
 		keywords: ['h3', 'heading', 'subheading', 'small'],
 		run: (editor) => editor.chain().focus().setHeading({ level: 3 }).run()
 	},
 	{
 		id: 'bullet-list',
-		title: 'Bullet list',
-		description: 'Create a simple bulleted list.',
+		title: blockTypes['bullet-list'],
+		description: labels.descriptions['bullet-list'],
 		aliases: ['ul', 'bullet', '-'],
-		group: 'Lists',
+		group: labels.groups.lists,
 		icon: BulletListIcon,
 		keywords: ['bullet', 'list', 'unordered'],
 		run: (editor) => editor.chain().focus().toggleBulletList().run()
 	},
 	{
 		id: 'ordered-list',
-		title: 'Numbered list',
-		description: 'Create a list with numbering.',
+		title: blockTypes['ordered-list'],
+		description: labels.descriptions['ordered-list'],
 		aliases: ['ol', 'numbered', '1.'],
-		group: 'Lists',
+		group: labels.groups.lists,
 		icon: OrderedListIcon,
 		keywords: ['numbered', 'list', 'ordered'],
 		run: (editor) => editor.chain().focus().toggleOrderedList().run()
 	},
 	{
 		id: 'task-list',
-		title: 'To-do list',
-		description: 'Track tasks with a to-do list.',
+		title: blockTypes['task-list'],
+		description: labels.descriptions['task-list'],
 		aliases: ['todo', 'task', 'check', '[]'],
-		group: 'Lists',
+		group: labels.groups.lists,
 		icon: TaskListIcon,
 		keywords: ['todo', 'task', 'checkbox', 'checklist'],
 		run: (editor) => editor.chain().focus().toggleTaskList().run()
 	},
 	{
 		id: 'blockquote',
-		title: 'Quote',
-		description: 'Capture a quotation.',
+		title: blockTypes['blockquote'],
+		description: labels.descriptions['blockquote'],
 		aliases: ['quote', '>'],
-		group: 'Basic blocks',
+		group: labels.groups.basic,
 		icon: QuoteIcon,
 		keywords: ['quote', 'blockquote', 'citation'],
 		run: (editor) => editor.chain().focus().toggleBlockquote().run()
 	},
 	{
 		id: 'code-block',
-		title: 'Code',
-		description: 'Capture a code snippet.',
+		title: blockTypes['code-block'],
+		description: labels.descriptions['code-block'],
 		aliases: ['code', '```'],
-		group: 'Basic blocks',
+		group: labels.groups.basic,
 		icon: CodeIcon,
 		keywords: ['code', 'codeblock', 'snippet', 'pre'],
 		run: (editor) => editor.chain().focus().toggleCodeBlock().run()
 	},
 	{
 		id: 'callout',
-		title: 'Callout',
-		description: 'Highlight important information.',
+		title: blockTypes['callout'],
+		description: labels.descriptions['callout'],
 		aliases: ['callout', 'box', 'note', ':::'],
-		group: 'Basic blocks',
+		group: labels.groups.basic,
 		icon: CalloutIcon,
 		keywords: ['callout', 'note', 'box', 'alert', 'info', 'emoji'],
 		run: (editor) => editor.chain().focus().toggleCallout().run()
 	},
 	{
 		id: 'divider',
-		title: 'Divider',
-		description: 'Visually separate sections with a line.',
+		title: blockTypes['divider'],
+		description: labels.descriptions['divider'],
 		aliases: ['hr', 'divider', '---', 'rule'],
-		group: 'Basic blocks',
+		group: labels.groups.basic,
 		icon: DividerIcon,
 		keywords: ['divider', 'horizontal', 'rule', 'line', 'separator'],
 		run: (editor) => editor.chain().focus().setHorizontalRule().run()
 	},
 	{
 		id: 'table',
-		title: 'Table',
-		description: 'Pick a size, with a header row.',
+		title: blockTypes['table'],
+		description: labels.descriptions['table'],
 		aliases: ['table', 'grid', '|||'],
-		group: 'Advanced',
+		group: labels.groups.advanced,
 		icon: TableIcon,
 		keywords: ['table', 'grid', 'rows', 'columns'],
 		picker: GridPicker,
@@ -148,10 +163,10 @@ export const defaultSlashCommands: SlashCommand[] = [
 	},
 	{
 		id: 'image',
-		title: 'Image',
-		description: 'Upload an image from your device.',
+		title: blockTypes['image'],
+		description: labels.descriptions['image'],
 		aliases: ['image', 'img', 'photo'],
-		group: 'Advanced',
+		group: labels.groups.advanced,
 		icon: ImageIcon,
 		keywords: ['image', 'img', 'photo', 'picture', 'upload', 'media'],
 		// Drop and paste already work without the menu. This is the third
@@ -163,6 +178,9 @@ export const defaultSlashCommands: SlashCommand[] = [
 		run: (editor) => editor.chain().focus().openUploadPicker().run()
 	}
 ];
+
+export const defaultSlashCommands: SlashCommand[] =
+	/* @__PURE__ */ createSlashCommands();
 
 export type AddCommandOptions = {
 	before?: string;

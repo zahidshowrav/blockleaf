@@ -7,6 +7,11 @@ import {
 	TrashIcon
 } from './icons.js';
 import type { BlockAction } from './types.js';
+import {
+	defaultLabels,
+	type BlockMenuLabels,
+	type BlockTypeLabels
+} from '../../core/labels.js';
 import { whenNodeExists } from '../schema-guard.js';
 import {
 	BulletListIcon,
@@ -83,6 +88,7 @@ const canMove = (editor: Editor, pos: number, direction: -1 | 1) => {
 };
 
 const turnInto = (
+	group: string,
 	id: string,
 	title: string,
 	icon: BlockAction['icon'],
@@ -92,100 +98,118 @@ const turnInto = (
 ): BlockAction => ({
 	id,
 	title,
-	group: 'Turn into',
+	group,
 	icon,
 	isActive: (editor, pos) => isBlockType(editor, pos, typeName, attrs),
 	isAvailable: whenNodeExists(typeName, () => true),
 	run: apply
 });
 
-export const defaultBlockActions: BlockAction[] = [
+/**
+ * The default block actions, built against a label set.
+ *
+ * The "Turn into" titles come from `blockTypes`, the same map the slash
+ * menu names its blocks with — one translation, two surfaces.
+ */
+export const createBlockActions = (
+	labels: BlockMenuLabels = defaultLabels.blockMenu,
+	blockTypes: BlockTypeLabels = defaultLabels.blockTypes
+): BlockAction[] => [
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-paragraph',
-		'Text',
+		blockTypes['paragraph'],
 		TextIcon,
 		'paragraph',
 		(editor, pos) => focusBlock(editor, pos).setParagraph().run()
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-heading-1',
-		'Heading 1',
+		blockTypes['heading-1'],
 		Heading1Icon,
 		'heading',
 		(editor, pos) => focusBlock(editor, pos).setHeading({ level: 1 }).run(),
 		{ level: 1 }
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-heading-2',
-		'Heading 2',
+		blockTypes['heading-2'],
 		Heading2Icon,
 		'heading',
 		(editor, pos) => focusBlock(editor, pos).setHeading({ level: 2 }).run(),
 		{ level: 2 }
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-heading-3',
-		'Heading 3',
+		blockTypes['heading-3'],
 		Heading3Icon,
 		'heading',
 		(editor, pos) => focusBlock(editor, pos).setHeading({ level: 3 }).run(),
 		{ level: 3 }
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-bullet-list',
-		'Bullet list',
+		blockTypes['bullet-list'],
 		BulletListIcon,
 		'bulletList',
 		(editor, pos) => focusBlock(editor, pos).toggleBulletList().run()
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-ordered-list',
-		'Numbered list',
+		blockTypes['ordered-list'],
 		OrderedListIcon,
 		'orderedList',
 		(editor, pos) => focusBlock(editor, pos).toggleOrderedList().run()
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-task-list',
-		'To-do list',
+		blockTypes['task-list'],
 		TaskListIcon,
 		'taskList',
 		(editor, pos) => focusBlock(editor, pos).toggleTaskList().run()
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-blockquote',
-		'Quote',
+		blockTypes['blockquote'],
 		QuoteIcon,
 		'blockquote',
 		(editor, pos) => focusBlock(editor, pos).toggleBlockquote().run()
 	),
 	/* @__PURE__ */ turnInto(
+		labels.groups.turnInto,
 		'turn-code-block',
-		'Code',
+		blockTypes['code-block'],
 		CodeIcon,
 		'codeBlock',
 		(editor, pos) => focusBlock(editor, pos).toggleCodeBlock().run()
 	),
 	{
 		id: 'move-up',
-		title: 'Move up',
-		group: 'Actions',
+		title: labels.actions['move-up'],
+		group: labels.groups.actions,
 		icon: ArrowUpIcon,
 		isAvailable: (editor, pos) => canMove(editor, pos, -1),
 		run: (editor, pos) => moveBlock(editor, pos, -1)
 	},
 	{
 		id: 'move-down',
-		title: 'Move down',
-		group: 'Actions',
+		title: labels.actions['move-down'],
+		group: labels.groups.actions,
 		icon: ArrowDownIcon,
 		isAvailable: (editor, pos) => canMove(editor, pos, 1),
 		run: (editor, pos) => moveBlock(editor, pos, 1)
 	},
 	{
 		id: 'duplicate',
-		title: 'Duplicate',
-		group: 'Actions',
+		title: labels.actions['duplicate'],
+		group: labels.groups.actions,
 		icon: DuplicateIcon,
 		run: (editor, pos) => {
 			const node = editor.state.doc.nodeAt(pos);
@@ -196,8 +220,8 @@ export const defaultBlockActions: BlockAction[] = [
 	},
 	{
 		id: 'delete',
-		title: 'Delete',
-		group: 'Actions',
+		title: labels.actions['delete'],
+		group: labels.groups.actions,
 		icon: TrashIcon,
 		danger: true,
 		run: (editor, pos) => {
@@ -210,14 +234,18 @@ export const defaultBlockActions: BlockAction[] = [
 	}
 ];
 
+export const defaultBlockActions: BlockAction[] =
+	/* @__PURE__ */ createBlockActions();
+
 export const resolveBlockActions = (
-	actions?: BlockAction[] | ((defaults: BlockAction[]) => BlockAction[])
+	actions?: BlockAction[] | ((defaults: BlockAction[]) => BlockAction[]),
+	defaults: BlockAction[] = defaultBlockActions
 ): BlockAction[] => {
 	if (typeof actions === 'function') {
-		return actions(defaultBlockActions);
+		return actions(defaults);
 	}
 	if (Array.isArray(actions)) {
 		return actions;
 	}
-	return defaultBlockActions;
+	return defaults;
 };

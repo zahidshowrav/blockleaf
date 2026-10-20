@@ -1,0 +1,110 @@
+---
+title: Translating the chrome
+description: Every string the editor renders comes from one labels object, and a partial translation is a valid one.
+icon: Languages
+---
+
+The default chrome is replaceable, but replacing all of it to change one word
+is not a translation story. So every string the editor and its menus put on
+screen comes from a single `labels` object.
+
+```tsx
+import { BlockleafEditor, type BlockleafLabels } from '@blockleaf/editor';
+
+// Outside the component. See "Give it a stable reference" below.
+const fr: BlockleafLabels = {
+	blockTypes: { 'heading-1': 'Titre 1' },
+	slashMenu: { menu: 'Commandes', groups: { headings: 'Titres' } },
+	link: { address: 'Adresse du lien' }
+};
+
+<BlockleafEditor labels={fr} />;
+```
+
+Anything left out keeps its English default, at every level — overriding one
+group heading does not require restating the others. A partial translation is
+a valid one.
+
+## What is in it
+
+| Key           | Covers                                                       |
+| ------------- | ------------------------------------------------------------ |
+| `blockTypes`  | The names of the blocks themselves                           |
+| `slashMenu`   | The menu, its group headings, item descriptions, size picker |
+| `bubbleMenu`  | The selection toolbar and its marks                          |
+| `blockMenu`   | The drag handle, its menu, "Turn into" and the block actions |
+| `table`       | Row, column and cell actions, and the menus that hold them   |
+| `image`       | Alignment, delete, and the alt text panel                    |
+| `link`        | The link editor's field and buttons                          |
+| `upload`      | Progress, failure, Cancel, Retry and Dismiss                 |
+| `codeBlock`   | The language picker                                          |
+| `placeholder` | The text shown in an empty block                             |
+
+<Callout title="One translation, two surfaces">
+	`blockTypes` names each block once. The slash menu's items and the block
+	menu's "Turn into" group both read from it, so `Heading 1` is never
+	translated twice — and the two can never drift apart.
+</Callout>
+
+Every key is typed. A misspelled id is a compile error rather than a silently
+English menu item:
+
+```ts
+resolveLabels({ table: { actions: { 'add-row-above': 'x' } } });
+//                                  ^ not a TableActionId
+```
+
+## Give it a stable reference
+
+`labels` is one of the props the editor's extensions are rebuilt from, the
+same as `slashItems` and `bubbleActions`. Define it at module scope, or
+memoise it — an object literal written inline is a new object on every render,
+and the chrome would be rebuilt each time.
+
+```tsx
+// Do this.
+const labels: BlockleafLabels = { link: { address: 'Adresse du lien' } };
+
+// Not this.
+<BlockleafEditor labels={{ link: { address: 'Adresse du lien' } }} />;
+```
+
+## The upload adapter
+
+The upload extension is built by your code, because it needs your adapter, so
+it is not among the extensions `BlockleafEditor` assembles. It is wired up for
+you anyway: if it carries no labels of its own, it is given the ones on the
+editor. Pass them yourself when you build it outside an editor, or want it to
+differ:
+
+```tsx
+import { createUploadExtension, resolveLabels } from '@blockleaf/editor';
+
+createUploadExtension({ adapter, labels: resolveLabels(fr) });
+```
+
+The [code block](/docs/code-block) is the same: it ships from its own subpath
+and takes `labels` directly.
+
+## Building your own menus
+
+Each default registry is a function of a label set, so your own list can start
+from a translated one rather than from English:
+
+```ts
+import { createSlashCommands, resolveLabels } from '@blockleaf/editor';
+
+const labels = resolveLabels(fr);
+const commands = createSlashCommands(labels.slashMenu, labels.blockTypes);
+```
+
+`createBubbleActions`, `createBlockActions`, `createTableActions`,
+`createCellActions` and `createImageActions` work the same way. The old
+`defaultSlashCommands`, `defaultBubbleActions` and friends are still exported
+and still English — they are those same functions called with the defaults.
+
+## What is not covered
+
+Right-to-left layout, and date or number formatting. The editor stores text,
+not formatted values, so neither has come up yet; [say so in an
+issue](https://github.com/zahidshowrav/blockleaf/issues) if it has for you.

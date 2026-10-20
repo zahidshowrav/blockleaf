@@ -5,7 +5,11 @@ import {
 	SCHEMA_VERSION,
 	createEmptyDocument
 } from '@blockleaf/editor';
-import type { BlockleafDocument, UploadFailure } from '@blockleaf/editor';
+import type {
+	BlockleafDocument,
+	BlockleafLabels,
+	UploadFailure
+} from '@blockleaf/editor';
 
 import { sandboxUpload } from './upload-adapter.js';
 
@@ -15,6 +19,28 @@ import '@blockleaf/editor/styles.css';
  * Not a demo — a workbench. It exists so extension work has a fast reload loop
  * without booting the docs site. The polished demo lives in apps/docs (M4).
  */
+/**
+ * A deliberately partial translation, reached with `?fr`.
+ *
+ * Partial because that is the claim worth exercising: anything left out keeps
+ * its English default. Defined at module scope because `labels` is in the
+ * extension memo's dependencies, so an inline object would rebuild the chrome
+ * on every render.
+ */
+const FRENCH: BlockleafLabels = {
+	blockTypes: { 'heading-1': 'Titre 1' },
+	slashMenu: { menu: 'Commandes', groups: { headings: 'Titres' } },
+	blockMenu: { menu: 'Actions du bloc', handle: 'Actions du bloc' },
+	link: { address: 'Adresse du lien' },
+	upload: { cancel: 'Annuler' }
+};
+
+const labels =
+	typeof window === 'undefined' ||
+	!new URLSearchParams(window.location.search).has('fr')
+		? undefined
+		: FRENCH;
+
 export const App = () => {
 	const [doc, setDoc] = useState<BlockleafDocument>(createEmptyDocument());
 	const [dirty, setDirty] = useState(false);
@@ -41,6 +67,7 @@ export const App = () => {
 				<div className="sandbox__pane">
 					<BlockleafEditor
 						defaultValue={doc}
+						labels={labels}
 						autofocus
 						upload={sandboxUpload}
 						onUploadError={(failure: UploadFailure) =>

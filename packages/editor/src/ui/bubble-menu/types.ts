@@ -3,6 +3,7 @@ import type { EditorState, PluginKey } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import type { ComponentType, ReactNode } from 'react';
 
+import { type ResolvedLabels } from '../../core/labels.js';
 import type { IconProps } from '../slash-menu/icons.js';
 
 /**
@@ -27,6 +28,8 @@ export type BubbleAction = {
 
 export type BubbleMenuPanelProps = {
 	editor: Editor;
+	/** The resolved label set. A panel takes the slice it needs. */
+	labels?: ResolvedLabels;
 	/** Returns focus to the toolbar when the panel closes. */
 	onClose: () => void;
 };
@@ -62,6 +65,8 @@ export type BubbleMenuShouldShow = (props: {
 }) => boolean;
 
 export type BubbleMenuOptions = {
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 	/** Custom actions array, or a function receiving the defaults. */
 	actions?: BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]);
 	/** Whether the link editor is reachable from the toolbar. Defaults to `true`. */
@@ -79,6 +84,7 @@ export type BubbleMenuOptions = {
 
 export type BubbleMenuProps = {
 	editor: Editor;
+	labels?: ResolvedLabels;
 	actions: BubbleAction[];
 	link: boolean;
 	panel?: BubbleMenuPanel;

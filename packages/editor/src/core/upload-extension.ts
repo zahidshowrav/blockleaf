@@ -3,6 +3,11 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import { UPLOAD_EXTENSION_NAME } from './constants.js';
+import {
+	defaultLabels,
+	type ResolvedLabels,
+	type UploadLabels
+} from './labels.js';
 import { isAbortError, isUploadResult, type UploadAdapter } from './upload.js';
 
 export const UPLOAD_PLUGIN_KEY = /* @__PURE__ */ new PluginKey<UploadState>(
@@ -133,6 +138,8 @@ type UploadMeta =
 
 export interface UploadExtensionOptions {
 	adapter: UploadAdapter | null;
+	/** The resolved label set. Defaults to English. */
+	labels: ResolvedLabels;
 	accept: string[];
 	maxBytes: number;
 	onError?: (failure: UploadFailure) => void;
@@ -207,7 +214,8 @@ const placeholderKey = (entry: PendingUpload): string =>
 
 const createPlaceholder = (
 	entry: PendingUpload,
-	editor: Editor
+	editor: Editor,
+	labels: UploadLabels
 ): PlaceholderHandle => {
 	const element = document.createElement('div');
 	element.className = 'blockleaf-upload';
@@ -228,12 +236,12 @@ const createPlaceholder = (
 		element.append(
 			message,
 			button(
-				'Retry',
+				labels.retry,
 				() => editor.commands.retryUpload(entry.id),
 				'retry'
 			),
 			button(
-				'Dismiss',
+				labels.dismiss,
 				() => editor.commands.dismissUpload(entry.id),
 				'dismiss'
 			)
@@ -247,12 +255,12 @@ const createPlaceholder = (
 
 	const name = document.createElement('span');
 	name.className = 'blockleaf-upload__name';
-	name.textContent = `Uploading ${entry.name}…`;
+	name.textContent = labels.uploading(entry.name);
 
 	const track = document.createElement('div');
 	track.className = 'blockleaf-upload__track';
 	track.setAttribute('role', 'progressbar');
-	track.setAttribute('aria-label', `Uploading ${entry.name}`);
+	track.setAttribute('aria-label', labels.uploading(entry.name));
 	track.setAttribute('aria-valuemin', '0');
 	track.setAttribute('aria-valuemax', '100');
 
@@ -280,7 +288,11 @@ const createPlaceholder = (
 	element.append(
 		name,
 		track,
-		button('Cancel', () => editor.commands.cancelUpload(entry.id), 'cancel')
+		button(
+			labels.cancel,
+			() => editor.commands.cancelUpload(entry.id),
+			'cancel'
+		)
 	);
 	return { element, update };
 };
@@ -321,6 +333,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 	addOptions() {
 		return {
 			adapter: null,
+			labels: defaultLabels,
 			accept: DEFAULT_UPLOAD_ACCEPT,
 			maxBytes: DEFAULT_MAX_UPLOAD_BYTES,
 			onError: undefined
@@ -368,7 +381,8 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 					adapter,
 					file,
 					at,
-					report
+					report,
+					this.options.labels.upload
 				);
 			}
 		};
@@ -414,6 +428,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 						entry.file,
 						entry.pos,
 						report,
+						this.options.labels.upload,
 						// Same id, so the entry keeps the position it has been
 						// mapping all along.
 						id
@@ -471,6 +486,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 
 	addProseMirrorPlugins() {
 		const { editor, storage } = this;
+		const uploadLabels = this.options.labels.upload;
 
 		return [
 			new Plugin<UploadState>({
@@ -551,7 +567,8 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 							// `toDOM` never runs again, so this is the only place a
 							// progress tick can reach the element.
 							const handle =
-								existing ?? createPlaceholder(entry, editor);
+								existing ??
+								createPlaceholder(entry, editor, uploadLabels);
 							if (existing) existing.update?.(entry);
 							else placeholders.set(key, handle);
 
@@ -636,6 +653,7 @@ const uploadOne = async (
 	file: File,
 	at: number,
 	report: (failure: UploadFailure) => void,
+	labels: UploadLabels,
 	existingId?: string
 ): Promise<void> => {
 	const id = existingId ?? nextUploadId();
@@ -682,7 +700,7 @@ const uploadOne = async (
 
 		if (!isUploadResult(result)) {
 			controllers.delete(id);
-			const message = `Could not upload ${file.name}.`;
+			const message = labels.failed(file.name);
 			dispatch({ type: 'fail', id, message });
 			report({
 				file,
@@ -733,12 +751,12 @@ const uploadOne = async (
 		dispatch({
 			type: 'fail',
 			id,
-			message: `Could not upload ${file.name}.`
+			message: labels.failed(file.name)
 		});
 		report({
 			file,
 			reason: 'adapter',
-			message: `Could not upload ${file.name}.`,
+			message: labels.failed(file.name),
 			cause: error
 		});
 	}

@@ -2,10 +2,11 @@ import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
 import { ReactRenderer } from '@tiptap/react';
 
-import { resolveBlockActions } from './actions.js';
+import { createBlockActions, resolveBlockActions } from './actions.js';
 import { BlockHandle, type BlockHandleComponentProps } from './block-handle.js';
 import { createDragHandlePlugin, type DragHandleController } from './plugin.js';
 import type { DragHandleOptions } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 export const DRAG_HANDLE_PLUGIN_KEY = /* @__PURE__ */ new PluginKey(
 	'blockleafDragHandle'
@@ -24,6 +25,7 @@ export const DragHandleExtension =
 		addOptions() {
 			return {
 				actions: undefined,
+				labels: undefined,
 				insertButton: true,
 				pluginKey: undefined
 			};
@@ -65,7 +67,11 @@ export const DragHandleExtension =
 
 		addProseMirrorPlugins() {
 			const storage = this.storage as DragHandleStorage;
-			const actions = resolveBlockActions(this.options.actions);
+			const labels = this.options.labels ?? defaultLabels;
+			const actions = resolveBlockActions(
+				this.options.actions,
+				createBlockActions(labels.blockMenu, labels.blockTypes)
+			);
 			const insertButton = this.options.insertButton !== false;
 
 			const setLocked = (locked: boolean) =>
@@ -79,6 +85,7 @@ export const DragHandleExtension =
 				props: {
 					editor: this.editor,
 					actions,
+					labels,
 					insertButton,
 					pos: null,
 					onLockChange: setLocked

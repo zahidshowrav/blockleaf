@@ -1,11 +1,13 @@
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import type { Selection } from '@tiptap/pm/state';
 
-import { defaultImageActions } from './actions.js';
+import { createImageActions } from './actions.js';
 import { AltEditor } from './alt-editor.js';
 import { AltTextIcon } from './icons.js';
+import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 import {
 	createBubbleMenuExtension,
+	resolveBubbleActions,
 	type BubbleAction,
 	type BubbleMenuShouldShow
 } from '../bubble-menu/index.js';
@@ -41,6 +43,8 @@ export const imageMenuShouldShow: BubbleMenuShouldShow = ({
 
 export type ImageMenuOptions = {
 	actions?: BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]);
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 };
 
 /**
@@ -49,18 +53,23 @@ export type ImageMenuOptions = {
  * appears differ.
  */
 export const createImageMenuExtension = ({
-	actions = defaultImageActions
+	labels = defaultLabels,
+	actions
 }: ImageMenuOptions = {}) =>
 	createBubbleMenuExtension({
-		actions,
+		actions: resolveBubbleActions(
+			actions,
+			createImageActions(labels.image)
+		),
+		labels,
 		link: false,
-		label: 'Image',
+		label: labels.image.toolbar,
 		panel: {
 			id: 'alt',
 			label: (editor) =>
 				typeof editor.getAttributes('image').alt === 'string'
-					? 'Edit alt text'
-					: 'Add alt text',
+					? labels.image.editAlt
+					: labels.image.addAlt,
 			icon: AltTextIcon,
 			isActive: (editor) =>
 				typeof editor.getAttributes('image').alt === 'string',

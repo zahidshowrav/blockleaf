@@ -5,6 +5,7 @@ import type { ComponentType, ReactNode, Ref } from 'react';
 
 import type { IconProps } from './icons.js';
 import type { CommandRegistry } from './registry.js';
+import { type ResolvedLabels } from '../../core/labels.js';
 
 export type SlashCommandGroup =
 	'Basic blocks' | 'Headings' | 'Lists' | 'Advanced' | (string & {});
@@ -36,6 +37,8 @@ export type SlashCommand = {
 
 export type SlashPickerProps = {
 	editor: Editor;
+	/** The resolved label set, so a picker can name itself. */
+	labels?: ResolvedLabels;
 	/** The `/query` text to replace when the command finally runs. */
 	range: Range;
 	/** Dismiss the picker and return to the list. */
@@ -48,6 +51,7 @@ export type SlashMenuRef = {
 
 export type SlashMenuProps = {
 	items: SlashCommand[];
+	labels?: ResolvedLabels;
 	command: (item: SlashCommand) => void;
 	editor: Editor;
 	range: Range;
@@ -56,6 +60,8 @@ export type SlashMenuProps = {
 
 export type SlashMenuOptions = {
 	registry?: CommandRegistry;
+	/** Strings the menu renders. Defaults to English. */
+	labels?: ResolvedLabels;
 	items?: SlashCommand[] | ((defaults: SlashCommand[]) => SlashCommand[]);
 	char?: string;
 	pluginKey?: PluginKey;

@@ -9,6 +9,7 @@ import {
 	SplitIcon
 } from './icons.js';
 import type { TableAction } from './types.js';
+import { defaultLabels, type TableLabels } from '../../core/labels.js';
 import { TrashIcon } from '../drag-handle/icons.js';
 import { whenNodeExists } from '../schema-guard.js';
 
@@ -20,10 +21,13 @@ import { whenNodeExists } from '../schema-guard.js';
  * command already knows, and two implementations of "can you delete this
  * column" would eventually disagree.
  */
-export const defaultTableActions: TableAction[] = [
+/** The default row and column actions, built against a label set. */
+export const createTableActions = (
+	labels: TableLabels = defaultLabels.table
+): TableAction[] => [
 	{
 		id: 'add-row-before',
-		title: 'Insert row above',
+		title: labels.actions['add-row-before'],
 		axis: 'row',
 		icon: InsertAboveIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -33,7 +37,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'add-row-after',
-		title: 'Insert row below',
+		title: labels.actions['add-row-after'],
 		axis: 'row',
 		icon: InsertBelowIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -43,7 +47,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'add-column-before',
-		title: 'Insert column left',
+		title: labels.actions['add-column-before'],
 		axis: 'column',
 		icon: InsertLeftIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -53,7 +57,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'add-column-after',
-		title: 'Insert column right',
+		title: labels.actions['add-column-after'],
 		axis: 'column',
 		icon: InsertRightIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -63,7 +67,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'toggle-header-row',
-		title: 'Toggle header row',
+		title: labels.actions['toggle-header-row'],
 		axis: 'row',
 		icon: HeaderIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -73,7 +77,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'toggle-header-column',
-		title: 'Toggle header column',
+		title: labels.actions['toggle-header-column'],
 		axis: 'column',
 		icon: HeaderIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -83,7 +87,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'merge-cells',
-		title: 'Merge cells',
+		title: labels.actions['merge-cells'],
 		axis: 'both',
 		icon: MergeIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -93,7 +97,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'split-cell',
-		title: 'Split cell',
+		title: labels.actions['split-cell'],
 		axis: 'both',
 		icon: SplitIcon,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -103,7 +107,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'delete-row',
-		title: 'Delete row',
+		title: labels.actions['delete-row'],
 		axis: 'row',
 		icon: TrashIcon,
 		danger: true,
@@ -114,7 +118,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'delete-column',
-		title: 'Delete column',
+		title: labels.actions['delete-column'],
 		axis: 'column',
 		icon: TrashIcon,
 		danger: true,
@@ -125,7 +129,7 @@ export const defaultTableActions: TableAction[] = [
 	},
 	{
 		id: 'delete-table',
-		title: 'Delete table',
+		title: labels.actions['delete-table'],
 		axis: 'both',
 		icon: DeleteTableIcon,
 		danger: true,
@@ -136,16 +140,20 @@ export const defaultTableActions: TableAction[] = [
 	}
 ];
 
+export const defaultTableActions: TableAction[] =
+	/* @__PURE__ */ createTableActions();
+
 export const resolveTableActions = (
-	actions?: TableAction[] | ((defaults: TableAction[]) => TableAction[])
+	actions?: TableAction[] | ((defaults: TableAction[]) => TableAction[]),
+	defaults: TableAction[] = defaultTableActions
 ): TableAction[] => {
 	if (typeof actions === 'function') {
-		return actions(defaultTableActions);
+		return actions(defaults);
 	}
 	if (Array.isArray(actions)) {
 		return actions;
 	}
-	return defaultTableActions;
+	return defaults;
 };
 
 export const actionsForAxis = (
