@@ -16,6 +16,7 @@ export {
 export {
 	CommandRegistry,
 	createCommandRegistry,
+	createSlashCommands,
 	defaultSlashCommands,
 	type AddCommandOptions
 } from './registry.js';

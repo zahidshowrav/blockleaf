@@ -2,6 +2,7 @@ import type { Editor } from '@tiptap/core';
 import type { PluginKey } from '@tiptap/pm/state';
 import type { ComponentType, ReactNode } from 'react';
 
+import { type ResolvedLabels } from '../../core/labels.js';
 import type { IconProps } from '../slash-menu/icons.js';
 
 export type BlockActionGroup = 'Turn into' | 'Actions' | (string & {});
@@ -27,6 +28,8 @@ export type BlockAction = {
 };
 
 export type DragHandleOptions = {
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 	/** Custom block actions, or a function receiving the defaults. */
 	actions?: BlockAction[] | ((defaults: BlockAction[]) => BlockAction[]);
 	/** Whether the `+` button that inserts a block below is shown. Defaults to `true`. */
@@ -36,6 +39,7 @@ export type DragHandleOptions = {
 
 export type BlockHandleProps = {
 	editor: Editor;
+	labels?: ResolvedLabels;
 	actions: BlockAction[];
 	insertButton: boolean;
 	/** `null` when no block is hovered — the handle renders nothing. */
@@ -44,6 +48,7 @@ export type BlockHandleProps = {
 
 export type BlockMenuProps = {
 	editor: Editor;
+	labels?: ResolvedLabels;
 	actions: BlockAction[];
 	pos: number;
 	onClose: () => void;

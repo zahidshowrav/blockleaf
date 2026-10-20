@@ -8,6 +8,7 @@ import {
 import { createPortal } from 'react-dom';
 
 import type { BlockAction, BlockMenuProps } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: BlockAction['icon']) => {
 	if (!icon) return null;
@@ -27,6 +28,7 @@ const VIEWPORT_MARGIN = 8;
 export const BlockMenu = ({
 	editor,
 	actions,
+	labels = defaultLabels,
 	pos,
 	onClose,
 	anchor
@@ -189,7 +191,7 @@ export const BlockMenu = ({
 		<div
 			ref={menuRef}
 			role="menu"
-			aria-label="Block actions"
+			aria-label={labels.blockMenu.menu}
 			aria-activedescendant={
 				active ? `blockleaf-block-action-${active.id}` : undefined
 			}

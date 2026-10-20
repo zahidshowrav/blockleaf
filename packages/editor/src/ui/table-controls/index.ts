@@ -1,5 +1,6 @@
 export {
 	actionsForAxis,
+	createTableActions,
 	defaultTableActions,
 	resolveTableActions
 } from './actions.js';
@@ -39,6 +40,7 @@ export {
 	cellMenuShouldShow,
 	isCellSelection,
 	createCellMenuExtension,
+	createCellActions,
 	defaultCellActions,
 	type CellMenuOptions
 } from './cell-menu.js';

@@ -5,6 +5,7 @@ import { useCallback, useState, type DragEvent } from 'react';
 import { BlockMenu } from './block-menu.js';
 import { GripIcon, PlusIcon } from './icons.js';
 import type { BlockHandleProps } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 /**
  * Hands the drag to ProseMirror rather than implementing one.
@@ -55,6 +56,7 @@ export type BlockHandleComponentProps = BlockHandleProps & {
 export const BlockHandle = ({
 	editor,
 	actions,
+	labels = defaultLabels,
 	insertButton,
 	pos,
 	onLockChange,
@@ -124,8 +126,8 @@ export const BlockHandle = ({
 				<button
 					type="button"
 					className="blockleaf-block-handle__button"
-					aria-label="Insert a block below"
-					title="Insert a block below"
+					aria-label={labels.blockMenu.insert}
+					title={labels.blockMenu.insert}
 					onClick={insertBelow}
 				>
 					<PlusIcon aria-hidden="true" />
@@ -136,10 +138,10 @@ export const BlockHandle = ({
 				type="button"
 				draggable
 				className="blockleaf-block-handle__button"
-				aria-label="Block actions"
+				aria-label={labels.blockMenu.handle}
 				aria-haspopup="menu"
 				aria-expanded={menuOpen}
-				title="Drag to move, click for actions"
+				title={labels.blockMenu.handleHint}
 				onClick={() => (menuOpen ? closeMenu() : openMenu())}
 				onDragStart={onDragStart}
 			>
@@ -150,6 +152,7 @@ export const BlockHandle = ({
 				<BlockMenu
 					editor={editor}
 					actions={actions}
+					labels={labels}
 					pos={pos}
 					onClose={closeMenu}
 					anchor={handleEl}

@@ -1,7 +1,9 @@
 import type { Extensions } from '@tiptap/core';
+import { type CodeBlockLowlightOptions } from '@tiptap/extension-code-block-lowlight';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
 import { CodeBlockView } from './code-block-view.js';
+import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 import {
 	createCodeBlockExtension,
 	type CodeBlockOptions
@@ -10,6 +12,8 @@ import {
 export interface CodeBlockUIOptions extends CodeBlockOptions {
 	/** Set `false` for a highlighted code block with no language dropdown. */
 	picker?: boolean;
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 }
 
 /**
@@ -21,12 +25,28 @@ export interface CodeBlockUIOptions extends CodeBlockOptions {
  */
 export const createCodeBlock = ({
 	picker = true,
+	labels = defaultLabels,
 	...options
 }: CodeBlockUIOptions = {}) => {
 	const extension = createCodeBlockExtension(options);
 	if (!picker) return extension;
 
-	return extension.extend({
+	return extension.extend<
+		CodeBlockLowlightOptions & {
+			languageNames: string[];
+			labels: ResolvedLabels;
+		}
+	>({
+		addOptions() {
+			// Carried on the extension because the node view is rendered by
+			// ProseMirror, outside any React tree a provider could reach.
+			return {
+				...(this.parent?.() as CodeBlockLowlightOptions & {
+					languageNames: string[];
+				}),
+				labels
+			};
+		},
 		addNodeView() {
 			return ReactNodeViewRenderer(CodeBlockView);
 		}

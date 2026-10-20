@@ -9,11 +9,12 @@ import {
 
 import {
 	createCommandRegistry,
-	defaultSlashCommands,
+	createSlashCommands,
 	type CommandRegistry
 } from './registry.js';
 import { SlashMenu } from './slash-menu.js';
 import type { SlashCommand, SlashMenuOptions, SlashMenuRef } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 export const SlashMenuExtension =
 	/* @__PURE__ */ Extension.create<SlashMenuOptions>({
@@ -22,6 +23,7 @@ export const SlashMenuExtension =
 		addOptions() {
 			return {
 				registry: undefined,
+				labels: undefined,
 				items: undefined,
 				char: '/',
 				pluginKey: undefined
@@ -29,15 +31,18 @@ export const SlashMenuExtension =
 		},
 
 		addProseMirrorPlugins() {
+			const labels = this.options.labels ?? defaultLabels;
+			const defaults = createSlashCommands(
+				labels.slashMenu,
+				labels.blockTypes
+			);
 			const registry: CommandRegistry =
 				this.options.registry ??
 				(typeof this.options.items === 'function'
-					? createCommandRegistry(
-							this.options.items(defaultSlashCommands)
-						)
+					? createCommandRegistry(this.options.items(defaults))
 					: Array.isArray(this.options.items)
 						? createCommandRegistry(this.options.items)
-						: createCommandRegistry(defaultSlashCommands));
+						: createCommandRegistry(defaults));
 
 			return [
 				Suggestion<SlashCommand, SlashCommand>({
@@ -81,7 +86,8 @@ export const SlashMenuExtension =
 								component = new ReactRenderer(SlashMenu, {
 									props: {
 										...props,
-										items: props.items
+										items: props.items,
+										labels
 									},
 									editor: props.editor
 								});

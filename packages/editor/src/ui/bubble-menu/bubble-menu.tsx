@@ -14,6 +14,7 @@ import type {
 	BubbleMenuPanel,
 	BubbleMenuProps
 } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: BubbleAction['icon']) => {
 	if (!icon) return null;
@@ -89,7 +90,8 @@ export const BubbleMenu = ({
 	actions,
 	link,
 	panel,
-	label = 'Text formatting',
+	labels = defaultLabels,
+	label,
 	openLinkRequest = 0
 }: BubbleMenuProps) => {
 	const [openPanelId, setOpenPanelId] = useState<string | null>(null);
@@ -190,6 +192,7 @@ export const BubbleMenu = ({
 			<div className="blockleaf-bubble-menu">
 				<PanelComponent
 					editor={editor}
+					labels={labels}
 					onClose={closePanel}
 				/>
 			</div>
@@ -200,7 +203,7 @@ export const BubbleMenu = ({
 		<div
 			ref={toolbarRef}
 			role="toolbar"
-			aria-label={label}
+			aria-label={label ?? labels.bubbleMenu.toolbar}
 			aria-orientation="horizontal"
 			className="blockleaf-bubble-menu"
 			onKeyDown={onToolbarKeyDown}

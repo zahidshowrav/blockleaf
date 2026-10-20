@@ -10,11 +10,15 @@ import {
 } from 'react';
 
 import type { SlashCommand, SlashMenuProps, SlashMenuRef } from './types.js';
+import { defaultLabels } from '../../core/labels.js';
 
 export const SlashMenu = /* @__PURE__ */ forwardRef<
 	SlashMenuRef,
 	SlashMenuProps
->(function SlashMenu({ items, command, editor, range, query }, ref) {
+>(function SlashMenu(
+	{ items, command, editor, range, query, labels = defaultLabels },
+	ref
+) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [pickerFor, setPickerFor] = useState<SlashCommand | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -142,6 +146,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 					ref={pickerRef}
 					editor={editor}
 					range={range}
+					labels={labels}
 					onCancel={closePicker}
 				/>
 			</div>
@@ -169,7 +174,7 @@ export const SlashMenu = /* @__PURE__ */ forwardRef<
 			ref={containerRef}
 			id="blockleaf-slash-menu"
 			role="listbox"
-			aria-label="Slash commands"
+			aria-label={labels.slashMenu.menu}
 			aria-activedescendant={
 				activeCommand
 					? `blockleaf-slash-item-${activeCommand.id}`

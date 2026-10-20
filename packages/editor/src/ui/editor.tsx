@@ -1,6 +1,12 @@
 import { useMemo, type ReactNode } from 'react';
 
-import { createExtensions } from '../core/index.js';
+import { UPLOAD_EXTENSION_NAME } from '../core/constants.js';
+import {
+	createExtensions,
+	defaultLabels,
+	resolveLabels,
+	type BlockleafLabels
+} from '../core/index.js';
 import {
 	BlockleafEditor as BaseBlockleafEditor,
 	type BlockleafEditorProps as BaseBlockleafEditorProps
@@ -112,6 +118,15 @@ export type BlockleafEditorProps = Omit<
 	 * turns the placeholder off.
 	 */
 	placeholder?: string | PlaceholderLabels | false;
+	/**
+	 * Every string the chrome renders. Anything left out keeps its English
+	 * default, so a partial translation is a valid one.
+	 *
+	 * Give it a stable reference — a module-level constant, or something
+	 * memoised — as the extensions are rebuilt when it changes, the same as
+	 * for `slashItems` and the other override props.
+	 */
+	labels?: BlockleafLabels;
 	children?: ReactNode;
 };
 
@@ -135,18 +150,29 @@ export const BlockleafEditor = ({
 	imageMenu = true,
 	imageActions,
 	placeholder,
+	labels,
 	...rest
 }: BlockleafEditorProps) => {
 	const resolvedExtensions = useMemo(() => {
+		const resolved = resolveLabels(labels);
 		const base = extensions ?? createExtensions(preset);
-		const chrome = [...base];
+		// The upload extension is built by the host, because it needs their
+		// adapter. If one is in the list and nobody gave it labels of its own,
+		// it gets these rather than staying stubbornly English.
+		const chrome = base.map((extension) =>
+			extension.name === UPLOAD_EXTENSION_NAME &&
+			(extension.options as { labels?: unknown }).labels === defaultLabels
+				? extension.configure({ labels: resolved })
+				: extension
+		);
 
 		const hasSlashMenu = chrome.some((ext) => ext.name === 'slashMenu');
 		if (slashMenu && !hasSlashMenu) {
 			chrome.push(
 				createSlashMenuExtension({
 					items: slashItems,
-					registry: slashRegistry
+					registry: slashRegistry,
+					labels: resolved
 				})
 			);
 		}
@@ -157,6 +183,7 @@ export const BlockleafEditor = ({
 				createBubbleMenuExtension({
 					actions: bubbleActions,
 					link: linkEditor,
+					labels: resolved,
 					shouldShow: bubbleShouldShow
 				})
 			);
@@ -167,6 +194,7 @@ export const BlockleafEditor = ({
 			chrome.push(
 				createDragHandleExtension({
 					actions: blockActions,
+					labels: resolved,
 					insertButton
 				})
 			);
@@ -177,23 +205,40 @@ export const BlockleafEditor = ({
 		);
 		if (tableControls && !hasTableControls) {
 			chrome.push(
-				createTableControlsExtension({ actions: tableActions })
+				createTableControlsExtension({
+					actions: tableActions,
+					labels: resolved
+				})
 			);
 		}
 
 		const hasCellMenu = chrome.some((ext) => ext.name === 'cellMenu');
 		if (cellMenu && !hasCellMenu) {
-			chrome.push(createCellMenuExtension({ actions: cellActions }));
+			chrome.push(
+				createCellMenuExtension({
+					actions: cellActions,
+					labels: resolved
+				})
+			);
 		}
 
 		const hasImageMenu = chrome.some((ext) => ext.name === 'imageMenu');
 		if (imageMenu && !hasImageMenu) {
-			chrome.push(createImageMenuExtension({ actions: imageActions }));
+			chrome.push(
+				createImageMenuExtension({
+					actions: imageActions,
+					labels: resolved
+				})
+			);
 		}
 
 		const hasPlaceholder = chrome.some((ext) => ext.name === 'placeholder');
 		if (placeholder !== false && !hasPlaceholder) {
-			chrome.push(createPlaceholderExtension({ placeholder }));
+			chrome.push(
+				createPlaceholderExtension({
+					placeholder: placeholder ?? resolved.placeholder
+				})
+			);
 		}
 
 		return chrome;
@@ -216,7 +261,8 @@ export const BlockleafEditor = ({
 		cellActions,
 		imageMenu,
 		imageActions,
-		placeholder
+		placeholder,
+		labels
 	]);
 
 	return (

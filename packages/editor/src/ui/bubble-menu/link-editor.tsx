@@ -9,13 +9,18 @@ import {
 import { CheckIcon, ExternalLinkIcon, UnlinkIcon } from './icons.js';
 import type { LinkEditorProps } from './types.js';
 import { sanitizeHref } from '../../core/index.js';
+import { defaultLabels } from '../../core/labels.js';
 
 /**
  * The link editor is a convenience, not a gate. `sanitizeHref` is called here
  * only to tell the user why an href will not stick — the schema rejects the
  * same hrefs whether or not this component ran. See `src/core/marks/link.ts`.
  */
-export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
+export const LinkEditor = ({
+	editor,
+	labels = defaultLabels,
+	onClose
+}: LinkEditorProps) => {
 	const existingHref = (editor.getAttributes('link').href as string) ?? '';
 	const [value, setValue] = useState(existingHref);
 	const [rejected, setRejected] = useState(false);
@@ -123,8 +128,8 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 				type="text"
 				inputMode="url"
 				className="blockleaf-bubble-menu__panel-input"
-				placeholder="Paste or type a link"
-				aria-label="Link address"
+				placeholder={labels.link.placeholder}
+				aria-label={labels.link.address}
 				aria-invalid={rejected}
 				aria-describedby={rejected ? 'blockleaf-link-error' : undefined}
 				value={value}
@@ -137,8 +142,8 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 			<button
 				type="submit"
 				className="blockleaf-bubble-menu__button"
-				title="Apply link"
-				aria-label="Apply link"
+				title={labels.link.apply}
+				aria-label={labels.link.apply}
 			>
 				<CheckIcon aria-hidden="true" />
 			</button>
@@ -147,8 +152,8 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 				<button
 					type="button"
 					className="blockleaf-bubble-menu__button"
-					title="Open link in a new tab"
-					aria-label="Open link in a new tab"
+					title={labels.link.open}
+					aria-label={labels.link.open}
 					onClick={openLink}
 				>
 					<ExternalLinkIcon aria-hidden="true" />
@@ -159,8 +164,8 @@ export const LinkEditor = ({ editor, onClose }: LinkEditorProps) => {
 				<button
 					type="button"
 					className="blockleaf-bubble-menu__button"
-					title="Remove link"
-					aria-label="Remove link"
+					title={labels.link.remove}
+					aria-label={labels.link.remove}
 					onClick={removeLink}
 				>
 					<UnlinkIcon aria-hidden="true" />

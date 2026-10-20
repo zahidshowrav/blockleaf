@@ -9,7 +9,13 @@ import {
 	SplitIcon
 } from './icons.js';
 import {
+	defaultLabels,
+	type ResolvedLabels,
+	type TableLabels
+} from '../../core/labels.js';
+import {
 	createBubbleMenuExtension,
+	resolveBubbleActions,
 	type BubbleAction,
 	type BubbleMenuShouldShow
 } from '../bubble-menu/index.js';
@@ -47,10 +53,13 @@ export const cellMenuShouldShow: BubbleMenuShouldShow = ({ editor, state }) => {
  * asks the command itself, so the toolbar cannot claim an operation the
  * editor would refuse.
  */
-export const defaultCellActions: BubbleAction[] = [
+/** The default in-cell actions, built against a label set. */
+export const createCellActions = (
+	labels: TableLabels = defaultLabels.table
+): BubbleAction[] => [
 	{
 		id: 'merge-cells',
-		title: 'Merge cells',
+		title: labels.actions['merge-cells'],
 		icon: MergeIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -60,7 +69,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'split-cell',
-		title: 'Split cell',
+		title: labels.actions['split-cell'],
 		icon: SplitIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -70,7 +79,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'toggle-header-cell',
-		title: 'Toggle header cell',
+		title: labels.actions['toggle-header-cell'],
 		icon: HeaderIcon,
 		isActive: (editor) => editor.isActive('tableHeader'),
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -80,7 +89,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'add-row-after',
-		title: 'Insert row below',
+		title: labels.actions['add-row-after'],
 		icon: InsertAboveIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -90,7 +99,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'add-column-after',
-		title: 'Insert column right',
+		title: labels.actions['add-column-after'],
 		icon: InsertLeftIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -100,7 +109,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'delete-row',
-		title: 'Delete row',
+		title: labels.actions['delete-row'],
 		icon: TrashIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -110,7 +119,7 @@ export const defaultCellActions: BubbleAction[] = [
 	},
 	{
 		id: 'delete-table',
-		title: 'Delete table',
+		title: labels.actions['delete-table'],
 		icon: DeleteTableIcon,
 		isActive: () => false,
 		isAvailable: whenNodeExists('table', (editor) =>
@@ -120,8 +129,13 @@ export const defaultCellActions: BubbleAction[] = [
 	}
 ];
 
+export const defaultCellActions: BubbleAction[] =
+	/* @__PURE__ */ createCellActions();
+
 export type CellMenuOptions = {
 	actions?: BubbleAction[] | ((defaults: BubbleAction[]) => BubbleAction[]);
+	/** The resolved label set. Defaults to English. */
+	labels?: ResolvedLabels;
 };
 
 /**
@@ -129,10 +143,15 @@ export type CellMenuOptions = {
  * The surface is CH-02's; only what it offers and when it appears differ.
  */
 export const createCellMenuExtension = ({
-	actions = defaultCellActions
+	labels = defaultLabels,
+	actions
 }: CellMenuOptions = {}) =>
 	createBubbleMenuExtension({
-		actions,
+		// Resolved here rather than handed on: the generic bubble extension
+		// would fall back to the text toolbar's actions, not the cell's.
+		actions: resolveBubbleActions(actions, createCellActions(labels.table)),
+		labels,
+		label: labels.table.cellMenu,
 		link: false,
 		pluginKey: CELL_MENU_PLUGIN_KEY,
 		shouldShow: cellMenuShouldShow
