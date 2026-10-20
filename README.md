@@ -4,7 +4,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 
 ![Blockleaf being typed into: a heading and a paragraph, a bullet list chosen from the slash menu, then bold applied from the bubble menu](.github/media/demo.gif)
 
-> **Status: pre-1.0.** The editor, the default chrome, the full node set and `@blockleaf/renderer` are all built and on npm. What is not done is hardening — accessibility, i18n, mobile and large-document performance. The document schema **will** change before `1.0`, and migrations ship with every bump. Don't put it in production yet.
+> **Status: pre-1.0.** The editor, the default chrome, the full node set and `@blockleaf/renderer` are all built and on npm. Accessibility, translation and touch are done. What is not done is large-document performance — nothing here has been measured against 10k blocks yet. The document schema **will** change before `1.0`, and migrations ship with every bump. Don't put it in production yet.
 >
 > Full documentation: **[blockleaf.dev](https://blockleaf.dev)**
 

@@ -40,6 +40,33 @@ Colour contrast is checked here rather than in the unit suite on purpose. The
 jsdom tests have no layout, so contrast, focus visibility and anything that
 depends on where an element actually lands can only be seen in a browser.
 
+## Tables
+
+A table is the one block where the markup carries meaning a screen reader
+depends on, so it gets more than a scan.
+
+- **`scope` on every header cell**, decided from the document's shape rather
+  than stored: a header in a row of nothing but headers heads its column, one
+  sitting among data cells heads its row. The editor and
+  [`@blockleaf/renderer`](/docs/rendering) decide it the same way, so a
+  document does not announce one way while it is edited and another once it is
+  published.
+- **The caret's position is announced** as it moves between cells — "Row 2 of
+  4, column 3 of 3" — through a polite live region. Counted with
+  `TableMap`, so a merged cell reports the first column it actually occupies
+  rather than a number that would be false.
+- **A header nobody has typed in yet is named**, so it announces as an empty
+  header rather than as nothing at all. axe still reports
+  `empty-table-header` on it, because that rule checks visible text and an
+  `aria-label` is not visible; the suite excepts that one rule by name and
+  says why.
+- **A table too wide for the screen scrolls** inside a focusable, labelled
+  region rather than pushing the page sideways. See
+  [On a phone](/docs/chrome#on-a-phone).
+
+None of it is stored, so no `SCHEMA_VERSION` moved and nothing in anyone's
+database had to change.
+
 ## Keyboard
 
 Every menu opens, moves and closes from the keyboard.
@@ -96,9 +123,9 @@ value is stored on the node — see [the schema](/docs/schema).
 
 ## What is still open
 
-- **Empty table headers.** A brand-new table has empty `th` cells until
-  someone types in them, which axe reports as a minor finding. Header
-  semantics — `scope`, a caption, announced cell position — are being
-  addressed separately.
+- **A table `<caption>`.** An author cannot write one. It would be stored
+  content, so it needs a `SCHEMA_VERSION` bump — and there is no migration
+  runner to hang the migration on yet. See
+  [the schema](/docs/schema#before-the-first-release--expired).
 - **Right-to-left layout.** The stylesheet uses logical properties in places
   and physical ones in others, and no suite checks it.
