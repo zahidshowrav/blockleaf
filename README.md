@@ -119,7 +119,7 @@ Next:
 - **HD** — accessibility pass, i18n, mobile, large-document performance
 - **Later** — collaboration, AI commands, markdown import/export, comments
 
-`0.1.0` is the first release the schema is meant to be depended on; `0.0.x` is what is on npm today.
+The schema has been meant to be depended on since `0.1.0`. For what is on npm right now, see [the package](https://www.npmjs.com/package/@blockleaf/editor).
 
 Collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
 
