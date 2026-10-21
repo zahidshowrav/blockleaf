@@ -1,0 +1,91 @@
+name: Comparison survey
+
+# `apps/docs/content/docs/comparisons.mdx` dates its figures because the prose
+# around them is a judgement that does not update itself. Dating them only
+# helps if somebody re-reads them, so this does it every Saturday.
+#
+# It opens a pull request rather than pushing, and rather than going red: a
+# failing check on a docs table is something people learn to ignore, and a
+# version bump next to an argument about how actively a project is maintained
+# deserves a person's eye.
+#
+# A pull request opened with GITHUB_TOKEN does not trigger other workflows, so
+# CI will not run on it by itself. Push a commit, or close and reopen it, if
+# you want the checks.
+
+on:
+    schedule:
+        - cron: '0 6 * * 6' # Saturdays, 06:00 UTC
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+
+jobs:
+    survey:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+
+            - name: Re-read the figures from npm
+              id: survey
+              run: |
+                  node scripts/survey-comparisons.ts | tee survey.log
+                  if git diff --quiet -- apps/docs/content/docs/comparisons.mdx; then
+                    echo 'changed=false' >> "$GITHUB_OUTPUT"
+                  else
+                    echo 'changed=true' >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Open a pull request
+              if: steps.survey.outputs.changed == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  BRANCH: chore/comparison-survey
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+                  git checkout -B "$BRANCH"
+                  git add apps/docs/content/docs/comparisons.mdx
+                  git commit -m 'docs: re-survey the comparison table' \
+                    -m 'Figures re-read from npm. The prose around them is unchanged.'
+                  git push --force origin "$BRANCH"
+
+                  {
+                    echo 'Weekly re-read of the figures in `comparisons.mdx`.'
+                    echo
+                    echo '```'
+                    cat survey.log
+                    echo '```'
+                    echo
+                    echo 'Only the versions, dates and the checked-on line were touched.'
+                    echo 'The prose is a judgement and was left alone — if a project this'
+                    echo 'page calls dormant has started publishing again, the `activity`'
+                    echo 'lines above are where that shows, and the sentence needs a person.'
+                    echo
+                    echo 'CI does not run on a pull request opened by `GITHUB_TOKEN`.'
+                    echo 'Push a commit or reopen it if you want the checks.'
+                  } > body.md
+
+                  # One open PR at a time: a week nobody merged is updated
+                  # rather than duplicated.
+                  if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+                    gh pr create --base main --head "$BRANCH" \
+                      --title 'docs: re-survey the comparison table' \
+                      --body-file body.md
+                  fi
