@@ -1,5 +1,6 @@
 packages:
     - 'apps/*'
+    - 'examples/*'
     - 'packages/*'
 # Added by pnpm because these versions are newer than a `minimumReleaseAge`
 # policy configured locally. They are deliberate — the repo tracks current
