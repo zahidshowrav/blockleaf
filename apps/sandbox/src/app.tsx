@@ -79,8 +79,34 @@ const wideTableDocument = (): BlockleafDocument => ({
 	]
 });
 
-const initialDocument = () =>
-	params.has('wide') ? wideTableDocument() : createEmptyDocument();
+/**
+ * A document of `?blocks=N` paragraphs, for measuring against a long one.
+ *
+ * Paragraphs rather than a mix, because the point is the count: a block the
+ * editor has to lay out, map positions through and serialise is the unit that
+ * HD-05 cares about, and the cheapest one is the honest floor.
+ */
+const longDocument = (blocks: number): BlockleafDocument => ({
+	...createEmptyDocument(),
+	content: Array.from({ length: blocks }, (_, index) => ({
+		type: 'paragraph' as const,
+		// `?ids=0` leaves them off, which is what an imported document looks
+		// like; a document that was saved by this editor already has them.
+		attrs: params.get('ids') === '0' ? undefined : { id: `block-${index}` },
+		content: [
+			{
+				type: 'text' as const,
+				text: `Block ${index + 1}. The quick brown fox jumps over the lazy dog.`
+			}
+		]
+	}))
+});
+
+const initialDocument = () => {
+	const blocks = Number(params.get('blocks'));
+	if (Number.isFinite(blocks) && blocks > 0) return longDocument(blocks);
+	return params.has('wide') ? wideTableDocument() : createEmptyDocument();
+};
 
 export const App = () => {
 	const [doc, setDoc] = useState<BlockleafDocument>(initialDocument);
@@ -114,7 +140,11 @@ export const App = () => {
 						onUploadError={(failure: UploadFailure) =>
 							setUploadError(failure.message)
 						}
-						onChangeImmediate={() => setDirty(true)}
+						onChangeImmediate={
+							params.get('immediate') === '0'
+								? undefined
+								: () => setDirty(true)
+						}
 						onChange={(next) => {
 							setDoc(next);
 							setDirty(false);
@@ -122,9 +152,16 @@ export const App = () => {
 					/>
 				</div>
 
-				<pre className="sandbox__pane sandbox__json">
-					{JSON.stringify(doc, null, 2)}
-				</pre>
+				{/*
+				 * `?json=0` leaves it out. Re-stringifying a long document on
+				 * every change is the workbench's own cost, and it swamps the
+				 * editor's when something is being measured.
+				 */}
+				{params.get('json') === '0' ? null : (
+					<pre className="sandbox__pane sandbox__json">
+						{JSON.stringify(doc, null, 2)}
+					</pre>
+				)}
 			</section>
 		</main>
 	);
