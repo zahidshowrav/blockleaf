@@ -4,7 +4,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 
 ![Blockleaf being typed into: a heading and a paragraph, a bullet list chosen from the slash menu, then bold applied from the bubble menu](.github/media/demo.gif)
 
-> **Status: pre-1.0.** The editor, the default chrome, the full node set and `@blockleaf/renderer` are all built and on npm. Accessibility, translation and touch are done. What is not done is large-document performance — nothing here has been measured against 10k blocks yet. The document schema **will** change before `1.0`, and migrations ship with every bump. Don't put it in production yet.
+> **Status: pre-1.0.** The editor, the default chrome, the full node set and `@blockleaf/renderer` are all built and on npm. Accessibility, translation, touch and long documents are done — a ten-thousand-block import opens in about two seconds. What is not done is a real app running on it. The document schema **will** change before `1.0`, and migrations ship with every bump. Don't put it in production yet.
 >
 > Full documentation: **[blockleaf.dev](https://blockleaf.dev)**
 
@@ -90,6 +90,7 @@ pnpm + Turborepo.
 | `packages/tsconfig`, `packages/eslint-config` | shared presets (private)                                                 |
 | `apps/docs`                                   | the Fumadocs site published at `blockleaf.dev`; not published to npm     |
 | `apps/sandbox`                                | Vite SPA for fast extension work; not published                          |
+| `examples/vite-spa`                           | a runnable app: write, store as JSON, publish with the renderer          |
 
 Inside `packages/editor`, `src/core` → `src/react` → `src/ui` is a one-way import boundary enforced by lint, so pulling `@blockleaf/core` out later stays a `mv` rather than a refactor.
 
@@ -101,6 +102,7 @@ pnpm build
 pnpm check:packaging   # publint + are-the-types-wrong
 pnpm size              # size-limit, hard budget
 pnpm demo:gif          # re-record the GIF at the top of this file
+pnpm perf              # open long documents and time them
 ```
 
 ## Roadmap

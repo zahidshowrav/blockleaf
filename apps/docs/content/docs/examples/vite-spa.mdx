@@ -1,0 +1,40 @@
+---
+title: A whole app
+description: Write a document, store it as JSON, and read it back without the editor — the runnable version.
+---
+
+The examples on the other pages are each one idea. This one is an app you can
+run, and it exists because the idea that matters most only shows up when the
+pieces are together: **the thing that renders a document a thousand times does
+not have to carry the thing that wrote it once.**
+
+```bash
+git clone https://github.com/zahidshowrav/blockleaf
+cd blockleaf
+pnpm install
+pnpm --filter example-vite-spa dev
+```
+
+The source is in [`examples/vite-spa`](https://github.com/zahidshowrav/blockleaf/tree/main/examples/vite-spa).
+
+## What it puts together
+
+- **Editing** with `BlockleafEditor`.
+- **Storing** the document as JSON. It uses `localStorage`, but the shape is
+  the one you would put in a database, and it is read back through
+  `isBlockleafDocument` rather than trusted — what comes out of storage is a
+  shape you hope is right, not one you know is.
+- **Publishing** with [`@blockleaf/renderer`](/docs/rendering). Switch to the
+  Read view and there is no ProseMirror on the page at all.
+- **A table of contents** from `extractHeadings`, built straight off the
+  stored JSON. No editor, no DOM, no parsing HTML back apart — a sidebar, a
+  search index and a summary are all this shape.
+- **Theming** through `--bl-*` custom properties in one stylesheet. Nothing of
+  the editor's own CSS is overridden, and there is no framework.
+
+<Callout title="Copying it">
+	The two `@blockleaf/*` dependencies are `workspace:*` so the repository's CI
+	builds the example against the packages as they are. In your own project,
+	`pnpm add @blockleaf/editor @blockleaf/renderer` instead. Everything else
+	carries over unchanged.
+</Callout>

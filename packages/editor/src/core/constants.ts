@@ -32,3 +32,28 @@ export const UPLOAD_EXTENSION_NAME = 'blockleafUpload';
  * announces have to be translatable like the rest of the chrome.
  */
 export const TABLE_A11Y_EXTENSION_NAME = 'blockleafTableAccessibility';
+
+/**
+ * The node types that carry a stable block id.
+ *
+ * Here rather than beside the extension list because `schema.ts` reads it,
+ * and `schema.ts` is what a server imports for `createEmptyDocument` alone.
+ * Importing it from `extensions.ts` would pull Tiptap, StarterKit and the
+ * table kit into a 2 kB budget — none of which ship `sideEffects: false`, so
+ * none of which would be shaken back out.
+ */
+export const BLOCK_NODE_TYPES = [
+	'paragraph',
+	'heading',
+	'blockquote',
+	'codeBlock',
+	'horizontalRule',
+	'bulletList',
+	'orderedList',
+	'listItem',
+	'taskList',
+	'taskItem',
+	'callout',
+	'image',
+	'table'
+] as const;

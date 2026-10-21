@@ -8,7 +8,11 @@ import { UniqueID } from '@tiptap/extension-unique-id';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { StarterKit } from '@tiptap/starter-kit';
 
-import { HEADING_LEVELS, NORMALISATION_META } from './constants.js';
+import {
+	BLOCK_NODE_TYPES,
+	HEADING_LEVELS,
+	NORMALISATION_META
+} from './constants.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
 import { Image } from './nodes/image.js';
@@ -17,21 +21,7 @@ import { TableAccessibility } from './table-a11y.js';
 
 export type PresetName = 'minimal' | 'standard';
 
-export const BLOCK_NODE_TYPES = [
-	'paragraph',
-	'heading',
-	'blockquote',
-	'codeBlock',
-	'horizontalRule',
-	'bulletList',
-	'orderedList',
-	'listItem',
-	'taskList',
-	'taskItem',
-	'callout',
-	'image',
-	'table'
-] as const;
+export { BLOCK_NODE_TYPES } from './constants.js';
 
 /**
  * Block types after which a trailing paragraph is pointless.

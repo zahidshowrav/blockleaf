@@ -84,6 +84,7 @@ export {
 	SCHEMA_VERSION,
 	createEmptyDocument,
 	isBlockleafDocument,
+	withBlockIds,
 	withSchemaVersion,
 	type BlockNode,
 	type BlockleafDocument,

@@ -1,0 +1,137 @@
+/*
+ * The app's own chrome. The editor and the rendered document are themed
+ * entirely through `--bl-*` custom properties below — no stylesheet of the
+ * editor's is overridden, and there is no CSS framework here or in the
+ * package.
+ */
+
+:root {
+	font-family: ui-sans-serif, system-ui, sans-serif;
+	line-height: 1.5;
+}
+
+body {
+	margin: 0;
+	background: var(--page-bg);
+	color: var(--page-fg);
+}
+
+.app {
+	--page-bg: #ffffff;
+	--page-fg: #111827;
+	--page-line: #e5e7eb;
+
+	/* Everything the editor and the renderer look like. */
+	--bl-color-bg: transparent;
+	--bl-color-fg: var(--page-fg);
+	--bl-color-accent: #047857;
+	--bl-content-padding: 0 0 0 2.5rem;
+	--bl-radius: 8px;
+
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 1.5rem 1rem 4rem;
+	background: var(--page-bg);
+	color: var(--page-fg);
+	min-height: 100vh;
+}
+
+.app[data-theme='dark'] {
+	--page-bg: #0d1117;
+	--page-fg: #e6edf3;
+	--page-line: #30363d;
+	--bl-color-accent: #34d399;
+}
+
+.app__bar {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--page-line);
+}
+
+.app__bar h1 {
+	font-size: 1.05rem;
+	margin: 0;
+	margin-right: auto;
+}
+
+.app__bar button {
+	font: inherit;
+	font-size: 0.85rem;
+	padding: 0.4rem 0.7rem;
+	border: 1px solid var(--page-line);
+	border-radius: 6px;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+
+.app__bar button:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+
+.app__bar button[aria-pressed='true'] {
+	border-color: var(--bl-color-accent);
+	color: var(--bl-color-accent);
+}
+
+.app__publish:not(:disabled) {
+	border-color: var(--bl-color-accent);
+	color: var(--bl-color-accent);
+	font-weight: 600;
+}
+
+.app__modes {
+	display: flex;
+	gap: 0.35rem;
+}
+
+.app__panel {
+	margin-top: 1.75rem;
+}
+
+.app__panel--read {
+	display: grid;
+	gap: 2rem;
+	/* `min-width: 0` on the content column, so a wide table scrolls rather
+	   than stretching the grid. The editor's own wrapper contains itself,
+	   but the rendered output is plain markup in your layout. */
+	grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 60rem) {
+	.app__panel--read {
+		grid-template-columns: 12rem minmax(0, 1fr);
+	}
+}
+
+.app__toc {
+	font-size: 0.85rem;
+	align-self: start;
+}
+
+.app__toc-title {
+	margin: 0 0 0.5rem;
+	font-weight: 600;
+	opacity: 0.6;
+}
+
+.app__toc ol {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.3rem;
+}
+
+.app__toc li[data-level='2'] {
+	padding-left: 0.75rem;
+}
+
+.app__toc li[data-level='3'] {
+	padding-left: 1.5rem;
+}
