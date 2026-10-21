@@ -90,6 +90,7 @@ pnpm + Turborepo.
 | `packages/tsconfig`, `packages/eslint-config` | shared presets (private)                                                 |
 | `apps/docs`                                   | the Fumadocs site published at `blockleaf.dev`; not published to npm     |
 | `apps/sandbox`                                | Vite SPA for fast extension work; not published                          |
+| `examples/vite-spa`                           | a runnable app: write, store as JSON, publish with the renderer          |
 
 Inside `packages/editor`, `src/core` → `src/react` → `src/ui` is a one-way import boundary enforced by lint, so pulling `@blockleaf/core` out later stays a `mv` rather than a refactor.
 
@@ -101,6 +102,7 @@ pnpm build
 pnpm check:packaging   # publint + are-the-types-wrong
 pnpm size              # size-limit, hard budget
 pnpm demo:gif          # re-record the GIF at the top of this file
+pnpm perf              # open long documents and time them
 ```
 
 ## Roadmap
