@@ -21,13 +21,14 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
-`HD-01`, `HD-02`, `HD-04`, `HD-05`, `HD-07` and `HD-08` are done, leaving
-`HD-06`. `@blockleaf/editor@0.3.0` and `@blockleaf/renderer@0.0.1` are live on
+`HD-01` through `HD-08` are done. What is left in the block is `HD-09`
+to `HD-11`, none of which is on the critical path. `@blockleaf/editor@0.3.0` and `@blockleaf/renderer@0.0.1` are live on
 npm, and the docs site is deployed at `blockleaf.dev`.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
 Playwright across two projects — 37 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.46 kB of 160 kB, schema entry at 207 B of 2 kB, code block
-subpath at 80.44 kB of 85 kB.
+subpath at 80.44 kB of 85 kB. Lint, typecheck and build cover eight workspaces
+now that `examples/*` is one of them.
 
 ---
 
@@ -294,6 +295,16 @@ per thousand blocks and linear, so virtualisation is not bought yet: it is
 `HD-11`, and it wants evidence from someone working past ten thousand blocks
 rather than caution.
 
+`HD-06` put `examples/vite-spa` in the tree — a runnable app rather than
+another snippet, because the thing worth showing only appears when the pieces
+are together. It writes a document, stores it as JSON, reads it back with
+`@blockleaf/renderer`, and builds its table of contents from `extractHeadings`
+off that same JSON. Switch it to Read and there is no ProseMirror on the page
+at all, which is the whole argument for storing a document rather than HTML.
+`examples/*` joined the pnpm workspace, so the repository's own lint,
+typecheck and build now cover it and a breaking change to either package
+fails here first.
+
 The table `<caption>` that `HD-07` also named is **not** done, and the reason
 is worth recording. It would be stored content, the pre-`0.1.0` additive
 exemption expired when `0.1.0` was published on 2026-10-18, and there is no
@@ -313,7 +324,7 @@ will ever be.
 | HD-03 | Theming docs for the `--bl-*` custom properties                        | Done        | `f7108af` | 2026-10-14 |
 | HD-04 | Mobile and touch behaviour                                             | Done        | `fe25a20` | 2026-10-20 |
 | HD-05 | Large-document performance — 10k+ blocks measured, nothing quadratic   | Done        | `dda1a78` | 2026-10-21 |
-| HD-06 | `examples/vite-spa`                                                    | Not started | —         | —          |
+| HD-06 | `examples/vite-spa`                                                    | Done        | `4734b38` | 2026-10-21 |
 | HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10) | Done        | `316b929` | 2026-10-21 |
 | HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override        | Done        | `316b929` | 2026-10-21 |
 | HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable           | Not started | —         | —          |
