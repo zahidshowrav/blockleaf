@@ -75,11 +75,21 @@ Tables were on this list until 2026-10-10. They were moved into `EC` deliberatel
 
 ## Changing this document
 
-### Before the first release, and only before it
+### Before the first release — expired
 
-`SCHEMA_VERSION` is `1` and version `1` has never been published — the registry has no `@blockleaf/editor` at all. Until it does, nothing is in anyone's database, so additive node work lands **inside version 1** rather than bumping to 2, and there is no migration to write because there is nothing to migrate.
+`SCHEMA_VERSION` is `1`. Until `0.1.0` the registry had no `@blockleaf/editor` at all, so nothing was in anyone's database: additive node work landed **inside version 1** rather than bumping to 2, and there was no migration to write because there was nothing to migrate. The table nodes used that exemption.
 
-This is the exemption the table nodes are using. It expires at `0.1.0`, which is the first build a stranger can install, and the numbered process below governs every change after that without exception. An additive change is cheap exactly once; the whole point of versioning the document is that nobody gets to decide it is cheap a second time.
+**It expired when `0.1.0` was published on 18 October 2026.** The numbered process below now governs every change, without exception. An additive change is cheap exactly once; the whole point of versioning the document is that nobody gets to decide it is cheap a second time.
+
+<Callout type="warn" title="There is no migration runner yet">
+	`withSchemaVersion` stamps the current `SCHEMA_VERSION` onto a document
+	without transforming anything, so it cannot be what performs a migration
+	— pointed at a version 1 document after a bump it would relabel it as
+	version 2 and change nothing. Step 2 below therefore means building that
+	runner first, and until it exists `SCHEMA_VERSION` does not move. This is
+	why the table `<caption>` that would otherwise have shipped with the table
+	accessibility work did not.
+</Callout>
 
 1. Add the change behind the next `SCHEMA_VERSION`.
 2. Write the migration from the previous version in the same PR.

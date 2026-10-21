@@ -1193,3 +1193,48 @@
 		opacity: 1;
 	}
 }
+
+/*
+ * Tables: read across, and reachable on a narrow screen
+ *
+ * HD-07 and HD-08.
+ */
+
+/* Announced, not shown — anyone who can see the caret knows where it is. */
+.blockleaf-table-live {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/*
+ * A table wider than the editor scrolls inside its own box instead of pushing
+ * the page sideways. prosemirror-tables already wraps every table in this
+ * div; it had just never been given anywhere to go, so a stored `colwidth`
+ * wider than a phone cut the document off at the screen edge.
+ *
+ * `contain: inline-size` is what actually holds the line, and `overflow-x`
+ * alone did not. A grid or flex item defaults to `min-width: auto`, so its
+ * minimum size is its content's — a 780px table pushed the *host's* grid
+ * item wider than the screen, and every box inside it, this wrapper included,
+ * inherited that width and had nothing left to scroll. Containment stops the
+ * table's width being the wrapper's business, so it never reaches the host's
+ * layout. The alternative was asking every consumer to put `min-width: 0` on
+ * whatever box they put the editor in.
+ */
+.blockleaf-editor__content .tableWrapper {
+	contain: inline-size;
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.blockleaf-editor__content .tableWrapper:focus-visible {
+	outline: 2px solid var(--bl-color-accent, #3b5bdb);
+	outline-offset: 2px;
+}

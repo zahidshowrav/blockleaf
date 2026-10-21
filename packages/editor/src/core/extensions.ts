@@ -13,6 +13,7 @@ import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
 import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
+import { TableAccessibility } from './table-a11y.js';
 
 export type PresetName = 'minimal' | 'standard';
 
@@ -208,6 +209,10 @@ export const createExtensions = (
 				resizable: false
 			}
 		}),
+		// Paired with TableKit rather than optional: a table whose header
+		// cells carry no `scope` is a table a screen reader cannot read
+		// across, and one that cannot scroll is one a narrow screen cuts off.
+		TableAccessibility,
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
 		}),

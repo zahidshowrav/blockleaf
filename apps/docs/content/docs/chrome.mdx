@@ -584,5 +584,21 @@ already clears it, but 24px is a floor, not a thumb. Under
 rows grow to 44px. A mouse keeps the compact chrome — neither pointer pays for
 the other.
 
-Not addressed yet: a table wider than the screen, and the layout shift when
-the virtual keyboard opens over a toolbar near the bottom of the viewport.
+**A table too wide for the screen** scrolls inside its own box rather than
+pushing the page sideways, and that box is focusable so it can be scrolled
+without a pointer. A stored `colwidth` is the author's and a narrow screen
+does not overrule it — the table keeps its width and you reach the rest of it
+by scrolling.
+
+<Callout title="Why containment, not just overflow">
+	`overflow-x` alone was not enough. A grid or flex item defaults to
+	`min-width: auto`, so its minimum size is its content's: a 780px table
+	pushed the *host's* layout wider than the screen, and the wrapper inherited
+	that width and had nothing left to scroll. The wrapper now uses `contain:
+	inline-size`, which keeps the table's width from reaching your layout at all
+	— so you do not have to put `min-width: 0` on whatever box you put the
+	editor in.
+</Callout>
+
+Not addressed yet: the layout shift when the virtual keyboard opens over a
+toolbar near the bottom of the viewport.

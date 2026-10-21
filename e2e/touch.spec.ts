@@ -129,4 +129,31 @@ test.describe('The editor on a phone', () => {
 			)
 		).toBe(false);
 	});
+
+	// A stored `colwidth` is the author's, and a phone does not get to
+	// overrule it — the table keeps its width and scrolls inside its own box
+	// instead of cutting the document off at the screen edge. `?wide` serves a
+	// document whose columns are 260px each, which no phone can show at once.
+	test('a table wider than the screen scrolls rather than overflowing', async ({
+		page
+	}) => {
+		await page.goto('/?wide');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+
+		const overflow = await page.evaluate(() => {
+			const wrapper = document.querySelector(
+				'.tiptap.ProseMirror .tableWrapper'
+			) as HTMLElement;
+			return {
+				scrolls: wrapper.scrollWidth > wrapper.clientWidth,
+				withinViewport: wrapper.clientWidth <= window.innerWidth,
+				pageOverflows:
+					document.documentElement.scrollWidth > window.innerWidth
+			};
+		});
+
+		expect(overflow.scrolls).toBe(true);
+		expect(overflow.withinViewport).toBe(true);
+		expect(overflow.pageOverflows).toBe(false);
+	});
 });
