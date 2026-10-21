@@ -24,6 +24,7 @@ export {
 	matchesAccept,
 	sanitizeSrc,
 	screenFiles,
+	withBlockIds,
 	withSchemaVersion,
 	type BlockNode,
 	type BlockleafDocument,

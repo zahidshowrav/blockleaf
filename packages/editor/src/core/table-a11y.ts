@@ -45,6 +45,11 @@ const headerDecorations = (
 	const decorations: Decoration[] = [];
 
 	doc.descendants((node, pos) => {
+		// A textblock holds text, never a table, and on a long document its
+		// children are most of the nodes there are. Not descending into them
+		// is the difference between walking the document and walking its
+		// structure.
+		if (node.isTextblock) return false;
 		if (node.type.name !== 'tableRow') return true;
 
 		let headersOnly = true;
@@ -215,16 +220,26 @@ export const TableAccessibility =
 
 		addProseMirrorPlugins() {
 			const labels = this.options.labels.table;
+			let cached: { doc: ProseMirrorNode; set: DecorationSet } | null =
+				null;
 
 			return [
 				new Plugin({
 					key: TABLE_A11Y_PLUGIN_KEY,
 					props: {
-						decorations: (state) =>
-							DecorationSet.create(
+						// Cached on the document's identity. `decorations` is
+						// asked on every update, and most updates move the
+						// caret rather than the document — a document is
+						// immutable, so the same one has the same answer.
+						decorations: (state) => {
+							if (cached?.doc === state.doc) return cached.set;
+							const set = DecorationSet.create(
 								state.doc,
 								headerDecorations(state.doc, labels)
-							)
+							);
+							cached = { doc: state.doc, set };
+							return set;
+						}
 					},
 					view: (view) => new TableAccessibilityView(view, labels)
 				})

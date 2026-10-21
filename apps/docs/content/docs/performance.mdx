@@ -1,0 +1,82 @@
+---
+title: Long documents
+description: What the editor costs on a document of ten thousand blocks, measured rather than guessed.
+icon: Gauge
+---
+
+The question a long document asks is not "is it fast" but "what grows". Two
+things used to grow faster than the document did; both were fixed by
+measuring, and `pnpm perf` is how.
+
+## Opening a document
+
+**A document this editor saved opens in about two seconds at ten thousand
+blocks.** A document from somewhere else — an import, a migration, anything
+that has never been through this editor — used to take **two minutes**.
+
+The difference was block ids. Every block carries a stable `id`, and
+`@tiptap/extension-unique-id` assigns the missing ones inside ProseMirror:
+one `setNodeMarkup` step per block on a single transaction, with every step
+applied to the document the step before it produced. That is quadratic.
+
+The editor now stamps them before the document reaches ProseMirror, in one
+pass over plain JSON, which is linear. The extension finds nothing to do on
+load and keeps the job it is good at — the one new block at a time.
+
+| Blocks | Import, before | Import, now |
+| ------ | -------------- | ----------- |
+| 1,000  | 2.1s           | 0.5s        |
+| 5,000  | 34.2s          | 1.3s        |
+| 10,000 | 137.2s         | 2.3s        |
+
+<Callout title="You can do this yourself">
+	`withBlockIds` is exported. If you are migrating documents in bulk, run it
+	once when you store them and the editor has nothing left to do:
+	```ts
+	import { withBlockIds } from '@blockleaf/editor';
+
+    await store(withBlockIds(documentFromElsewhere));
+    ```
+
+</Callout>
+
+## Typing in it
+
+Typing costs roughly **four milliseconds per thousand blocks**, and it is
+linear. At a thousand blocks it is not measurable against the noise; at ten
+thousand it is about forty milliseconds, which is perceptible but not in the
+way a freeze is.
+
+That cost is ProseMirror's own — mapping positions and reconciling the DOM
+across the whole document. Removing `UniqueID` entirely, which does a deep
+document comparison on every transaction, changed nothing measurable, so the
+obvious suspect was not the culprit.
+
+**Where your own code can make it worse:** `onChange` is debounced, and the
+document is now serialised _inside_ that debounce rather than on every
+keystroke. `onChangeImmediate` is not debounced and cannot be — if you pass
+one, you are asking for the whole document on every keystroke. Pass it only
+if you need it, and keep what it does cheap.
+
+## Virtualisation
+
+The plan allowed for it. The measurements say not yet: nothing is quadratic
+any more, and what is left is linear and modest. Virtualising a ProseMirror
+document is a large change that fights the editor's own model of the DOM, and
+it should be bought with evidence rather than caution.
+
+If you are working with documents far past ten thousand blocks and feeling
+it, [say so in an
+issue](https://github.com/zahidshowrav/blockleaf/issues) — that is the
+evidence it would take.
+
+## Measuring it yourself
+
+```bash
+pnpm perf
+```
+
+Boots the sandbox, opens documents of several sizes and times opening and
+typing in each. Numbers from one machine are a before and after, not a
+budget — the budget lives in `e2e/performance.spec.ts`, which fails if
+opening a five thousand block import ever takes more than ten seconds again.

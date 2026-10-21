@@ -22,6 +22,7 @@
 		"test": "turbo run test",
 		"test:e2e": "playwright test",
 		"demo:gif": "node scripts/record-demo.ts",
+		"perf": "node scripts/measure-performance.ts",
 		"check:packaging": "turbo run check:packaging",
 		"size": "turbo run size",
 		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,mdx,yml}\"",

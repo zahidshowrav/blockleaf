@@ -8,6 +8,7 @@ import {
 	NORMALISATION_META,
 	createExtensions,
 	createUploadExtension,
+	withBlockIds,
 	withSchemaVersion,
 	type BlockleafDocument,
 	type PresetName,
@@ -100,9 +101,17 @@ export const useBlockleafEditor = ({
 		onUploadError
 	]);
 
+	// Ids are stamped here rather than left to `UniqueID`, which assigns
+	// them one quadratic transaction step at a time once the document is
+	// already inside ProseMirror. See `withBlockIds`.
+	const content = useMemo(
+		() => (defaultValue ? withBlockIds(defaultValue) : defaultValue),
+		[defaultValue]
+	);
+
 	const editor = useEditor({
 		extensions: resolvedExtensions,
-		content: defaultValue,
+		content,
 		editable,
 		autofocus,
 		// Next.js App Router hydrates on the client; rendering immediately is the
@@ -125,17 +134,21 @@ export const useBlockleafEditor = ({
 			// The one cast in the package, and the right place for it: Tiptap's
 			// JSONContent is `any`-typed, so this is where a loose shape becomes the
 			// documented contract. M1 validates here instead of asserting.
-			const doc = withSchemaVersion(
-				instance.getJSON() as BlockleafDocument
-			);
-			onChangeImmediateRef.current?.(doc);
+			const serialise = () =>
+				withSchemaVersion(instance.getJSON() as BlockleafDocument);
+
+			onChangeImmediateRef.current?.(serialise());
 
 			if (!onChangeRef.current) return;
 			clearTimeout(timerRef.current);
-			timerRef.current = setTimeout(
-				() => onChangeRef.current?.(doc),
-				debounceMs
-			);
+			// Serialised inside the timer, not before it. Serialising on every
+			// keystroke and then debouncing only the delivery is what the
+			// debounce exists to avoid — the whole document is walked either
+			// way, and on a long one that is the keystroke's cost.
+			timerRef.current = setTimeout(() => {
+				if (instance.isDestroyed) return;
+				onChangeRef.current?.(serialise());
+			}, debounceMs);
 		}
 	});
 
