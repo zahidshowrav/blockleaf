@@ -22,7 +22,7 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
 `HD-01` through `HD-08` are done. What is left in the block is `HD-09`
-to `HD-13`; `HD-12` is the only one of them shipping a defect today. `@blockleaf/editor@0.5.0` and `@blockleaf/renderer@0.0.1` are live on
+to `HD-13`, with `HD-12` done. Nothing left in the block ships a defect. `@blockleaf/editor@0.5.0` and `@blockleaf/renderer@0.0.1` are live on
 npm, and the docs site is deployed at `blockleaf.dev`.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
@@ -320,12 +320,21 @@ will ever be.
 Three more gaps came out of reviewing that work rather than doing it, and are
 written down here because the only other copy was a merged pull request body.
 
-`HD-12` is the sharper one. `HD-08` taught the editor to contain a table wider
-than the screen; `@blockleaf/renderer` emits a bare `<table>` with no wrapper,
-no overflow and no containment, so a **published** page still blows out its
-host's layout exactly as the editor used to. That is the read path — the one
-§1 argues is used a thousand times for every time a document is written — so
-it is the worse place to have the bug, and the fix is one already proven.
+`HD-12` is **done**. `HD-08` taught the editor to contain a table wider than
+the screen; `@blockleaf/renderer` emitted a bare `<table>`, so a published
+page blew out its host's layout exactly as the editor used to — on the read
+path, the one §1 argues is used a thousand times for every time a document is
+written. Both targets now wrap a table identically in
+`.blockleaf-table-scroll`, focusable and named, and the class is styled
+unscoped on purpose: rendered output lands in whatever markup the host wrote,
+and a table that only behaves when somebody remembered `.blockleaf-editor__content`
+is a table that does not behave. Proven in a browser rather than asserted — a
+900px published table inside a 428px box on a 500px viewport scrolls, stays in
+the viewport, and leaves the page alone.
+
+The renderer gained a `labels` option in the process. It had no user-facing
+strings before this one, and hard-coding English while the editor has had a
+full label set since `HD-02` would have made it the odd one out.
 
 `HD-13`: `withBlockIds` fixed loading, not pasting. `UniqueID`'s
 `transformPasted` strips ids from pasted content and `appendTransaction`
@@ -355,7 +364,7 @@ this table is for.
 | HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable           | Not started | —         | —          |
 | HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump             | Not started | —         | —          |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it    | Not started | —         | —          |
-| HD-12 | A wide table in `@blockleaf/renderer`, which wraps one in nothing      | Not started | —         | —          |
+| HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing    | Done        | `a52d2dc` | 2026-10-22 |
 | HD-13 | Pasting a long document, which still takes the quadratic path          | Not started | —         | —          |
 
 ## OP — Optional packages (ongoing)
