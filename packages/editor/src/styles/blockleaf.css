@@ -1219,6 +1219,13 @@
  * div; it had just never been given anywhere to go, so a stored `colwidth`
  * wider than a phone cut the document off at the screen edge.
  *
+ * `.tableWrapper` is prosemirror-tables' own class, so it stays scoped to the
+ * editor's content where it cannot collide. `.blockleaf-table-scroll` is what
+ * `@blockleaf/renderer` emits around a published table, and is deliberately
+ * unscoped: rendered output lands in whatever markup the host wrote, and a
+ * table that only behaves when somebody remembered a wrapper class is a table
+ * that does not behave.
+ *
  * `contain: inline-size` is what actually holds the line, and `overflow-x`
  * alone did not. A grid or flex item defaults to `min-width: auto`, so its
  * minimum size is its content's — a 780px table pushed the *host's* grid
@@ -1228,13 +1235,15 @@
  * layout. The alternative was asking every consumer to put `min-width: 0` on
  * whatever box they put the editor in.
  */
-.blockleaf-editor__content .tableWrapper {
+.blockleaf-editor__content .tableWrapper,
+.blockleaf-table-scroll {
 	contain: inline-size;
 	max-width: 100%;
 	overflow-x: auto;
 }
 
-.blockleaf-editor__content .tableWrapper:focus-visible {
+.blockleaf-editor__content .tableWrapper:focus-visible,
+.blockleaf-table-scroll:focus-visible {
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: 2px;
 }

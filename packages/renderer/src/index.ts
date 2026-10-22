@@ -12,6 +12,11 @@ export {
 	type ImageAttributes,
 	type LinkAttributes
 } from './attrs.js';
+export {
+	defaultRendererLabels,
+	resolveRendererLabels,
+	type RendererLabels
+} from './labels.js';
 export { sanitizeHref, sanitizeSrc } from './sanitize.js';
 export {
 	extractHeadings,
