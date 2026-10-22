@@ -109,8 +109,58 @@ describe('structure', () => {
 
 	it('renders an empty table without crashing', () => {
 		for (const html of both(table())) {
-			expect(html).toBe('<table data-id="t"></table>');
+			expect(html).toContain('<table data-id="t"></table>');
 		}
+	});
+});
+
+/**
+ * HD-12. The editor learned to contain a table wider than the screen in
+ * HD-08; this side emitted a bare `<table>`, so a published page blew out its
+ * host's layout exactly as the editor used to — on the path that gets read a
+ * thousand times for every time a document is written.
+ */
+describe('the box a wide table scrolls inside', () => {
+	const doc = table(row(header('Name')), row(cell('Ada')));
+
+	it('wraps the table in both targets, identically', () => {
+		const [react, string] = both(doc);
+
+		for (const html of [react, string]) {
+			expect(html).toContain('class="blockleaf-table-scroll"');
+			expect(html).toMatch(
+				/<div[^>]*class="blockleaf-table-scroll"[^>]*><table/
+			);
+		}
+	});
+
+	// A scroll container nobody can focus is one nobody without a pointer can
+	// scroll, and a `region` with no name is announced by nothing.
+	it('is focusable and named', () => {
+		for (const html of both(doc)) {
+			expect(html).toContain('tabindex="0"');
+			expect(html).toContain('role="region"');
+			expect(html).toContain('aria-label="Table, scrollable"');
+		}
+	});
+
+	it('takes its name from the label set, in both targets', () => {
+		const labels = { tableScrollRegion: 'Tableau, défilant' };
+
+		expect(reactHTML(doc, { labels })).toContain(
+			'aria-label="Tableau, défilant"'
+		);
+		expect(stringHTML(doc, { labels })).toContain(
+			'aria-label="Tableau, défilant"'
+		);
+	});
+
+	it('escapes a label that would otherwise break the attribute', () => {
+		const labels = { tableScrollRegion: 'Say "table"' };
+
+		expect(stringHTML(doc, { labels })).toContain(
+			'aria-label="Say &quot;table&quot;"'
+		);
 	});
 });
 
