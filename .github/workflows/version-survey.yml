@@ -14,15 +14,12 @@ name: Version survey
 # the site would have advertised a version nobody could install.
 #
 # Monthly rather than weekly: measured drift is about one competitor release a
-# week, and a two-line pull request arriving every Saturday is one that gets
-# merged without being read.
+# week, and a two-line pull request arriving every week is one that gets merged
+# without being read.
 
 on:
     schedule:
-        # Every Saturday; the first job drops all but the month's first one.
-        # Cron cannot express "first Saturday" — given both a day-of-month and
-        # a day-of-week it matches either, not both.
-        - cron: '0 6 * * 6'
+        - cron: '0 6 1 * *' # The 1st of each month, 06:00 UTC
     workflow_dispatch:
 
 permissions:
@@ -34,35 +31,10 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    first-saturday:
-        runs-on: ubuntu-latest
-        outputs:
-            proceed: ${{ steps.date.outputs.proceed }}
-        steps:
-            - name: Is this the month's first Saturday?
-              id: date
-              run: |
-                  if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
-                    echo 'Started by hand, so the date does not matter.'
-                    echo 'proceed=true' >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-
-                  DAY=$(date -u +%-d)
-                  if [ "$DAY" -le 7 ]; then
-                    echo "Day $DAY: the first Saturday of the month."
-                    echo 'proceed=true' >> "$GITHUB_OUTPUT"
-                  else
-                    echo "Day $DAY: not the first Saturday. Nothing to do."
-                    echo 'proceed=false' >> "$GITHUB_OUTPUT"
-                  fi
-
     # Its own job on purpose: a release that did not land and a comparison
     # table that moved are unrelated problems, and one should not hide the
     # other.
     published:
-        needs: first-saturday
-        if: needs.first-saturday.outputs.proceed == 'true'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
@@ -75,8 +47,6 @@ jobs:
               run: node scripts/check-published-versions.ts
 
     survey:
-        needs: first-saturday
-        if: needs.first-saturday.outputs.proceed == 'true'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
