@@ -22,8 +22,8 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
 `HD-01` through `HD-08` are done. What is left in the block is `HD-09`
-to `HD-13`, with `HD-12` done. Nothing left in the block ships a defect. `@blockleaf/editor@0.5.0` and `@blockleaf/renderer@0.0.1` are live on
-npm, and the docs site is deployed at `blockleaf.dev`.
+to `HD-13`, with `HD-12` done. Nothing left in the block ships a defect. Both packages are live on npm and
+the docs site is deployed at `blockleaf.dev`.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
 Playwright across two projects — 37 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.46 kB of 160 kB, schema entry at 207 B of 2 kB, code block

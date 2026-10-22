@@ -11,6 +11,12 @@
  * - `README.md` and `docs/` are plain Markdown with no way to interpolate, so
  *   a literal is allowed but must match what the manifests say today.
  *
+ * In practice that second rule means: do not name a current version in either
+ * of them. `progress-tracker.md` did, and because the release pull request is
+ * the thing that moves the manifests, this check turned every release red
+ * until somebody hand-edited a snapshot line. Link to npm instead — a
+ * sentence that has to be rewritten on every publish is one that will not be.
+ *
  * Only the `@blockleaf/<pkg>@<version>` form is matched. A version in a
  * sentence about the past — "the exemption expired when `0.1.0` was
  * published" — is a fact rather than a claim about now, and is left alone.
