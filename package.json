@@ -27,6 +27,7 @@
 		"size": "turbo run size",
 		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,mdx,yml}\"",
 		"format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,mdx,yml}\"",
+		"check:versions": "node scripts/check-doc-versions.ts",
 		"changeset": "changeset",
 		"version-packages": "changeset version && pnpm install --lockfile-only",
 		"release": "turbo run build --filter=./packages/* && changeset publish",

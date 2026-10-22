@@ -33,6 +33,9 @@ jobs:
             - name: Format check
               run: pnpm format:check
 
+            - name: Package versions in the docs
+              run: pnpm check:versions
+
             - name: Unit tests
               run: pnpm test
 

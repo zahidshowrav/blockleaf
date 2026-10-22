@@ -22,7 +22,7 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
 `HD-01` through `HD-08` are done. What is left in the block is `HD-09`
-to `HD-11`, none of which is on the critical path. `@blockleaf/editor@0.3.0` and `@blockleaf/renderer@0.0.1` are live on
+to `HD-11`, none of which is on the critical path. `@blockleaf/editor@0.5.0` and `@blockleaf/renderer@0.0.1` are live on
 npm, and the docs site is deployed at `blockleaf.dev`.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46

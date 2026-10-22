@@ -10,11 +10,12 @@ frameworks you build an editor with, and some are editors you install.
 
 Blockleaf is the second kind, built on the first kind.
 
-<Callout title="Checked on 14 October 2026">
+<Callout title="Checked on 21 October 2026">
 
-Versions, dates and licences below were read from npm and GitHub on that
-day. Everything else is a judgement, and other people's judgements
-reasonably differ.
+The other projects' versions, dates and licences were read from npm and
+GitHub on that day. Blockleaf's own version is read from this repository
+when the page is built, so it is never a day out. Everything else is a
+judgement, and other people's judgements reasonably differ.
 
 </Callout>
 
@@ -22,10 +23,10 @@ reasonably differ.
 
 |               | Kind      | Stored output       | Licence                | Latest release                        |
 | ------------- | --------- | ------------------- | ---------------------- | ------------------------------------- |
-| **Blockleaf** | Editor    | Versioned JSON      | MIT                    | `@blockleaf/editor@0.0.5`             |
+| **Blockleaf** | Editor    | Versioned JSON      | MIT                    | <PackageVersion />                    |
 | **Tiptap**    | Framework | Whatever you define | MIT (platform is paid) | `@tiptap/core@3.32.0`, Oct 2026       |
 | **Novel**     | Editor    | Tiptap JSON         | Apache-2.0             | `novel@1.0.2`, Jan 2025               |
-| **BlockNote** | Editor    | Its own block JSON  | MPL-2.0                | `@blocknote/core@0.55.0`, Sep 2026    |
+| **BlockNote** | Editor    | Its own block JSON  | MPL-2.0                | `@blocknote/core@0.56.0`, Oct 2026    |
 | **Editor.js** | Editor    | Its own block JSON  | Apache-2.0             | `@editorjs/editorjs@2.31.7`, Sep 2026 |
 | **Lexical**   | Framework | Whatever you define | MIT                    | `lexical@0.52.0`, Sep 2026            |
 
@@ -99,8 +100,9 @@ For symmetry, the honest list:
 
 - **No collaboration.** No CRDT, no presence, no sync. BlockNote and Tiptap's
   platform both have it.
-- **Young.** `0.0.5`, with the schema still pre-`0.1.0`. The versioning
-  promise is real, but the track record behind it is short.
+- **Young.** <PackageVersion bare />, and the schema has been stable enough
+  to depend on only since `0.1.0`. The versioning promise is real, but the
+  track record behind it is short.
 - **React only.** The core is deliberately framework-free so that other
   bindings stay possible, but today React is the only one shipped.
 - **Smaller plugin ecosystem.** It is Tiptap's ecosystem underneath, which
