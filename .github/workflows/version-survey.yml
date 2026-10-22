@@ -1,0 +1,158 @@
+name: Version survey
+
+# Two version claims go stale on their own, and neither is caught by anything
+# that runs per pull request.
+#
+# The comparison table quotes five rival editors. Those move on somebody
+# else's release schedule, and the prose around them is a judgement that does
+# not update itself — so the table is dated rather than live, and dating it
+# only helps if somebody re-reads it.
+#
+# Separately, every other check compares the docs to this repository's package
+# manifests. Nothing compared the manifests to npm, and on 2026-10-20 a publish
+# failed with a 409 while the manifests had already moved. For a few minutes
+# the site would have advertised a version nobody could install.
+#
+# Monthly rather than weekly: measured drift is about one competitor release a
+# week, and a two-line pull request arriving every Saturday is one that gets
+# merged without being read.
+
+on:
+    schedule:
+        # Every Saturday; the first job drops all but the month's first one.
+        # Cron cannot express "first Saturday" — given both a day-of-month and
+        # a day-of-week it matches either, not both.
+        - cron: '0 6 * * 6'
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+
+jobs:
+    first-saturday:
+        runs-on: ubuntu-latest
+        outputs:
+            proceed: ${{ steps.date.outputs.proceed }}
+        steps:
+            - name: Is this the month's first Saturday?
+              id: date
+              run: |
+                  if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+                    echo 'Started by hand, so the date does not matter.'
+                    echo 'proceed=true' >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+
+                  DAY=$(date -u +%-d)
+                  if [ "$DAY" -le 7 ]; then
+                    echo "Day $DAY: the first Saturday of the month."
+                    echo 'proceed=true' >> "$GITHUB_OUTPUT"
+                  else
+                    echo "Day $DAY: not the first Saturday. Nothing to do."
+                    echo 'proceed=false' >> "$GITHUB_OUTPUT"
+                  fi
+
+    # Its own job on purpose: a release that did not land and a comparison
+    # table that moved are unrelated problems, and one should not hide the
+    # other.
+    published:
+        needs: first-saturday
+        if: needs.first-saturday.outputs.proceed == 'true'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version-file: .nvmrc
+
+            - name: What we claim is released is installable
+              run: node scripts/check-published-versions.ts
+
+    survey:
+        needs: first-saturday
+        if: needs.first-saturday.outputs.proceed == 'true'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - uses: pnpm/action-setup@v4
+
+            - uses: actions/setup-node@v5
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+
+            - name: Re-read the figures from npm
+              id: survey
+              run: |
+                  node scripts/survey-comparisons.ts | tee survey.log
+                  if git diff --quiet -- apps/docs/content/docs/comparisons.mdx; then
+                    echo 'changed=false' >> "$GITHUB_OUTPUT"
+                  else
+                    echo 'changed=true' >> "$GITHUB_OUTPUT"
+                  fi
+
+            # A pull request opened with GITHUB_TOKEN does not trigger other
+            # workflows — GitHub's guard against a workflow that opens a pull
+            # request that starts a workflow. So the two checks that can
+            # actually fail on a change to this file run here, before the pull
+            # request exists, rather than being bought with a longer-lived
+            # credential.
+            - name: Normalise formatting
+              if: steps.survey.outputs.changed == 'true'
+              run: >-
+                  pnpm exec prettier --write
+                  apps/docs/content/docs/comparisons.mdx
+
+            - name: The page still builds
+              if: steps.survey.outputs.changed == 'true'
+              run: pnpm --filter docs build
+
+            - name: Open a pull request
+              if: steps.survey.outputs.changed == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  BRANCH: chore/comparison-survey
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+                  git checkout -B "$BRANCH"
+                  git add apps/docs/content/docs/comparisons.mdx
+                  git commit -m 'docs: re-survey the comparison table' \
+                    -m 'Figures re-read from npm. The prose around them is unchanged.'
+                  git push --force origin "$BRANCH"
+
+                  {
+                    echo 'Monthly re-read of the figures in `comparisons.mdx`.'
+                    echo
+                    echo '```'
+                    cat survey.log
+                    echo '```'
+                    echo
+                    echo 'Only the versions, dates and the checked-on line were touched.'
+                    echo 'The prose is a judgement and was left alone — if a project this'
+                    echo 'page calls dormant has started publishing again, the `activity`'
+                    echo 'lines above are where that shows, and the sentence needs a person.'
+                    echo
+                    echo 'GitHub does not run workflows on a pull request opened by'
+                    echo '`GITHUB_TOKEN`, so there are no checks below. Prettier and a full'
+                    echo 'docs build already ran on this change before the pull request was'
+                    echo 'opened — if the page had stopped building, this would not exist.'
+                  } > body.md
+
+                  # One open pull request at a time: a month nobody merged is
+                  # updated rather than duplicated.
+                  if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+                    gh pr create --base main --head "$BRANCH" \
+                      --title 'docs: re-survey the comparison table' \
+                      --body-file body.md
+                  fi

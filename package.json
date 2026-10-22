@@ -24,6 +24,7 @@
 		"demo:gif": "node scripts/record-demo.ts",
 		"perf": "node scripts/measure-performance.ts",
 		"survey:comparisons": "node scripts/survey-comparisons.ts",
+		"check:published": "node scripts/check-published-versions.ts",
 		"check:packaging": "turbo run check:packaging",
 		"size": "turbo run size",
 		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,css,json,md,mdx,yml}\"",
