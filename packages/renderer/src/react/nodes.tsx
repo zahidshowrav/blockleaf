@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 
+import { defaultRendererLabels, type RendererLabels } from '../labels.js';
 import { type NodeRenderer } from './types.js';
 import {
 	blockId,
@@ -172,43 +173,58 @@ const HardBreak: NodeRenderer = () => <br />;
  * not an HTML attribute; the widths belong in `<colgroup>`, which is where
  * both put them.
  */
-const Table: NodeRenderer = ({ node, renderNode, combine }) => {
-	const rows = tableRows(node);
-	const columns = tableColumns(node);
-	const headerCount = headerRowCount(rows);
-	const minWidth = tableMinWidth(columns);
+export const tableRenderer =
+	(labels: RendererLabels = defaultRendererLabels): NodeRenderer =>
+	({ node, renderNode, combine }) => {
+		const rows = tableRows(node);
+		const columns = tableColumns(node);
+		const headerCount = headerRowCount(rows);
+		const minWidth = tableMinWidth(columns);
 
-	const renderRows = (slice: RenderableNode[]) =>
-		combine(slice.map((row) => renderNode(row, node)));
+		const renderRows = (slice: RenderableNode[]) =>
+			combine(slice.map((row) => renderNode(row, node)));
 
-	return (
-		<table
-			data-id={blockId(node)}
-			style={minWidth ? { minWidth: `${minWidth}px` } : undefined}
-		>
-			{columns.length > 0 && (
-				<colgroup>
-					{columns.map((column, index) => (
-						<col
-							key={index}
-							style={{
-								...(column.width !== undefined
-									? { width: `${column.width}px` }
-									: { minWidth: '25px' })
-							}}
-						/>
-					))}
-				</colgroup>
-			)}
-			{headerCount > 0 && (
-				<thead>{renderRows(rows.slice(0, headerCount))}</thead>
-			)}
-			{rows.length > headerCount && (
-				<tbody>{renderRows(rows.slice(headerCount))}</tbody>
-			)}
-		</table>
-	);
-};
+		return (
+			// The box the table scrolls inside. `contain: inline-size` is what
+			// stops a stored `colwidth` wider than the screen pushing the page
+			// sideways: a grid or flex item defaults to `min-width: auto`, so
+			// without it the table's width becomes the host layout's problem.
+			// Focusable, because a scroll container nobody can focus is one
+			// nobody without a pointer can scroll.
+			<div
+				className="blockleaf-table-scroll"
+				role="region"
+				aria-label={labels.tableScrollRegion}
+				tabIndex={0}
+			>
+				<table
+					data-id={blockId(node)}
+					style={minWidth ? { minWidth: `${minWidth}px` } : undefined}
+				>
+					{columns.length > 0 && (
+						<colgroup>
+							{columns.map((column, index) => (
+								<col
+									key={index}
+									style={{
+										...(column.width !== undefined
+											? { width: `${column.width}px` }
+											: { minWidth: '25px' })
+									}}
+								/>
+							))}
+						</colgroup>
+					)}
+					{headerCount > 0 && (
+						<thead>{renderRows(rows.slice(0, headerCount))}</thead>
+					)}
+					{rows.length > headerCount && (
+						<tbody>{renderRows(rows.slice(headerCount))}</tbody>
+					)}
+				</table>
+			</div>
+		);
+	};
 
 const TableRow: NodeRenderer = ({ children }) => <tr>{children}</tr>;
 
@@ -268,7 +284,7 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	callout: Callout,
 	details: Details,
 	image: Image,
-	table: Table,
+	table: tableRenderer(),
 	tableRow: TableRow,
 	tableHeader: TableHeader,
 	tableCell: TableCell,

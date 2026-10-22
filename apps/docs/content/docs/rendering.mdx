@@ -132,6 +132,54 @@ concept of a table section. The editor also writes a `colwidth` attribute on
 each cell, which is not an HTML attribute; the renderer drops it, since the
 width is already in the `<col>`.
 
+### A table wider than the page
+
+Every table comes out inside a box it can scroll in:
+
+```html
+<div
+	class="blockleaf-table-scroll"
+	role="region"
+	aria-label="Table, scrollable"
+	tabindex="0"
+>
+	<table data-id="t">
+		…
+	</table>
+</div>
+```
+
+A stored `colwidth` is the author's, and a narrow screen does not overrule it
+— the table keeps its width and the reader scrolls to the rest of it.
+
+<Callout title="Why containment, not just overflow">
+	`overflow-x` alone is not enough. A grid or flex item defaults to
+	`min-width: auto`, so its minimum size is its content's: a 900px table
+	pushes *your* layout wider than the screen, and the box inside it inherits
+	that width with nothing left to scroll. The stylesheet gives
+	`.blockleaf-table-scroll` `contain: inline-size`, which keeps the table's
+	width out of your layout — so you do not have to put `min-width: 0` on
+	whatever you render this into. Supported in Safari 16, Chrome 105 and
+	Firefox 101; older browsers simply fall back to the old behaviour.
+</Callout>
+
+The `tabindex` is there because a scroll container nobody can focus is one
+nobody without a pointer can scroll. The name comes from the label set, so it
+can be translated:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	labels={{ tableScrollRegion: 'Tableau, défilant' }}
+/>
+```
+
+`renderToHTML` takes the same `labels` option. The class is styled by
+`@blockleaf/editor/styles.css` and, unlike the prose rules, is **not** scoped
+to `.blockleaf-editor__content` — rendered output lands in whatever markup you
+wrote, and a table that only behaves when somebody remembered a wrapper class
+is a table that does not behave.
+
 ## Where it differs from the editor, on purpose
 
 **The task checkbox is disabled.** Rendered output is a record of what the

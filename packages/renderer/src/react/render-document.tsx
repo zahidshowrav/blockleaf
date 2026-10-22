@@ -1,7 +1,8 @@
 import { Fragment, type ReactElement, type ReactNode } from 'react';
 
+import { resolveRendererLabels, type RendererLabels } from '../labels.js';
 import { defaultMarks, unhandledMark } from './marks.js';
-import { defaultNodes, unhandledNode } from './nodes.js';
+import { defaultNodes, tableRenderer, unhandledNode } from './nodes.js';
 import { type MarkRenderer, type NodeRenderer } from './types.js';
 import { type RenderableDocument } from '../types.js';
 import { createRenderer } from '../walk.js';
@@ -30,6 +31,11 @@ export interface RenderDocumentProps {
 	 */
 	doc: RenderableDocument;
 	/**
+	 * Strings the output carries. Only the scrollable table's name so far;
+	 * anything left out keeps its English default.
+	 */
+	labels?: Partial<RendererLabels>;
+	/**
 	 * Replaces the component used for a node type, by name. Anything not named
 	 * keeps its default, so an override is a patch rather than a whole
 	 * mapping.
@@ -48,19 +54,27 @@ export interface RenderDocumentProps {
 export const RenderDocument = ({
 	doc,
 	components,
-	marks
+	marks,
+	labels
 }: RenderDocumentProps): ReactElement => {
 	// Overrides are merged per render rather than memoised, because this
 	// component has to work in a server component, where hooks do not exist.
 	// Merging two objects is cheap next to walking a document; hoisting the
 	// override map to module scope makes it cheaper still.
+	const base_nodes = labels
+		? {
+				...defaultNodes,
+				table: tableRenderer(resolveRendererLabels(labels))
+			}
+		: defaultNodes;
+
 	const render =
-		components || marks
+		components || marks || labels
 			? createRenderer<ReactNode>({
 					...base,
 					nodes: components
-						? { ...defaultNodes, ...components }
-						: defaultNodes,
+						? { ...base_nodes, ...components }
+						: base_nodes,
 					marks: marks ? { ...defaultMarks, ...marks } : defaultMarks
 				})
 			: renderDefault;

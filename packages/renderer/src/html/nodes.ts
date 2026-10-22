@@ -1,3 +1,4 @@
+import { defaultRendererLabels, type RendererLabels } from '../labels.js';
 import { attributes, element, escapeText, voidElement } from './escape.js';
 import {
 	blockId,
@@ -29,7 +30,16 @@ import { type NodeRender } from '../walk.js';
 
 export type HtmlNodeRenderer = NodeRender<string>;
 
-const defaults: Record<string, HtmlNodeRenderer> = {
+/**
+ * The default node map, built against a label set.
+ *
+ * A factory rather than a constant because one node — the table — puts a
+ * string in its output, and the editor has had translatable chrome since
+ * HD-02. A renderer hard-coding English would be the odd one out.
+ */
+export const createHtmlNodes = (
+	labels: RendererLabels = defaultRendererLabels
+): Record<string, HtmlNodeRenderer> => ({
 	doc: ({ children }) => children,
 
 	paragraph: ({ node, children }) =>
@@ -166,13 +176,27 @@ const defaults: Record<string, HtmlNodeRenderer> = {
 				? element('tbody', {}, renderRows(rows.slice(headerCount)))
 				: '';
 
+		// The box the table scrolls inside, matching the React target and
+		// the editor. `contain: inline-size` in the stylesheet is what stops
+		// a stored `colwidth` wider than the screen pushing the page
+		// sideways; focusable, because a scroll container nobody can focus
+		// is one nobody without a pointer can scroll.
 		return element(
-			'table',
+			'div',
 			{
-				'data-id': blockId(node),
-				style: minWidth ? `min-width: ${minWidth}px` : undefined
+				class: 'blockleaf-table-scroll',
+				role: 'region',
+				'aria-label': labels.tableScrollRegion,
+				tabindex: '0'
 			},
-			colgroup + head + body
+			element(
+				'table',
+				{
+					'data-id': blockId(node),
+					style: minWidth ? `min-width: ${minWidth}px` : undefined
+				},
+				colgroup + head + body
+			)
 		);
 	},
 
@@ -202,14 +226,14 @@ const defaults: Record<string, HtmlNodeRenderer> = {
 	text: ({ node }) => escapeText(node.text ?? ''),
 
 	hardBreak: () => voidElement('br', {})
-};
+});
 
 /** Whether a row is made entirely of header cells, so its cells head columns. */
 const allHeaders = (row: RenderableNode | undefined): boolean =>
 	Boolean(row?.content?.length) &&
 	(row?.content ?? []).every((cell) => isHeaderCell(cell));
 
-export const defaultHtmlNodes = defaults;
+export const defaultHtmlNodes = /* @__PURE__ */ createHtmlNodes();
 
 /** An unknown node keeps its children and loses its wrapper. */
 export const unhandledHtmlNode: HtmlNodeRenderer = ({ children }) => children;
