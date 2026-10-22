@@ -1,6 +1,6 @@
 {
 	"name": "@blockleaf/renderer",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Renders a stored Blockleaf document to React or an HTML string, with no editor and no ProseMirror.",
 	"license": "MIT",
 	"homepage": "https://blockleaf.dev",
