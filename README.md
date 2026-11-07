@@ -109,22 +109,22 @@ pnpm perf              # open long documents and time them
 
 Done:
 
-- **EC** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
-- **CH** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
-- **MC** — upload adapter, images, code blocks with highlighting
-- **RD** — `@blockleaf/renderer` and the docs site
+- **Editing Core (EC)** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
+- **The Chrome (CH)** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
+- **Media & Code (MC)** — upload adapter, images, code blocks with highlighting
+- **Renderer & Docs (RD)** — `@blockleaf/renderer` and the docs site
 
 Next:
 
-- **HD** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
-- **FC** — forward compatibility: an editor that meets a document written by a newer editor should say so, not fall over
-- **PA** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
+- **Hardening (HD)** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
+- **Forward Compatibility (FC)** — an editor that meets a document written by a newer editor should say so, not fall over
+- **Parity Blocks & Marks (PA)** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
 
 Later, and demand-led:
 
-- **OP** — collaboration, comments, AI, markdown import
-- **UX** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
-- **EX** — Word in and out, version history
+- **Optional Extensions (OP)** — collaboration, comments, AI, markdown import
+- **Design & Motion (UX)** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
+- **Conversion & Export (EX)** — Word in and out, version history
 
 Everything in `PA` and after ships as a subpath or its own package. Installing the editor never gets heavier because a feature you do not import exists.
 
