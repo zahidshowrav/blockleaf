@@ -58,4 +58,59 @@ describe('<BlockleafEditor />', () => {
 		expect(root?.classList.contains('blockleaf-editor')).toBe(true);
 		expect(root?.classList.contains('my-editor')).toBe(true);
 	});
+
+	it('surfaces content error via onContentError (FC-01)', async () => {
+		let capturedError: Error | null = null;
+		const invalidDoc = {
+			type: 'doc',
+			content: [
+				{
+					type: 'unknown_unsupported_node_type',
+					attrs: { foo: 'bar' }
+				}
+			]
+		} as unknown as BlockleafDocument;
+
+		const { container } = render(
+			<BlockleafEditor
+				defaultValue={invalidDoc}
+				onContentError={({ error }) => {
+					capturedError = error;
+				}}
+			/>
+		);
+
+		await waitFor(() => expect(capturedError).not.toBeNull());
+		expect((capturedError as Error | null)?.message).toContain(
+			'[tiptap error]: Invalid JSON content'
+		);
+		expect(surfaceOf(container)).not.toBeNull();
+	});
+
+	it('allows explicit emitContentError={false} to suppress onContentError', async () => {
+		let errorCalled = false;
+		const invalidDoc = {
+			type: 'doc',
+			content: [
+				{
+					type: 'unknown_unsupported_node_type',
+					attrs: { foo: 'bar' }
+				}
+			]
+		} as unknown as BlockleafDocument;
+
+		const { container } = render(
+			<BlockleafEditor
+				defaultValue={invalidDoc}
+				enableContentCheck={false}
+				emitContentError={false}
+				onContentError={() => {
+					errorCalled = true;
+				}}
+			/>
+		);
+
+		await waitFor(() => expect(surfaceOf(container)).not.toBeNull());
+		expect(errorCalled).toBe(false);
+	});
 });

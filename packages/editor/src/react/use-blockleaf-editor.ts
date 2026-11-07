@@ -1,4 +1,4 @@
-import type { Editor, Extensions } from '@tiptap/core';
+import type { Editor, EditorEvents, Extensions } from '@tiptap/core';
 import { useEditor } from '@tiptap/react';
 import { useEffect, useMemo, useRef } from 'react';
 
@@ -16,6 +16,9 @@ import {
 	type UploadFailure
 } from '../core/index.js';
 
+export type ContentErrorProps = EditorEvents['contentError'];
+export type ContentErrorCallback = (props: ContentErrorProps) => void;
+
 export type UseBlockleafEditorOptions = {
 	/**
 	 * Initial content. The editor is **uncontrolled**: changing this prop later
@@ -32,6 +35,20 @@ export type UseBlockleafEditorOptions = {
 	debounceMs?: number;
 	editable?: boolean;
 	autofocus?: boolean;
+	/**
+	 * If `true`, the editor checks the content for errors on initialization.
+	 * Defaults to `true` when `onContentError` is provided, otherwise `false`.
+	 */
+	enableContentCheck?: boolean;
+	/**
+	 * If `true`, emits the `contentError` event if invalid content is encountered.
+	 * Defaults to `true` when `onContentError` is provided, otherwise `false`.
+	 */
+	emitContentError?: boolean;
+	/**
+	 * Called when the editor encounters invalid content during initialization or insertion.
+	 */
+	onContentError?: ContentErrorCallback;
 	/**
 	 * Accessible name for the editing surface.
 	 *
@@ -65,6 +82,9 @@ export const useBlockleafEditor = ({
 	debounceMs = DEFAULT_CHANGE_DEBOUNCE_MS,
 	editable = true,
 	autofocus = false,
+	enableContentCheck,
+	emitContentError,
+	onContentError,
 	label = 'Document',
 	upload,
 	uploadAccept,
@@ -73,6 +93,7 @@ export const useBlockleafEditor = ({
 }: UseBlockleafEditorOptions = {}): Editor | null => {
 	const onChangeRef = useRef(onChange);
 	const onChangeImmediateRef = useRef(onChangeImmediate);
+	const onContentErrorRef = useRef(onContentError);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined
 	);
@@ -117,6 +138,9 @@ export const useBlockleafEditor = ({
 		// Next.js App Router hydrates on the client; rendering immediately is the
 		// single most common Tiptap/SSR mismatch. Handle it rather than document it.
 		immediatelyRender: false,
+		enableContentCheck: enableContentCheck ?? Boolean(onContentError),
+		emitContentError: emitContentError ?? Boolean(onContentError),
+		onContentError: (props) => onContentErrorRef.current?.(props),
 		editorProps: {
 			attributes: {
 				class: `${EDITOR_CLASS_NAME}__content`,
@@ -155,7 +179,8 @@ export const useBlockleafEditor = ({
 	useEffect(() => {
 		onChangeRef.current = onChange;
 		onChangeImmediateRef.current = onChangeImmediate;
-	}, [onChange, onChangeImmediate]);
+		onContentErrorRef.current = onContentError;
+	}, [onChange, onChangeImmediate, onContentError]);
 
 	useEffect(() => {
 		editor?.setEditable(editable);

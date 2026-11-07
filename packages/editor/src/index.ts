@@ -85,6 +85,8 @@ export {
 } from './core/index.js';
 export {
 	useBlockleafEditor,
+	type ContentErrorCallback,
+	type ContentErrorProps,
 	type UseBlockleafEditorOptions
 } from './react/index.js';
 export {

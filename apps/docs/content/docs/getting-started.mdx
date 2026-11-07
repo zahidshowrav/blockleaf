@@ -114,6 +114,22 @@ choice for a page that only ever displays content — that page should use
 />
 ```
 
+## Handling content errors
+
+If stored content contains an invalid structure or unrecognised node types, the editor intercepts the parse error and reports it through `onContentError` rather than crashing the page:
+
+```tsx
+<BlockleafEditor
+	defaultValue={doc}
+	onContentError={({ error, editor }) => {
+		console.error('Failed to parse document content:', error);
+		// Log to monitoring, show a notification, or offer recovery
+	}}
+/>
+```
+
+Providing `onContentError` automatically enables content checking (`enableContentCheck: true` and `emitContentError: true`). If you need explicit control over whether invalid content throws or emits, pass `enableContentCheck` or `emitContentError` directly.
+
 ## Presets
 
 `preset` chooses the extension set:
