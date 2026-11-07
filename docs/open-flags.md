@@ -8,184 +8,82 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** F17, F18, F19, F20, F21 · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16 · **Last reviewed:** 2026-10-28
-
----
-
-## Open
-
-### F17 — what an editor does with a document newer than itself
-
-**Blocks:** `FC-02`, and therefore the whole of `FC` and `PA`.
-
-Today the answer is accidental. Stored JSON carrying an unrecognised node
-throws `RangeError: Unknown node type` out of `nodeFromJSON`; an unrecognised
-mark throws `There is no mark type … in this schema`. The paste path, which
-parses HTML rather than JSON, silently drops instead. `blockNodeSchema` is a
-strict `z.union`, so `./validate` rejects the entire document. The renderer
-keeps an unknown node's children and loses its wrapper, which means a
-childless node renders as nothing.
-
-Throwing is defensible — better to refuse a document than to eat the parts of
-it you cannot read. What is not defensible is that the host has no way to
-handle it: the error arrives from inside the editor with nothing to act on,
-so the obvious recovery is an empty document, and the next save overwrites
-content that was never corrupt.
-
-Two decisions are needed, and only the developer can make them.
-
-**One: is an unrecognised type preserved, or refused?** Preserving means a
-pre-parse walk swapping unknown nodes and marks for a placeholder that
-carries the original payload, and a reverse walk on the way out. It costs
-code in `src/core`, a placeholder node, and a permanent promise that the
-round trip is lossless. Refusing is free and keeps the stored shape strict,
-but makes every version skew an outage.
-
-**Two: what is the default when `attrs.schemaVersion` is ahead of
-`SCHEMA_VERSION`?** `readonly` — open it, show it, refuse to save over it —
-is the safe answer and closes the data-loss path on its own. `preserve` is
-friendlier and relies entirely on decision one being right. `throw` is
-today's behaviour, made deliberate.
-
-Whichever is chosen, it belongs in `apps/docs/content/docs/schema.mdx` as
-part of the published contract rather than in the code alone. The document
-shape is the product; how it degrades across versions is part of its shape.
-
-**Why it cannot wait.** The walk has to exist in the version doing the
-_reading_. Shipping it later does nothing for installs that already exist,
-and `0.1.x` is already out there.
-
-### F18 — does a stored design value keep a token or a CSS value
-
-**Blocks:** `PA-05`, `PA-10`, `PA-11`, `PA-22`, `PA-23`.
-
-Written about fonts, decided for colours too: both are a user choosing an
-appearance that then has to live inside a document, and the answer has to be
-the same for both or the schema has two conventions.
-
-Per-character font family and size are wanted. How they are stored is
-permanent once published, and the two options are not close.
-
-A **CSS value** — `{ "fontSize": "14px", "fontFamily": "Arial" }` — is what
-Tiptap's extensions emit and what every other editor does. It is also
-presentation stored inside content: `14px` is wrong on a phone, wrong under a
-host's larger-text theme, and wrong in `@blockleaf/renderer`, where the
-editor stylesheet may not be loaded at all. It defeats theming, because an
-inline `font-family` beats every `--bl-*` property a host sets. And a
-free-text style value is injectable in the same shape an `href` is, which is
-the risk §3 already closes at the schema level rather than in the UI.
-
-A **token** — `{ "fontSize": "lg", "fontFamily": "mono" }` — resolves through
-`--bl-font-size-lg` and `--bl-font-mono`, emits a class rather than a style
-attribute, validates against an allowed set, and leaves theming working. The
-cost is real and should not be glossed: a user picks from the set the host
-offers, not from every font installed on their machine. For a product with a
-house style that is correct behaviour. For one replacing Word, it will read
-as a missing feature.
-
-If the full list is genuinely required, the escape hatch is a host-level
-opt-in that permits arbitrary values, sanitised, off by default — so a host
-turns it on knowingly rather than discovering later that their theme stopped
-applying.
-
-**Colour makes the same argument harder to refuse.** A stored `#1a1a1a` is a
-value chosen against whatever background the author happened to be looking
-at, and it stays that value when the reader opens the document in dark mode,
-where it is often unreadable. A token resolves per theme and cannot be
-illegible in one of them by accident. The precedent is already in the
-schema — `callout` stores `tone`, a name, rather than a colour — so the
-inconsistent choice would be the new one.
-
-### F19 — what the editor's motion is built out of
-
-**Blocks:** `UX-01`, and the shape of the whole `UX` block.
-
-A design pass needs a motion language, and the choice of what implements it
-is made once. It is on this list rather than assumed because the obvious
-answer and the right answer may not be the same one.
-
-**CSS transitions and keyframes** cost nothing at runtime, nothing in the
-bundle, and survive a host swapping the stylesheet. They are weak at exactly
-two things, and both appear in an editor: animating a list as its items
-reorder, and moving an element between two positions in the DOM — a block
-being dragged to a new place being the obvious case.
-
-**An animation library** makes both of those straightforward and costs tens
-of kilobytes against a core budget with roughly twelve to spare. It also
-breaks a stated promise: a host who swaps the stylesheet would still inherit
-whatever the library does.
-
-The third option, and probably the honest one, is **CSS for everything and no
-animation at all for the two hard cases** — a drag that snaps rather than
-glides is not a worse editor, and nobody has asked for it to glide.
-
-Whatever is chosen, `prefers-reduced-motion` is not part of the decision. It
-is required either way, and `UX-01` writes it before anything else in the
-block so that no later task has to remember.
-
-### F20 — is a caption plain text or rich text
-
-**Blocks:** `PA-20`, `PA-21`, and `HD-10` with them.
-
-Captions are wanted on images, video, audio, files and embeds, with their own
-alignment, separate from alt text. What a caption may _contain_ is the
-decision, and it is structural rather than cosmetic.
-
-**Plain text in an attribute** is additive and cheap. `image` stays
-`atom: true` — a leaf the caret cannot enter — nothing about selection
-changes, and the whole feature is an attribute and some chrome.
-
-**Rich text in a child node** means `image` stops being an atom. The caret
-can enter the block, which touches selection, the drag handle, the block
-menu, keyboard navigation and every `HD-01` axe surface that assumed a leaf.
-It is a markedly larger piece of work.
-
-The reason not to take the cheap one: the most common thing a caption
-contains is a credit, and a credit is usually a link. Emphasis is the second.
-Both are impossible in a plain string, and moving from a string to rich
-content afterwards is a breaking change to the stored shape, paid by every
-host, to add something that was foreseeable at the start.
-
-A third shape is worth weighing: the media node keeps a `caption?` **child
-node** that holds inline content, rather than becoming a general container.
-The media stays a leaf, the caption is a defined place with defined contents,
-and `<figure>`/`<figcaption>` falls out of it naturally.
-
-Whatever is chosen binds `HD-10` as well. A table caption and a figure
-caption that store differently are two mechanisms for one idea, in a schema
-that is the product.
-
-### F21 — what an image resize is allowed to change
-
-**Blocks:** `PA-24`.
-
-Dragging an image or video to resize it is wanted, from any edge, with a
-one-click full width.
-
-Width is uncontroversial: `image` already stores one, the aspect ratio
-follows, and full width is a named value rather than a pixel count — a
-number measured on the author's monitor is wrong on a phone.
-
-A **top or bottom** edge is the question, because free height means one of
-two things and neither is obviously the request. Either the picture
-**distorts**, which is almost never what someone dragging a handle wants and
-which no amount of UI makes pleasant. Or it **crops**, which is a genuinely
-useful feature and a different one: it needs a stored crop rectangle, a way
-to reposition the visible area, and an original that is kept so the crop can
-be undone.
-
-Editors that look like this one — and the one this request came from — resize
-width only and keep the ratio, for this reason rather than from lack of
-ambition.
-
-So: ratio-locked width and a full-width toggle, which is `PA-24` as written.
-Cropping, if it is wanted, is its own task with its own stored shape, and
-should be asked for as cropping rather than arrive as a side effect of a
-drag handle. Free distortion is the one option worth refusing outright.
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21 · **Last reviewed:** 2026-11-07
 
 ---
 
 ## Settled
+
+### F21 — what an image resize is allowed to change · decided 2026-11-07
+
+Resizing media blocks (images, videos, YouTube/Vimeo embeds, iframes) resizes
+**width while locking the aspect ratio**, plus provides a 1-click **full-width** toggle (`PA-24`).
+
+**Decisions:**
+
+- Width is resized smoothly with aspect ratio maintained; arbitrary height distortion (squishing/stretching) is strictly refused.
+- Applies across all media types: image, video, embeds (YouTube, Vimeo), and general iframes.
+- Full width is a named state/class rather than a raw pixel width, ensuring responsive rendering on mobile and varied screen sizes.
+- Image cropping, if desired in the future, will be introduced as its own dedicated crop tool rather than a side-effect of resize handles.
+
+### F20 — is a caption plain text or rich text · decided 2026-11-07
+
+Captions (under images, video, embeds, audio, and tables) are structured as **rich text**
+(inline content holding text and marks such as links, emphasis, and strong).
+
+**Decisions:**
+
+- A media/table block includes a `caption` child node (rendering `<figcaption>` or `<caption>`) containing inline content.
+- Supports clickable links and formatting (essential for credits, source links, and licenses).
+- Aligns `PA-20`, `PA-21`, and `HD-10` on the same structured caption mechanism.
+- **Why:** Plain string attributes cannot express source/attribution links, which are present in almost all production captions. Storing rich text immediately prevents a breaking schema bump later when link credits are inevitable.
+
+### F19 — what the editor's motion is built out of · decided 2026-11-07
+
+The editor's motion and animation language is built entirely out of **pure CSS transitions and keyframes**.
+
+**Decisions:**
+
+- Motion uses CSS variables (`--bl-duration-*`, `--bl-ease-*`) and standard CSS keyframes/transitions.
+- Drag-and-drop indicator snaps into position cleanly without requiring heavy runtime physics animation.
+- No JavaScript animation libraries (e.g., Framer Motion) are bundled.
+- Respects `prefers-reduced-motion` globally so all motion collapses to instant cuts when requested.
+- **Why:** Keeps 0 kB runtime JS overhead against the strict 160 kB bundle budget, avoids breaking host stylesheets, and provides instant, predictable UI response.
+
+### F18 — does a stored design value keep a token or a CSS value · decided 2026-11-07
+
+Stored design values (text color, background color, font family, font size) store
+**semantic tokens**, not raw CSS values.
+
+**Decisions:**
+
+- Font size stores named scale tokens (e.g., `"sm"`, `"md"`, `"lg"`), resolving via `--bl-font-size-*`.
+- Font family stores semantic family tokens (e.g., `"sans"`, `"serif"`, `"mono"`), resolving via `--bl-font-*`.
+- Colors store semantic theme tokens (e.g., `"muted"`, `"brand"`, `"accent"`), resolving via `--bl-*` custom properties.
+- **Why:** Raw CSS values (`14px`, `#1a1a1a`) embed presentation into document content, break dark mode, fail under high-contrast or larger-text accessibility settings, and bypass theming. Semantic tokens guarantee responsive scaling and dark-mode legibility, matching the precedent already established by `callout` (`tone`).
+
+### F17 — what an editor does with a document newer than itself · decided 2026-11-07
+
+The editor encounters an unrecognised node/mark or an `attrs.schemaVersion` newer than
+its own `SCHEMA_VERSION`.
+
+**Decisions:**
+
+1. **Unrecognised nodes and marks are preserved losslessly.**
+    - The editor runs a pre-parse walk swapping unknown nodes and marks into a placeholder
+      node/mark that preserves the exact original payload, and performs a reverse walk on
+      serialization to write it back byte-for-byte.
+    - In the editor, an "Unsupported block" placeholder UI is rendered so the author is
+      aware content exists that their current version cannot edit directly.
+    - In `@blockleaf/renderer`, unknown blocks skip rendering cleanly (emitting `null` / nothing)
+      without noisy error banners for readers, though consumers may supply an `unknown` component
+      override (`FC-05`).
+2. **Default for newer `schemaVersion` is `readonly`.**
+    - The editor introduces a configurable `futureDocument?: 'readonly' | 'preserve' | 'throw'` prop
+      defaulting to `'readonly'`.
+    - When opened in `readonly`, the document is displayed and readable, but editing and saving
+      are locked to prevent accidental overwrite or corruption of newer schema structures.
+    - Hosts that prefer seamless editing can opt into `'preserve'`.
 
 ### F16 — the no-CSS-framework rule governs the packages, not the repo · decided 2026-10-14
 
