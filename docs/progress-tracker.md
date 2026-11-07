@@ -395,13 +395,13 @@ Already-published versions cannot be fixed from here. The walk has to exist
 in the version doing the reading, which is why this block runs before `PA`
 rather than beside it.
 
-| Id    | Task                                                                             | Status      | Commit | Completed  |
-| ----- | -------------------------------------------------------------------------------- | ----------- | ------ | ---------- |
-| FC-01 | `emitContentError` and `onContentError` surfaced to the host                     | Done        | —      | 2026-11-07 |
-| FC-02 | `futureDocument: 'readonly' \| 'preserve' \| 'throw'` from `attrs.schemaVersion` | Not started | —      | —          |
-| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte          | Not started | —      | —          |
-| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract          | Not started | —      | —          |
-| FC-05 | Renderer takes an `unknown` component override                                   | Not started | —      | —          |
+| Id    | Task                                                                             | Status      | Commit    | Completed  |
+| ----- | -------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| FC-01 | `emitContentError` and `onContentError` surfaced to the host                     | Done        | `b332a3c` | 2026-11-07 |
+| FC-02 | `futureDocument: 'readonly' \| 'preserve' \| 'throw'` from `attrs.schemaVersion` | Not started | —         | —          |
+| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte          | Not started | —         | —          |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract          | Not started | —         | —          |
+| FC-05 | Renderer takes an `unknown` component override                                   | Not started | —         | —          |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
 is an editor option Tiptap already ships and Blockleaf does not set, and it
