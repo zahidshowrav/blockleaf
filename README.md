@@ -19,7 +19,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 | **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                                                |
 | **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                                               |
 
-Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose](#roadmap).
+Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose, and scheduled](#roadmap).
 
 ## Install
 
@@ -116,12 +116,19 @@ Done:
 
 Next:
 
-- **HD** — accessibility pass, i18n, mobile, large-document performance
-- **Later** — collaboration, AI commands, markdown import/export, comments
+- **HD** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
+- **FC** — forward compatibility: an editor that meets a document written by a newer editor should say so, not fall over
+- **PA** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
+
+Later, and demand-led:
+
+- **OP** — collaboration, comments, AI, markdown import
+- **UX** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
+- **EX** — Word in and out, version history
+
+Everything in `PA` and after ships as a subpath or its own package. Installing the editor never gets heavier because a feature you do not import exists.
 
 The schema has been meant to be depended on since `0.1.0`. For what is on npm right now, see [the package](https://www.npmjs.com/package/@blockleaf/editor).
-
-Collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
 
 ## Licence
 

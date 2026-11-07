@@ -1,0 +1,135 @@
+---
+title: Roadmap
+description: What Blockleaf has, what is being built next, and what is deliberately not planned.
+icon: Map
+---
+
+This page is a direction, not a delivery schedule. Nothing here carries a
+date, and anything in the later sections may move or be dropped if nobody
+asks for it.
+
+What does not move is the document. The stored shape is the API, and the
+rules for changing it are in [the document](./schema.mdx).
+
+## Shipped
+
+Paragraphs, three heading levels, bullet, numbered and task lists, quotes,
+callouts, dividers, code blocks with syntax highlighting, images with an
+upload adapter, and tables with merge, split and header rows.
+
+Around them: a slash menu, a bubble menu, a drag handle with block actions,
+table controls, keyboard shortcuts and markdown input rules throughout, and
+`@blockleaf/renderer` for turning stored JSON into React or an HTML string
+with no ProseMirror on the page.
+
+Plus the parts that are easy to skip and expensive to retrofit: an
+accessibility pass across twelve surfaces, translatable labels, touch and
+mobile behaviour, and measured performance on documents past ten thousand
+blocks.
+
+## Next
+
+### Forward compatibility
+
+An editor should survive meeting a document written by a newer version of
+itself.
+
+Today it does not. Hand the editor stored JSON containing a node or mark it
+does not recognise and it throws, which means the document will not open at
+all. That is the right instinct — refusing a document is safer than quietly
+dropping the parts of it you cannot read — but it leaves you with nothing to
+act on, and the natural fallback of starting from an empty document is how
+content actually gets lost.
+
+What is being built: an error you can catch and report, a stated policy for
+what happens when a document's `schemaVersion` is ahead of the editor's
+(opening it read-only by default), and a guarantee that anything the editor
+does not understand is handed back out exactly as it came in.
+
+<Callout type="info" title="Why this one comes first">
+
+    Preserving an unfamiliar block only works in the version doing the
+    reading. Shipping it later does nothing for a copy of the editor already
+    installed somewhere, so it is worth doing before the blocks it protects.
+
+</Callout>
+
+### More blocks and marks
+
+The toggle block, mentions, emoji, maths, a table of contents, word count,
+text and background colour, text alignment, subscript and superscript, font
+family and size, video, audio, file attachments, embeds, link previews and
+columns. Plus markdown export and a print stylesheet, so a browser can
+produce a readable PDF without any extra dependency.
+
+Images, video, audio, files and embeds gain an optional **caption** with its
+own alignment, and captions appear in the rendered output as well as the
+editor. A caption is not alt text and does not replace it — alt text
+describes an image to someone who cannot see it, a caption adds context for
+everyone, and a screen reader reads both.
+
+Images and video also gain **drag-to-resize** and a one-click full width.
+Resizing keeps the aspect ratio: dragging a top edge would either distort the
+picture or crop it, and cropping is a feature worth building properly rather
+than one worth inheriting from a drag handle.
+
+Two promises hold across all of it:
+
+- **Nothing lands in the main entry.** Every addition is a separate import,
+  and the base bundle is unchanged if you do not use it. Installing the
+  editor does not get heavier because a feature exists.
+- **Fonts and colours store a token, not a CSS value.** A stored `14px` is
+  wrong on a phone, and a colour picked against a white background is often
+  unreadable in dark mode. Tokens resolve through the `--bl-*`
+  [custom properties](./styling) instead, so your styling and your themes
+  still win.
+
+## Later
+
+Demand-led. These are real projects, and none of them should start before
+someone asks for it:
+
+- **Collaboration** — Yjs with a provider adapter. Blockleaf ships the
+  editor half; the sync server is yours to run, and good open-source ones
+  exist.
+- **Comments** — a mark holding a thread id, plus a thread store you
+  implement, the same way the upload adapter already works. Unlike most
+  implementations, this will not require collaboration to be switched on.
+- **AI** — a streaming adapter with no provider bundled and no key of ours
+  involved.
+- **Markdown import**, and **Word in and out**.
+- **Version history**.
+
+### A design and motion pass
+
+Once the block set is complete, a pass over how all of it looks and moves —
+the menus and handles you touch, the blocks you look at, and the read view
+`@blockleaf/renderer` produces, which is where content is seen far more often
+than it is edited.
+
+It comes after the blocks rather than before them, because refining the
+design of something not yet built is work thrown away.
+
+The rules do not change for it. No CSS framework, no `!important`, every
+value a custom property you can override, and every animation stopping under
+`prefers-reduced-motion` — motion is a comfort for some people and a problem
+for others, and an editor is something you sit in front of all day.
+
+## Not planned
+
+Said plainly, so it does not need asking:
+
+- **Heading levels 4 to 6.** Three is a document-structure decision, not an
+  oversight.
+- **List nesting past three levels.**
+- **A raw HTML block.** Link and image URLs are sanitised in the schema
+  rather than in the UI, and a raw HTML block hands that guarantee back.
+- **A CSS framework, ever.** One stylesheet and custom properties. Installing
+  the editor will never require Tailwind, a `prose` class, or a build step.
+
+## Requesting something
+
+If something here matters to you, or something missing does, say so on
+[GitHub](https://github.com/zahidshowrav/blockleaf/issues). The later
+sections are ordered by what people actually ask for, and an issue with a
+real use case in it moves things more than a vote does.

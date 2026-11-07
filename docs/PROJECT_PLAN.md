@@ -119,7 +119,7 @@ Decide this before writing a single component. Everything else can be refactored
 | `link`                                          | Sanitise `href`: allow `https:`, `mailto:` and site-relative paths; reject `javascript:` at the schema level, not in the UI. |
 | `highlight`                                     | Optional colour attribute.                                                                                                   |
 
-**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own. Say so in the roadmap so people stop asking.
+**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own and each is scheduled as such — `PA` and `EX` in §9, after the schema can carry them safely. Say so in the roadmap so people stop asking.
 
 ### 3.1 Tables, and why they are in
 
@@ -306,10 +306,52 @@ Upload adapter, drop/paste/picker, progress and abort, image block with alt and 
 Full a11y pass, i18n via `labels`, theming docs, mobile and touch behaviour, large-document performance (10k+ blocks, virtualisation if needed), `examples/vite-spa`.
 **Exit:** a 500-page document stays responsive; the editor is fully usable on a phone.
 
+### FC — Forward compatibility (½–1 week)
+
+An editor must survive a document written by a newer editor than itself. It does not today: stored JSON carrying an unrecognised node or mark throws `RangeError` out of `nodeFromJSON`, the Zod validator rejects the whole document, and the renderer drops the wrapper and keeps the children. The crash is not the damage — the recovery code a host writes around the crash is, because that is what overwrites the content it could not read.
+
+ProseMirror offers no hook for this: a schema is a lookup by name and `nodeFromJSON` throws before any extension runs. The only place to solve it is before the JSON reaches ProseMirror — walk the document, swap unrecognised nodes and marks for a placeholder carrying the original payload, and splice the payload back on the way out so it round-trips untouched.
+
+This block comes before `PA` for a reason that does not improve with time: the walk has to exist in the version doing the _reading_. Every release without it is another install that can never open a future document, and shipping it later does nothing for them.
+**Exit:** an editor built without the table extensions opens a document full of tables, shows them as placeholders, saves, and the tables come back out byte for byte.
+
+### PA — Parity blocks and marks (3–4 weeks)
+
+The node and mark set a Notion-style editor is expected to have and this one does not: the toggle block already in the schema but with no extension behind it, mentions, emoji, math, a table of contents, text colour and alignment, subscript and superscript, font family and size, then media — video, audio, file attachments, embeds, link previews — and columns last, because it is the only one that fights the drag handle and the block menu.
+
+Two rules hold across the block. Everything ships as a subpath or its own package, never in the main entry: the core is at 147.46 kB of a 160 kB budget and that slack is not available. And the additive schema changes land in planned batches rather than one `SCHEMA_VERSION` bump each — six bumps for six node types is version churn that every host pays to follow.
+
+Media blocks carry an optional **caption** with its own alignment, distinct from alt text — alt describes the image to someone who cannot see it, a caption adds context for everyone, and a screen reader reads both. The caption ships with each media block rather than after it, so the stored shape moves once. What a caption may contain is `F20`, and it is structural: `image` is `atom: true` today, and a caption holding a link is not an attribute on a leaf. Table captions (`HD-10`) share whatever shape it settles on, because two caption mechanisms in one schema is one too many.
+
+Resizing is width with the ratio locked, plus a named full width. A dragged top edge means distorting the picture or cropping it; the first is never the request and the second is a different feature with its own stored shape. See `F21`.
+
+Font family, font size and colour store a **token**, not a CSS value. `fontSize: "14px"` written into a document is presentation in the content: wrong on a phone, wrong in a host's theme, wrong in the renderer, and an injection surface of exactly the kind §3's `href` rule exists to close. A token resolves through the `--bl-*` properties instead, which is what they are for. Colour makes the argument twice over, because a value chosen against a light background is frequently unreadable on a dark one — and the schema already agrees with itself here, since `callout` stores `tone` rather than a colour.
+**Exit:** each addition is importable on its own, the base bundle is unchanged without it, and the schema moved in planned batches with a migration per batch.
+
 ### OP — Optional packages (ongoing)
 
 `@blockleaf/collab` (Yjs + provider adapter), `@blockleaf/ai` (streaming adapter, no bundled provider), `@blockleaf/markdown`, comments/mentions.
 **Exit:** each is additive — removing it changes nothing in the base bundle.
+
+### UX — Design and motion (2–3 weeks)
+
+A pass over how the editor looks and moves, once there is a full set of blocks to look at. It runs after `OP` deliberately: refining the design of blocks that do not exist yet is work thrown away, and a motion language is easier to set once across twelve surfaces than to retrofit twelve times.
+
+Three things are in scope. The chrome — slash menu, bubble menu, block menu, drag handle, table controls — which is what a user actually touches. The blocks themselves, callouts and toggles and code and media, which is what they look at. And the read view in `@blockleaf/renderer`, which is where the content is seen a thousand times for every time it is edited, and which has had no design attention at all.
+
+The constraints are the same ones that made the editor worth building, and a design pass is exactly where they get quietly broken. No CSS framework and no `!important`, still. Every value a `--bl-*` custom property, because a design a host cannot override is a design imposed on them. And motion is CSS, not a library: an animation package is tens of kilobytes against a budget with twelve to spare, which is the trade §11 already refuses elsewhere.
+
+`prefers-reduced-motion` is not a finishing touch here. Vestibular disorders are not a minority taste, and an editor is a surface people sit in front of all day; every animation this block adds needs a path that does not run. It is cheaper to write that rule once at the start of the block than to audit for it at the end.
+**Exit:** the refreshed surfaces are still axe-clean, every animation stops under `prefers-reduced-motion`, nothing gained an `!important` or a hardcoded colour, and a screenshot suite fails if any of it silently changes.
+
+### EX — Conversion and export (ongoing)
+
+Getting a document out of Blockleaf and into something else. Markdown export is the cheap one and does not belong here — it is a fourth target on the renderer's existing walker, alongside React, HTML and plain text, and it ships in `PA`. What is left is genuinely expensive and should wait for someone to ask.
+
+Word in and out, in `@blockleaf/convert`. `docx` (MIT) and `mammoth` (BSD-2) make it possible with no licence cost; fidelity is the part that never finishes, because a callout has no Word equivalent, nested lists need document-level numbering definitions, and every consumer has a different idea of correct output.
+
+PDF ships as **a recipe, not a package**: a documentation page showing how to run a headless browser over `@blockleaf/renderer`'s HTML. The common case is covered earlier and far more cheaply by a print stylesheet in `PA`, which costs one `@media print` block and no dependency at all.
+**Exit:** a document survives a round trip through each supported format without losing a node the format can represent.
 
 ### V1 — 1.0
 

@@ -17,13 +17,17 @@ A commit id is the commit that finished the task, not the one that started it.
 Tasks completed outside a commit — repository settings, registry actions — show
 `—` in that column and still carry a date.
 
-Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `OP` →
-`V1`, the same ids `PROJECT_PLAN.md` §9 uses.
+Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `FC` →
+`PA` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
 `HD-01` through `HD-08` are done. What is left in the block is `HD-09`
 to `HD-13`, with `HD-12` done. Nothing left in the block ships a defect. Both packages are live on npm and
 the docs site is deployed at `blockleaf.dev`.
+
+`HD-09` is the gate. The migration runner is what `HD-10`, `SG-04` and every
+schema change in `FC` and `PA` are waiting on, and `FC-01` is the one task in
+either block that needs nothing from it.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
 Playwright across two projects — 37 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.46 kB of 160 kB, schema entry at 207 B of 2 kB, code block
@@ -351,32 +355,222 @@ containment `HD-08` leans on is three years old and needs no fallback.
 that blocks work — they are known defects with known fixes, which is what
 this table is for.
 
-| Id    | Task                                                                   | Status      | Commit    | Completed  |
-| ----- | ---------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| HD-01 | Full accessibility pass                                                | Done        | `61d82a8` | 2026-10-20 |
-| HD-02 | i18n via `labels`                                                      | Done        | `52aa00f` | 2026-10-20 |
-| HD-03 | Theming docs for the `--bl-*` custom properties                        | Done        | `f7108af` | 2026-10-14 |
-| HD-04 | Mobile and touch behaviour                                             | Done        | `fe25a20` | 2026-10-20 |
-| HD-05 | Large-document performance — 10k+ blocks measured, nothing quadratic   | Done        | `dda1a78` | 2026-10-21 |
-| HD-06 | `examples/vite-spa`                                                    | Done        | `4734b38` | 2026-10-21 |
-| HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10) | Done        | `316b929` | 2026-10-21 |
-| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override        | Done        | `316b929` | 2026-10-21 |
-| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable           | Not started | —         | —          |
-| HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump             | Not started | —         | —          |
-| HD-11 | Virtualisation — only if someone past 10k blocks reports needing it    | Not started | —         | —          |
-| HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing    | Done        | `a52d2dc` | 2026-10-22 |
-| HD-13 | Pasting a long document, which still takes the quadratic path          | Not started | —         | —          |
+| Id    | Task                                                                                      | Status      | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| HD-01 | Full accessibility pass                                                                   | Done        | `61d82a8` | 2026-10-20 |
+| HD-02 | i18n via `labels`                                                                         | Done        | `52aa00f` | 2026-10-20 |
+| HD-03 | Theming docs for the `--bl-*` custom properties                                           | Done        | `f7108af` | 2026-10-14 |
+| HD-04 | Mobile and touch behaviour                                                                | Done        | `fe25a20` | 2026-10-20 |
+| HD-05 | Large-document performance — 10k+ blocks measured, nothing quadratic                      | Done        | `dda1a78` | 2026-10-21 |
+| HD-06 | `examples/vite-spa`                                                                       | Done        | `4734b38` | 2026-10-21 |
+| HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10)                    | Done        | `316b929` | 2026-10-21 |
+| HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override                           | Done        | `316b929` | 2026-10-21 |
+| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Not started | —         | —          |
+| HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump; shares its shape with `PA-20` | Not started | —         | —          |
+| HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
+| HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
+| HD-13 | Pasting a long document, which still takes the quadratic path                             | Not started | —         | —          |
+
+## FC — Forward compatibility (½–1 week)
+
+**Exit:** an editor built without the table extensions opens a document full
+of tables, shows them as placeholders, saves, and the tables come back out
+byte for byte.
+
+Measured against the pinned ProseMirror on 2026-10-28, because the three
+surfaces do not fail the same way and the differences decide the work.
+Loading stored JSON **throws** — `RangeError: Unknown node type` for a node,
+`There is no mark type … in this schema` for a mark. The paste path parses
+HTML instead and **silently drops** what it does not recognise. The validator
+rejects the whole document, because `blockNodeSchema` is a strict `z.union`.
+`@blockleaf/renderer` keeps an unknown node's children and loses its wrapper,
+so a childless node renders as nothing at all.
+
+Throwing is the better failure — an install that cannot read a document
+refuses it rather than eating the parts it does not understand. The loss
+arrives one step later, when a host catches the error, falls back to an empty
+document, and the next save writes that over real content.
+
+Already-published versions cannot be fixed from here. The walk has to exist
+in the version doing the reading, which is why this block runs before `PA`
+rather than beside it.
+
+| Id    | Task                                                                             | Status      | Commit | Completed |
+| ----- | -------------------------------------------------------------------------------- | ----------- | ------ | --------- |
+| FC-01 | `emitContentError` and `onContentError` surfaced to the host                     | Not started | —      | —         |
+| FC-02 | `futureDocument: 'readonly' \| 'preserve' \| 'throw'` from `attrs.schemaVersion` | Not started | —      | —         |
+| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte          | Not started | —      | —         |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract          | Not started | —      | —         |
+| FC-05 | Renderer takes an `unknown` component override                                   | Not started | —      | —         |
+
+`FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
+is an editor option Tiptap already ships and Blockleaf does not set, and it
+turns an unexplained crash into an event a host can report.
+
+## PA — Parity blocks and marks (3–4 weeks)
+
+**Exit:** each addition is importable on its own, the base bundle is
+unchanged without it, and the schema moved in planned batches with a
+migration per batch.
+
+Nothing here lands in the main entry. The core is at 147.46 kB of a 160 kB
+budget, so every item below is a subpath or its own package, each with its
+own `size-limit` entry declaring `import`. Five of the marks share
+`./text-style` and two share `./toc`, because a subpath per feature is
+release overhead with nothing to show for it.
+
+The additive schema changes land in **planned batches** — `PA-02` to `PA-11`
+in one bump, `PA-12` to `PA-17` in another. Six bumps for six node types is
+churn every host pays to follow, and the migration for a purely additive
+change is the same work whether it runs once or six times.
+
+`PA-01` needs no bump at all: `details` is already in `schema.ts`, in
+`validate.ts` and in both renderer targets, and has no editor extension
+behind it. `PA-18` and `PA-19` do not touch the stored shape either.
+
+| Id    | Task                                                              | Ships as                       | Status      | Commit | Completed |
+| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | ------ | --------- |
+| PA-01 | `details` — the toggle block the schema already carries           | core                           | Not started | —      | —         |
+| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —      | —         |
+| PA-03 | Emoji                                                             | `./emoji`                      | Not started | —      | —         |
+| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —      | —         |
+| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —      | —         |
+| PA-06 | Text alignment                                                    | `./text-style`                 | Not started | —      | —         |
+| PA-07 | Subscript and superscript                                         | `./text-style`                 | Not started | —      | —         |
+| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —      | —         |
+| PA-09 | Character and word count                                          | `./toc`                        | Not started | —      | —         |
+| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —      | —         |
+| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —      | —         |
+| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —         |
+| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —         |
+| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —      | —         |
+| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —      | —         |
+| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —      | —         |
+| PA-17 | Columns                                                           | `./layout`                     | Not started | —      | —         |
+| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —      | —         |
+| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Not started | —      | —         |
+| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —      | —         |
+| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —      | —         |
+| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —      | —         |
+| PA-23 | Block background colour                                           | core                           | Not started | —      | —         |
+| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —      | —         |
+
+`PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
+`--bl-font-size-lg` — not a CSS value. A `14px` written into a document is
+presentation stored in content: wrong on a phone, wrong under a host's theme,
+wrong in the renderer, and a free-text style attribute is the same injection
+shape the schema's `href` rule exists to close. See `F18`.
+
+`PA-15` carries the same rule: an `<iframe>` pointed at an arbitrary URL is
+the risk `href` sanitising already guards against, so the provider allowlist
+belongs in the schema.
+
+`PA-17` is last in the block because it is the only item that fights existing
+chrome — the drag handle and block menu both assume one vertical stack.
+
+`PA-20` is the structural one. `image` is `atom: true` today — a leaf the
+caret cannot enter — and a caption that can hold a link or an emphasis stops
+it being one. That changes selection, the drag handle, the block menu and the
+`HD-01` axe surfaces, which is why it is its own task and not a line in
+`PA-12`. It also changes what the renderer emits, from a bare `<img>` to a
+`<figure>`, so any host styling that targets the old output moves with it.
+See `F20`.
+
+A caption is **not** alt text and does not replace it. Alt text describes the
+image for someone who cannot see it; a caption adds context for everyone, and
+a screen reader reads both. Where they say the same thing it is announced
+twice, so the docs page for `PA-20` has to say what each is for rather than
+leaving hosts to guess.
+
+`PA-20`, `PA-21` and `HD-10` are one design, not three. A table caption and a
+figure caption that store differently would put two caption mechanisms in one
+schema, permanently. Whichever ships first sets the shape.
+
+`PA-22` is mostly chrome: `highlight` already carries an optional `color`, so
+a text background exists in the stored shape and has no menu. `PA-23` is the
+schema-heavy one — a background on _every_ block is a new attribute
+everywhere, and it overlaps the callout, which is already a block whose
+purpose is being a coloured box.
+
+Colours store a **token**, not a value, for the same reasons as `PA-10` and
+`PA-11` and with one more: a hex that reads well on white is often unreadable
+on dark. The precedent is already here — `callout` stores `tone`, not a
+colour. See `F18`.
+
+`PA-24` resizes **width only, with the aspect ratio locked**, plus a
+full-width toggle, unless `F21` decides otherwise. Dragging a top or bottom
+edge means either distorting the picture or cropping it; the first is almost
+never wanted and the second is a different feature with its own stored shape.
+Full width is a named value rather than a pixel count, because a number
+measured on the author's screen is wrong on everyone else's.
 
 ## OP — Optional packages (ongoing)
 
 **Exit:** each is additive — removing it changes nothing in the base bundle.
 
-| Id    | Task                                                     | Status      | Commit | Completed |
-| ----- | -------------------------------------------------------- | ----------- | ------ | --------- |
-| OP-01 | `@blockleaf/collab` — Yjs plus a provider adapter        | Not started | —      | —         |
-| OP-02 | `@blockleaf/ai` — streaming adapter, no bundled provider | Not started | —      | —         |
-| OP-03 | `@blockleaf/markdown`                                    | Not started | —      | —         |
-| OP-04 | Comments and mentions                                    | Not started | —      | —         |
+| Id    | Task                                                                               | Status      | Commit | Completed |
+| ----- | ---------------------------------------------------------------------------------- | ----------- | ------ | --------- |
+| OP-01 | `@blockleaf/collab` — Yjs plus a provider adapter                                  | Not started | —      | —         |
+| OP-02 | `@blockleaf/ai` — streaming adapter, no bundled provider                           | Not started | —      | —         |
+| OP-03 | `@blockleaf/convert` — markdown import; export is `PA-18`                          | Not started | —      | —         |
+| OP-04 | Comments — the mark plus a `ThreadStore` the host implements; mentions are `PA-02` | Not started | —      | —         |
+
+## UX — Design and motion (2–3 weeks)
+
+**Exit:** the refreshed surfaces are still axe-clean, every animation stops
+under `prefers-reduced-motion`, nothing gained an `!important` or a hardcoded
+colour, and a screenshot suite fails if any of it silently changes.
+
+Runs after `OP` on purpose. Refining blocks that do not exist yet is work
+thrown away, and a motion language is easier to set once across every surface
+than to retrofit onto each of them.
+
+Motion is CSS, not a library — see `F19`. An animation package costs tens of
+kilobytes against a budget with twelve to spare, which is the same trade
+§11 refuses everywhere else.
+
+`UX-01` comes first and is not a formality. Every animation in this block
+needs a path that does not run, and writing that rule once at the start is
+cheaper than auditing twelve surfaces for it at the end.
+
+| Id    | Task                                                                                        | Status      | Commit | Completed |
+| ----- | ------------------------------------------------------------------------------------------- | ----------- | ------ | --------- |
+| UX-01 | Motion tokens (`--bl-duration-*`, `--bl-ease-*`) and a global `prefers-reduced-motion` rule | Not started | —      | —         |
+| UX-02 | Slash menu, bubble menu and block menu — open, close, selection                             | Not started | —      | —         |
+| UX-03 | Drag handle, drop indicator, and the dragged block's own feedback                           | Not started | —      | —         |
+| UX-04 | Callout, toggle, code block and task list designs                                           | Not started | —      | —         |
+| UX-05 | Table — grips, cell selection, row and column menus                                         | Not started | —      | —         |
+| UX-06 | Media — selection, resize, upload progress, failed upload                                   | Not started | —      | —         |
+| UX-07 | Empty, loading and placeholder states, the `FC-03` unknown block included                   | Not started | —      | —         |
+| UX-08 | Focus and selection treatment, consistent across every block                                | Not started | —      | —         |
+| UX-09 | `@blockleaf/renderer` read view, and the `PA-19` print stylesheet with it                   | Not started | —      | —         |
+| UX-10 | Dark mode and contrast pass over everything the block touched                               | Not started | —      | —         |
+| UX-11 | Playwright screenshot tests, so a refresh cannot regress silently                           | Not started | —      | —         |
+| UX-12 | Re-run the twelve-surface axe suite from `HD-01`                                            | Not started | —      | —         |
+
+`UX-09` is the one most easily skipped and the hardest to justify skipping.
+Content is read far more often than it is written, and the read view has had
+no design attention at all.
+
+## EX — Conversion and export (ongoing)
+
+**Exit:** a document survives a round trip through each supported format
+without losing a node the format can represent.
+
+Demand-led. Nothing here should start before someone asks for it by name —
+the cheap half of conversion ships in `PA-18` and `PA-19`, and what is left
+is the expensive half.
+
+| Id    | Task                 | Ships as                     | Status      | Commit | Completed |
+| ----- | -------------------- | ---------------------------- | ----------- | ------ | --------- |
+| EX-01 | Word export          | `@blockleaf/convert`         | Not started | —      | —         |
+| EX-02 | Word import          | `@blockleaf/convert`         | Not started | —      | —         |
+| EX-03 | PDF at full fidelity | a docs recipe, not a package | Not started | —      | —         |
+| EX-04 | Version history      | `@blockleaf/collab`          | Not started | —      | —         |
+
+`EX-03` ships no code. A headless browser over `@blockleaf/renderer`'s HTML
+output is a page in the docs; `PA-19` covers the common case with a print
+stylesheet and no dependency at all.
 
 ## V1 — 1.0
 
