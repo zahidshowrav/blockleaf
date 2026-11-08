@@ -18,7 +18,7 @@ Tasks completed outside a commit — repository settings, registry actions — s
 `—` in that column and still carry a date.
 
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `FC` →
-`PA` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
+`PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
 `HD-01` through `HD-08` are done. What is left in the block is `HD-09`
@@ -525,6 +525,57 @@ edge means either distorting the picture or cropping it; the first is almost
 never wanted and the second is a different feature with its own stored shape.
 Full width is a named value rather than a pixel count, because a number
 measured on the author's screen is wrong on everyone else's.
+
+## TB — Tables (1–2 weeks)
+
+**Exit:** a column can be resized, a row or column moved, and a cell coloured
+from a mouse, from the keyboard and from a touch screen alike; a document
+that stores none of it renders exactly as it did before the block.
+
+The table has had its own rules since `EC`: `CH` calls `EC`, and every
+feature has a keyboard path that owes nothing to the chrome. This block
+extends the table under those same rules, first to the set of features a
+Notion-style editor's table is expected to have, then past it.
+
+It sits after `PA` rather than after `FC` on purpose. `PA-05` and `PA-06`
+give a cell its text colour and alignment for free, because they are a mark
+and a paragraph attribute and a cell holds paragraphs. `PA-23` sets the
+token precedent a cell background follows. And `HD-09` has landed by then,
+so the one stored addition here is a planned bump rather than a rushed one.
+
+Unlike `PA`, this block lands beside the table that is already in the main
+entry; a subpath for one feature of a block the core ships would be a strange
+shape. Each row is measured before it lands, against the 160 kB budget, and
+anything that does not fit ships as a subpath after all.
+
+| Id    | Task                                                                            | Status      | Commit | Completed |
+| ----- | ------------------------------------------------------------------------------- | ----------- | ------ | --------- |
+| TB-01 | Column resize by drag, writing the `colwidth` the schema already stores (`F22`) | Not started | —      | —         |
+| TB-02 | Move a row or column, from the handles and from the keyboard                    | Not started | —      | —         |
+| TB-03 | Add a row or column from the table's edge, one tap, no menu                     | Not started | —      | —         |
+| TB-04 | Cell background, stored as a tone token; the one bump in the block              | Not started | —      | —         |
+
+`TB-01` changes nothing in the stored shape. `colwidth` has been in the
+schema since `EC-11`, `@blockleaf/renderer` has honoured it since `RD-07`,
+and `HD-08` already overrides it on a narrow screen; the editor simply passes
+`resizable: false` to the table extension today. The resize code ships inside
+that extension whether or not it is on, so the expected cost is close to
+nothing, measured rather than assumed. What the row does have to add is a
+second and a third path: a column width is set from the column menu and
+nudged from the keyboard, because a drag handle is a mouse feature and
+nothing hovers on a phone (`HD-04`). `F22` records the reversal of the
+plan's v0.1 note that resizing would not be persisted; `TB-01` waits on it.
+
+`TB-02` and `TB-03` are commands plus chrome, with no stored change. `TB-04`
+is the only task here that touches the schema: a `tone` on `tableCell` and
+`tableHeader`, the same token shape `callout` stores and `PA-23` extends to
+every block, with its migration in the same PR under `SG-04`.
+
+Rows for the features that go past that set are added once they are written
+down; the ids from `TB-05` are reserved for them.
+
+`UX-05` stays where it is. That is the design pass over the table's grips,
+selection and menus, and this block gives it more to design.
 
 ## OP — Optional packages (ongoing)
 

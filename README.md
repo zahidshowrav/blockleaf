@@ -119,6 +119,7 @@ Next:
 - **Hardening (HD)** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
 - **Forward Compatibility (FC)** — an editor that meets a document written by a newer editor should say so, not fall over
 - **Parity Blocks & Marks (PA)** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
+- **Tables (TB)** — column resize, moving rows and columns, one-tap add from the edge, cell background, each with a keyboard and a touch path
 
 Later, and demand-led:
 
@@ -126,7 +127,7 @@ Later, and demand-led:
 - **Design & Motion (UX)** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
 - **Conversion & Export (EX)** — Word in and out, version history
 
-Everything in `PA` and after ships as a subpath or its own package. Installing the editor never gets heavier because a feature you do not import exists.
+Everything in `PA` and after ships as a subpath or its own package, apart from `TB`, which extends the table already in the core and is measured against the same budget. Installing the editor never gets heavier because a feature you do not import exists.
 
 The schema has been meant to be depended on since `0.1.0`. For what is on npm right now, see [the package](https://www.npmjs.com/package/@blockleaf/editor).
 

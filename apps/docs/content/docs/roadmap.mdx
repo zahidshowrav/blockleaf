@@ -86,6 +86,23 @@ Two promises hold across all of it:
   [custom properties](./styling.mdx) instead, so your styling and your themes
   still win.
 
+### Tables
+
+The table already merges and splits cells, toggles header rows and columns,
+pastes in from Google Docs and Word, and holds whole blocks in a cell, so a
+list fits inside one. Next for it: resizing a column by dragging its edge,
+moving a row or column, adding either from the table's edge with one tap,
+and a cell background. Each of those gets a keyboard path and works on a
+phone, as every table feature so far has.
+
+A resized column writes its width into the same `colwidth` field the document
+has carried since the first release, and a cell background stores a token
+like every other colour here. A document that uses neither is unchanged.
+
+Table work is the one exception to the import rule above: the table is
+already in the core, so its features land beside it, and the bundle budget is
+measured on every one.
+
 ## Later
 
 Demand-led. These are real projects, and none of them should start before

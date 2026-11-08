@@ -8,9 +8,35 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21 · **Last reviewed:** 2026-11-07
+**Open:** F22 · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21 · **Last reviewed:** 2026-11-08
 
 ---
+
+## Open
+
+### F22 — may a column width written by a drag be stored
+
+**Blocks:** `TB-01`.
+
+§3.1 of the plan admitted tables to `0.1` with a list of what was not admitted
+with them, and "column resizing persisted as layout" is on it. The same
+section admitted `colwidth` because ProseMirror's table implementation
+expects it, so the field is in the schema, in `./validate`, in the snapshot
+and in both renderer targets, and has been since `0.1.0`. The editor simply
+passes `resizable: false`, so nothing writes to it today.
+
+`TB-01` would write to it. That is the whole change: no new attribute, no
+`SCHEMA_VERSION` bump, no migration. What the plan was guarding against is
+still real. A pixel width measured on the author's screen is presentation in
+a document that otherwise stores meaning, and `HD-08` already has to override
+it on a narrow screen.
+
+**The recommendation is to allow it.** The field exists and is honoured on
+every output already; refusing to write it keeps the document no cleaner, it
+only keeps a feature out. The guard is the one `HD-08` set: a stored width is
+a hint a narrow viewport may ignore, never a rule. Reversing the §3.1 note in
+writing is what this flag is for, so the decision is deliberate rather than
+by drift, as the table's own admission was.
 
 ## Settled
 
