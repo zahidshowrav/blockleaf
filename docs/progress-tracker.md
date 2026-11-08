@@ -370,6 +370,7 @@ this table is for.
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
 | HD-13 | Pasting a long document, which still takes the quadratic path                             | Not started | —         | —          |
+| HD-14 | Autofocus threw on Android, iOS and Safari, and `create` never fired — Tiptap 8546        | Done        | `729dae6` | 2026-11-08 |
 
 ## FC — Forward compatibility (½–1 week)
 
