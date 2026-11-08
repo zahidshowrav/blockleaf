@@ -85,6 +85,18 @@ its own `SCHEMA_VERSION`.
       are locked to prevent accidental overwrite or corruption of newer schema structures.
     - Hosts that prefer seamless editing can opt into `'preserve'`.
 
+**Amended 2026-11-08 (`FC-01`).** The trigger is wider and the prop is
+renamed. A document that fails the content check — an unrecognised node or
+mark at any `schemaVersion`, which is the common case once blocks ship as
+subpaths — is the surer signal, and a newer version number that still parses
+is the rarer one; both feed one policy. The prop is `incompatibleDocument`,
+because `futureDocument` named only the second trigger. Its values are
+`'readonly'` (default) and `'discard'`, which opens the empty fallback
+editable and says so in its name; `'preserve'` cannot exist before `FC-03`,
+and `'throw'` waits for `FC-02`. The lock is the package's by default because
+the safe move needs nothing a host knows; the override is where host
+knowledge belongs.
+
 ### F16 — the no-CSS-framework rule governs the packages, not the repo · decided 2026-10-14
 
 `conventions.md` says "No CSS framework, and no `!important`", and says it

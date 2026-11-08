@@ -87,6 +87,7 @@ export {
 	useBlockleafEditor,
 	type ContentErrorCallback,
 	type ContentErrorProps,
+	type IncompatibleDocumentPolicy,
 	type UseBlockleafEditorOptions
 } from './react/index.js';
 export {

@@ -377,35 +377,56 @@ this table is for.
 of tables, shows them as placeholders, saves, and the tables come back out
 byte for byte.
 
-Measured against the pinned ProseMirror on 2026-10-28, because the three
-surfaces do not fail the same way and the differences decide the work.
-Loading stored JSON **throws** — `RangeError: Unknown node type` for a node,
-`There is no mark type … in this schema` for a mark. The paste path parses
-HTML instead and **silently drops** what it does not recognise. The validator
-rejects the whole document, because `blockNodeSchema` is a strict `z.union`.
-`@blockleaf/renderer` keeps an unknown node's children and loses its wrapper,
-so a childless node renders as nothing at all.
+Measured against the pinned ProseMirror on 2026-10-28 and re-checked through
+the editor on 2026-11-07, because the surfaces do not fail the same way and
+the differences decide the work. `nodeFromJSON` **throws** — `RangeError:
+Unknown node type` for a node, `There is no mark type … in this schema` for a
+mark — but Tiptap catches it: with `enableContentCheck` off, the editor logs
+a console warning and opens an **empty document**, the valid blocks gone with
+the unknown one. The paste path parses HTML instead and **silently drops**
+what it does not recognise. The validator rejects the whole document, because
+`blockNodeSchema` is a strict `z.union`. `@blockleaf/renderer` keeps an
+unknown node's children and loses its wrapper, so a childless node renders as
+nothing at all.
 
-Throwing is the better failure — an install that cannot read a document
-refuses it rather than eating the parts it does not understand. The loss
-arrives one step later, when a host catches the error, falls back to an empty
-document, and the next save writes that over real content.
+The empty document is the worst of these. A refused document leaves the
+stored copy alone; an empty editor that still saves writes nothing over
+something on the first keystroke, and nothing told the host.
 
 Already-published versions cannot be fixed from here. The walk has to exist
 in the version doing the reading, which is why this block runs before `PA`
 rather than beside it.
 
-| Id    | Task                                                                             | Status      | Commit    | Completed  |
-| ----- | -------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| FC-01 | `emitContentError` and `onContentError` surfaced to the host                     | Done        | `b332a3c` | 2026-11-07 |
-| FC-02 | `futureDocument: 'readonly' \| 'preserve' \| 'throw'` from `attrs.schemaVersion` | Not started | —         | —          |
-| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte          | Not started | —         | —          |
-| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract          | Not started | —         | —          |
-| FC-05 | Renderer takes an `unknown` component override                                   | Not started | —         | —          |
+| Id    | Task                                                                              | Status      | Commit    | Completed  |
+| ----- | --------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
+| FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `b332a3c` | 2026-11-07 |
+| FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Not started | —         | —          |
+| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Not started | —         | —          |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Not started | —         | —          |
+| FC-05 | Renderer takes an `unknown` component override                                    | Not started | —         | —          |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
-is an editor option Tiptap already ships and Blockleaf does not set, and it
-turns an unexplained crash into an event a host can report.
+turns Tiptap's content check on, and when `defaultValue` fails it the editor
+opens read-only whatever `editable` says, with `onChange` and
+`onChangeImmediate` silent, so the empty fallback can never be saved over the
+stored document. `onContentError` reports why. `incompatibleDocument` is the
+override — `'readonly'` by default, `'discard'` to edit the empty document
+and accept the loss — and it is live, so a host can flip it after a
+confirmation. The lock is the package's job rather than the host's because
+the safe move is the same for every host and needs nothing a host knows; the
+override is where host knowledge comes in. See `F17`.
+
+Two consequences of the check being on, both documented: `setContent` with
+unreadable content throws rather than reporting, and a known block whose
+children break the schema's content rules now fails too. Every document the
+editor writes is valid, because ProseMirror enforces those rules on every
+edit; the editor's unit and browser suites were run with the check on and
+nothing locked.
+
+The block ships as **one release** when `FC-05` lands. Changesets accumulate
+on `main` until then and collapse into a single minor bump, so the release
+carries the whole story — refusal, placeholder, validator and renderer
+together — rather than a locked empty editor on its own.
 
 ## PA — Parity blocks and marks (3–4 weeks)
 

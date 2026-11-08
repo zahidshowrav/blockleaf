@@ -119,7 +119,7 @@ Decide this before writing a single component. Everything else can be refactored
 | `link`                                          | Sanitise `href`: allow `https:`, `mailto:` and site-relative paths; reject `javascript:` at the schema level, not in the UI. |
 | `highlight`                                     | Optional colour attribute.                                                                                                   |
 
-**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own and each is scheduled as such — `PA` and `EX` in §9, after the schema can carry them safely. Say so in the roadmap so people stop asking.
+**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own, and all but footnotes are scheduled as such — `PA` and `OP` in §9, after the schema can carry them safely. Say so in the roadmap so people stop asking.
 
 ### 3.1 Tables, and why they are in
 
@@ -308,11 +308,11 @@ Full a11y pass, i18n via `labels`, theming docs, mobile and touch behaviour, lar
 
 ### FC — Forward compatibility (½–1 week)
 
-An editor must survive a document written by a newer editor than itself. It does not today: stored JSON carrying an unrecognised node or mark throws `RangeError` out of `nodeFromJSON`, the Zod validator rejects the whole document, and the renderer drops the wrapper and keeps the children. The crash is not the damage — the recovery code a host writes around the crash is, because that is what overwrites the content it could not read.
+An editor must survive a document written by a newer editor than itself. It does not today: stored JSON carrying an unrecognised node or mark makes `nodeFromJSON` throw `RangeError`, Tiptap catches that and opens an empty document behind a console warning, the Zod validator rejects the whole document, and the renderer drops the wrapper and keeps the children. The empty document is the damage — a host that keeps saving writes it over the content the editor could not read, and nothing told it. `FC-01` closes that: a document the editor cannot read opens read-only, with its change callbacks silent, until the host says otherwise through `incompatibleDocument`.
 
 ProseMirror offers no hook for this: a schema is a lookup by name and `nodeFromJSON` throws before any extension runs. The only place to solve it is before the JSON reaches ProseMirror — walk the document, swap unrecognised nodes and marks for a placeholder carrying the original payload, and splice the payload back on the way out so it round-trips untouched.
 
-This block comes before `PA` for a reason that does not improve with time: the walk has to exist in the version doing the _reading_. Every release without it is another install that can never open a future document, and shipping it later does nothing for them.
+This block comes before `PA` for a reason that does not improve with time: the walk has to exist in the version doing the _reading_. Every release without it is another install that can never open a future document, and shipping it later does nothing for them. The block ships as one release when `FC-05` lands, so the first version with the refusal is also the first with the walk.
 **Exit:** an editor built without the table extensions opens a document full of tables, shows them as placeholders, saves, and the tables come back out byte for byte.
 
 ### PA — Parity blocks and marks (3–4 weeks)

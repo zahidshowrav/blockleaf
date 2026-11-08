@@ -3,5 +3,6 @@ export {
 	useBlockleafEditor,
 	type ContentErrorCallback,
 	type ContentErrorProps,
+	type IncompatibleDocumentPolicy,
 	type UseBlockleafEditorOptions
 } from './use-blockleaf-editor.js';

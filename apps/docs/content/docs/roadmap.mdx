@@ -35,16 +35,18 @@ An editor should survive meeting a document written by a newer version of
 itself.
 
 Today it does not. Hand the editor stored JSON containing a node or mark it
-does not recognise and it throws, which means the document will not open at
-all. That is the right instinct — refusing a document is safer than quietly
-dropping the parts of it you cannot read — but it leaves you with nothing to
-act on, and the natural fallback of starting from an empty document is how
-content actually gets lost.
+does not recognise and it opens an empty document, with nothing more than a
+console warning to say so. That is the worst of the available failures.
+Refusing the document would at least leave the stored copy alone; an empty
+editor that still saves writes nothing over something on the first
+keystroke.
 
-What is being built: an error you can catch and report, a stated policy for
-what happens when a document's `schemaVersion` is ahead of the editor's
-(opening it read-only by default), and a guarantee that anything the editor
-does not understand is handed back out exactly as it came in.
+What is being built, in this order: an editor that refuses a document it
+cannot read, opening it read-only with its change callbacks silent and
+`onContentError` telling your code why; the same refusal for a document whose
+`schemaVersion` is ahead of the editor's; and then the real fix, a guarantee
+that anything the editor does not understand is handed back out exactly as it
+came in, so that the refusal is rarely needed.
 
 <Callout type="info" title="Why this one comes first">
 
@@ -81,7 +83,7 @@ Two promises hold across all of it:
 - **Fonts and colours store a token, not a CSS value.** A stored `14px` is
   wrong on a phone, and a colour picked against a white background is often
   unreadable in dark mode. Tokens resolve through the `--bl-*`
-  [custom properties](./styling) instead, so your styling and your themes
+  [custom properties](./styling.mdx) instead, so your styling and your themes
   still win.
 
 ## Later

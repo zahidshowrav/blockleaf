@@ -114,21 +114,72 @@ choice for a page that only ever displays content — that page should use
 />
 ```
 
-## Handling content errors
+## When the document cannot be read
 
-If stored content contains an invalid structure or unrecognised node types, the editor intercepts the parse error and reports it through `onContentError` rather than crashing the page:
+A stored document can carry something the editor does not know: a block from
+a preset or subpath this instance did not load, a node from a host extension
+that is not installed here, or JSON a migration got wrong. Tiptap's answer is
+to open an **empty document** behind a console warning. On its own that is
+how content gets lost, because the next save writes the empty document over
+the stored one.
+
+So the editor refuses. When `defaultValue` cannot be read it opens read-only,
+whatever `editable` says, and `onChange` and `onChangeImmediate` stay silent.
+Nothing can reach your save path. `onContentError` tells you why, and that is
+where to show a message:
+
+```tsx
+function Article({ doc }: { doc: BlockleafDocument }) {
+	const [unreadable, setUnreadable] = useState<Error | null>(null);
+
+	return (
+		<BlockleafEditor
+			defaultValue={doc}
+			onChange={save}
+			onContentError={({ error }) => setUnreadable(error)}
+		>
+			{unreadable && (
+				<p role="alert">
+					This document contains content this editor cannot read. It
+					is open read-only so nothing is lost.
+				</p>
+			)}
+		</BlockleafEditor>
+	);
+}
+```
+
+`incompatibleDocument` is the override. The default is `'readonly'`. Pass
+`'discard'` to open the empty document editable; you are accepting that
+whatever could not be read is gone. The prop is live, so a "start over"
+button can flip it once the user has agreed:
 
 ```tsx
 <BlockleafEditor
 	defaultValue={doc}
-	onContentError={({ error, editor }) => {
-		console.error('Failed to parse document content:', error);
-		// Log to monitoring, show a notification, or offer recovery
-	}}
+	incompatibleDocument={startOver ? 'discard' : 'readonly'}
 />
 ```
 
-Providing `onContentError` automatically enables content checking (`enableContentCheck: true` and `emitContentError: true`). If you need explicit control over whether invalid content throws or emits, pass `enableContentCheck` or `emitContentError` directly.
+Behind this sits Tiptap's content check, which the editor turns on for you.
+Three paths are checked, and they fail differently:
+
+- **`defaultValue`** fires `onContentError`, then opens empty and locked.
+- **`insertContent`** fires it and returns `false`. Nothing is inserted and
+  nothing locks.
+- **`setContent`** throws `[tiptap error]: Invalid JSON content`, does not
+  fire the callback, and leaves the document as it was. Wrap the call.
+
+`enableContentCheck={false}` turns the check off. That restores Tiptap's own
+behaviour, an empty editable document and no callback, and nothing locks.
+`emitContentError` only matters with the check off: it makes `insertContent`
+still report, and does nothing for `defaultValue`.
+
+This is the first step, not the last. The editor can refuse a document it
+cannot read; it cannot yet keep what it does not understand. Handing an
+unknown block back out exactly as it came in, and treating a newer
+`schemaVersion` the same way, are next on
+[the roadmap](./roadmap.mdx#forward-compatibility).
 
 ## Presets
 
@@ -151,20 +202,22 @@ Passing your own `extensions` array replaces the preset entirely. See
 
 ## The props you will reach for
 
-| Prop                | Type                        | Default        | What it does                                |
-| ------------------- | --------------------------- | -------------- | ------------------------------------------- |
-| `defaultValue`      | `BlockleafDocument`         | empty document | Initial content; read once                  |
-| `onChange`          | `(doc) => void`             | —              | Debounced. Persist from here                |
-| `onChangeImmediate` | `(doc) => void`             | —              | Every transaction. Dirty flags and previews |
-| `debounceMs`        | `number`                    | `300`          | How long `onChange` waits                   |
-| `preset`            | `'standard' \| 'minimal'`   | `'standard'`   | Which extension set                         |
-| `extensions`        | `Extensions`                | —              | Replaces the preset entirely                |
-| `editable`          | `boolean`                   | `true`         | Turns input off without unmounting          |
-| `autofocus`         | `boolean`                   | `false`        | Place the caret on mount                    |
-| `label`             | `string`                    | `'Document'`   | Accessible name for the editing surface     |
-| `placeholder`       | `string \| object \| false` | built-in       | Empty-block hint                            |
-| `className`         | `string`                    | —              | Added alongside `blockleaf-editor`          |
-| `fallback`          | `ReactNode`                 | `null`         | Rendered before the editor is ready         |
+| Prop                   | Type                        | Default        | What it does                                      |
+| ---------------------- | --------------------------- | -------------- | ------------------------------------------------- |
+| `defaultValue`         | `BlockleafDocument`         | empty document | Initial content; read once                        |
+| `onChange`             | `(doc) => void`             | —              | Debounced. Persist from here                      |
+| `onChangeImmediate`    | `(doc) => void`             | —              | Every transaction. Dirty flags and previews       |
+| `debounceMs`           | `number`                    | `300`          | How long `onChange` waits                         |
+| `preset`               | `'standard' \| 'minimal'`   | `'standard'`   | Which extension set                               |
+| `extensions`           | `Extensions`                | —              | Replaces the preset entirely                      |
+| `editable`             | `boolean`                   | `true`         | Turns input off without unmounting                |
+| `autofocus`            | `boolean`                   | `false`        | Place the caret on mount                          |
+| `label`                | `string`                    | `'Document'`   | Accessible name for the editing surface           |
+| `placeholder`          | `string \| object \| false` | built-in       | Empty-block hint                                  |
+| `className`            | `string`                    | —              | Added alongside `blockleaf-editor`                |
+| `fallback`             | `ReactNode`                 | `null`         | Rendered before the editor is ready               |
+| `onContentError`       | `(props) => void`           | —              | The document could not be read. See above         |
+| `incompatibleDocument` | `'readonly' \| 'discard'`   | `'readonly'`   | What happens to a document the editor cannot read |
 
 Upload props are documented in [uploads](./uploads.mdx); every chrome prop —
 `slashItems`, `bubbleActions`, `blockActions`, `tableActions` and the rest —
