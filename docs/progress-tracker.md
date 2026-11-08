@@ -399,7 +399,7 @@ rather than beside it.
 
 | Id    | Task                                                                              | Status      | Commit    | Completed  |
 | ----- | --------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `b332a3c` | 2026-11-07 |
+| FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `a8f517c` | 2026-11-08 |
 | FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Not started | —         | —          |
 | FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Not started | —         | —          |
 | FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Not started | —         | —          |
