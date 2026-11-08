@@ -177,7 +177,23 @@ export const useBlockleafEditor = ({
 		extensions: resolvedExtensions,
 		content,
 		editable: effectiveEditable,
-		autofocus,
+		// Autofocus is done in `onCreate` below rather than handed to Tiptap.
+		// On Android, iOS and desktop Safari Tiptap's `focus` command focuses
+		// the DOM synchronously, which makes its own focus plugin dispatch a
+		// transaction before the command's one, and the command's one then
+		// throws "Applying a mismatched transaction". The throw happens inside
+		// Tiptap's mount timer, ahead of `create`, so the event never fires
+		// and `TrailingNodeOnLoad` never runs. Tiptap issue 8546; drop this
+		// once a pinned release has it fixed.
+		autofocus: false,
+		onCreate: ({ editor: instance }) => {
+			if (!autofocus) return;
+			// Focusing the DOM first lets the focus plugin's transaction land
+			// on its own. The command then finds the view focused and dispatches
+			// against the state that produced.
+			instance.view.focus();
+			instance.commands.focus(autofocus);
+		},
 		// Next.js App Router hydrates on the client; rendering immediately is the
 		// single most common Tiptap/SSR mismatch. Handle it rather than document it.
 		immediatelyRender: false,

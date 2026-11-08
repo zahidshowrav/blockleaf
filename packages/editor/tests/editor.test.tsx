@@ -24,6 +24,15 @@ describe('<BlockleafEditor />', () => {
 		);
 	});
 
+	it('autofocus places the caret in the editor', async () => {
+		const { container } = render(<BlockleafEditor autofocus />);
+
+		await waitFor(() => expect(surfaceOf(container)).not.toBeNull());
+		await waitFor(() =>
+			expect(document.activeElement).toBe(surfaceOf(container))
+		);
+	});
+
 	it('respects editable={false}', async () => {
 		const { container } = render(<BlockleafEditor editable={false} />);
 
