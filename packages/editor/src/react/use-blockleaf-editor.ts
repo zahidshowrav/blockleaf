@@ -5,9 +5,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
+	IncompatibleDocumentError,
 	NORMALISATION_META,
 	createExtensions,
 	createUploadExtension,
+	newerSchemaVersion,
 	withBlockIds,
 	withSchemaVersion,
 	type BlockleafDocument,
@@ -19,7 +21,7 @@ import {
 export type ContentErrorProps = EditorEvents['contentError'];
 export type ContentErrorCallback = (props: ContentErrorProps) => void;
 /** See `UseBlockleafEditorOptions.incompatibleDocument`. */
-export type IncompatibleDocumentPolicy = 'readonly' | 'discard';
+export type IncompatibleDocumentPolicy = 'readonly' | 'discard' | 'throw';
 
 export type UseBlockleafEditorOptions = {
 	/**
@@ -38,20 +40,29 @@ export type UseBlockleafEditorOptions = {
 	editable?: boolean;
 	autofocus?: boolean;
 	/**
-	 * What to do with a `defaultValue` the editor cannot read — an
-	 * unrecognised node or mark, or a structure the schema refuses. Tiptap's
-	 * fallback is an empty document; this decides what happens to it.
+	 * What to do with a `defaultValue` the editor should not edit as it
+	 * stands. Two things trigger it:
+	 *
+	 * - the document **cannot be read** — an unrecognised node or mark, or a
+	 *   structure the schema refuses. Tiptap's fallback is an empty document.
+	 * - its `attrs.schemaVersion` is **newer** than this editor's
+	 *   `SCHEMA_VERSION`. It reads, but a newer editor wrote it, and saving it
+	 *   from here would stamp it with an older version than it has.
+	 *
+	 * The policies:
 	 *
 	 * - `'readonly'` (default): the editor opens read-only whatever `editable`
-	 *   says, and `onChange` and `onChangeImmediate` stay silent, so the empty
-	 *   document can never be saved over the stored one. `onContentError`
-	 *   still fires, so the host can say why.
-	 * - `'discard'`: the empty document opens editable. The host has accepted
-	 *   that whatever could not be read is gone.
+	 *   says, and `onChange` and `onChangeImmediate` stay silent, so nothing
+	 *   can be saved over the stored document. `onContentError` still fires,
+	 *   so the host can say why.
+	 * - `'discard'`: the editor opens editable — the empty fallback for an
+	 *   unreadable document, the document itself for a newer one. The host
+	 *   has accepted the loss.
+	 * - `'throw'`: the hook throws an `IncompatibleDocumentError` during
+	 *   render, for an error boundary to catch. Nothing is mounted.
 	 *
 	 * The prop is live: flipping it to `'discard'` after a confirmation
-	 * unlocks the editor. Keeping an unknown block intact instead is `FC-03`;
-	 * a newer `attrs.schemaVersion` joining the trigger is `FC-02`.
+	 * unlocks the editor. Keeping an unknown block intact instead is `FC-03`.
 	 */
 	incompatibleDocument?: IncompatibleDocumentPolicy;
 	/**
@@ -81,6 +92,10 @@ export type UseBlockleafEditorOptions = {
 	 * editor has already fallen back to an empty document and, unless
 	 * `incompatibleDocument` says otherwise, locked itself by the time this
 	 * runs. The job left for the host is to tell the user.
+	 *
+	 * Also called once, as the editor is created, for a `defaultValue` whose
+	 * `schemaVersion` is newer than the editor's. The `error` is then an
+	 * `IncompatibleDocumentError` with `reason: 'newer-version'`.
 	 */
 	onContentError?: ContentErrorCallback;
 	/**
@@ -105,6 +120,12 @@ export type UseBlockleafEditorOptions = {
 	uploadMaxBytes?: number;
 	/** Called for every rejected file and every failed upload. */
 	onUploadError?: (failure: UploadFailure) => void;
+};
+
+const schemaVersionOf = (doc: unknown): number | undefined => {
+	const version = (doc as { attrs?: { schemaVersion?: unknown } } | undefined)
+		?.attrs?.schemaVersion;
+	return typeof version === 'number' ? version : undefined;
 };
 
 export const useBlockleafEditor = ({
@@ -135,7 +156,13 @@ export const useBlockleafEditor = ({
 	// callbacks that can run before React has re-rendered with the state.
 	const [unreadable, setUnreadable] = useState(false);
 	const unreadableRef = useRef(false);
-	const locked = unreadable && incompatibleDocument === 'readonly';
+	// Read once, like `defaultValue` itself: the editor is uncontrolled.
+	const [newerVersion] = useState(() => newerSchemaVersion(defaultValue));
+	const incompatible = unreadable || newerVersion !== undefined;
+	const locked = incompatible && incompatibleDocument === 'readonly';
+	// `onUpdate` is the closure Tiptap was created with, and the policy is
+	// live, so the callback reads it through a ref.
+	const policyRef = useRef(incompatibleDocument);
 	const effectiveEditable = editable && !locked;
 	const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined
@@ -187,6 +214,18 @@ export const useBlockleafEditor = ({
 		// once a pinned release has it fixed.
 		autofocus: false,
 		onCreate: ({ editor: instance }) => {
+			if (newerVersion !== undefined) {
+				// The document read, so Tiptap reported nothing. Say why the
+				// editor is locked through the same callback as the other case.
+				onContentErrorRef.current?.({
+					editor: instance,
+					error: new IncompatibleDocumentError(
+						'newer-version',
+						newerVersion
+					),
+					disableCollaboration: () => {}
+				});
+			}
 			if (!autofocus) return;
 			// Focusing the DOM first lets the focus plugin's transaction land
 			// on its own. The command then finds the view focused and dispatches
@@ -223,8 +262,13 @@ export const useBlockleafEditor = ({
 			if (transaction.getMeta(NORMALISATION_META)) return;
 			if (!transaction.docChanged) return;
 			// Locked means the document in the editor is Tiptap's empty
-			// fallback, not the author's. It must not reach a save path.
-			if (unreadableRef.current && incompatibleDocument === 'readonly') {
+			// fallback, or one a newer editor wrote. Neither may reach a
+			// save path. The ref covers the constructor, before React has
+			// re-rendered with `unreadable`.
+			if (
+				(unreadableRef.current || newerVersion !== undefined) &&
+				policyRef.current === 'readonly'
+			) {
 				return;
 			}
 
@@ -253,7 +297,8 @@ export const useBlockleafEditor = ({
 		onChangeRef.current = onChange;
 		onChangeImmediateRef.current = onChangeImmediate;
 		onContentErrorRef.current = onContentError;
-	}, [onChange, onChangeImmediate, onContentError]);
+		policyRef.current = incompatibleDocument;
+	}, [onChange, onChangeImmediate, onContentError, incompatibleDocument]);
 
 	useEffect(() => {
 		editorRef.current = editor;
@@ -264,6 +309,16 @@ export const useBlockleafEditor = ({
 	}, [editor, effectiveEditable]);
 
 	useEffect(() => () => clearTimeout(timerRef.current), []);
+
+	// Thrown during render rather than from a callback, so it reaches the
+	// host's error boundary. A newer version is known before the editor
+	// exists; an unreadable one only once Tiptap has tried to parse it.
+	if (incompatible && incompatibleDocument === 'throw') {
+		throw new IncompatibleDocumentError(
+			unreadable ? 'unreadable' : 'newer-version',
+			newerVersion ?? schemaVersionOf(defaultValue)
+		);
+	}
 
 	return editor;
 };

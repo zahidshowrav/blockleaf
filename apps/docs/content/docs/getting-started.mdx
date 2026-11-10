@@ -149,10 +149,26 @@ function Article({ doc }: { doc: BlockleafDocument }) {
 }
 ```
 
-`incompatibleDocument` is the override. The default is `'readonly'`. Pass
-`'discard'` to open the empty document editable; you are accepting that
-whatever could not be read is gone. The prop is live, so a "start over"
-button can flip it once the user has agreed:
+The same lock applies to a document a **newer** editor wrote: one whose
+`attrs.schemaVersion` is higher than this editor's `SCHEMA_VERSION`. Unlike
+an unreadable document, it opens showing its content, because everything in
+it could be read. It is still locked, because saving it from here would stamp
+it with an older version than it has. `onContentError` fires once as the
+editor is created, and its `error` is an `IncompatibleDocumentError` with
+`reason: 'newer-version'`, `documentVersion` and `editorVersion`.
+
+`incompatibleDocument` is the override. The default is `'readonly'`. The
+other two:
+
+- **`'discard'`** opens the editor editable. For an unreadable document that
+  is the empty one; for a newer one it is the document, saved from then on
+  with this editor's version. Either way, you are accepting the loss.
+- **`'throw'`** throws an `IncompatibleDocumentError` during render, for your
+  error boundary to catch. Nothing is mounted. Its `reason` is
+  `'unreadable'` or `'newer-version'`.
+
+The prop is live, so a "start over" button can flip it once the user has
+agreed:
 
 ```tsx
 <BlockleafEditor
@@ -175,10 +191,9 @@ behaviour, an empty editable document and no callback, and nothing locks.
 `emitContentError` only matters with the check off: it makes `insertContent`
 still report, and does nothing for `defaultValue`.
 
-This is the first step, not the last. The editor can refuse a document it
-cannot read; it cannot yet keep what it does not understand. Handing an
-unknown block back out exactly as it came in, and treating a newer
-`schemaVersion` the same way, are next on
+This is not the last step. The editor can refuse a document it cannot read;
+it cannot yet keep what it does not understand. Handing an unknown block
+back out exactly as it came in is next on
 [the roadmap](./roadmap.mdx#forward-compatibility).
 
 ## Presets
@@ -202,22 +217,22 @@ Passing your own `extensions` array replaces the preset entirely. See
 
 ## The props you will reach for
 
-| Prop                   | Type                        | Default        | What it does                                      |
-| ---------------------- | --------------------------- | -------------- | ------------------------------------------------- |
-| `defaultValue`         | `BlockleafDocument`         | empty document | Initial content; read once                        |
-| `onChange`             | `(doc) => void`             | —              | Debounced. Persist from here                      |
-| `onChangeImmediate`    | `(doc) => void`             | —              | Every transaction. Dirty flags and previews       |
-| `debounceMs`           | `number`                    | `300`          | How long `onChange` waits                         |
-| `preset`               | `'standard' \| 'minimal'`   | `'standard'`   | Which extension set                               |
-| `extensions`           | `Extensions`                | —              | Replaces the preset entirely                      |
-| `editable`             | `boolean`                   | `true`         | Turns input off without unmounting                |
-| `autofocus`            | `boolean`                   | `false`        | Place the caret on mount                          |
-| `label`                | `string`                    | `'Document'`   | Accessible name for the editing surface           |
-| `placeholder`          | `string \| object \| false` | built-in       | Empty-block hint                                  |
-| `className`            | `string`                    | —              | Added alongside `blockleaf-editor`                |
-| `fallback`             | `ReactNode`                 | `null`         | Rendered before the editor is ready               |
-| `onContentError`       | `(props) => void`           | —              | The document could not be read. See above         |
-| `incompatibleDocument` | `'readonly' \| 'discard'`   | `'readonly'`   | What happens to a document the editor cannot read |
+| Prop                   | Type                                 | Default        | What it does                                      |
+| ---------------------- | ------------------------------------ | -------------- | ------------------------------------------------- |
+| `defaultValue`         | `BlockleafDocument`                  | empty document | Initial content; read once                        |
+| `onChange`             | `(doc) => void`                      | —              | Debounced. Persist from here                      |
+| `onChangeImmediate`    | `(doc) => void`                      | —              | Every transaction. Dirty flags and previews       |
+| `debounceMs`           | `number`                             | `300`          | How long `onChange` waits                         |
+| `preset`               | `'standard' \| 'minimal'`            | `'standard'`   | Which extension set                               |
+| `extensions`           | `Extensions`                         | —              | Replaces the preset entirely                      |
+| `editable`             | `boolean`                            | `true`         | Turns input off without unmounting                |
+| `autofocus`            | `boolean`                            | `false`        | Place the caret on mount                          |
+| `label`                | `string`                             | `'Document'`   | Accessible name for the editing surface           |
+| `placeholder`          | `string \| object \| false`          | built-in       | Empty-block hint                                  |
+| `className`            | `string`                             | —              | Added alongside `blockleaf-editor`                |
+| `fallback`             | `ReactNode`                          | `null`         | Rendered before the editor is ready               |
+| `onContentError`       | `(props) => void`                    | —              | The document could not be read. See above         |
+| `incompatibleDocument` | `'readonly' \| 'discard' \| 'throw'` | `'readonly'`   | What happens to a document the editor cannot read |
 
 Upload props are documented in [uploads](./uploads.mdx); every chrome prop —
 `slashItems`, `bubbleActions`, `blockActions`, `tableActions` and the rest —

@@ -40,6 +40,11 @@ export {
 	cellPositionAt,
 	type TableAccessibilityOptions
 } from './table-a11y.js';
+export {
+	IncompatibleDocumentError,
+	newerSchemaVersion,
+	type IncompatibleDocumentReason
+} from './incompatible-document.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
