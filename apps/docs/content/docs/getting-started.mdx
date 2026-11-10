@@ -114,14 +114,46 @@ choice for a page that only ever displays content — that page should use
 />
 ```
 
+## A block the editor does not know
+
+A stored document can carry a node or mark this editor does not know: a block
+from a preset or subpath this instance did not load, or a node from a host
+extension that is not installed here. The editor keeps it. Each one opens as
+a placeholder that names its type — "Unsupported block: table" — and the rest
+of the document is editable as usual. When the document is saved, the
+placeholder is swapped back for the original JSON, exactly as it came in.
+
+A placeholder can be selected, dragged, and deleted like any block. It cannot
+be edited from here, and **cut and paste drops it**: a placeholder is never
+rebuilt from clipboard HTML, because a payload read from the clipboard could
+carry anything at all into your database. Its text is in
+[`labels.unknown`](./i18n.mdx).
+
+`onChange` and `onChangeImmediate` hand you the document with the originals
+already back in place. If you go around them — `editor.getJSON()`, or
+`setContent` with a stored document — do the swap yourself:
+
+```ts
+import {
+	unwrapUnknownContent,
+	wrapUnknownContent,
+	withSchemaVersion
+} from '@blockleaf/editor';
+
+editor.commands.setContent(wrapUnknownContent(stored, editor.schema));
+const doc = withSchemaVersion(unwrapUnknownContent(editor.getJSON()));
+```
+
+The placeholders come with both presets. If you pass your own `extensions`,
+the editor adds them for you.
+
 ## When the document cannot be read
 
-A stored document can carry something the editor does not know: a block from
-a preset or subpath this instance did not load, a node from a host extension
-that is not installed here, or JSON a migration got wrong. Tiptap's answer is
-to open an **empty document** behind a console warning. On its own that is
-how content gets lost, because the next save writes the empty document over
-the stored one.
+Some documents still cannot be opened: a known block in a place the schema
+does not allow, like a list item outside a list, or JSON a migration got
+wrong. Tiptap's answer is to open an **empty document** behind a console
+warning. On its own that is how content gets lost, because the next save
+writes the empty document over the stored one.
 
 So the editor refuses. When `defaultValue` cannot be read it opens read-only,
 whatever `editable` says, and `onChange` and `onChangeImmediate` stay silent.
@@ -190,11 +222,6 @@ Three paths are checked, and they fail differently:
 behaviour, an empty editable document and no callback, and nothing locks.
 `emitContentError` only matters with the check off: it makes `insertContent`
 still report, and does nothing for `defaultValue`.
-
-This is not the last step. The editor can refuse a document it cannot read;
-it cannot yet keep what it does not understand. Handing an unknown block
-back out exactly as it came in is next on
-[the roadmap](./roadmap.mdx#forward-compatibility).
 
 ## Presets
 

@@ -1,4 +1,9 @@
-import type { Editor, EditorEvents, Extensions } from '@tiptap/core';
+import {
+	getSchema,
+	type Editor,
+	type EditorEvents,
+	type Extensions
+} from '@tiptap/core';
 import { useEditor } from '@tiptap/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -7,11 +12,15 @@ import {
 	EDITOR_CLASS_NAME,
 	IncompatibleDocumentError,
 	NORMALISATION_META,
+	UNKNOWN_CONTENT_EXTENSION_NAME,
+	UnknownContent,
 	createExtensions,
 	createUploadExtension,
 	newerSchemaVersion,
+	unwrapUnknownContent,
 	withBlockIds,
 	withSchemaVersion,
+	wrapUnknownContent,
 	type BlockleafDocument,
 	type PresetName,
 	type UploadAdapter,
@@ -43,8 +52,10 @@ export type UseBlockleafEditorOptions = {
 	 * What to do with a `defaultValue` the editor should not edit as it
 	 * stands. Two things trigger it:
 	 *
-	 * - the document **cannot be read** — an unrecognised node or mark, or a
-	 *   structure the schema refuses. Tiptap's fallback is an empty document.
+	 * - the document **cannot be read** — a structure the schema refuses,
+	 *   such as a list item outside a list. Tiptap's fallback is an empty
+	 *   document. An unrecognised node or mark is *not* this case: it opens
+	 *   as a placeholder and is saved back exactly as it came in.
 	 * - its `attrs.schemaVersion` is **newer** than this editor's
 	 *   `SCHEMA_VERSION`. It reads, but a newer editor wrote it, and saving it
 	 *   from here would stamp it with an older version than it has.
@@ -62,7 +73,7 @@ export type UseBlockleafEditorOptions = {
 	 *   render, for an error boundary to catch. Nothing is mounted.
 	 *
 	 * The prop is live: flipping it to `'discard'` after a confirmation
-	 * unlocks the editor. Keeping an unknown block intact instead is `FC-03`.
+	 * unlocks the editor.
 	 */
 	incompatibleDocument?: IncompatibleDocumentPolicy;
 	/**
@@ -169,7 +180,14 @@ export const useBlockleafEditor = ({
 	);
 
 	const resolvedExtensions = useMemo(() => {
-		const base = extensions ?? createExtensions(preset);
+		const given = extensions ?? createExtensions(preset);
+		// The placeholders are what keep an unknown block from emptying the
+		// document, so a host's own `extensions` array gets them too.
+		const base = given.some(
+			(extension) => extension.name === UNKNOWN_CONTENT_EXTENSION_NAME
+		)
+			? given
+			: [...given, UnknownContent];
 		if (!upload) return base;
 		// Only added when there is an adapter: the plugin's drop and
 		// paste handlers swallow files, and swallowing them with nowhere
@@ -192,12 +210,22 @@ export const useBlockleafEditor = ({
 		onUploadError
 	]);
 
-	// Ids are stamped here rather than left to `UniqueID`, which assigns
-	// them one quadratic transaction step at a time once the document is
-	// already inside ProseMirror. See `withBlockIds`.
+	// Unknown nodes and marks are swapped for placeholders first, so the
+	// content check never sees them and the ids below never reach inside
+	// them. Ids are stamped here rather than left to `UniqueID`, which
+	// assigns them one quadratic transaction step at a time once the
+	// document is already inside ProseMirror. See `withBlockIds`.
 	const content = useMemo(
-		() => (defaultValue ? withBlockIds(defaultValue) : defaultValue),
-		[defaultValue]
+		() =>
+			defaultValue
+				? withBlockIds(
+						wrapUnknownContent(
+							defaultValue,
+							getSchema(resolvedExtensions)
+						)
+					)
+				: defaultValue,
+		[defaultValue, resolvedExtensions]
 	);
 
 	const editor = useEditor({
@@ -276,7 +304,11 @@ export const useBlockleafEditor = ({
 			// JSONContent is `any`-typed, so this is where a loose shape becomes the
 			// documented contract. M1 validates here instead of asserting.
 			const serialise = () =>
-				withSchemaVersion(instance.getJSON() as BlockleafDocument);
+				withSchemaVersion(
+					unwrapUnknownContent(
+						instance.getJSON() as BlockleafDocument
+					)
+				);
 
 			onChangeImmediateRef.current?.(serialise());
 

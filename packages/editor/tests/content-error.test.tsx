@@ -16,13 +16,15 @@ import {
 	type UseBlockleafEditorOptions
 } from '../src/react/use-blockleaf-editor.js';
 
-/** One block the schema knows and one it does not. What happens to the one
- *  it knows is the point of half the tests below. */
+/** One block the editor can read and one it cannot: a node with no type at
+ *  all, the shape a broken migration leaves behind. An unknown *type* is no
+ *  longer unreadable — it opens as a placeholder (FC-03). What happens to the
+ *  readable block is the point of half the tests below. */
 const unknownBlock = {
 	type: 'doc',
 	content: [
 		{ type: 'paragraph', content: [{ type: 'text', text: 'kept?' }] },
-		{ type: 'unknown_block', attrs: { payload: true } }
+		{ attrs: { payload: true } }
 	]
 } as unknown as BlockleafDocument;
 

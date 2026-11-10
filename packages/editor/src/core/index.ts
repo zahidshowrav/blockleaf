@@ -4,7 +4,11 @@ export {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
 	TABLE_A11Y_EXTENSION_NAME,
-	NORMALISATION_META
+	NORMALISATION_META,
+	UNKNOWN_BLOCK_NODE,
+	UNKNOWN_CONTENT_EXTENSION_NAME,
+	UNKNOWN_INLINE_NODE,
+	UNKNOWN_MARK
 } from './constants.js';
 export {
 	BLOCK_NODE_TYPES,
@@ -32,8 +36,18 @@ export {
 	type SlashMenuLabels,
 	type TableActionId,
 	type TableLabels,
+	type UnknownContentLabels,
 	type UploadLabels
 } from './labels.js';
+export {
+	UnknownBlock,
+	UnknownContent,
+	UnknownInline,
+	UnknownMark,
+	unwrapUnknownContent,
+	wrapUnknownContent,
+	type UnknownContentOptions
+} from './unknown-content.js';
 export {
 	TABLE_A11Y_PLUGIN_KEY,
 	TableAccessibility,
