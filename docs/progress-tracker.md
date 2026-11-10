@@ -405,7 +405,7 @@ rather than beside it.
 | FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done   | `4344313` | 2026-11-11 |
 | FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Done   | `cc7933e` | 2026-11-11 |
 | FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done   | `f46ac4a` | 2026-11-11 |
-| FC-05 | Renderer takes an `unknown` component override                                    | Done   | —         | 2026-11-11 |
+| FC-05 | Renderer takes an `unknown` component override                                    | Done   | `70dcf8a` | 2026-11-11 |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
 turns Tiptap's content check on, and when `defaultValue` fails it the editor
