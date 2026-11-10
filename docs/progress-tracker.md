@@ -404,7 +404,7 @@ rather than beside it.
 | FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `a8f517c` | 2026-11-08 |
 | FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done        | `4344313` | 2026-11-11 |
 | FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Done        | `cc7933e` | 2026-11-11 |
-| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done        | —         | 2026-11-11 |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done        | `f46ac4a` | 2026-11-11 |
 | FC-05 | Renderer takes an `unknown` component override                                    | Not started | —         | —          |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
