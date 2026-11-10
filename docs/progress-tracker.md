@@ -402,7 +402,7 @@ rather than beside it.
 | Id    | Task                                                                              | Status      | Commit    | Completed  |
 | ----- | --------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
 | FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `a8f517c` | 2026-11-08 |
-| FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done        | —         | 2026-11-11 |
+| FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done        | `4344313` | 2026-11-11 |
 | FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Not started | —         | —          |
 | FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Not started | —         | —          |
 | FC-05 | Renderer takes an `unknown` component override                                    | Not started | —         | —          |
