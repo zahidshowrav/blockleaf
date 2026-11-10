@@ -119,7 +119,7 @@ Next:
 - **Hardening (HD)** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
 - **Forward Compatibility (FC)** — an editor that meets a document written by a newer editor should say so, not fall over
 - **Parity Blocks & Marks (PA)** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
-- **Tables (TB)** — column resize, moving rows and columns, one-tap add from the edge, cell background, each with a keyboard and a touch path
+- **Tables (TB)** — column resize with exact widths on every screen, a table as wide as its columns with a named full width, moving rows and columns, one-tap add from the edge, alignment and formatting across a selection, cell background, each with a keyboard and a touch path
 
 Later, and demand-led:
 

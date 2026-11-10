@@ -90,14 +90,31 @@ Two promises hold across all of it:
 
 The table already merges and splits cells, toggles header rows and columns,
 pastes in from Google Docs and Word, and holds whole blocks in a cell, so a
-list fits inside one. Next for it: resizing a column by dragging its edge,
-moving a row or column, adding either from the table's edge with one tap,
-and a cell background. Each of those gets a keyboard path and works on a
-phone, as every table feature so far has.
+list fits inside one. Next for it:
 
-A resized column writes its width into the same `colwidth` field the document
-has carried since the first release, and a cell background stores a token
-like every other colour here. A document that uses neither is unchanged.
+- **Resize a column** by dragging its edge. The width you set is the width
+  everyone sees, on a phone too; a table wider than its container scrolls
+  sideways rather than squeezing. One command puts every column back to
+  equal widths.
+- **A table as wide as its columns.** Today a two-column table fills the
+  container. It will start at a sensible width, grow with each column you
+  add, and scroll once it is wider than the page, with a one-click full
+  width for a table that still has room to grow.
+- **Move a row or column**, and **add one from the table's edge** with a
+  single tap, without opening a menu.
+- **Align and format whole rows and columns.** Select a row, a column or a
+  range of cells, and the bubble menu applies the format to all of it. Cells
+  gain vertical alignment and a background colour.
+- **Scrolling in the read view** by finger, trackpad, or dragging the table
+  with a mouse.
+
+Each of these gets a keyboard path and works on a phone, as every table
+feature so far has. Colours and alignment store tokens like everything else
+here, a resized column writes the same `colwidth` field the document has
+carried since the first release, and the stored additions land in one schema
+bump with its migration. The default width is the one visible change for an
+existing document: a table with no stored widths will render narrower than it
+does today.
 
 Table work is the one exception to the import rule above: the table is
 already in the core, so its features land beside it, and the bundle budget is

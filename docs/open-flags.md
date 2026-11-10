@@ -8,37 +8,29 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** F22 · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21 · **Last reviewed:** 2026-11-08
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22 · **Last reviewed:** 2026-11-10
 
 ---
 
-## Open
+## Settled
 
-### F22 — may a column width written by a drag be stored
-
-**Blocks:** `TB-01`.
+### F22 — may a column width written by a drag be stored · decided 2026-11-10
 
 §3.1 of the plan admitted tables to `0.1` with a list of what was not admitted
 with them, and "column resizing persisted as layout" is on it. The same
 section admitted `colwidth` because ProseMirror's table implementation
-expects it, so the field is in the schema, in `./validate`, in the snapshot
-and in both renderer targets, and has been since `0.1.0`. The editor simply
-passes `resizable: false`, so nothing writes to it today.
+expects it, so the field has been in the schema, in `./validate`, in the
+snapshot and in both renderer targets since `0.1.0`. The editor passed
+`resizable: false`, so nothing wrote to it. `TB-01` writes to it. That is the
+whole change: no new attribute, no `SCHEMA_VERSION` bump, no migration.
 
-`TB-01` would write to it. That is the whole change: no new attribute, no
-`SCHEMA_VERSION` bump, no migration. What the plan was guarding against is
-still real. A pixel width measured on the author's screen is presentation in
-a document that otherwise stores meaning, and `HD-08` already has to override
-it on a narrow screen.
+**Decisions:**
 
-**The recommendation is to allow it.** The field exists and is honoured on
-every output already; refusing to write it keeps the document no cleaner, it
-only keeps a feature out. The guard is the one `HD-08` set: a stored width is
-a hint a narrow viewport may ignore, never a rule. Reversing the §3.1 note in
-writing is what this flag is for, so the decision is deliberate rather than
-by drift, as the table's own admission was.
-
-## Settled
+- **Allowed.** A dragged column width is stored in `colwidth`, in pixels, as the field has always been defined.
+- **Exact on every screen, phone included.** The editor and `@blockleaf/renderer` show the stored width; neither squeezes a column to fit. A table wider than its container scrolls sideways inside its wrapper, which `HD-08` and `HD-12` already built.
+- **Reversible in one command.** `TB-07` writes the field back to `null` on every cell, so the table returns to equal columns.
+- **Not a precedent.** The table's own full width (`TB-08`) stores a named value, as `F21` chose for images, never a pixel count measured on the author's screen. No other node gains a layout attribute without the same argument being made in public.
+- **Why:** the field exists and is honoured on every output already; refusing to write it kept the document no cleaner, it only kept a feature out. Reversing the §3.1 note here makes the reversal deliberate rather than by drift, as the table's own admission was.
 
 ### F21 — what an image resize is allowed to change · decided 2026-11-07
 

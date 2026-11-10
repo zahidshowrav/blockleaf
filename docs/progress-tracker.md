@@ -526,53 +526,92 @@ never wanted and the second is a different feature with its own stored shape.
 Full width is a named value rather than a pixel count, because a number
 measured on the author's screen is wrong on everyone else's.
 
-## TB — Tables (1–2 weeks)
+## TB — Tables (2–3 weeks)
 
-**Exit:** a column can be resized, a row or column moved, and a cell coloured
-from a mouse, from the keyboard and from a touch screen alike; a document
-that stores none of it renders exactly as it did before the block.
+**Exit:** a column can be resized, a row or column moved, a cell aligned and
+coloured, and a whole row formatted in one go, from a mouse, from the
+keyboard and from a touch screen alike; a table that stores none of it looks
+as it did before the block, apart from its default width.
 
 The table has had its own rules since `EC`: `CH` calls `EC`, and every
 feature has a keyboard path that owes nothing to the chrome. This block
 extends the table under those same rules, first to the set of features a
-Notion-style editor's table is expected to have, then past it.
+Notion-style editor's table is expected to have, then to what a spreadsheet
+user reaches for in a document: alignment, one format across a whole row,
+equal widths back in one click.
 
-It sits after `PA` rather than after `FC` on purpose. `PA-05` and `PA-06`
-give a cell its text colour and alignment for free, because they are a mark
-and a paragraph attribute and a cell holds paragraphs. `PA-23` sets the
-token precedent a cell background follows. And `HD-09` has landed by then,
-so the one stored addition here is a planned bump rather than a rushed one.
+It sits after `PA` rather than after `FC` on purpose. `PA-06` gives a cell
+its horizontal alignment, because it is a paragraph attribute and a cell
+holds paragraphs, and `TB-05` applies it across a selection. `PA-23` sets the
+token precedent a cell background follows. And `HD-09` has landed by then, so
+the block's stored additions are one planned bump rather than three rushed
+ones.
 
 Unlike `PA`, this block lands beside the table that is already in the main
 entry; a subpath for one feature of a block the core ships would be a strange
 shape. Each row is measured before it lands, against the 160 kB budget, and
 anything that does not fit ships as a subpath after all.
 
-| Id    | Task                                                                            | Status      | Commit | Completed |
-| ----- | ------------------------------------------------------------------------------- | ----------- | ------ | --------- |
-| TB-01 | Column resize by drag, writing the `colwidth` the schema already stores (`F22`) | Not started | —      | —         |
-| TB-02 | Move a row or column, from the handles and from the keyboard                    | Not started | —      | —         |
-| TB-03 | Add a row or column from the table's edge, one tap, no menu                     | Not started | —      | —         |
-| TB-04 | Cell background, stored as a tone token; the one bump in the block              | Not started | —      | —         |
+| Id    | Task                                                                                    | Status      | Commit | Completed |
+| ----- | --------------------------------------------------------------------------------------- | ----------- | ------ | --------- |
+| TB-01 | Column resize by drag, writing the `colwidth` the schema already stores (`F22`)         | Not started | —      | —         |
+| TB-02 | Move a row or column, from the handles and from the keyboard                            | Not started | —      | —         |
+| TB-03 | Add a column or a row from the table's right and bottom edges, one tap, no menu         | Not started | —      | —         |
+| TB-04 | Cell background, stored as a tone token                                                 | Not started | —      | —         |
+| TB-05 | Vertical and horizontal alignment, for a cell or across selected rows and columns       | Not started | —      | —         |
+| TB-06 | Bubble menu on a cell selection — one format applied to every cell in a row or column   | Not started | —      | —         |
+| TB-07 | Equal column widths restored in one command, after any column was resized               | Not started | —      | —         |
+| TB-08 | Table width follows its columns, with a named full width; the renderer matches          | Not started | —      | —         |
+| TB-09 | Renderer: a wide table scrolls by touch, trackpad and pointer drag, proven in a browser | Not started | —      | —         |
 
 `TB-01` changes nothing in the stored shape. `colwidth` has been in the
 schema since `EC-11`, `@blockleaf/renderer` has honoured it since `RD-07`,
-and `HD-08` already overrides it on a narrow screen; the editor simply passes
-`resizable: false` to the table extension today. The resize code ships inside
-that extension whether or not it is on, so the expected cost is close to
-nothing, measured rather than assumed. What the row does have to add is a
-second and a third path: a column width is set from the column menu and
-nudged from the keyboard, because a drag handle is a mouse feature and
-nothing hovers on a phone (`HD-04`). `F22` records the reversal of the
-plan's v0.1 note that resizing would not be persisted; `TB-01` waits on it.
+and since `HD-08` and `HD-12` a table wider than its container scrolls inside
+its wrapper in both; the editor simply passes `resizable: false` to the table
+extension today. The resize code ships inside that extension whether or not
+it is on, so the expected cost is close to nothing, measured rather than
+assumed. What the row does have to add is a second and a third path: a column
+width is set from the column menu and nudged from the keyboard, because a
+drag handle is a mouse feature and nothing hovers on a phone (`HD-04`). The
+width is exact on every screen, phone included, and the table scrolls when
+its columns add up to more than the container. `F22` records the reversal of
+the plan's v0.1 note that resizing would not be persisted.
 
-`TB-02` and `TB-03` are commands plus chrome, with no stored change. `TB-04`
-is the only task here that touches the schema: a `tone` on `tableCell` and
-`tableHeader`, the same token shape `callout` stores and `PA-23` extends to
-every block, with its migration in the same PR under `SG-04`.
+`TB-03` is the edge affordance: a strip down the table's right side adds a
+column, a strip along its bottom adds a row, and the corner where they meet
+shows both. They appear while the pointer is over the table and, on a phone,
+while the caret is in it. `TB-02` and `TB-03` are commands plus chrome with
+no stored change, and so is `TB-06`: a drag across cells or a tap on a row
+or column handle makes a cell selection, the bubble menu opens on it, and a
+mark applied there lands in every cell of it. `TB-07` writes `colwidth` back
+to `null` on every cell, so the table returns to equal columns.
 
-Rows for the features that go past that set are added once they are written
-down; the ids from `TB-05` are reserved for them.
+`TB-08` changes a default. A table today is as wide as its container however
+few columns it has. After this row a column has a default width, a token
+resolving through a `--bl-*` property; a table is the sum of its columns;
+each added column makes it wider; and once it is wider than the container it
+scrolls. Full width is a named value stored on the table, the shape `F21`
+chose for images rather than a pixel count measured on the author's screen,
+and the toggle is offered only while the table is narrower than its
+container, because a scrolling table is already as wide as it can be. The
+renderer changes in the same release, so a document reads as it edits, and
+the changeset says plainly that an existing table with no stored widths will
+render narrower than it did.
+
+`TB-09` mostly proves what `HD-08` and `HD-12` built: the wrapper is a native
+`overflow-x: auto` region, so a finger or a trackpad scrolls it already. What
+the row adds is dragging the table sideways with a mouse, and a browser test
+on the emulated phone against the renderer's output rather than the editor's.
+
+Three rows touch the schema, and they land in **one** bump with the migration
+in the same PR under `SG-04`. `TB-04` adds `tone` on `tableCell` and
+`tableHeader`, the token shape `callout` stores and `PA-23` extends to every
+block. `TB-05` adds a vertical alignment token on the same two nodes, while
+horizontal alignment is `PA-06`'s paragraph attribute applied to every
+paragraph in the selected cells. `TB-08` adds the table's named width.
+
+Rows for the requirements not yet decided are added once they are written
+down; the ids from `TB-10` are reserved for them.
 
 `UX-05` stays where it is. That is the design pass over the table's grips,
 selection and menus, and this block gives it more to design.
