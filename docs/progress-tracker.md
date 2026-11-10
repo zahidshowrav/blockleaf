@@ -20,14 +20,15 @@ Tasks completed outside a commit — repository settings, registry actions — s
 Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD` → `FC` →
 `PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
-**Position:** `MC` and `RD` are closed apart from `RD-06`. `HD` is under way:
-`HD-01` through `HD-08` are done. What is left in the block is `HD-09`
-to `HD-13`, with `HD-12` done. Nothing left in the block ships a defect. Both packages are live on npm and
-the docs site is deployed at `blockleaf.dev`.
+**Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
+`HD-08`, `HD-12` and `HD-14` are done; `HD-09`, `HD-10`, `HD-11` and `HD-13`
+are left. In `FC`, `FC-01` is done. Both packages are live on npm and the docs
+site is deployed at `blockleaf.dev`.
 
-`HD-09` is the gate. The migration runner is what `HD-10`, `SG-04` and every
-schema change in `FC` and `PA` are waiting on, and `FC-01` is the one task in
-either block that needs nothing from it.
+**Next:** `FC-02` to `FC-05`, then `HD-09`. None of the `FC` tasks change the
+stored shape — the `FC-03` placeholder lives only in the open editor and is
+swapped back on save — so none of them wait on the migration runner. `HD-09`
+is what `HD-10`, `SG-04` and every schema change in `PA` and `TB` wait on.
 
 **Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
 Playwright across two projects — 37 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.46 kB of 160 kB, schema entry at 207 B of 2 kB, code block
@@ -669,9 +670,8 @@ no design attention at all.
 **Exit:** a document survives a round trip through each supported format
 without losing a node the format can represent.
 
-Demand-led. Nothing here should start before someone asks for it by name —
-the cheap half of conversion ships in `PA-18` and `PA-19`, and what is left
-is the expensive half.
+Planned, and coming after `UX`. The cheap half of conversion ships in
+`PA-18` and `PA-19`, and what is left is the expensive half.
 
 | Id    | Task                 | Ships as                     | Status      | Commit | Completed |
 | ----- | -------------------- | ---------------------------- | ----------- | ------ | --------- |

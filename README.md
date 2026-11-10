@@ -121,7 +121,7 @@ Next:
 - **Parity Blocks & Marks (PA)** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
 - **Tables (TB)** — column resize with exact widths on every screen, a table as wide as its columns with a named full width, moving rows and columns, one-tap add from the edge, alignment and formatting across a selection, cell background, each with a keyboard and a touch path
 
-Later, and demand-led:
+Later:
 
 - **Optional Extensions (OP)** — collaboration, comments, AI, markdown import
 - **Design & Motion (UX)** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
