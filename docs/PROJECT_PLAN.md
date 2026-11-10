@@ -119,7 +119,7 @@ Decide this before writing a single component. Everything else can be refactored
 | `link`                                          | Sanitise `href`: allow `https:`, `mailto:` and site-relative paths; reject `javascript:` at the schema level, not in the UI. |
 | `highlight`                                     | Optional colour attribute.                                                                                                   |
 
-**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own. Say so in the roadmap so people stop asking.
+**Explicitly out of v0.1:** columns, embeds, footnotes, mentions, comments, math. Each is a project of its own, and all but footnotes are scheduled as such — `PA` and `OP` in §9, after the schema can carry them safely. Say so in the roadmap so people stop asking.
 
 ### 3.1 Tables, and why they are in
 
@@ -127,9 +127,9 @@ Tables were written out of v0.1 in the first draft of this plan, as the headline
 
 The cost of a table is almost entirely in the schema, and the schema cost is lowest **now**. Nothing is published — the registry has no `0.0.1` — so adding four nodes today costs no `SCHEMA_VERSION` bump and no migration, because there are no stored documents to migrate. The same four nodes added after `0.1.0` cost both, forever, for every host. A feature this schema-heavy is either admitted before the first release or it is genuinely expensive.
 
-What is **not** admitted with it: nested tables, column resizing persisted as layout, cell background colours, spreadsheet behaviour of any kind. A table in v0.1 is a grid of rich-text cells with an optional header row. The moment it starts storing presentation, it has become the thing §11 warns about.
+What is **not** admitted with it: nested tables, column resizing persisted as layout, cell background colours, spreadsheet behaviour of any kind. A table in v0.1 is a grid of rich-text cells with an optional header row. The moment it starts storing presentation, it has become the thing §11 warns about. Two of those are revisited by `TB` in §9, once `0.1.0` has shipped and the migration runner exists: a column width written by a drag (`F22`, decided), and a cell background and a vertical alignment stored as tokens. Nested tables and spreadsheet behaviour stay out.
 
-One attribute deserves scrutiny in review: `colwidth` stores pixel widths in the document. That is presentation in a document that otherwise stores meaning, and it is the one part of the table schema that a renderer on a narrow viewport has to argue with. It is included because ProseMirror's table implementation expects it; it is not a precedent for storing other layout.
+One attribute deserves scrutiny in review: `colwidth` stores pixel widths in the document. That is presentation in a document that otherwise stores meaning, and it is the one part of the table schema that a renderer on a narrow viewport has to argue with. It is included because ProseMirror's table implementation expects it; it is not a precedent for storing other layout. `F22` (2026-11-10) decided the editor writes it: a dragged width is exact on every screen, and a table wider than its container scrolls rather than squeezing.
 
 ---
 
@@ -306,10 +306,61 @@ Upload adapter, drop/paste/picker, progress and abort, image block with alt and 
 Full a11y pass, i18n via `labels`, theming docs, mobile and touch behaviour, large-document performance (10k+ blocks, virtualisation if needed), `examples/vite-spa`.
 **Exit:** a 500-page document stays responsive; the editor is fully usable on a phone.
 
+### FC — Forward compatibility (½–1 week)
+
+An editor must survive a document written by a newer editor than itself. It does not today: stored JSON carrying an unrecognised node or mark makes `nodeFromJSON` throw `RangeError`, Tiptap catches that and opens an empty document behind a console warning, the Zod validator rejects the whole document, and the renderer drops the wrapper and keeps the children. The empty document is the damage — a host that keeps saving writes it over the content the editor could not read, and nothing told it. `FC-01` closes that: a document the editor cannot read opens read-only, with its change callbacks silent, until the host says otherwise through `incompatibleDocument`.
+
+ProseMirror offers no hook for this: a schema is a lookup by name and `nodeFromJSON` throws before any extension runs. The only place to solve it is before the JSON reaches ProseMirror — walk the document, swap unrecognised nodes and marks for a placeholder carrying the original payload, and splice the payload back on the way out so it round-trips untouched.
+
+This block comes before `PA` for a reason that does not improve with time: the walk has to exist in the version doing the _reading_. Every release without it is another install that can never open a future document, and shipping it later does nothing for them. The block ships as one release when `FC-05` lands, so the first version with the refusal is also the first with the walk.
+**Exit:** an editor built without the table extensions opens a document full of tables, shows them as placeholders, saves, and the tables come back out byte for byte.
+
+### PA — Parity blocks and marks (3–4 weeks)
+
+The node and mark set a Notion-style editor is expected to have and this one does not: the toggle block already in the schema but with no extension behind it, mentions, emoji, math, a table of contents, text colour and alignment, subscript and superscript, font family and size, then media — video, audio, file attachments, embeds, link previews — and columns last, because it is the only one that fights the drag handle and the block menu.
+
+Two rules hold across the block. Everything ships as a subpath or its own package, never in the main entry: the core is at 147.46 kB of a 160 kB budget and that slack is not available. And the additive schema changes land in planned batches rather than one `SCHEMA_VERSION` bump each — six bumps for six node types is version churn that every host pays to follow.
+
+Media blocks carry an optional **caption** with its own alignment, distinct from alt text — alt describes the image to someone who cannot see it, a caption adds context for everyone, and a screen reader reads both. The caption ships with each media block rather than after it, so the stored shape moves once. What a caption may contain is `F20`, and it is structural: `image` is `atom: true` today, and a caption holding a link is not an attribute on a leaf. Table captions (`HD-10`) share whatever shape it settles on, because two caption mechanisms in one schema is one too many.
+
+Resizing is width with the ratio locked, plus a named full width. A dragged top edge means distorting the picture or cropping it; the first is never the request and the second is a different feature with its own stored shape. See `F21`.
+
+Font family, font size and colour store a **token**, not a CSS value. `fontSize: "14px"` written into a document is presentation in the content: wrong on a phone, wrong in a host's theme, wrong in the renderer, and an injection surface of exactly the kind §3's `href` rule exists to close. A token resolves through the `--bl-*` properties instead, which is what they are for. Colour makes the argument twice over, because a value chosen against a light background is frequently unreadable on a dark one — and the schema already agrees with itself here, since `callout` stores `tone` rather than a colour.
+**Exit:** each addition is importable on its own, the base bundle is unchanged without it, and the schema moved in planned batches with a migration per batch.
+
+### TB — Tables (2–3 weeks)
+
+The table features a Notion-style editor is expected to have and this one does not, then what a spreadsheet user reaches for in a document: column resize by drag, moving a row or column, adding either from the table's edge with one tap, a cell background and a vertical alignment stored as tokens, one format applied to a whole selected row or column from the bubble menu, equal widths restored in one command, and a table that is as wide as its columns rather than its container, with a named full width. Placed after `PA` because horizontal alignment reaches a cell for free once `PA-06` exists, `PA-23` sets the token precedent a cell background follows, and the migration runner has landed by then.
+
+Column resize writes `colwidth`, which the schema has stored and the renderer has honoured since `0.1.0`; the editor simply has it switched off. §3.1 said resizing would not be persisted, and `F22` reversed that in writing rather than by drift: the width is exact on every screen, and a table wider than its container scrolls inside its wrapper, as it has since `HD-08`. Every row keeps the rule the table was built under: a keyboard path and a touch path beside the mouse one.
+
+The block's three stored additions — cell tone, vertical alignment, the table's named width — land in one bump with one migration. It lands beside the table in the main entry rather than as a subpath, measured row by row against the budget, and `@blockleaf/renderer` moves in the same release so a document reads as it edits.
+**Exit:** a column can be resized, a row or column moved, a cell aligned and coloured, and a whole row formatted in one go, from a mouse, the keyboard and a touch screen alike; a table that stores none of it looks as it did before, apart from its default width.
+
 ### OP — Optional packages (ongoing)
 
 `@blockleaf/collab` (Yjs + provider adapter), `@blockleaf/ai` (streaming adapter, no bundled provider), `@blockleaf/markdown`, comments/mentions.
 **Exit:** each is additive — removing it changes nothing in the base bundle.
+
+### UX — Design and motion (2–3 weeks)
+
+A pass over how the editor looks and moves, once there is a full set of blocks to look at. It runs after `OP` deliberately: refining the design of blocks that do not exist yet is work thrown away, and a motion language is easier to set once across twelve surfaces than to retrofit twelve times.
+
+Three things are in scope. The chrome — slash menu, bubble menu, block menu, drag handle, table controls — which is what a user actually touches. The blocks themselves, callouts and toggles and code and media, which is what they look at. And the read view in `@blockleaf/renderer`, which is where the content is seen a thousand times for every time it is edited, and which has had no design attention at all.
+
+The constraints are the same ones that made the editor worth building, and a design pass is exactly where they get quietly broken. No CSS framework and no `!important`, still. Every value a `--bl-*` custom property, because a design a host cannot override is a design imposed on them. And motion is CSS, not a library: an animation package is tens of kilobytes against a budget with twelve to spare, which is the trade §11 already refuses elsewhere.
+
+`prefers-reduced-motion` is not a finishing touch here. Vestibular disorders are not a minority taste, and an editor is a surface people sit in front of all day; every animation this block adds needs a path that does not run. It is cheaper to write that rule once at the start of the block than to audit for it at the end.
+**Exit:** the refreshed surfaces are still axe-clean, every animation stops under `prefers-reduced-motion`, nothing gained an `!important` or a hardcoded colour, and a screenshot suite fails if any of it silently changes.
+
+### EX — Conversion and export (ongoing)
+
+Getting a document out of Blockleaf and into something else. Markdown export is the cheap one and does not belong here — it is a fourth target on the renderer's existing walker, alongside React, HTML and plain text, and it ships in `PA`. What is left is genuinely expensive and should wait for someone to ask.
+
+Word in and out, in `@blockleaf/convert`. `docx` (MIT) and `mammoth` (BSD-2) make it possible with no licence cost; fidelity is the part that never finishes, because a callout has no Word equivalent, nested lists need document-level numbering definitions, and every consumer has a different idea of correct output.
+
+PDF ships as **a recipe, not a package**: a documentation page showing how to run a headless browser over `@blockleaf/renderer`'s HTML. The common case is covered earlier and far more cheaply by a print stylesheet in `PA`, which costs one `@media print` block and no dependency at all.
+**Exit:** a document survives a round trip through each supported format without losing a node the format can represent.
 
 ### V1 — 1.0
 

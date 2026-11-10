@@ -137,6 +137,11 @@ test.describe('The editor on a phone', () => {
 	test('a table wider than the screen scrolls rather than overflowing', async ({
 		page
 	}) => {
+		// Autofocus into this document used to throw on a phone, and the throw
+		// stopped Tiptap's `create` event, so the paragraph after the table
+		// never arrived. Tiptap issue 8546.
+		const errors: Error[] = [];
+		page.on('pageerror', (error) => errors.push(error));
 		await page.goto('/?wide');
 		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
 
@@ -155,5 +160,9 @@ test.describe('The editor on a phone', () => {
 		expect(overflow.scrolls).toBe(true);
 		expect(overflow.withinViewport).toBe(true);
 		expect(overflow.pageOverflows).toBe(false);
+		expect(errors).toEqual([]);
+		await expect(
+			page.locator('.blockleaf-editor__content > :last-child')
+		).toHaveJSProperty('tagName', 'P');
 	});
 });

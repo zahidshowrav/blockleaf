@@ -19,7 +19,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 | **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                                                |
 | **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                                               |
 
-Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose](#roadmap).
+Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose, and scheduled](#roadmap).
 
 ## Install
 
@@ -109,19 +109,27 @@ pnpm perf              # open long documents and time them
 
 Done:
 
-- **EC** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
-- **CH** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
-- **MC** — upload adapter, images, code blocks with highlighting
-- **RD** — `@blockleaf/renderer` and the docs site
+- **Editing Core (EC)** — full node and mark set including tables, stable block ids, markdown input rules, paste normalisation, link sanitisation
+- **The Chrome (CH)** — slash menu, bubble menu, drag handle and block menu, keyboard-complete and axe-clean
+- **Media & Code (MC)** — upload adapter, images, code blocks with highlighting
+- **Renderer & Docs (RD)** — `@blockleaf/renderer` and the docs site
 
 Next:
 
-- **HD** — accessibility pass, i18n, mobile, large-document performance
-- **Later** — collaboration, AI commands, markdown import/export, comments
+- **Hardening (HD)** — accessibility pass, i18n, mobile, large-document performance. Done apart from a migration runner, a table caption, and paste on very long documents
+- **Forward Compatibility (FC)** — an editor that meets a document written by a newer editor should say so, not fall over
+- **Parity Blocks & Marks (PA)** — the toggle block, mentions, emoji, math, text colour and alignment, font tokens, a table of contents, media, embeds, columns, markdown export, print styles
+- **Tables (TB)** — column resize with exact widths on every screen, a table as wide as its columns with a named full width, moving rows and columns, one-tap add from the edge, alignment and formatting across a selection, cell background, each with a keyboard and a touch path
+
+Later:
+
+- **Optional Extensions (OP)** — collaboration, comments, AI, markdown import
+- **Design & Motion (UX)** — a design and motion pass over the chrome, the blocks and the read view, once there is a full set of blocks to design
+- **Conversion & Export (EX)** — Word in and out, version history
+
+Everything in `PA` and after ships as a subpath or its own package, apart from `TB`, which extends the table already in the core and is measured against the same budget. Installing the editor never gets heavier because a feature you do not import exists.
 
 The schema has been meant to be depended on since `0.1.0`. For what is on npm right now, see [the package](https://www.npmjs.com/package/@blockleaf/editor).
-
-Collaboration, comments and mentions are deliberately out of `0.1`. Each is a project of its own.
 
 ## Licence
 

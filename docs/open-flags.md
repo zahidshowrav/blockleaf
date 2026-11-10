@@ -8,11 +8,112 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16 · **Last reviewed:** 2026-10-18
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22 · **Last reviewed:** 2026-11-10
 
 ---
 
 ## Settled
+
+### F22 — may a column width written by a drag be stored · decided 2026-11-10
+
+§3.1 of the plan admitted tables to `0.1` with a list of what was not admitted
+with them, and "column resizing persisted as layout" is on it. The same
+section admitted `colwidth` because ProseMirror's table implementation
+expects it, so the field has been in the schema, in `./validate`, in the
+snapshot and in both renderer targets since `0.1.0`. The editor passed
+`resizable: false`, so nothing wrote to it. `TB-01` writes to it. That is the
+whole change: no new attribute, no `SCHEMA_VERSION` bump, no migration.
+
+**Decisions:**
+
+- **Allowed.** A dragged column width is stored in `colwidth`, in pixels, as the field has always been defined.
+- **Exact on every screen, phone included.** The editor and `@blockleaf/renderer` show the stored width; neither squeezes a column to fit. A table wider than its container scrolls sideways inside its wrapper, which `HD-08` and `HD-12` already built.
+- **Reversible in one command.** `TB-07` writes the field back to `null` on every cell, so the table returns to equal columns.
+- **Not a precedent.** The table's own full width (`TB-08`) stores a named value, as `F21` chose for images, never a pixel count measured on the author's screen. No other node gains a layout attribute without the same argument being made in public.
+- **Why:** the field exists and is honoured on every output already; refusing to write it kept the document no cleaner, it only kept a feature out. Reversing the §3.1 note here makes the reversal deliberate rather than by drift, as the table's own admission was.
+
+### F21 — what an image resize is allowed to change · decided 2026-11-07
+
+Resizing media blocks (images, videos, YouTube/Vimeo embeds, iframes) resizes
+**width while locking the aspect ratio**, plus provides a 1-click **full-width** toggle (`PA-24`).
+
+**Decisions:**
+
+- Width is resized smoothly with aspect ratio maintained; arbitrary height distortion (squishing/stretching) is strictly refused.
+- Applies across all media types: image, video, embeds (YouTube, Vimeo), and general iframes.
+- Full width is a named state/class rather than a raw pixel width, ensuring responsive rendering on mobile and varied screen sizes.
+- Image cropping, if desired in the future, will be introduced as its own dedicated crop tool rather than a side-effect of resize handles.
+
+### F20 — is a caption plain text or rich text · decided 2026-11-07
+
+Captions (under images, video, embeds, audio, and tables) are structured as **rich text**
+(inline content holding text and marks such as links, emphasis, and strong).
+
+**Decisions:**
+
+- A media/table block includes a `caption` child node (rendering `<figcaption>` or `<caption>`) containing inline content.
+- Supports clickable links and formatting (essential for credits, source links, and licenses).
+- Aligns `PA-20`, `PA-21`, and `HD-10` on the same structured caption mechanism.
+- **Why:** Plain string attributes cannot express source/attribution links, which are present in almost all production captions. Storing rich text immediately prevents a breaking schema bump later when link credits are inevitable.
+
+### F19 — what the editor's motion is built out of · decided 2026-11-07
+
+The editor's motion and animation language is built entirely out of **pure CSS transitions and keyframes**.
+
+**Decisions:**
+
+- Motion uses CSS variables (`--bl-duration-*`, `--bl-ease-*`) and standard CSS keyframes/transitions.
+- Drag-and-drop indicator snaps into position cleanly without requiring heavy runtime physics animation.
+- No JavaScript animation libraries (e.g., Framer Motion) are bundled.
+- Respects `prefers-reduced-motion` globally so all motion collapses to instant cuts when requested.
+- **Why:** Keeps 0 kB runtime JS overhead against the strict 160 kB bundle budget, avoids breaking host stylesheets, and provides instant, predictable UI response.
+
+### F18 — does a stored design value keep a token or a CSS value · decided 2026-11-07
+
+Stored design values (text color, background color, font family, font size) store
+**semantic tokens**, not raw CSS values.
+
+**Decisions:**
+
+- Font size stores named scale tokens (e.g., `"sm"`, `"md"`, `"lg"`), resolving via `--bl-font-size-*`.
+- Font family stores semantic family tokens (e.g., `"sans"`, `"serif"`, `"mono"`), resolving via `--bl-font-*`.
+- Colors store semantic theme tokens (e.g., `"muted"`, `"brand"`, `"accent"`), resolving via `--bl-*` custom properties.
+- **Why:** Raw CSS values (`14px`, `#1a1a1a`) embed presentation into document content, break dark mode, fail under high-contrast or larger-text accessibility settings, and bypass theming. Semantic tokens guarantee responsive scaling and dark-mode legibility, matching the precedent already established by `callout` (`tone`).
+
+### F17 — what an editor does with a document newer than itself · decided 2026-11-07
+
+The editor encounters an unrecognised node/mark or an `attrs.schemaVersion` newer than
+its own `SCHEMA_VERSION`.
+
+**Decisions:**
+
+1. **Unrecognised nodes and marks are preserved losslessly.**
+    - The editor runs a pre-parse walk swapping unknown nodes and marks into a placeholder
+      node/mark that preserves the exact original payload, and performs a reverse walk on
+      serialization to write it back byte-for-byte.
+    - In the editor, an "Unsupported block" placeholder UI is rendered so the author is
+      aware content exists that their current version cannot edit directly.
+    - In `@blockleaf/renderer`, unknown blocks skip rendering cleanly (emitting `null` / nothing)
+      without noisy error banners for readers, though consumers may supply an `unknown` component
+      override (`FC-05`).
+2. **Default for newer `schemaVersion` is `readonly`.**
+    - The editor introduces a configurable `futureDocument?: 'readonly' | 'preserve' | 'throw'` prop
+      defaulting to `'readonly'`.
+    - When opened in `readonly`, the document is displayed and readable, but editing and saving
+      are locked to prevent accidental overwrite or corruption of newer schema structures.
+    - Hosts that prefer seamless editing can opt into `'preserve'`.
+
+**Amended 2026-11-08 (`FC-01`).** The trigger is wider and the prop is
+renamed. A document that fails the content check — an unrecognised node or
+mark at any `schemaVersion`, which is the common case once blocks ship as
+subpaths — is the surer signal, and a newer version number that still parses
+is the rarer one; both feed one policy. The prop is `incompatibleDocument`,
+because `futureDocument` named only the second trigger. Its values are
+`'readonly'` (default) and `'discard'`, which opens the empty fallback
+editable and says so in its name; `'preserve'` cannot exist before `FC-03`,
+and `'throw'` waits for `FC-02`. The lock is the package's by default because
+the safe move needs nothing a host knows; the override is where host
+knowledge belongs.
 
 ### F16 — the no-CSS-framework rule governs the packages, not the repo · decided 2026-10-14
 

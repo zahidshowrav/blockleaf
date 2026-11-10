@@ -1,6 +1,6 @@
-import type { Editor, Extensions } from '@tiptap/core';
+import type { Editor, EditorEvents, Extensions } from '@tiptap/core';
 import { useEditor } from '@tiptap/react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
@@ -15,6 +15,11 @@ import {
 	type UploadAdapter,
 	type UploadFailure
 } from '../core/index.js';
+
+export type ContentErrorProps = EditorEvents['contentError'];
+export type ContentErrorCallback = (props: ContentErrorProps) => void;
+/** See `UseBlockleafEditorOptions.incompatibleDocument`. */
+export type IncompatibleDocumentPolicy = 'readonly' | 'discard';
 
 export type UseBlockleafEditorOptions = {
 	/**
@@ -32,6 +37,52 @@ export type UseBlockleafEditorOptions = {
 	debounceMs?: number;
 	editable?: boolean;
 	autofocus?: boolean;
+	/**
+	 * What to do with a `defaultValue` the editor cannot read — an
+	 * unrecognised node or mark, or a structure the schema refuses. Tiptap's
+	 * fallback is an empty document; this decides what happens to it.
+	 *
+	 * - `'readonly'` (default): the editor opens read-only whatever `editable`
+	 *   says, and `onChange` and `onChangeImmediate` stay silent, so the empty
+	 *   document can never be saved over the stored one. `onContentError`
+	 *   still fires, so the host can say why.
+	 * - `'discard'`: the empty document opens editable. The host has accepted
+	 *   that whatever could not be read is gone.
+	 *
+	 * The prop is live: flipping it to `'discard'` after a confirmation
+	 * unlocks the editor. Keeping an unknown block intact instead is `FC-03`;
+	 * a newer `attrs.schemaVersion` joining the trigger is `FC-02`.
+	 */
+	incompatibleDocument?: IncompatibleDocumentPolicy;
+	/**
+	 * Check content against the schema instead of letting Tiptap drop what
+	 * does not fit behind a console warning. On by default: it is how the
+	 * editor knows to lock itself (see `incompatibleDocument`).
+	 *
+	 * A failed check ends differently on each path. `defaultValue` fires
+	 * `onContentError` and the editor opens with an **empty document**, the
+	 * valid blocks gone with the unknown one. `insertContent` fires it and
+	 * returns `false`. `setContent` throws, fires nothing, and leaves the
+	 * document as it was — wrap that call.
+	 *
+	 * `false` restores Tiptap's own behaviour: the empty document opens
+	 * editable, nothing fires, and nothing locks.
+	 */
+	enableContentCheck?: boolean;
+	/**
+	 * Only read when `enableContentCheck` is `false`: `insertContent` then
+	 * still fires `onContentError`, and goes ahead with whatever could be
+	 * parsed. It has no effect on `defaultValue` or `setContent`. Defaults to
+	 * `true` when `onContentError` is given.
+	 */
+	emitContentError?: boolean;
+	/**
+	 * Called when content fails the schema check. For `defaultValue` the
+	 * editor has already fallen back to an empty document and, unless
+	 * `incompatibleDocument` says otherwise, locked itself by the time this
+	 * runs. The job left for the host is to tell the user.
+	 */
+	onContentError?: ContentErrorCallback;
 	/**
 	 * Accessible name for the editing surface.
 	 *
@@ -65,6 +116,10 @@ export const useBlockleafEditor = ({
 	debounceMs = DEFAULT_CHANGE_DEBOUNCE_MS,
 	editable = true,
 	autofocus = false,
+	enableContentCheck = true,
+	emitContentError,
+	onContentError,
+	incompatibleDocument = 'readonly',
 	label = 'Document',
 	upload,
 	uploadAccept,
@@ -73,6 +128,15 @@ export const useBlockleafEditor = ({
 }: UseBlockleafEditorOptions = {}): Editor | null => {
 	const onChangeRef = useRef(onChange);
 	const onChangeImmediateRef = useRef(onChangeImmediate);
+	const onContentErrorRef = useRef(onContentError);
+	const editorRef = useRef<Editor | null>(null);
+	// Set the moment Tiptap reports that `defaultValue` could not be read,
+	// which happens inside the editor's constructor. The ref is for the
+	// callbacks that can run before React has re-rendered with the state.
+	const [unreadable, setUnreadable] = useState(false);
+	const unreadableRef = useRef(false);
+	const locked = unreadable && incompatibleDocument === 'readonly';
+	const effectiveEditable = editable && !locked;
 	const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined
 	);
@@ -112,11 +176,39 @@ export const useBlockleafEditor = ({
 	const editor = useEditor({
 		extensions: resolvedExtensions,
 		content,
-		editable,
-		autofocus,
+		editable: effectiveEditable,
+		// Autofocus is done in `onCreate` below rather than handed to Tiptap.
+		// On Android, iOS and desktop Safari Tiptap's `focus` command focuses
+		// the DOM synchronously, which makes its own focus plugin dispatch a
+		// transaction before the command's one, and the command's one then
+		// throws "Applying a mismatched transaction". The throw happens inside
+		// Tiptap's mount timer, ahead of `create`, so the event never fires
+		// and `TrailingNodeOnLoad` never runs. Tiptap issue 8546; drop this
+		// once a pinned release has it fixed.
+		autofocus: false,
+		onCreate: ({ editor: instance }) => {
+			if (!autofocus) return;
+			// Focusing the DOM first lets the focus plugin's transaction land
+			// on its own. The command then finds the view focused and dispatches
+			// against the state that produced.
+			instance.view.focus();
+			instance.commands.focus(autofocus);
+		},
 		// Next.js App Router hydrates on the client; rendering immediately is the
 		// single most common Tiptap/SSR mismatch. Handle it rather than document it.
 		immediatelyRender: false,
+		enableContentCheck,
+		emitContentError: emitContentError ?? Boolean(onContentError),
+		onContentError: (props) => {
+			// The initial document fails inside the constructor, before this
+			// hook has been handed an editor. A failure that arrives once it
+			// has one came from `insertContent`, and that locks nothing.
+			if (editorRef.current === null) {
+				unreadableRef.current = true;
+				setUnreadable(true);
+			}
+			onContentErrorRef.current?.(props);
+		},
 		editorProps: {
 			attributes: {
 				class: `${EDITOR_CLASS_NAME}__content`,
@@ -130,6 +222,11 @@ export const useBlockleafEditor = ({
 			// Tiptap actually hands this callback.
 			if (transaction.getMeta(NORMALISATION_META)) return;
 			if (!transaction.docChanged) return;
+			// Locked means the document in the editor is Tiptap's empty
+			// fallback, not the author's. It must not reach a save path.
+			if (unreadableRef.current && incompatibleDocument === 'readonly') {
+				return;
+			}
 
 			// The one cast in the package, and the right place for it: Tiptap's
 			// JSONContent is `any`-typed, so this is where a loose shape becomes the
@@ -155,11 +252,16 @@ export const useBlockleafEditor = ({
 	useEffect(() => {
 		onChangeRef.current = onChange;
 		onChangeImmediateRef.current = onChangeImmediate;
-	}, [onChange, onChangeImmediate]);
+		onContentErrorRef.current = onContentError;
+	}, [onChange, onChangeImmediate, onContentError]);
 
 	useEffect(() => {
-		editor?.setEditable(editable);
-	}, [editor, editable]);
+		editorRef.current = editor;
+	}, [editor]);
+
+	useEffect(() => {
+		editor?.setEditable(effectiveEditable);
+	}, [editor, effectiveEditable]);
 
 	useEffect(() => () => clearTimeout(timerRef.current), []);
 
