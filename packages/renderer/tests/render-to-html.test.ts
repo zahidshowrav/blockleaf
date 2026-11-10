@@ -204,12 +204,24 @@ describe('overrides', () => {
 });
 
 describe('documents this package did not write', () => {
-	it('renders an unknown node as its children', () => {
+	it('renders an unknown node as nothing (FC-05)', () => {
 		expect(
 			renderToHTML(
-				docOf({ type: 'fromTheFuture', content: [paragraph('kept')] })
+				docOf({ type: 'fromTheFuture', content: [paragraph('hidden')] })
 			)
-		).toBe('<p>kept</p>');
+		).toBe('');
+	});
+
+	it('hands an unknown node to the unknown override', () => {
+		expect(
+			renderToHTML(
+				docOf({ type: 'fromTheFuture', content: [paragraph('kept')] }),
+				{
+					unknown: ({ node, children }) =>
+						`<div data-type="${node.type ?? ''}">${children}</div>`
+				}
+			)
+		).toBe('<div data-type="fromTheFuture"><p>kept</p></div>');
 	});
 
 	it('renders an empty document as an empty string', () => {

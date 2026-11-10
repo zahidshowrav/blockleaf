@@ -123,12 +123,12 @@ them, the migrations do not know them, and no test guards them. That is a
 reasonable trade — it is your application and your database — as long as you
 know you have made it.
 
-Three consequences:
+Four consequences:
 
-1. **The renderer does not know your node.** `@blockleaf/renderer` renders an
-   unknown node's children and drops an unknown mark's decoration rather than
-   throwing, so nothing breaks, but a mention renders as plain text until you
-   supply an override. See
+1. **The renderer does not know your node.** `@blockleaf/renderer` skips an
+   unknown node and drops an unknown mark's decoration rather than throwing,
+   so nothing breaks, but your node is missing from the page until you supply
+   an override. See
    [rendering a node type of your own](./rendering.mdx#rendering-a-node-type-of-your-own).
 2. **Block ids are not automatic.** `UniqueID` is configured with a fixed
    list of types. A node of yours gets no `id` unless you add it:

@@ -22,18 +22,18 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-08`, `HD-12` and `HD-14` are done; `HD-09`, `HD-10`, `HD-11` and `HD-13`
-are left. In `FC`, `FC-01` to `FC-04` are done. Both packages are live on npm and the docs
+are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `FC-05`, then `HD-09`. None of the `FC` tasks change the
-stored shape — the `FC-03` placeholder lives only in the open editor and is
-swapped back on save — so none of them wait on the migration runner. `HD-09`
-is what `HD-10`, `SG-04` and every schema change in `PA` and `TB` wait on.
+**Next:** `HD-09`, the migration runner. It is what `HD-10`, `SG-04` and
+every schema change in `PA` and `TB` wait on. The `FC` block changed no stored
+shape — the `FC-03` placeholder lives only in the open editor and is swapped
+back on save — so it needed none. It reaches npm with the `0.6.0` release.
 
-**Last verified:** 2026-10-21: 360 editor unit tests, 149 renderer, 46
-Playwright across two projects — 37 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 147.46 kB of 160 kB, schema entry at 207 B of 2 kB, code block
-subpath at 80.44 kB of 85 kB. Lint, typecheck and build cover eight workspaces
-now that `examples/*` is one of them.
+**Last verified:** 2026-11-11: 395 editor unit tests, 156 renderer, 48
+Playwright across two projects — 39 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 148.34 kB of 160 kB, schema entry at 211 B of 2 kB, code block
+subpath at 80.42 kB of 85 kB. Lint, typecheck and build cover eight
+workspaces.
 
 ---
 
@@ -399,13 +399,13 @@ Already-published versions cannot be fixed from here. The walk has to exist
 in the version doing the reading, which is why this block runs before `PA`
 rather than beside it.
 
-| Id    | Task                                                                              | Status      | Commit    | Completed  |
-| ----- | --------------------------------------------------------------------------------- | ----------- | --------- | ---------- |
-| FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `a8f517c` | 2026-11-08 |
-| FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done        | `4344313` | 2026-11-11 |
-| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Done        | `cc7933e` | 2026-11-11 |
-| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done        | `f46ac4a` | 2026-11-11 |
-| FC-05 | Renderer takes an `unknown` component override                                    | Not started | —         | —          |
+| Id    | Task                                                                              | Status | Commit    | Completed  |
+| ----- | --------------------------------------------------------------------------------- | ------ | --------- | ---------- |
+| FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done   | `a8f517c` | 2026-11-08 |
+| FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done   | `4344313` | 2026-11-11 |
+| FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Done   | `cc7933e` | 2026-11-11 |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done   | `f46ac4a` | 2026-11-11 |
+| FC-05 | Renderer takes an `unknown` component override                                    | Done   | —         | 2026-11-11 |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
 turns Tiptap's content check on, and when `defaultValue` fails it the editor

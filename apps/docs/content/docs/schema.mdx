@@ -84,6 +84,9 @@ Blockleaf document, and every part of Blockleaf leaves it alone:
   where the schema allows no block at all, such as directly inside a list;
   that document opens read-only. See
   [a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
+- **The renderer** renders nothing for an unrecognised node and plain text for
+  an unrecognised mark, unless you pass an `unknown` override. See
+  [rendering](./rendering.mdx#a-node-type-nobody-named).
 
 In TypeScript these are `UnrecognisedNode` and `UnrecognisedMark`. They are
 deliberately **not** members of `BlockNode`, `InlineNode` or `BlockleafMark`,

@@ -187,11 +187,14 @@ document says, and nothing on the page can write a change back. A checkbox
 that invites a click and then silently discards it is worse than one that
 plainly cannot be clicked.
 
-**An unknown node renders its children.** Documents outlive the code that
-reads them, so a server running an older renderer will eventually meet a node
-type a newer editor wrote. Throwing there takes down the whole page for one
-unrecognised block, so the text inside survives and the wrapper does not. The
-same applies to an unknown mark, which renders as undecorated text.
+**An unknown node renders nothing.** Documents outlive the code that reads
+them, so a server running an older renderer will eventually meet a node type
+a newer editor wrote. Throwing there takes down the whole page for one
+unrecognised block, and rendering its children is no safer: a wrapper's
+meaning is often the point, and its text out of context can read as something
+it is not. So it is skipped, with no error banner for the reader. An unknown
+mark renders as undecorated text, because the text is still the author's.
+Pass [`unknown`](#a-node-type-nobody-named) to decide for yourself.
 
 **Tables get a `<thead>`.** See above.
 
@@ -289,6 +292,27 @@ host adds a node the editor does not have:
 />
 ```
 
+### A node type nobody named
+
+`unknown` renders every node whose type neither the defaults nor
+`components` name. It gets the same props as any override:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	unknown={({ node }) => (
+		<p className="notice">
+			This page has a {node.type} block that cannot be shown here.
+		</p>
+	)}
+/>
+```
+
+`({ children }) => children` brings back the content inside an unknown node,
+if that is what your documents want. `renderToHTML` takes `unknown` in its
+options the same way, returning a string. A name in `components` always wins
+over `unknown`.
+
 ### Props an override receives
 
 | Prop         | What it is                            |
@@ -322,8 +346,8 @@ import { renderToHTML } from '@blockleaf/renderer/html';
 const body = renderToHTML(article.body);
 ```
 
-It writes the same markup the React target does, takes the same `components`
-and `marks` overrides, and imports nothing at all. The entry does not touch
+It writes the same markup the React target does, takes the same
+`components`, `marks` and `unknown` overrides, and imports nothing at all. The entry does not touch
 React, so a worker that renders digest emails installs no UI library to do it.
 
 Escaping here is this package's job rather than React's, so text and attribute
