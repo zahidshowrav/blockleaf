@@ -71,6 +71,8 @@ export {
 	type TaskListNode,
 	type TextNode,
 	type UnderlineMark,
+	type UnrecognisedMark,
+	type UnrecognisedNode,
 	type UploadAdapter,
 	type UploadExtensionOptions,
 	type UploadFailure,

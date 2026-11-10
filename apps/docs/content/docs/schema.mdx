@@ -67,6 +67,36 @@ Planned for `EC`–`MC`:
 
 A table is a grid of rich-text cells with an optional header row. Nested tables and spreadsheet behaviour are out — see `PROJECT_PLAN.md` §3.1. A cell background and a vertical alignment are on the roadmap, stored as tokens.
 
+## Types this document does not define
+
+A node or mark whose `type` is a string not listed above is **unrecognised**.
+It may come from a newer version of this schema, from a subpath your editor
+did not load, or from someone's own extension. It is still a valid part of a
+Blockleaf document, and every part of Blockleaf leaves it alone:
+
+- **The validator** accepts it anywhere a node or mark may go, does not look
+  inside it, and returns it exactly as it was. Every type listed above is
+  still checked in full — a `heading` with `level: 4` is a broken heading, not
+  an unrecognised node, and is refused. A node with no string `type` at all is
+  refused too.
+- **The editor** shows it as a placeholder and saves it back byte for byte,
+  unless the author deletes it. The one exception is an unrecognised node
+  where the schema allows no block at all, such as directly inside a list;
+  that document opens read-only. See
+  [a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
+
+In TypeScript these are `UnrecognisedNode` and `UnrecognisedMark`. They are
+deliberately **not** members of `BlockNode`, `InlineNode` or `BlockleafMark`,
+because a member typed `type: string` would stop `node.type === 'heading'`
+from narrowing. So code that walks a document needs a `default` branch: the
+types describe what this schema defines, and a stored document can always
+hold more.
+
+What is **not** kept is an unknown _attribute_ on a known node. The validator
+strips it and the editor drops it. That is why adding an attribute to an
+existing node is a schema change, with a `SCHEMA_VERSION` bump and a
+migration, and a new node type is not.
+
 ## Explicitly out of v0.1
 
 Columns, embeds, footnotes, mentions, comments, math. Each is a project of its own, and saying so here is what lets every "can you also…" have somewhere to be pointed.

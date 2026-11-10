@@ -136,5 +136,7 @@ export {
 	type TaskItemNode,
 	type TaskListNode,
 	type TextNode,
-	type UnderlineMark
+	type UnderlineMark,
+	type UnrecognisedMark,
+	type UnrecognisedNode
 } from './schema.js';

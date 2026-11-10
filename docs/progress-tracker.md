@@ -22,10 +22,10 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-08`, `HD-12` and `HD-14` are done; `HD-09`, `HD-10`, `HD-11` and `HD-13`
-are left. In `FC`, `FC-01` to `FC-03` are done. Both packages are live on npm and the docs
+are left. In `FC`, `FC-01` to `FC-04` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `FC-04` and `FC-05`, then `HD-09`. None of the `FC` tasks change the
+**Next:** `FC-05`, then `HD-09`. None of the `FC` tasks change the
 stored shape — the `FC-03` placeholder lives only in the open editor and is
 swapped back on save — so none of them wait on the migration runner. `HD-09`
 is what `HD-10`, `SG-04` and every schema change in `PA` and `TB` wait on.
@@ -404,7 +404,7 @@ rather than beside it.
 | FC-01 | `onContentError` surfaced; a document the editor cannot read opens read-only      | Done        | `a8f517c` | 2026-11-08 |
 | FC-02 | A newer `attrs.schemaVersion` joins the `incompatibleDocument` trigger; `'throw'` | Done        | `4344313` | 2026-11-11 |
 | FC-03 | Unknown nodes and marks round-trip through a placeholder, byte for byte           | Done        | `cc7933e` | 2026-11-11 |
-| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Not started | —         | —          |
+| FC-04 | Validator accepts unrecognised types; `schema.mdx` records the contract           | Done        | —         | 2026-11-11 |
 | FC-05 | Renderer takes an `unknown` component override                                    | Not started | —         | —          |
 
 `FC-01` depends on nothing — not on `HD-09`, not on the rest of the block. It
