@@ -123,12 +123,12 @@ them, the migrations do not know them, and no test guards them. That is a
 reasonable trade — it is your application and your database — as long as you
 know you have made it.
 
-Three consequences:
+Four consequences:
 
-1. **The renderer does not know your node.** `@blockleaf/renderer` renders an
-   unknown node's children and drops an unknown mark's decoration rather than
-   throwing, so nothing breaks, but a mention renders as plain text until you
-   supply an override. See
+1. **The renderer does not know your node.** `@blockleaf/renderer` skips an
+   unknown node and drops an unknown mark's decoration rather than throwing,
+   so nothing breaks, but your node is missing from the page until you supply
+   an override. See
    [rendering a node type of your own](./rendering.mdx#rendering-a-node-type-of-your-own).
 2. **Block ids are not automatic.** `UniqueID` is configured with a fixed
    list of types. A node of yours gets no `id` unless you add it:
@@ -146,6 +146,10 @@ Three consequences:
    and Markdown into the documented schema. It will not know how to produce
    your node, so pasted markup that should become one will arrive as a
    paragraph.
+4. **An editor without your extension keeps your node.** It opens as a
+   placeholder and is saved back exactly as it came in, so a document written
+   where your extension is installed survives being opened where it is not.
+   See [a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
 
 ## Extensions that are already handled
 

@@ -26,34 +26,14 @@ accessibility pass across twelve surfaces, translatable labels, touch and
 mobile behaviour, and measured performance on documents past ten thousand
 blocks.
 
+And forward compatibility: an editor that meets a document written by a newer
+version of itself keeps what it does not understand. An unknown block opens as
+a placeholder and is saved back exactly as it came in. A document the editor
+truly cannot read, or one with a newer `schemaVersion`, opens read-only with
+its change callbacks silent, so nothing is saved over it. The validator
+accepts unknown types, and the renderer skips them unless you say otherwise.
+
 ## Next
-
-### Forward compatibility
-
-An editor should survive meeting a document written by a newer version of
-itself.
-
-Today it does not. Hand the editor stored JSON containing a node or mark it
-does not recognise and it opens an empty document, with nothing more than a
-console warning to say so. That is the worst of the available failures.
-Refusing the document would at least leave the stored copy alone; an empty
-editor that still saves writes nothing over something on the first
-keystroke.
-
-What is being built, in this order: an editor that refuses a document it
-cannot read, opening it read-only with its change callbacks silent and
-`onContentError` telling your code why; the same refusal for a document whose
-`schemaVersion` is ahead of the editor's; and then the real fix, a guarantee
-that anything the editor does not understand is handed back out exactly as it
-came in, so that the refusal is rarely needed.
-
-<Callout type="info" title="Why this one comes first">
-
-    Preserving an unfamiliar block only works in the version doing the
-    reading. Shipping it later does nothing for a copy of the editor already
-    installed somewhere, so it is worth doing before the blocks it protects.
-
-</Callout>
 
 ### More blocks and marks
 

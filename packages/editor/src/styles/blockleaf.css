@@ -1247,3 +1247,24 @@
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: 2px;
 }
+
+/* FC-03. A node or mark this editor does not know, kept intact. Muted and
+   dashed so it reads as "here, but not editable from here". */
+.blockleaf-editor__content .blockleaf-unknown {
+	padding: 0.6em 0.85em;
+	border: 1px dashed var(--bl-color-border);
+	border-radius: var(--bl-radius);
+	color: var(--bl-color-muted);
+	font-size: 0.875em;
+	user-select: none;
+}
+
+.blockleaf-editor__content .blockleaf-unknown--inline {
+	padding: 0 0.3em;
+	font-size: inherit;
+}
+
+.blockleaf-editor__content .blockleaf-unknown.ProseMirror-selectednode {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 1px;
+}

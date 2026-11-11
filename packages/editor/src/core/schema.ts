@@ -267,6 +267,25 @@ export type BlockNode =
  */
 export type BlockleafNode = BlockNode | InlineNode;
 
+/**
+ * A node of a type this schema does not define: from a newer version, a
+ * subpath, or a host's own extension. The validator accepts one anywhere a
+ * node may go and does not look inside it; the editor keeps it through a
+ * placeholder. Deliberately **not** a member of `BlockNode` or `InlineNode` —
+ * a `type: string` member would stop `node.type === 'heading'` narrowing —
+ * so code that walks a document needs a default branch for it.
+ */
+export interface UnrecognisedNode {
+	type: string;
+	[key: string]: unknown;
+}
+
+/** A mark of a type this schema does not define. See `UnrecognisedNode`. */
+export interface UnrecognisedMark {
+	type: string;
+	[key: string]: unknown;
+}
+
 export interface BlockleafDocument {
 	type: 'doc';
 	attrs: { schemaVersion: number };

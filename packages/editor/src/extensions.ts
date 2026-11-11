@@ -20,5 +20,14 @@ export {
 	isMarkdownText,
 	markdownToHTML
 } from './core/paste.js';
+export {
+	UnknownBlock,
+	UnknownContent,
+	UnknownInline,
+	UnknownMark,
+	unwrapUnknownContent,
+	wrapUnknownContent,
+	type UnknownContentOptions
+} from './core/unknown-content.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
 export { TableKit } from '@tiptap/extension-table';
