@@ -16,6 +16,7 @@ import {
 	UnknownContent,
 	createExtensions,
 	createUploadExtension,
+	migrate,
 	newerSchemaVersion,
 	unwrapUnknownContent,
 	withBlockIds,
@@ -37,6 +38,10 @@ export type UseBlockleafEditorOptions = {
 	 * Initial content. The editor is **uncontrolled**: changing this prop later
 	 * does nothing. A controlled ProseMirror fights its own transactions and
 	 * destroys the undo stack — use `editor.commands.setContent()` instead.
+	 *
+	 * A document stored at an older `schemaVersion` is run through `migrate()`
+	 * first. `setContent()` is Tiptap's and does not migrate: pass it
+	 * `migrate(doc)`.
 	 */
 	defaultValue?: BlockleafDocument;
 	extensions?: Extensions;
@@ -210,7 +215,12 @@ export const useBlockleafEditor = ({
 		onUploadError
 	]);
 
-	// Unknown nodes and marks are swapped for placeholders first, so the
+	// An older document is migrated to the current version first, so
+	// everything after this — the placeholders, the ids, the content check —
+	// only ever sees the current shape. A current or newer one comes back as
+	// the same object. Nothing is saved until the user edits, and that save
+	// carries the current version.
+	// Unknown nodes and marks are swapped for placeholders next, so the
 	// content check never sees them and the ids below never reach inside
 	// them. Ids are stamped here rather than left to `UniqueID`, which
 	// assigns them one quadratic transaction step at a time once the
@@ -220,7 +230,7 @@ export const useBlockleafEditor = ({
 			defaultValue
 				? withBlockIds(
 						wrapUnknownContent(
-							defaultValue,
+							migrate(defaultValue),
 							getSchema(resolvedExtensions)
 						)
 					)

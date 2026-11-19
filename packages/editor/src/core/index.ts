@@ -97,6 +97,12 @@ export {
 	type UploadScreening,
 	type UploadState
 } from './upload-extension.js';
+export {
+	migrate,
+	migrations,
+	type DocumentMigration,
+	type StoredDocument
+} from './migrate.js';
 export { UniqueID } from '@tiptap/extension-unique-id';
 export { TableKit } from '@tiptap/extension-table';
 export {

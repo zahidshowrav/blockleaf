@@ -21,12 +21,12 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
-`HD-08`, `HD-12` and `HD-14` are done; `HD-09`, `HD-10`, `HD-11` and `HD-13`
-are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
+`HD-09`, `HD-12` and `HD-14` are done; `HD-10`, `HD-11` and `HD-13` are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `HD-09`, the migration runner. It is what `HD-10`, `SG-04` and
-every schema change in `PA` and `TB` wait on. The `FC` block changed no stored
+**Next:** `SG-04`, the guard that fails CI when `SCHEMA_VERSION` moves
+without a migration, then `HD-10`. `HD-09` added `migrate()`, which every
+schema change in `PA` and `TB` waits on; the editor runs it on `defaultValue`. The `FC` block changed no stored
 shape — the `FC-03` placeholder lives only in the open editor and is swapped
 back on save — so it needed none. It reached npm as `@blockleaf/editor@0.6.0`
 and `@blockleaf/renderer@0.2.0`.
@@ -377,7 +377,7 @@ this table is for.
 | HD-06 | `examples/vite-spa`                                                                       | Done        | `4734b38` | 2026-10-21 |
 | HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10)                    | Done        | `316b929` | 2026-10-21 |
 | HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override                           | Done        | `316b929` | 2026-10-21 |
-| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Not started | —         | —          |
+| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Done        | —         | 2026-11-20 |
 | HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump; shares its shape with `PA-20` | Not started | —         | —          |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |

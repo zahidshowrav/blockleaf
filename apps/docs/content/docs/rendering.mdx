@@ -59,6 +59,11 @@ satisfies — a type import would be a dependency on the package this one exists
 to avoid. A test in the renderer asserts the two shapes stay compatible and
 fails if either drifts.
 
+The renderer does not migrate. A document saved at an older `schemaVersion`
+should go through `migrate()` from `@blockleaf/editor` first — on the server,
+or when it is read from the database. See
+[Reading an older document](/docs/schema#reading-an-older-document).
+
 ## Styling
 
 The renderer writes the same elements and the same attributes as the editor,
