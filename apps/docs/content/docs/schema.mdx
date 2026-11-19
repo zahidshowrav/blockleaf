@@ -137,4 +137,6 @@ Tables were on this list until 2026-10-10. They were moved into `EC` deliberatel
 3. Update the snapshot fixture; the diff in review **is** the contract change, so it should be read as one.
 4. Changeset: a minor while we are on `0.x`, a major after `1.0`.
 
+`packages/editor/tests/migrate.test.ts` fails until step 2 is done: it wants a migration from every version below `SCHEMA_VERSION`, and it migrates a frozen version 1 document (`tests/fixtures/schema-v1.json`, never updated) and validates the result against the current schema.
+
 The snapshot test in `packages/editor/tests/schema.test.ts` exists to make an accidental change fail loudly. It is not there to make a deliberate change hard — it is there to make it visible.

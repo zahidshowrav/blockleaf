@@ -2,11 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
 	migrate,
+	migrations,
 	runMigrations,
 	type DocumentMigration,
 	type StoredDocument
 } from '../src/core/migrate.js';
 import { SCHEMA_VERSION, createEmptyDocument } from '../src/core/schema.js';
+import { validateDocument } from '../src/validate.js';
+import schemaV1 from './fixtures/schema-v1.json' with { type: 'json' };
 
 /** A pretend history, so the runner can be exercised before any real bump:
  *  v1 → v2 renames `callout` to `aside`, v2 → v3 adds a `caption` to tables. */
@@ -132,5 +135,35 @@ describe('migrate', () => {
 			content: []
 		};
 		expect(migrate(newer)).toBe(newer);
+	});
+});
+
+/**
+ * A document saved by version 1, frozen. It is never updated: it is what a
+ * host's database holds, and every later version has to be able to read it.
+ */
+const storedV1: unknown = schemaV1;
+
+describe('every SCHEMA_VERSION bump ships a migration (SG-04)', () => {
+	it('has a migration from every version below the current one', () => {
+		for (let version = 1; version < SCHEMA_VERSION; version += 1) {
+			expect(
+				migrations[version],
+				`missing migration from ${version} to ${version + 1}`
+			).toBeTypeOf('function');
+		}
+	});
+
+	it('has no migration from the current version or past it', () => {
+		const from = Object.keys(migrations).map(Number);
+		expect(from.filter((v) => v < 1 || v >= SCHEMA_VERSION)).toEqual([]);
+	});
+
+	it('turns a stored version 1 document into a valid current one', () => {
+		const current = migrate(storedV1);
+		expect(current).toMatchObject({
+			attrs: { schemaVersion: SCHEMA_VERSION }
+		});
+		expect(() => validateDocument(current)).not.toThrow();
 	});
 });
