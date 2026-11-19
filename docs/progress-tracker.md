@@ -704,3 +704,14 @@ Not block work — these hold across every phase.
 | SG-02 | Tiptap pinned to exact `3.31.4`                                 | Done        | `b96a94f` | 2026-10-09 |
 | SG-03 | Scheduled CI job building against Tiptap `@latest` (§11, F8)    | Done        | —         | 2026-10-10 |
 | SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Not started | —         | —          |
+| SG-05 | Live docs site builds only on a release commit                  | Done        | —         | 2026-11-19 |
+
+`SG-05` exists because `apps/docs` builds against the workspace packages, not
+npm, so that docs can ship in the same PR as the feature and the site catches
+a breaking change first. The cost was that `blockleaf.dev` went live on every
+push to `main` and could document a feature nobody could install yet.
+`apps/docs/vercel.json` now runs `scripts/vercel-ignore-build.sh` as Vercel's
+ignored build step: previews always build, and production builds only on a
+commit that changes a package `CHANGELOG.md` — the merge of the Changesets
+release PR. A docs-only fix waits for the next release unless it is
+redeployed by hand from the Vercel dashboard.
