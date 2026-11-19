@@ -716,7 +716,7 @@ Not block work — these hold across every phase.
 | SG-01 | `size-limit` enforced in CI — 160 kB editor, 2 kB schema (F10)  | Done   | `b96a94f` | 2026-10-09 |
 | SG-02 | Tiptap pinned to exact `3.31.4`                                 | Done   | `b96a94f` | 2026-10-09 |
 | SG-03 | Scheduled CI job building against Tiptap `@latest` (§11, F8)    | Done   | —         | 2026-10-10 |
-| SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Done   | —         | 2026-11-20 |
+| SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Done   | `4fac212` | 2026-11-20 |
 | SG-05 | Live docs site builds only on a release commit                  | Done   | `c4c8d83` | 2026-11-19 |
 
 `SG-05` exists because `apps/docs` builds against the workspace packages, not

@@ -326,7 +326,7 @@ Media blocks carry an optional **caption** with its own alignment, distinct from
 Resizing is width with the ratio locked, plus a named full width. A dragged top edge means distorting the picture or cropping it; the first is never the request and the second is a different feature with its own stored shape. See `F21`.
 
 Font family, font size and colour store a **token**, not a CSS value. `fontSize: "14px"` written into a document is presentation in the content: wrong on a phone, wrong in a host's theme, wrong in the renderer, and an injection surface of exactly the kind §3's `href` rule exists to close. A token resolves through the `--bl-*` properties instead, which is what they are for. Colour makes the argument twice over, because a value chosen against a light background is frequently unreadable on a dark one — and the schema already agrees with itself here, since `callout` stores `tone` rather than a colour.
-**Exit:** each addition is importable on its own, the base bundle is unchanged without it, and the schema moved in planned batches with a migration per batch.
+**Exit:** each addition is importable on its own, the base bundle is unchanged without it, and the schema moved in one planned bump with one migration, shared with `HD-10` and `TB` (decided 2026-11-19, see `progress-tracker.md`).
 
 ### TB — Tables (2–3 weeks)
 
@@ -334,7 +334,7 @@ The table features a Notion-style editor is expected to have and this one does n
 
 Column resize writes `colwidth`, which the schema has stored and the renderer has honoured since `0.1.0`; the editor simply has it switched off. §3.1 said resizing would not be persisted, and `F22` reversed that in writing rather than by drift: the width is exact on every screen, and a table wider than its container scrolls inside its wrapper, as it has since `HD-08`. Every row keeps the rule the table was built under: a keyboard path and a touch path beside the mouse one.
 
-The block's three stored additions — cell tone, vertical alignment, the table's named width — land in one bump with one migration. It lands beside the table in the main entry rather than as a subpath, measured row by row against the budget, and `@blockleaf/renderer` moves in the same release so a document reads as it edits.
+The block's three stored additions — cell tone, vertical alignment, the table's named width — land in the same single bump as `HD-10` and `PA`, with one migration from version 1 (decided 2026-11-19, see `progress-tracker.md`). It lands beside the table in the main entry rather than as a subpath, measured row by row against the budget, and `@blockleaf/renderer` moves in the same release so a document reads as it edits.
 **Exit:** a column can be resized, a row or column moved, a cell aligned and coloured, and a whole row formatted in one go, from a mouse, the keyboard and a touch screen alike; a table that stores none of it looks as it did before, apart from its default width.
 
 ### OP — Optional packages (ongoing)
