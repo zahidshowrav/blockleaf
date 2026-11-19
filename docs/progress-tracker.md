@@ -28,7 +28,18 @@ site is deployed at `blockleaf.dev`.
 **Next:** `HD-09`, the migration runner. It is what `HD-10`, `SG-04` and
 every schema change in `PA` and `TB` wait on. The `FC` block changed no stored
 shape — the `FC-03` placeholder lives only in the open editor and is swapped
-back on save — so it needed none. It reaches npm with the `0.6.0` release.
+back on save — so it needed none. It reached npm as `@blockleaf/editor@0.6.0`
+and `@blockleaf/renderer@0.2.0`.
+
+**Schema releases are held (decided 2026-11-19):** `HD-09` ships on its own,
+since it changes no stored shape. Every stored-shape change after it — `HD-10`,
+the `PA` blocks and marks, the `TB` table work — merges to `main` but does not
+reach npm until all three are done. Then `SCHEMA_VERSION` goes from 1 to 2
+once, with one v1 → v2 migration, in one release. The reason: nothing is known
+to depend on the package yet, and each bump makes every reader of a stored
+document upgrade, since an older editor locks a newer document (`FC-02`). Leave
+the Changesets release PR open meanwhile; non-schema fixes wait with it.
+`SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
 **Last verified:** 2026-11-11: 395 editor unit tests, 156 renderer, 48
 Playwright across two projects — 39 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 148.34 kB of 160 kB, schema entry at 211 B of 2 kB, code block
@@ -704,3 +715,14 @@ Not block work — these hold across every phase.
 | SG-02 | Tiptap pinned to exact `3.31.4`                                 | Done        | `b96a94f` | 2026-10-09 |
 | SG-03 | Scheduled CI job building against Tiptap `@latest` (§11, F8)    | Done        | —         | 2026-10-10 |
 | SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Not started | —         | —          |
+| SG-05 | Live docs site builds only on a release commit                  | Done        | `c4c8d83` | 2026-11-19 |
+
+`SG-05` exists because `apps/docs` builds against the workspace packages, not
+npm, so that docs can ship in the same PR as the feature and the site catches
+a breaking change first. The cost was that `blockleaf.dev` went live on every
+push to `main` and could document a feature nobody could install yet.
+`apps/docs/vercel.json` now runs `scripts/vercel-ignore-build.sh` as Vercel's
+ignored build step: previews always build, and production builds only on a
+commit that changes a package `CHANGELOG.md` — the merge of the Changesets
+release PR. A docs-only fix waits for the next release unless it is
+redeployed by hand from the Vercel dashboard.
