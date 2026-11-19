@@ -1,5 +1,3 @@
-import { Fragment } from 'react';
-
 import { defaultRendererLabels, type RendererLabels } from '../labels.js';
 import { type NodeRenderer } from './types.js';
 import {
@@ -265,9 +263,15 @@ const allHeaders = (row: RenderableNode | undefined): boolean =>
  * page for everything else on it, so the text survives and the wrapper does
  * not.
  */
-export const unhandledNode: NodeRenderer = ({ children }) => (
-	<Fragment>{children}</Fragment>
-);
+/**
+ * A node type this package does not know renders nothing. FC-05.
+ *
+ * Its children are not a safe stand-in: a wrapper's meaning is often the
+ * point — columns, a toggle, an embed — and its text out of context can
+ * read as something it is not. Readers see no error banner either; the host
+ * that wants one passes `unknown`.
+ */
+export const unhandledNode: NodeRenderer = () => null;
 
 export const defaultNodes: Record<string, NodeRenderer> = {
 	doc: Doc,

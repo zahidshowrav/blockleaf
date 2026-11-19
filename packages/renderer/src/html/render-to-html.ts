@@ -35,6 +35,12 @@ export interface RenderToHTMLOptions {
 	 * anything left out keeps its English default.
 	 */
 	labels?: Partial<RendererLabels>;
+	/**
+	 * Renders a node of a type neither the defaults nor `components` name.
+	 * By default such a node renders nothing. See `RenderDocument`'s
+	 * `unknown`.
+	 */
+	unknown?: HtmlNodeRenderer;
 }
 
 /**
@@ -48,7 +54,12 @@ export const renderToHTML = (
 	doc: RenderableDocument,
 	options?: RenderToHTMLOptions
 ): string => {
-	if (!options?.components && !options?.marks && !options?.labels) {
+	if (
+		!options?.components &&
+		!options?.marks &&
+		!options?.labels &&
+		!options?.unknown
+	) {
 		return renderDefault(doc);
 	}
 
@@ -58,6 +69,7 @@ export const renderToHTML = (
 
 	return createRenderer<string>({
 		...base,
+		unknownNode: options.unknown ?? base.unknownNode,
 		nodes: options.components ? { ...nodes, ...options.components } : nodes,
 		marks: options.marks
 			? { ...defaultHtmlMarks, ...options.marks }

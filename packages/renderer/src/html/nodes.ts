@@ -236,4 +236,5 @@ const allHeaders = (row: RenderableNode | undefined): boolean =>
 export const defaultHtmlNodes = /* @__PURE__ */ createHtmlNodes();
 
 /** An unknown node keeps its children and loses its wrapper. */
-export const unhandledHtmlNode: HtmlNodeRenderer = ({ children }) => children;
+/** A node type this package does not know renders nothing. See the React target. */
+export const unhandledHtmlNode: HtmlNodeRenderer = () => '';

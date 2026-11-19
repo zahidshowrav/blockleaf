@@ -32,8 +32,81 @@ import type {
 	TaskItemNode,
 	TaskListNode,
 	TextNode,
-	UnderlineMark
+	UnderlineMark,
+	UnrecognisedMark,
+	UnrecognisedNode
 } from './core/schema.js';
+
+/* -------------------------------------------------------------------------- */
+/* Unrecognised types (FC-04)                                                 */
+/* -------------------------------------------------------------------------- */
+
+/** Every node type this schema defines. A type outside it is unrecognised. */
+const NODE_TYPES: ReadonlySet<string> = new Set([
+	'paragraph',
+	'heading',
+	'blockquote',
+	'codeBlock',
+	'horizontalRule',
+	'bulletList',
+	'orderedList',
+	'listItem',
+	'taskList',
+	'taskItem',
+	'callout',
+	'details',
+	'image',
+	'table',
+	'tableRow',
+	'tableHeader',
+	'tableCell',
+	'text',
+	'hardBreak'
+]);
+
+const MARK_TYPES: ReadonlySet<string> = new Set([
+	'bold',
+	'italic',
+	'strike',
+	'underline',
+	'code',
+	'link',
+	'highlight'
+]);
+
+/**
+ * A type the schema does not define, with whatever else it carries, left
+ * unread. A *known* type never matches here: a heading with `level: 4` is a
+ * broken heading, not an unknown node, and is still refused.
+ */
+const unrecognised = (known: ReadonlySet<string>) =>
+	z
+		.object({
+			type: z.string().refine((type) => !known.has(type), {
+				message: 'A known type that does not match its schema'
+			})
+		})
+		.passthrough();
+
+export const unrecognisedNodeSchema: z.ZodType<UnrecognisedNode> =
+	unrecognised(NODE_TYPES);
+
+export const unrecognisedMarkSchema: z.ZodType<UnrecognisedMark> =
+	unrecognised(MARK_TYPES);
+
+/**
+ * `schema`, or a node of a type the schema does not define.
+ *
+ * The cast keeps the output typed as the known union. `UnrecognisedNode`
+ * cannot join `BlockNode` without breaking narrowing on `type` (see its doc
+ * comment), so the types describe the known shapes and the contract in
+ * `schema.mdx` says a walker needs a default branch.
+ */
+const orUnrecognisedNode = <T>(schema: z.ZodType<T>): z.ZodType<T> =>
+	z.union([schema, unrecognisedNodeSchema]) as unknown as z.ZodType<T>;
+
+const orUnrecognisedMark = <T>(schema: z.ZodType<T>): z.ZodType<T> =>
+	z.union([schema, unrecognisedMarkSchema]) as unknown as z.ZodType<T>;
 
 /* -------------------------------------------------------------------------- */
 /* Marks                                                                      */
@@ -77,15 +150,17 @@ export const highlightMarkSchema: z.ZodType<HighlightMark> = z.object({
 		.optional()
 });
 
-export const blockleafMarkSchema: z.ZodType<BlockleafMark> = z.union([
-	boldMarkSchema,
-	italicMarkSchema,
-	strikeMarkSchema,
-	underlineMarkSchema,
-	codeMarkSchema,
-	linkMarkSchema,
-	highlightMarkSchema
-]);
+export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
+	z.union([
+		boldMarkSchema,
+		italicMarkSchema,
+		strikeMarkSchema,
+		underlineMarkSchema,
+		codeMarkSchema,
+		linkMarkSchema,
+		highlightMarkSchema
+	])
+);
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */
@@ -102,10 +177,9 @@ export const hardBreakNodeSchema: z.ZodType<HardBreakNode> = z.object({
 	marks: z.array(blockleafMarkSchema).optional()
 });
 
-export const inlineNodeSchema: z.ZodType<InlineNode> = z.union([
-	textNodeSchema,
-	hardBreakNodeSchema
-]);
+export const inlineNodeSchema: z.ZodType<InlineNode> = orUnrecognisedNode(
+	z.union([textNodeSchema, hardBreakNodeSchema])
+);
 
 /* -------------------------------------------------------------------------- */
 /* Block Nodes                                                                */
@@ -179,12 +253,14 @@ export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 					| OrderedListNode
 					| TaskListNode
 				> =>
-					z.union([
-						paragraphNodeSchema,
-						bulletListNodeSchema,
-						orderedListNodeSchema,
-						taskListNodeSchema
-					])
+					orUnrecognisedNode(
+						z.union([
+							paragraphNodeSchema,
+							bulletListNodeSchema,
+							orderedListNodeSchema,
+							taskListNodeSchema
+						])
+					)
 			)
 		)
 		.optional()
@@ -198,7 +274,11 @@ export const bulletListNodeSchema: z.ZodType<BulletListNode> = z.object({
 		})
 		.optional(),
 	content: z
-		.array(z.lazy((): z.ZodType<ListItemNode> => listItemNodeSchema))
+		.array(
+			z.lazy((): z.ZodType<ListItemNode> =>
+				orUnrecognisedNode(listItemNodeSchema)
+			)
+		)
 		.optional()
 });
 
@@ -211,7 +291,11 @@ export const orderedListNodeSchema: z.ZodType<OrderedListNode> = z.object({
 		})
 		.optional(),
 	content: z
-		.array(z.lazy((): z.ZodType<ListItemNode> => listItemNodeSchema))
+		.array(
+			z.lazy((): z.ZodType<ListItemNode> =>
+				orUnrecognisedNode(listItemNodeSchema)
+			)
+		)
 		.optional()
 });
 
@@ -230,12 +314,14 @@ export const taskItemNodeSchema: z.ZodType<TaskItemNode> = z.object({
 					| OrderedListNode
 					| TaskListNode
 				> =>
-					z.union([
-						paragraphNodeSchema,
-						bulletListNodeSchema,
-						orderedListNodeSchema,
-						taskListNodeSchema
-					])
+					orUnrecognisedNode(
+						z.union([
+							paragraphNodeSchema,
+							bulletListNodeSchema,
+							orderedListNodeSchema,
+							taskListNodeSchema
+						])
+					)
 			)
 		)
 		.optional()
@@ -249,7 +335,11 @@ export const taskListNodeSchema: z.ZodType<TaskListNode> = z.object({
 		})
 		.optional(),
 	content: z
-		.array(z.lazy((): z.ZodType<TaskItemNode> => taskItemNodeSchema))
+		.array(
+			z.lazy((): z.ZodType<TaskItemNode> =>
+				orUnrecognisedNode(taskItemNodeSchema)
+			)
+		)
 		.optional()
 });
 
@@ -298,19 +388,21 @@ export const detailsNodeSchema: z.ZodType<DetailsNode> = z.object({
 
 export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 	z.lazy((): z.ZodType<TableCellContentNode> =>
-		z.union([
-			paragraphNodeSchema,
-			headingNodeSchema,
-			blockquoteNodeSchema,
-			codeBlockNodeSchema,
-			horizontalRuleNodeSchema,
-			bulletListNodeSchema,
-			orderedListNodeSchema,
-			taskListNodeSchema,
-			calloutNodeSchema,
-			detailsNodeSchema,
-			imageNodeSchema
-		])
+		orUnrecognisedNode(
+			z.union([
+				paragraphNodeSchema,
+				headingNodeSchema,
+				blockquoteNodeSchema,
+				codeBlockNodeSchema,
+				horizontalRuleNodeSchema,
+				bulletListNodeSchema,
+				orderedListNodeSchema,
+				taskListNodeSchema,
+				calloutNodeSchema,
+				detailsNodeSchema,
+				imageNodeSchema
+			])
+		)
 	);
 
 export const tableHeaderNodeSchema: z.ZodType<TableHeaderNode> = z.object({
@@ -340,7 +432,11 @@ export const tableCellNodeSchema: z.ZodType<TableCellNode> = z.object({
 export const tableRowNodeSchema: z.ZodType<TableRowNode> = z.object({
 	type: z.literal('tableRow'),
 	content: z
-		.array(z.union([tableHeaderNodeSchema, tableCellNodeSchema]))
+		.array(
+			orUnrecognisedNode(
+				z.union([tableHeaderNodeSchema, tableCellNodeSchema])
+			)
+		)
 		.optional()
 });
 
@@ -351,7 +447,7 @@ export const tableNodeSchema: z.ZodType<TableNode> = z.object({
 			id: z.string().optional()
 		})
 		.optional(),
-	content: z.array(tableRowNodeSchema).optional()
+	content: z.array(orUnrecognisedNode(tableRowNodeSchema)).optional()
 });
 
 /* -------------------------------------------------------------------------- */
@@ -360,50 +456,54 @@ export const tableNodeSchema: z.ZodType<TableNode> = z.object({
 
 export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 	(): z.ZodType<BlockNode> =>
-		z.union([
-			paragraphNodeSchema,
-			headingNodeSchema,
-			blockquoteNodeSchema,
-			codeBlockNodeSchema,
-			horizontalRuleNodeSchema,
-			bulletListNodeSchema,
-			orderedListNodeSchema,
-			listItemNodeSchema,
-			taskListNodeSchema,
-			taskItemNodeSchema,
-			calloutNodeSchema,
-			detailsNodeSchema,
-			imageNodeSchema,
-			tableNodeSchema,
-			tableRowNodeSchema,
-			tableHeaderNodeSchema,
-			tableCellNodeSchema
-		])
+		orUnrecognisedNode(
+			z.union([
+				paragraphNodeSchema,
+				headingNodeSchema,
+				blockquoteNodeSchema,
+				codeBlockNodeSchema,
+				horizontalRuleNodeSchema,
+				bulletListNodeSchema,
+				orderedListNodeSchema,
+				listItemNodeSchema,
+				taskListNodeSchema,
+				taskItemNodeSchema,
+				calloutNodeSchema,
+				detailsNodeSchema,
+				imageNodeSchema,
+				tableNodeSchema,
+				tableRowNodeSchema,
+				tableHeaderNodeSchema,
+				tableCellNodeSchema
+			])
+		)
 );
 
 export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 	(): z.ZodType<BlockleafNode> =>
-		z.union([
-			paragraphNodeSchema,
-			headingNodeSchema,
-			blockquoteNodeSchema,
-			codeBlockNodeSchema,
-			horizontalRuleNodeSchema,
-			bulletListNodeSchema,
-			orderedListNodeSchema,
-			listItemNodeSchema,
-			taskListNodeSchema,
-			taskItemNodeSchema,
-			calloutNodeSchema,
-			detailsNodeSchema,
-			imageNodeSchema,
-			tableNodeSchema,
-			tableRowNodeSchema,
-			tableHeaderNodeSchema,
-			tableCellNodeSchema,
-			textNodeSchema,
-			hardBreakNodeSchema
-		])
+		orUnrecognisedNode(
+			z.union([
+				paragraphNodeSchema,
+				headingNodeSchema,
+				blockquoteNodeSchema,
+				codeBlockNodeSchema,
+				horizontalRuleNodeSchema,
+				bulletListNodeSchema,
+				orderedListNodeSchema,
+				listItemNodeSchema,
+				taskListNodeSchema,
+				taskItemNodeSchema,
+				calloutNodeSchema,
+				detailsNodeSchema,
+				imageNodeSchema,
+				tableNodeSchema,
+				tableRowNodeSchema,
+				tableHeaderNodeSchema,
+				tableCellNodeSchema,
+				textNodeSchema,
+				hardBreakNodeSchema
+			])
+		)
 );
 
 /* -------------------------------------------------------------------------- */
@@ -421,6 +521,11 @@ export const blockleafDocumentSchema: z.ZodType<BlockleafDocument> = z.object({
 /**
  * Validates a document against the full Blockleaf schema contract.
  * Throws a ZodError if validation fails.
+ *
+ * A node or mark of a type the schema does not define passes, unread, as
+ * long as it has a string `type`: it is a newer version's or another
+ * extension's, and refusing it would refuse the whole document. Every known
+ * type is still checked in full.
  */
 export const validateDocument = (doc: unknown): BlockleafDocument => {
 	return blockleafDocumentSchema.parse(doc);

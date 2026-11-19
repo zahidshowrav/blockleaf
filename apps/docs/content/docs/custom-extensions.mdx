@@ -139,8 +139,8 @@ give the command a `picker` instead of making the user insert and then edit.
 ## 5. Teach the renderer
 
 Without this step the block vanishes on every page that is not the editor.
-`@blockleaf/renderer` renders an unknown node's **children**, and an atom has
-none, so a `callToAction` renders as nothing at all:
+`@blockleaf/renderer` renders an unknown node as nothing, so a
+`callToAction` is simply missing until you name it:
 
 ```tsx title="components/article.tsx"
 import { RenderDocument } from '@blockleaf/renderer/react';

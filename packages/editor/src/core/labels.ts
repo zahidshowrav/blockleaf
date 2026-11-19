@@ -153,6 +153,13 @@ export type PlaceholderLabels = {
 	fallback?: string;
 };
 
+export type UnknownContentLabels = {
+	/** Shown in place of a block this editor cannot show. Gets its type name. */
+	block: (type: string) => string;
+	/** Shown in place of an inline node this editor cannot show. */
+	inline: (type: string) => string;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -164,6 +171,7 @@ export type ResolvedLabels = {
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
 	placeholder: Required<PlaceholderLabels>;
+	unknown: UnknownContentLabels;
 };
 
 /** What a host hands in: any subset, at any depth that has a default under it. */
@@ -190,6 +198,7 @@ export type BlockleafLabels = {
 	upload?: Partial<UploadLabels>;
 	codeBlock?: Partial<CodeBlockLabels>;
 	placeholder?: PlaceholderLabels;
+	unknown?: Partial<UnknownContentLabels>;
 };
 
 export const defaultPlaceholderLabels: Required<PlaceholderLabels> = {
@@ -324,7 +333,11 @@ export const defaultLabels: ResolvedLabels = {
 		language: 'Code language',
 		plainText: 'Plain text'
 	},
-	placeholder: defaultPlaceholderLabels
+	placeholder: defaultPlaceholderLabels,
+	unknown: {
+		block: (type) => `Unsupported block: ${type}`,
+		inline: (type) => `[${type}]`
+	}
 };
 
 /**
@@ -381,5 +394,6 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	link: { ...defaultLabels.link, ...labels?.link },
 	upload: { ...defaultLabels.upload, ...labels?.upload },
 	codeBlock: { ...defaultLabels.codeBlock, ...labels?.codeBlock },
-	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder }
+	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
+	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });

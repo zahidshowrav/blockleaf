@@ -115,6 +115,16 @@ and `'throw'` waits for `FC-02`. The lock is the package's by default because
 the safe move needs nothing a host knows; the override is where host
 knowledge belongs.
 
+**Amended 2026-11-11 (`FC-03`).** An unrecognised node or mark no longer
+triggers the policy at all: it opens as a placeholder and round-trips, and
+the document stays editable. The policy is left with two triggers — a
+structure the schema refuses, and a newer `schemaVersion`. `'preserve'` was
+**not** added. The placeholders keep unknown _types_, but ProseMirror still
+drops an unknown _attribute_ on a known node without a word, and an attribute
+added to a known node is exactly what a version bump carries (`HD-10`,
+`PA-20`). Opening a newer document editable would lose those attributes on
+the first save. Revisit only with a walk that keeps unknown attributes too.
+
 ### F16 — the no-CSS-framework rule governs the packages, not the repo · decided 2026-10-14
 
 `conventions.md` says "No CSS framework, and no `!important`", and says it

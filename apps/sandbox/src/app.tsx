@@ -102,9 +102,41 @@ const longDocument = (blocks: number): BlockleafDocument => ({
 	}))
 });
 
+/**
+ * A document from a newer editor, reached with `?unknown`: a block, an
+ * inline node and a mark this one has never heard of. FC-03 opens each as a
+ * placeholder and saves it back exactly as it came in.
+ */
+const unknownContentDocument = (): BlockleafDocument =>
+	({
+		...createEmptyDocument(),
+		content: [
+			{
+				type: 'paragraph',
+				attrs: { id: 'before' },
+				content: [
+					{ type: 'text', text: 'Hi ' },
+					{ type: 'mention', attrs: { id: 'u1', label: 'Ada' } },
+					{
+						type: 'text',
+						text: ' there',
+						marks: [{ type: 'comment', attrs: { thread: 'c1' } }]
+					}
+				]
+			},
+			{ type: 'poll', attrs: { question: 'Lunch?', options: ['Yes'] } },
+			{
+				type: 'paragraph',
+				attrs: { id: 'after' },
+				content: [{ type: 'text', text: 'After' }]
+			}
+		]
+	}) as unknown as BlockleafDocument;
+
 const initialDocument = () => {
 	const blocks = Number(params.get('blocks'));
 	if (Number.isFinite(blocks) && blocks > 0) return longDocument(blocks);
+	if (params.has('unknown')) return unknownContentDocument();
 	return params.has('wide') ? wideTableDocument() : createEmptyDocument();
 };
 

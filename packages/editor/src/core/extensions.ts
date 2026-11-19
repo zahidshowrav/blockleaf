@@ -18,6 +18,7 @@ import { Callout } from './nodes/callout.js';
 import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
 import { TableAccessibility } from './table-a11y.js';
+import { UnknownContent } from './unknown-content.js';
 
 export type PresetName = 'minimal' | 'standard';
 
@@ -170,7 +171,8 @@ export const createExtensions = (
 			UniqueID.configure({
 				types: ['paragraph']
 			}),
-			PasteNormalizer
+			PasteNormalizer,
+			UnknownContent
 		];
 	}
 
@@ -208,7 +210,10 @@ export const createExtensions = (
 		}),
 		Shortcuts,
 		TrailingNodeOnLoad,
-		PasteNormalizer
+		PasteNormalizer,
+		// A block from a preset or subpath this editor did not load opens as a
+		// placeholder and is saved back exactly as it came in. FC-03.
+		UnknownContent
 	];
 };
 

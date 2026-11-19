@@ -4,7 +4,11 @@ export {
 	DEFAULT_CHANGE_DEBOUNCE_MS,
 	EDITOR_CLASS_NAME,
 	TABLE_A11Y_EXTENSION_NAME,
-	NORMALISATION_META
+	NORMALISATION_META,
+	UNKNOWN_BLOCK_NODE,
+	UNKNOWN_CONTENT_EXTENSION_NAME,
+	UNKNOWN_INLINE_NODE,
+	UNKNOWN_MARK
 } from './constants.js';
 export {
 	BLOCK_NODE_TYPES,
@@ -32,14 +36,29 @@ export {
 	type SlashMenuLabels,
 	type TableActionId,
 	type TableLabels,
+	type UnknownContentLabels,
 	type UploadLabels
 } from './labels.js';
+export {
+	UnknownBlock,
+	UnknownContent,
+	UnknownInline,
+	UnknownMark,
+	unwrapUnknownContent,
+	wrapUnknownContent,
+	type UnknownContentOptions
+} from './unknown-content.js';
 export {
 	TABLE_A11Y_PLUGIN_KEY,
 	TableAccessibility,
 	cellPositionAt,
 	type TableAccessibilityOptions
 } from './table-a11y.js';
+export {
+	IncompatibleDocumentError,
+	newerSchemaVersion,
+	type IncompatibleDocumentReason
+} from './incompatible-document.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
 export {
@@ -117,5 +136,7 @@ export {
 	type TaskItemNode,
 	type TaskListNode,
 	type TextNode,
-	type UnderlineMark
+	type UnderlineMark,
+	type UnrecognisedMark,
+	type UnrecognisedNode
 } from './schema.js';

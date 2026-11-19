@@ -43,6 +43,14 @@ export interface RenderDocumentProps {
 	components?: Readonly<Record<string, NodeRenderer>>;
 	/** The same, for marks. */
 	marks?: Readonly<Record<string, MarkRenderer>>;
+	/**
+	 * Renders a node of a type neither the defaults nor `components` name —
+	 * one a newer editor or another extension wrote. By default such a node
+	 * renders nothing. It gets the same props as any override, so
+	 * `({ children }) => children` keeps its content and
+	 * `({ node }) => <Notice type={node.type} />` says something is missing.
+	 */
+	unknown?: NodeRenderer;
 }
 
 /**
@@ -55,7 +63,8 @@ export const RenderDocument = ({
 	doc,
 	components,
 	marks,
-	labels
+	labels,
+	unknown
 }: RenderDocumentProps): ReactElement => {
 	// Overrides are merged per render rather than memoised, because this
 	// component has to work in a server component, where hooks do not exist.
@@ -69,9 +78,10 @@ export const RenderDocument = ({
 		: defaultNodes;
 
 	const render =
-		components || marks || labels
+		components || marks || labels || unknown
 			? createRenderer<ReactNode>({
 					...base,
+					unknownNode: unknown ?? base.unknownNode,
 					nodes: components
 						? { ...base_nodes, ...components }
 						: base_nodes,

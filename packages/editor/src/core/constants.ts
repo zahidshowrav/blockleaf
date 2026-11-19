@@ -57,3 +57,20 @@ export const BLOCK_NODE_TYPES = [
 	'image',
 	'table'
 ] as const;
+
+/**
+ * The extension that keeps nodes and marks this editor does not know.
+ *
+ * Named so `BlockleafEditor` can hand it the resolved labels, and so the hook
+ * can tell whether a host's own `extensions` array already carries it.
+ */
+export const UNKNOWN_CONTENT_EXTENSION_NAME = 'blockleafUnknownContent';
+
+/**
+ * The placeholder types an unknown node or mark is swapped for while the
+ * document is open. They never reach storage: the swap is undone on the way
+ * out, so a stored document never contains these names.
+ */
+export const UNKNOWN_BLOCK_NODE = 'blockleafUnknownBlock';
+export const UNKNOWN_INLINE_NODE = 'blockleafUnknownInline';
+export const UNKNOWN_MARK = 'blockleafUnknownMark';

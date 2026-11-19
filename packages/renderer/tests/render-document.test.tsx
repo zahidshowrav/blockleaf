@@ -1,7 +1,9 @@
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { docOf, paragraph, text } from './fixtures.js';
 import { canonical, editorHTML, reactHTML } from './html.js';
+import { RenderDocument } from '../src/react.js';
 
 /**
  * Behaviour the renderer owns: what it does with input the editor would never
@@ -92,16 +94,43 @@ describe('sanitisation', () => {
 });
 
 describe('documents this package did not write', () => {
-	it('renders an unknown node as its children rather than throwing', () => {
-		const html = reactHTML(
-			docOf({
-				type: 'somethingFromALaterVersion',
-				attrs: { id: 'x' },
-				content: [paragraph('the text survives')]
-			})
+	const fromTheFuture = {
+		type: 'somethingFromALaterVersion',
+		attrs: { id: 'x' },
+		content: [paragraph('inside it')]
+	};
+
+	it('renders an unknown node as nothing, without throwing (FC-05)', () => {
+		const html = reactHTML(docOf(paragraph('before'), fromTheFuture));
+
+		expect(html).toBe('<p>before</p>');
+	});
+
+	it('hands an unknown node to the unknown override', () => {
+		const html = renderToStaticMarkup(
+			<RenderDocument
+				doc={docOf(fromTheFuture)}
+				unknown={({ node, children }) => (
+					<section data-type={node.type}>{children}</section>
+				)}
+			/>
 		);
 
-		expect(html).toBe('<p>the text survives</p>');
+		expect(html).toBe(
+			'<section data-type="somethingFromALaterVersion"><p>inside it</p></section>'
+		);
+	});
+
+	it('prefers a named override to the unknown one', () => {
+		const html = renderToStaticMarkup(
+			<RenderDocument
+				doc={docOf(fromTheFuture)}
+				components={{ somethingFromALaterVersion: () => <hr /> }}
+				unknown={() => <p>missing</p>}
+			/>
+		);
+
+		expect(html).toBe('<hr/>');
 	});
 
 	it('renders an unknown mark as undecorated text', () => {
