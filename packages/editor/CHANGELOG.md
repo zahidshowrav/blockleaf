@@ -1,5 +1,40 @@
 # @blockleaf/editor
 
+## 0.6.0
+
+### Minor Changes
+
+- 4344313: A document a newer editor wrote is locked too, and `incompatibleDocument` can throw (`FC-02`).
+  
+  A `defaultValue` whose `attrs.schemaVersion` is higher than this editor's `SCHEMA_VERSION` now triggers the same policy as an unreadable one. It opens showing its content, read-only, with `onChange` and `onChangeImmediate` silent, because saving it from here would stamp it with an older version than it has. `onContentError` fires once as the editor is created, with an `IncompatibleDocumentError` whose `reason` is `'newer-version'`.
+  
+  `incompatibleDocument` takes a third value, `'throw'`: the hook throws an `IncompatibleDocumentError` during render, for an error boundary to catch, and nothing is mounted. `IncompatibleDocumentError` is exported, with `reason`, `documentVersion` and `editorVersion`.
+- b332a3c: An editor that refuses a document it cannot read (`FC-01`).
+  
+  Stored content the editor cannot read — a block from a preset or subpath this instance did not load, a node from a host extension that is not installed here, or JSON a migration got wrong — used to open as an empty document behind a console warning, and the next save wrote that empty document over the stored one. The editor now opens read-only instead, whatever `editable` says, and `onChange` and `onChangeImmediate` stay silent, so the empty document can never reach a save path. `onContentError` reports why, so the host can show a message.
+  
+  `incompatibleDocument` is the override: `'readonly'`, the default, or `'discard'`, which opens the empty document editable and accepts the loss. It is live, so a "start over" button can flip it.
+  
+  Behind this sits Tiptap's content check, now on by default. `insertContent` of unreadable content reports and returns `false`; `setContent` throws rather than reporting, so wrap that call. `enableContentCheck={false}` restores Tiptap's own behaviour. Keeping an unknown block intact rather than refusing it is the next step.
+- cc7933e: An unknown block, inline node or mark is kept, not refused (`FC-03`).
+  
+  A stored document with a node or mark this editor does not know — a block from a preset or subpath it did not load, or a node from an extension not installed here — used to fail the content check and open locked. Each one now opens as a placeholder that names its type, the rest of the document stays editable, and `onChange` hands back the original JSON exactly as it came in. A placeholder can be selected, dragged and deleted; it is never rebuilt from pasted HTML.
+  
+  The placeholders ship as `UnknownContent` in both presets, and the editor adds it to a host's own `extensions` array. `wrapUnknownContent` and `unwrapUnknownContent` do the swap for hosts that call `setContent` or `getJSON` directly. The placeholder text is `labels.unknown`.
+  
+  A document whose structure the schema refuses, or whose `schemaVersion` is newer, is still locked by `incompatibleDocument`.
+- f46ac4a: The validator accepts node and mark types it does not define (`FC-04`).
+  
+  `validateDocument`, `safeValidateDocument` and `blockleafDocumentSchema` from `@blockleaf/editor/validate` used to refuse a whole document over one node of an unknown type. A node or mark with a string `type` the schema does not define now passes anywhere a node or mark may go, unread, and comes back exactly as it was. Every known type is still checked in full, and a node with no string `type` is still refused.
+  
+  `UnrecognisedNode` and `UnrecognisedMark` are exported as types, and `unrecognisedNodeSchema` and `unrecognisedMarkSchema` from `./validate`. They are not members of `BlockNode`, `InlineNode` or `BlockleafMark`, so `type` still narrows; a walker needs a `default` branch. The contract is written down in the schema page.
+
+### Patch Changes
+
+- 729dae6: Autofocus no longer throws on Android, iOS and desktop Safari.
+  
+  Tiptap's `focus` command focuses the DOM synchronously on those platforms, its own focus plugin dispatches a transaction in response, and the command's transaction then throws `RangeError: Applying a mismatched transaction`. The throw happens inside Tiptap's mount timer ahead of the `create` event, so the editor never emitted it and the paragraph added after a trailing table never appeared. The editor now does its own autofocus after `create`, focusing the DOM before running the command.
+
 ## 0.5.1
 
 ### Patch Changes
