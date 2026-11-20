@@ -314,9 +314,14 @@ for that axis.
 | `tableActions`  | —       | An array of actions, or `(defaults) => actions`. |
 
 **Row menu:** insert above, insert below, toggle header row, merge cells,
-split cell, delete row, delete table.
+split cell, delete row, toggle caption, delete table.
 **Column menu:** insert left, insert right, toggle header column, merge cells,
-split cell, delete column, delete table.
+split cell, delete column, toggle caption, delete table.
+
+**Toggle caption** puts a caption under the table and the caret in it, or
+takes it away. In the caption, Enter moves to a new paragraph below, and
+Backspace in an empty caption removes it. Deleting the table deletes its
+caption too. See [Captions](/docs/schema#captions) for how it is stored.
 
 Every entry calls a command from EC-14 or EC-15, and asks that same command
 whether it can run — `editor.can().mergeCells()` rather than re-deriving the
@@ -422,6 +427,7 @@ as content rather than as absence.
 	placeholder={{
 		paragraph: 'Write something',
 		heading: (level) => `Heading ${level}`,
+		caption: 'Write a caption',
 		fallback: ''
 	}}
 />

@@ -200,6 +200,18 @@ export const createHtmlNodes = (
 		);
 	},
 
+	// A captioned table (F20): the table, then its caption, as the editor
+	// writes them.
+	figure: ({ node, children }) =>
+		element(
+			'figure',
+			{ 'data-id': blockId(node), class: 'blockleaf-figure' },
+			children
+		),
+
+	caption: ({ children }) =>
+		element('figcaption', { class: 'blockleaf-caption' }, children),
+
 	tableRow: ({ children }) => element('tr', {}, children),
 
 	tableHeader: ({ node, parent, children }) =>

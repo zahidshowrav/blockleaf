@@ -51,7 +51,10 @@ Captions (under images, video, embeds, audio, and tables) are structured as **ri
 
 **Decisions:**
 
-- A media/table block includes a `caption` child node (rendering `<figcaption>` or `<caption>`) containing inline content.
+- ~~A media/table block includes a `caption` child node~~ — amended 2026-11-20, see below.
+- A captioned block is wrapped in a `figure` node holding the block and then a `caption` node with inline content: `figure > (table | image …) caption`. The block itself is stored exactly as it is without a caption.
+- **Why the wrapper, amended 2026-11-20:** `prosemirror-tables` treats every child of a `table` as a row (`computeMap` takes `height = table.childCount`), so a `caption` inside the table reads as a broken row and every table command breaks on it. A wrapper leaves the table untouched. It also spares `PA-20` its hardest part: `image` stays `atom: true` and the caption sits beside it rather than inside it. `figure` and `caption` are new node types, so adding them moves no existing node and needs no migration.
+- **The cost:** a reader that predates `figure` sees one unknown node where the captioned table was. An older editor keeps it as a placeholder and saves it back intact (`FC-03`); an older `@blockleaf/renderer` renders nothing for it (`FC-05`), so the whole table, not only its caption, is missing until the renderer is upgraded.
 - Supports clickable links and formatting (essential for credits, source links, and licenses).
 - Aligns `PA-20`, `PA-21`, and `HD-10` on the same structured caption mechanism.
 - **Why:** Plain string attributes cannot express source/attribution links, which are present in almost all production captions. Storing rich text immediately prevents a breaking schema bump later when link credits are inevitable.

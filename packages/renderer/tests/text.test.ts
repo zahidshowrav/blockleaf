@@ -170,3 +170,32 @@ describe('extractHeadings', () => {
 		expect(extractHeadings(docOf(paragraph('x')))).toEqual([]);
 	});
 });
+
+describe('a captioned table (HD-10)', () => {
+	it('keeps the caption apart from the last cell', () => {
+		const doc = docOf({
+			type: 'figure',
+			content: [
+				{
+					type: 'table',
+					content: [
+						{
+							type: 'tableRow',
+							content: [
+								{
+									type: 'tableCell',
+									content: [paragraph('cell')]
+								}
+							]
+						}
+					]
+				},
+				{
+					type: 'caption',
+					content: [{ type: 'text', text: 'caption' }]
+				}
+			]
+		});
+		expect(toPlainText(doc)).toBe('cell\n\ncaption');
+	});
+});

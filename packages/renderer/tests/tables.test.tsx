@@ -281,3 +281,63 @@ describe('the two targets agree', () => {
 		expect(words(reactHTML(doc))).toEqual(words(editorHTML(doc)));
 	});
 });
+
+describe('a captioned table (HD-10)', () => {
+	const captioned = (...caption: RenderableNode[]) =>
+		docOf({
+			type: 'figure',
+			attrs: { id: 'f' },
+			content: [
+				{
+					type: 'table',
+					attrs: { id: 't' },
+					content: [row(cell('a'))]
+				},
+				{ type: 'caption', content: caption }
+			]
+		});
+
+	it('writes a figure: the table, then a figcaption', () => {
+		const doc = captioned({ type: 'text', text: 'Q3 sales' });
+
+		for (const html of both(doc)) {
+			expect(html).toMatch(
+				/^<figure class="blockleaf-figure" data-id="f"><div [^>]*class="blockleaf-table-scroll"[^>]*><table[^>]*>.*<\/table><\/div><figcaption class="blockleaf-caption">Q3 sales<\/figcaption><\/figure>$/s
+			);
+		}
+	});
+
+	it('keeps a link in the caption, sanitised like any other', () => {
+		const doc = captioned(
+			{
+				type: 'text',
+				text: 'Source',
+				marks: [
+					{ type: 'link', attrs: { href: 'https://example.com' } }
+				]
+			},
+			{
+				type: 'text',
+				text: 'bad',
+				marks: [
+					{ type: 'link', attrs: { href: 'javascript:alert(1)' } }
+				]
+			}
+		);
+
+		for (const html of both(doc)) {
+			const caption = html.match(/<figcaption.*<\/figcaption>/s)?.[0];
+			expect(caption).toContain('href="https://example.com"');
+			expect(caption).not.toContain('javascript:');
+		}
+	});
+
+	it('wraps the table and caption the way the editor does', () => {
+		const doc = captioned({ type: 'text', text: 'Q3 sales' });
+		const editor = canonical(editorHTML(doc));
+
+		expect(editor).toMatch(
+			/^<figure class="blockleaf-figure" data-id="f"><table[^>]*>.*<\/table><figcaption class="blockleaf-caption">Q3 sales<\/figcaption><\/figure>$/s
+		);
+	});
+});

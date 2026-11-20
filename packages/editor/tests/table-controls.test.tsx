@@ -69,6 +69,7 @@ describe('Table actions (CH-07)', () => {
 			'split-cell',
 			'delete-row',
 			'delete-column',
+			'toggle-caption',
 			'delete-table'
 		]);
 	});

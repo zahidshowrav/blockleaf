@@ -123,9 +123,11 @@ value is stored on the node — see [the schema](/docs/schema).
 
 ## What is still open
 
-- **A table `<caption>`.** An author cannot write one. It would be stored
-  content, so it needs a `SCHEMA_VERSION` bump — and there is no migration
-  runner to hang the migration on yet. See
-  [the schema](/docs/schema#before-the-first-release--expired).
+- **A caption names the figure, not the table.** An author can caption a
+  table (see [Captions](/docs/schema#captions)), and it is written as a
+  `<figure>` with a `<figcaption>`, in the editor and in
+  `@blockleaf/renderer` alike. A screen reader announces the figure by its
+  caption and then the table, but the `<table>` itself is not yet labelled by
+  it with `aria-labelledby`.
 - **Right-to-left layout.** The stylesheet uses logical properties in places
   and physical ones in others, and no suite checks it.

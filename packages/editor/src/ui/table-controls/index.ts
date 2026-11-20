@@ -9,6 +9,7 @@ export {
 	createTableControlsExtension
 } from './extension.js';
 export {
+	CaptionIcon,
 	DeleteTableIcon,
 	HeaderIcon,
 	InsertAboveIcon,

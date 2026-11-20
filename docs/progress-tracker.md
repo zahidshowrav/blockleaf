@@ -21,14 +21,15 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
-`HD-09`, `HD-12` and `HD-14` are done; `HD-10`, `HD-11` and `HD-13` are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
+`HD-10`, `HD-12` and `HD-14` are done; `HD-11` and `HD-13` are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `HD-10`, the table `<caption>` — the first stored-shape change,
-held for the single v2 release below. `HD-09` added `migrate()` and the
-editor runs it on `defaultValue`; `SG-04` fails CI when `SCHEMA_VERSION`
-moves without a migration, or when a frozen version 1 document no longer
-migrates to a valid current one. The `FC` block changed no stored
+**Next:** `HD-13`, pasting a long document; `HD-11` waits for someone past
+ten thousand blocks to ask for it. Then `PA`. `HD-10` gave tables a caption
+as a `figure` holding the table and a `caption` (`F20`, amended 2026-11-20),
+and needed no `SCHEMA_VERSION` bump: both are new node types and no existing
+node changed. `HD-09` added `migrate()`, and `SG-04` fails CI when
+`SCHEMA_VERSION` moves without a migration. The `FC` block changed no stored
 shape — the `FC-03` placeholder lives only in the open editor and is swapped
 back on save — so it needed none. It reached npm in editor `0.6.0` and
 renderer `0.2.0`.
@@ -41,11 +42,12 @@ once, with one v1 → v2 migration, in one release. The reason: nothing is known
 to depend on the package yet, and each bump makes every reader of a stored
 document upgrade, since an older editor locks a newer document (`FC-02`). Leave
 the Changesets release PR open meanwhile; non-schema fixes wait with it.
+`HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-11: 395 editor unit tests, 156 renderer, 48
-Playwright across two projects — 39 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 148.34 kB of 160 kB, schema entry at 211 B of 2 kB, code block
-subpath at 80.42 kB of 85 kB. Lint, typecheck and build cover eight
+**Last verified:** 2026-11-20: 436 editor unit tests, 160 renderer, 52
+Playwright across two projects — 43 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 149.21 kB of 160 kB, schema entry at 405 B of 2 kB, code block
+subpath at 80.33 kB of 85 kB. Lint, typecheck and build cover eight
 workspaces.
 
 ---
@@ -380,7 +382,7 @@ this table is for.
 | HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10)                    | Done        | `316b929` | 2026-10-21 |
 | HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override                           | Done        | `316b929` | 2026-10-21 |
 | HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Done        | `f55edd9` | 2026-11-20 |
-| HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump; shares its shape with `PA-20` | Not started | —         | —          |
+| HD-10 | Table `<caption>` — a `figure` wrapper (`F20`), so no bump; shares its shape with `PA-20` | Done        | `80bd590` | 2026-11-20 |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
 | HD-13 | Pasting a long document, which still takes the quadratic path                             | Not started | —         | —          |
@@ -517,6 +519,10 @@ image for someone who cannot see it; a caption adds context for everyone, and
 a screen reader reads both. Where they say the same thing it is announced
 twice, so the docs page for `PA-20` has to say what each is for rather than
 leaving hosts to guess.
+
+Amended 2026-11-20 (`F20`): the caption lives in a `figure` wrapper beside the
+block, not inside it, so `image` stays an atom and most of the paragraph above
+no longer applies. The renderer still moves to a `<figure>` for a captioned image.
 
 `PA-20`, `PA-21` and `HD-10` are one design, not three. A table caption and a
 figure caption that store differently would put two caption mechanisms in one

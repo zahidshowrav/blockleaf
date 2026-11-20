@@ -165,6 +165,24 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, '.blockleaf-table-menu')).toEqual([]);
 	});
 
+	test('a captioned table has no violations', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('||| ');
+		await expect(page.locator(`${EDITOR} table`)).toBeVisible();
+		// Every header written, so the one rule the table test has to
+		// except is not needed here.
+		for (const heading of ['Name', 'Role', 'Team']) {
+			await page.keyboard.type(heading);
+			await page.keyboard.press('Tab');
+		}
+		await page.keyboard.press('Control+Alt+r');
+		await page.getByRole('menuitem', { name: 'Toggle caption' }).click();
+		await page.keyboard.type('People');
+		await expect(page.locator(`${EDITOR} figcaption`)).toHaveText('People');
+
+		expect(await violations(page, `${EDITOR} figure`)).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

@@ -448,23 +448,24 @@ Minified and brotlied, with all dependencies.
 
 Every node in [the schema](./schema.mdx) renders:
 
-| Node                         | Element                                               |
-| ---------------------------- | ----------------------------------------------------- |
-| `paragraph`                  | `<p>`                                                 |
-| `heading`                    | `<h1>`–`<h3>`, clamped into range                     |
-| `blockquote`                 | `<blockquote>`                                        |
-| `codeBlock`                  | `<pre><code class="language-…">`                      |
-| `horizontalRule`             | `<hr>`                                                |
-| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                 |
-| `listItem`                   | `<li>`                                                |
-| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox  |
-| `callout`                    | `<div data-type="callout" class="blockleaf-callout">` |
-| `details`                    | `<details open>`                                      |
-| `image`                      | `<img class="blockleaf-image">`                       |
-| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`  |
-| `tableRow`                   | `<tr>`                                                |
-| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                 |
-| `text` / `hardBreak`         | text / `<br>`                                         |
+| Node                         | Element                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| `paragraph`                  | `<p>`                                                                          |
+| `heading`                    | `<h1>`–`<h3>`, clamped into range                                              |
+| `blockquote`                 | `<blockquote>`                                                                 |
+| `codeBlock`                  | `<pre><code class="language-…">`                                               |
+| `horizontalRule`             | `<hr>`                                                                         |
+| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                                          |
+| `listItem`                   | `<li>`                                                                         |
+| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                           |
+| `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                          |
+| `details`                    | `<details open>`                                                               |
+| `image`                      | `<img class="blockleaf-image">`                                                |
+| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                           |
+| `tableRow`                   | `<tr>`                                                                         |
+| `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">` |
+| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                          |
+| `text` / `hardBreak`         | text / `<br>`                                                                  |
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to

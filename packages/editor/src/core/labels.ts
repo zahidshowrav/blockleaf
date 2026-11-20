@@ -75,6 +75,7 @@ export type TableActionId =
 	| 'toggle-header-row'
 	| 'toggle-header-column'
 	| 'toggle-header-cell'
+	| 'toggle-caption'
 	| 'merge-cells'
 	| 'split-cell'
 	| 'delete-row'
@@ -149,6 +150,8 @@ export type PlaceholderLabels = {
 	paragraph?: string;
 	/** Shown in an empty heading, by level. */
 	heading?: (level: number) => string;
+	/** Shown in an empty table caption. */
+	caption?: string;
 	/** Shown in any other empty block that has no label of its own. */
 	fallback?: string;
 };
@@ -207,6 +210,7 @@ export const defaultPlaceholderLabels: Required<PlaceholderLabels> = {
 		HEADING_LEVELS.includes(level as (typeof HEADING_LEVELS)[number])
 			? `Heading ${level}`
 			: 'Heading',
+	caption: 'Write a caption',
 	fallback: ''
 };
 
@@ -294,6 +298,7 @@ export const defaultLabels: ResolvedLabels = {
 			'toggle-header-row': 'Toggle header row',
 			'toggle-header-column': 'Toggle header column',
 			'toggle-header-cell': 'Toggle header cell',
+			'toggle-caption': 'Toggle caption',
 			'merge-cells': 'Merge cells',
 			'split-cell': 'Split cell',
 			'delete-row': 'Delete row',

@@ -98,3 +98,19 @@ export const DeleteTableIcon = (props: IconProps) => (
 );
 
 export type { IconProps };
+
+export const CaptionIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<rect
+			x="3"
+			y="3"
+			width="18"
+			height="12"
+			rx="2"
+		/>
+		<path d="M3 9h18M7 20h10" />
+	</svg>
+);

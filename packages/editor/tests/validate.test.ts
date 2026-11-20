@@ -319,3 +319,80 @@ describe('unrecognised types (FC-04)', () => {
 		);
 	});
 });
+
+describe('a captioned table (HD-10)', () => {
+	const table = {
+		type: 'table',
+		content: [
+			{
+				type: 'tableRow',
+				content: [
+					{
+						type: 'tableCell',
+						content: [
+							{
+								type: 'paragraph',
+								content: [{ type: 'text', text: 'a' }]
+							}
+						]
+					}
+				]
+			}
+		]
+	};
+	const doc = (figure: unknown) => ({
+		type: 'doc',
+		attrs: { schemaVersion: SCHEMA_VERSION },
+		content: [figure]
+	});
+
+	it('accepts a figure holding a table and a rich-text caption', () => {
+		const result = safeValidateDocument(
+			doc({
+				type: 'figure',
+				attrs: { id: 'f' },
+				content: [
+					table,
+					{
+						type: 'caption',
+						content: [
+							{
+								type: 'text',
+								text: 'Source',
+								marks: [
+									{
+										type: 'link',
+										attrs: { href: 'https://example.com' }
+									}
+								]
+							}
+						]
+					}
+				]
+			})
+		);
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts an empty caption', () => {
+		expect(
+			safeValidateDocument(
+				doc({ type: 'figure', content: [table, { type: 'caption' }] })
+			).success
+		).toBe(true);
+	});
+
+	it.each([
+		['the caption first', [{ type: 'caption' }, table]],
+		['no caption', [table]],
+		['two captions', [table, { type: 'caption' }, { type: 'caption' }]],
+		[
+			'a paragraph for a table',
+			[{ type: 'paragraph' }, { type: 'caption' }]
+		]
+	])('refuses a figure with %s', (_, content) => {
+		expect(
+			safeValidateDocument(doc({ type: 'figure', content })).success
+		).toBe(false);
+	});
+});

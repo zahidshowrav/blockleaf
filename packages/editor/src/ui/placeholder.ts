@@ -4,6 +4,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import {
+	CAPTION_NODE,
 	defaultPlaceholderLabels,
 	type PlaceholderLabels
 } from '../core/index.js';
@@ -28,6 +29,7 @@ const resolveLabels = (
 		? {
 				...defaultPlaceholderLabels,
 				paragraph: placeholder,
+				caption: placeholder,
 				fallback: placeholder
 			}
 		: { ...defaultPlaceholderLabels, ...placeholder };
@@ -41,6 +43,9 @@ export const labelFor = (
 	}
 	if (node.type.name === 'paragraph') {
 		return labels.paragraph;
+	}
+	if (node.type.name === CAPTION_NODE) {
+		return labels.caption;
 	}
 	return labels.fallback;
 };

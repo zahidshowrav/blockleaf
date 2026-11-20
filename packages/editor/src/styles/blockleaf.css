@@ -311,6 +311,22 @@
 	pointer-events: none;
 }
 
+/* A captioned table (F20): the table, then its caption below it. The figure
+   carries the block's spacing so the caption sits close to its table. */
+.blockleaf-editor__content .blockleaf-figure {
+	margin: 1em 0;
+}
+
+.blockleaf-editor__content .blockleaf-figure table {
+	margin: 0;
+}
+
+.blockleaf-editor__content .blockleaf-caption {
+	margin-top: 0.5em;
+	color: var(--bl-color-muted);
+	font-size: 0.875em;
+}
+
 /* The editing surface itself shows focus with the caret, not a ring — an
    outline around the whole document reads as an error state. Focusable
    chrome (menu buttons, the link editor) keeps its ring. */

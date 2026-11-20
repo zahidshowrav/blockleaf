@@ -111,6 +111,7 @@ export {
 } from './slash-menu/index.js';
 export {
 	TABLE_CONTROLS_PLUGIN_KEY,
+	CaptionIcon,
 	DeleteTableIcon,
 	HeaderIcon,
 	InsertAboveIcon,

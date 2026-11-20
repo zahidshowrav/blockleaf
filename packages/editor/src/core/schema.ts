@@ -202,6 +202,25 @@ export interface TableNode {
 	content?: TableRowNode[];
 }
 
+/**
+ * A block with a caption: the block, then its `caption` (`F20`). The caption
+ * sits beside the block rather than inside it, so the block is stored exactly
+ * as it would be without one. Only a table takes a caption today.
+ */
+export interface FigureNode {
+	type: 'figure';
+	attrs?: {
+		id?: string;
+	};
+	content?: [TableNode, CaptionNode];
+}
+
+/** A figure's caption. Rich text, so a credit can carry its link. */
+export interface CaptionNode {
+	type: 'caption';
+	content?: InlineNode[];
+}
+
 export interface TableRowNode {
 	type: 'tableRow';
 	content?: (TableHeaderNode | TableCellNode)[];
@@ -258,6 +277,8 @@ export type BlockNode =
 	| DetailsNode
 	| ImageNode
 	| TableNode
+	| FigureNode
+	| CaptionNode
 	| TableRowNode
 	| TableHeaderNode
 	| TableCellNode;

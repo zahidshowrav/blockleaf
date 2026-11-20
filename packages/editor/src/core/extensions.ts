@@ -15,6 +15,7 @@ import {
 } from './constants.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
+import { Caption, Figure } from './nodes/figure.js';
 import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
 import { TableAccessibility } from './table-a11y.js';
@@ -205,6 +206,8 @@ export const createExtensions = (
 		// cells carry no `scope` is a table a screen reader cannot read
 		// across, and one that cannot scroll is one a narrow screen cuts off.
 		TableAccessibility,
+		Figure,
+		Caption,
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
 		}),

@@ -55,7 +55,8 @@ export const BLOCK_NODE_TYPES = [
 	'taskItem',
 	'callout',
 	'image',
-	'table'
+	'table',
+	'figure'
 ] as const;
 
 /**
@@ -74,3 +75,11 @@ export const UNKNOWN_CONTENT_EXTENSION_NAME = 'blockleafUnknownContent';
 export const UNKNOWN_BLOCK_NODE = 'blockleafUnknownBlock';
 export const UNKNOWN_INLINE_NODE = 'blockleafUnknownInline';
 export const UNKNOWN_MARK = 'blockleafUnknownMark';
+
+/**
+ * The wrapper a captioned block lives in, and the caption itself (`F20`).
+ * The caption is beside the block, not inside it: `prosemirror-tables` reads
+ * every child of a `table` as a row.
+ */
+export const FIGURE_NODE = 'figure';
+export const CAPTION_NODE = 'caption';
