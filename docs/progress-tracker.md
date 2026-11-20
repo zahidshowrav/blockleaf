@@ -518,6 +518,10 @@ a screen reader reads both. Where they say the same thing it is announced
 twice, so the docs page for `PA-20` has to say what each is for rather than
 leaving hosts to guess.
 
+Amended 2026-11-20 (`F20`): the caption lives in a `figure` wrapper beside the
+block, not inside it, so `image` stays an atom and most of the paragraph above
+no longer applies. The renderer still moves to a `<figure>` for a captioned image.
+
 `PA-20`, `PA-21` and `HD-10` are one design, not three. A table caption and a
 figure caption that store differently would put two caption mechanisms in one
 schema, permanently. Whichever ships first sets the shape.
