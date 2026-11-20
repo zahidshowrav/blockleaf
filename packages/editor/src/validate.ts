@@ -9,9 +9,11 @@ import type {
 	BoldMark,
 	BulletListNode,
 	CalloutNode,
+	CaptionNode,
 	CodeBlockNode,
 	CodeMark,
 	DetailsNode,
+	FigureNode,
 	HardBreakNode,
 	HeadingNode,
 	HighlightMark,
@@ -57,6 +59,8 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'details',
 	'image',
 	'table',
+	'figure',
+	'caption',
 	'tableRow',
 	'tableHeader',
 	'tableCell',
@@ -450,6 +454,21 @@ export const tableNodeSchema: z.ZodType<TableNode> = z.object({
 	content: z.array(orUnrecognisedNode(tableRowNodeSchema)).optional()
 });
 
+export const captionNodeSchema: z.ZodType<CaptionNode> = z.object({
+	type: z.literal('caption'),
+	content: z.array(inlineNodeSchema).optional()
+});
+
+export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
+	type: z.literal('figure'),
+	attrs: z
+		.object({
+			id: z.string().optional()
+		})
+		.optional(),
+	content: z.tuple([tableNodeSchema, captionNodeSchema]).optional()
+});
+
 /* -------------------------------------------------------------------------- */
 /* BlockNode & BlockleafNode Unions                                           */
 /* -------------------------------------------------------------------------- */
@@ -472,6 +491,8 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				detailsNodeSchema,
 				imageNodeSchema,
 				tableNodeSchema,
+				figureNodeSchema,
+				captionNodeSchema,
 				tableRowNodeSchema,
 				tableHeaderNodeSchema,
 				tableCellNodeSchema
@@ -497,6 +518,8 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				detailsNodeSchema,
 				imageNodeSchema,
 				tableNodeSchema,
+				figureNodeSchema,
+				captionNodeSchema,
 				tableRowNodeSchema,
 				tableHeaderNodeSchema,
 				tableCellNodeSchema,

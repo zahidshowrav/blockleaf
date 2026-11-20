@@ -1,4 +1,6 @@
 export {
+	CAPTION_NODE,
+	FIGURE_NODE,
 	HEADING_LEVELS,
 	MAX_LIST_DEPTH,
 	DEFAULT_CHANGE_DEBOUNCE_MS,
@@ -61,6 +63,7 @@ export {
 } from './incompatible-document.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
+export { Caption, Figure } from './nodes/figure.js';
 export {
 	Image,
 	sanitizeSrc,
@@ -119,9 +122,11 @@ export {
 	type BoldMark,
 	type BulletListNode,
 	type CalloutNode,
+	type CaptionNode,
 	type CodeBlockNode,
 	type CodeMark,
 	type DetailsNode,
+	type FigureNode,
 	type HardBreakNode,
 	type HeadingNode,
 	type HighlightMark,

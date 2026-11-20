@@ -29,6 +29,8 @@ const BLOCKS = new Set([
 	'details',
 	'image',
 	'table',
+	'figure',
+	'caption',
 	'tableRow',
 	'tableHeader',
 	'tableCell'

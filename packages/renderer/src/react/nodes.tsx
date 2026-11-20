@@ -224,6 +224,20 @@ export const tableRenderer =
 		);
 	};
 
+/** A captioned table (F20): the table, then its caption. */
+const Figure: NodeRenderer = ({ node, children }) => (
+	<figure
+		data-id={blockId(node)}
+		className="blockleaf-figure"
+	>
+		{children}
+	</figure>
+);
+
+const Caption: NodeRenderer = ({ children }) => (
+	<figcaption className="blockleaf-caption">{children}</figcaption>
+);
+
 const TableRow: NodeRenderer = ({ children }) => <tr>{children}</tr>;
 
 /**
@@ -289,6 +303,8 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	details: Details,
 	image: Image,
 	table: tableRenderer(),
+	figure: Figure,
+	caption: Caption,
 	tableRow: TableRow,
 	tableHeader: TableHeader,
 	tableCell: TableCell,

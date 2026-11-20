@@ -1,4 +1,5 @@
 import {
+	CaptionIcon,
 	DeleteTableIcon,
 	HeaderIcon,
 	InsertAboveIcon,
@@ -126,6 +127,16 @@ export const createTableActions = (
 			editor.can().deleteColumn()
 		),
 		run: (editor) => editor.chain().focus().deleteColumn().run()
+	},
+	{
+		id: 'toggle-caption',
+		title: labels.actions['toggle-caption'],
+		axis: 'both',
+		icon: CaptionIcon,
+		isAvailable: whenNodeExists('figure', (editor) =>
+			editor.can().toggleTableCaption()
+		),
+		run: (editor) => editor.chain().focus().toggleTableCaption().run()
 	},
 	{
 		id: 'delete-table',
