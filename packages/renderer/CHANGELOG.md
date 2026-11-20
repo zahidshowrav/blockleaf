@@ -1,5 +1,13 @@
 # @blockleaf/renderer
 
+## 0.3.0
+
+### Minor Changes
+
+- 80bd590: Render a captioned table (`HD-10`): a `figure` node becomes `<figure class="blockleaf-figure">` and its `caption` becomes `<figcaption class="blockleaf-caption">`, as the editor writes them. `toPlainText` keeps the caption apart from the last cell.
+  
+  An older renderer renders nothing for a `figure`, so the whole captioned table is missing until this version is installed. Upgrade the renderer before the editor.
+
 ## 0.2.0
 
 ### Minor Changes
