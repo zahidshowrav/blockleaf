@@ -21,12 +21,14 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
-`HD-08`, `HD-12` and `HD-14` are done; `HD-09`, `HD-10`, `HD-11` and `HD-13`
-are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
+`HD-09`, `HD-12` and `HD-14` are done; `HD-10`, `HD-11` and `HD-13` are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `HD-09`, the migration runner. It is what `HD-10`, `SG-04` and
-every schema change in `PA` and `TB` wait on. The `FC` block changed no stored
+**Next:** `HD-10`, the table `<caption>` — the first stored-shape change,
+held for the single v2 release below. `HD-09` added `migrate()` and the
+editor runs it on `defaultValue`; `SG-04` fails CI when `SCHEMA_VERSION`
+moves without a migration, or when a frozen version 1 document no longer
+migrates to a valid current one. The `FC` block changed no stored
 shape — the `FC-03` placeholder lives only in the open editor and is swapped
 back on save — so it needed none. It reached npm as `@blockleaf/editor@0.6.0`
 and `@blockleaf/renderer@0.2.0`.
@@ -377,7 +379,7 @@ this table is for.
 | HD-06 | `examples/vite-spa`                                                                       | Done        | `4734b38` | 2026-10-21 |
 | HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10)                    | Done        | `316b929` | 2026-10-21 |
 | HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override                           | Done        | `316b929` | 2026-10-21 |
-| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Not started | —         | —          |
+| HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Done        | `f55edd9` | 2026-11-20 |
 | HD-10 | Table `<caption>` — stored, so it needs `HD-09` and a bump; shares its shape with `PA-20` | Not started | —         | —          |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
@@ -709,13 +711,13 @@ stylesheet and no dependency at all.
 
 Not block work — these hold across every phase.
 
-| Id    | Guard                                                           | Status      | Commit    | Completed  |
-| ----- | --------------------------------------------------------------- | ----------- | --------- | ---------- |
-| SG-01 | `size-limit` enforced in CI — 160 kB editor, 2 kB schema (F10)  | Done        | `b96a94f` | 2026-10-09 |
-| SG-02 | Tiptap pinned to exact `3.31.4`                                 | Done        | `b96a94f` | 2026-10-09 |
-| SG-03 | Scheduled CI job building against Tiptap `@latest` (§11, F8)    | Done        | —         | 2026-10-10 |
-| SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Not started | —         | —          |
-| SG-05 | Live docs site builds only on a release commit                  | Done        | `c4c8d83` | 2026-11-19 |
+| Id    | Guard                                                           | Status | Commit    | Completed  |
+| ----- | --------------------------------------------------------------- | ------ | --------- | ---------- |
+| SG-01 | `size-limit` enforced in CI — 160 kB editor, 2 kB schema (F10)  | Done   | `b96a94f` | 2026-10-09 |
+| SG-02 | Tiptap pinned to exact `3.31.4`                                 | Done   | `b96a94f` | 2026-10-09 |
+| SG-03 | Scheduled CI job building against Tiptap `@latest` (§11, F8)    | Done   | —         | 2026-10-10 |
+| SG-04 | A migration shipped in the same PR as any `SCHEMA_VERSION` bump | Done   | `4fac212` | 2026-11-20 |
+| SG-05 | Live docs site builds only on a release commit                  | Done   | `c4c8d83` | 2026-11-19 |
 
 `SG-05` exists because `apps/docs` builds against the workspace packages, not
 npm, so that docs can ship in the same PR as the feature and the site catches

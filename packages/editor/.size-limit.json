@@ -9,7 +9,7 @@
 	{
 		"name": "schema helpers only (server-side import)",
 		"path": "dist/index.js",
-		"import": "{ createEmptyDocument, isBlockleafDocument, SCHEMA_VERSION }",
+		"import": "{ createEmptyDocument, isBlockleafDocument, migrate, SCHEMA_VERSION }",
 		"limit": "2 kB",
 		"ignore": ["react", "react-dom"]
 	},

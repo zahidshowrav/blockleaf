@@ -1,0 +1,396 @@
+{
+	"type": "doc",
+	"attrs": {
+		"schemaVersion": 1
+	},
+	"content": [
+		{
+			"type": "heading",
+			"attrs": {
+				"level": 1,
+				"id": "heading-1"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Document Title",
+					"marks": [
+						{
+							"type": "bold"
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "heading",
+			"attrs": {
+				"level": 2,
+				"id": "heading-2"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Section Heading"
+				}
+			]
+		},
+		{
+			"type": "heading",
+			"attrs": {
+				"level": 3,
+				"id": "heading-3"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Subsection Heading"
+				}
+			]
+		},
+		{
+			"type": "paragraph",
+			"attrs": {
+				"id": "para-1"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Plain text, "
+				},
+				{
+					"type": "text",
+					"text": "bold",
+					"marks": [
+						{
+							"type": "bold"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", "
+				},
+				{
+					"type": "text",
+					"text": "italic",
+					"marks": [
+						{
+							"type": "italic"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", "
+				},
+				{
+					"type": "text",
+					"text": "strike",
+					"marks": [
+						{
+							"type": "strike"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", "
+				},
+				{
+					"type": "text",
+					"text": "underline",
+					"marks": [
+						{
+							"type": "underline"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", "
+				},
+				{
+					"type": "text",
+					"text": "code",
+					"marks": [
+						{
+							"type": "code"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", "
+				},
+				{
+					"type": "text",
+					"text": "highlight",
+					"marks": [
+						{
+							"type": "highlight",
+							"attrs": {
+								"color": "#ffff00"
+							}
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": ", and "
+				},
+				{
+					"type": "text",
+					"text": "sanitised link",
+					"marks": [
+						{
+							"type": "link",
+							"attrs": {
+								"href": "https://blockleaf.dev",
+								"target": "_blank",
+								"rel": "noopener noreferrer"
+							}
+						}
+					]
+				},
+				{
+					"type": "hardBreak"
+				}
+			]
+		},
+		{
+			"type": "blockquote",
+			"attrs": {
+				"id": "quote-1"
+			},
+			"content": [
+				{
+					"type": "paragraph",
+					"content": [
+						{
+							"type": "text",
+							"text": "Blockquote content"
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "codeBlock",
+			"attrs": {
+				"language": "typescript",
+				"id": "code-1"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "const answer: number = 42;"
+				}
+			]
+		},
+		{
+			"type": "horizontalRule",
+			"attrs": {
+				"id": "hr-1"
+			}
+		},
+		{
+			"type": "bulletList",
+			"attrs": {
+				"id": "bl-1"
+			},
+			"content": [
+				{
+					"type": "listItem",
+					"attrs": {
+						"id": "li-1"
+					},
+					"content": [
+						{
+							"type": "paragraph",
+							"content": [
+								{
+									"type": "text",
+									"text": "Bullet item 1"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "orderedList",
+			"attrs": {
+				"start": 1,
+				"id": "ol-1"
+			},
+			"content": [
+				{
+					"type": "listItem",
+					"attrs": {
+						"id": "li-2"
+					},
+					"content": [
+						{
+							"type": "paragraph",
+							"content": [
+								{
+									"type": "text",
+									"text": "Ordered item 1"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "taskList",
+			"attrs": {
+				"id": "tl-1"
+			},
+			"content": [
+				{
+					"type": "taskItem",
+					"attrs": {
+						"checked": true,
+						"id": "ti-1"
+					},
+					"content": [
+						{
+							"type": "paragraph",
+							"content": [
+								{
+									"type": "text",
+									"text": "Completed task"
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "taskItem",
+					"attrs": {
+						"checked": false,
+						"id": "ti-2"
+					},
+					"content": [
+						{
+							"type": "paragraph",
+							"content": [
+								{
+									"type": "text",
+									"text": "Pending task"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "callout",
+			"attrs": {
+				"emoji": "💡",
+				"tone": "info",
+				"id": "co-1"
+			},
+			"content": [
+				{
+					"type": "paragraph",
+					"content": [
+						{
+							"type": "text",
+							"text": "Callout block content"
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "details",
+			"attrs": {
+				"open": true,
+				"id": "det-1"
+			},
+			"content": [
+				{
+					"type": "paragraph",
+					"content": [
+						{
+							"type": "text",
+							"text": "Collapsible toggle content"
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "image",
+			"attrs": {
+				"id": "img-upload-id",
+				"src": "https://example.com/asset.png",
+				"alt": "Description",
+				"width": 800,
+				"align": "center"
+			}
+		},
+		{
+			"type": "table",
+			"attrs": {
+				"id": "tbl-1"
+			},
+			"content": [
+				{
+					"type": "tableRow",
+					"content": [
+						{
+							"type": "tableHeader",
+							"attrs": {
+								"colspan": 1,
+								"rowspan": 1,
+								"colwidth": [150]
+							},
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"type": "text",
+											"text": "Header Col"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "tableRow",
+					"content": [
+						{
+							"type": "tableCell",
+							"attrs": {
+								"colspan": 1,
+								"rowspan": 1,
+								"colwidth": [150]
+							},
+							"content": [
+								{
+									"type": "paragraph",
+									"content": [
+										{
+											"type": "text",
+											"text": "Cell Col"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -31,8 +31,26 @@ Every document is a single `doc` node carrying its schema version:
 
 1. **Store the envelope verbatim.** Don't unwrap `content` and don't re-key anything. If you need a different shape in your database, keep a converter at the boundary and store the original alongside it.
 2. **Validate before you store.** `isBlockleafDocument()` is a cheap structural guard today; a full Zod schema is exported from `@blockleaf/editor/validate` in `EC` (Zod is an optional peer, so it costs nothing unless you import it) so hosts can reject malformed client input server-side.
-3. **Never hand-edit stored JSON across a version boundary.** Run it through `migrate()` instead (`EC`).
+3. **Never hand-edit stored JSON across a version boundary.** Run it through `migrate()` instead — see [Reading an older document](#reading-an-older-document).
 4. **Block ids are stable** (`EC`). Once a block has an id it keeps it for life — drag handles, anchor links, comments and collaborative cursors all key off it.
+
+## Reading an older document
+
+A document keeps the `schemaVersion` it was saved with. When a later release bumps `SCHEMA_VERSION`, `migrate()` brings an older document up to date, one version at a time:
+
+```ts
+import { migrate } from '@blockleaf/editor';
+
+const current = migrate(stored);
+```
+
+- **The editor does this for you.** A `defaultValue` at an older version is migrated before it opens. Nothing is saved until the user edits, and that save carries the current version. `editor.commands.setContent()` is Tiptap's own and does **not** migrate — pass it `migrate(doc)`.
+- **Everywhere else, call it yourself:** on the server before validating with `@blockleaf/editor/validate`, and before handing a stored document to `@blockleaf/renderer`.
+- **It never changes its input.** A document already at the current version comes back as the same object, so calling it on every read costs nothing.
+- **It only goes forward.** A document **newer** than your editor comes back untouched; the editor opens it read-only (see `incompatibleDocument`).
+- **Anything that is not a Blockleaf document comes back untouched** — a value without a whole-number `attrs.schemaVersion` of 1 or more.
+
+`SCHEMA_VERSION` is `1` today, so there is nothing to migrate yet. `migrate()` exists now so that the first bump is survivable, and so your code can already call it.
 
 ## Node set
 
@@ -114,19 +132,11 @@ Tables were on this list until 2026-10-10. They were moved into `EC` deliberatel
 
 **It expired when `0.1.0` was published on 18 October 2026.** The numbered process below now governs every change, without exception. An additive change is cheap exactly once; the whole point of versioning the document is that nobody gets to decide it is cheap a second time.
 
-<Callout type="warn" title="There is no migration runner yet">
-	`withSchemaVersion` stamps the current `SCHEMA_VERSION` onto a document
-	without transforming anything, so it cannot be what performs a migration
-	— pointed at a version 1 document after a bump it would relabel it as
-	version 2 and change nothing. Step 2 below therefore means building that
-	runner first, and until it exists `SCHEMA_VERSION` does not move. This is
-	why the table `<caption>` that would otherwise have shipped with the table
-	accessibility work did not.
-</Callout>
-
 1. Add the change behind the next `SCHEMA_VERSION`.
-2. Write the migration from the previous version in the same PR.
+2. Write the migration from the previous version in the same PR, as a new entry in `migrations` in `packages/editor/src/core/migrate.ts`, keyed by the version it migrates **from**. The runner stamps the new version; the migration only changes the shape.
 3. Update the snapshot fixture; the diff in review **is** the contract change, so it should be read as one.
 4. Changeset: a minor while we are on `0.x`, a major after `1.0`.
+
+`packages/editor/tests/migrate.test.ts` fails until step 2 is done: it wants a migration from every version below `SCHEMA_VERSION`, and it migrates a frozen version 1 document (`tests/fixtures/schema-v1.json`, never updated) and validates the result against the current schema.
 
 The snapshot test in `packages/editor/tests/schema.test.ts` exists to make an accidental change fail loudly. It is not there to make a deliberate change hard — it is there to make it visible.
