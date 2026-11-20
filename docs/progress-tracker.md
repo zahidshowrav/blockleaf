@@ -382,7 +382,7 @@ this table is for.
 | HD-07 | Table a11y — header `scope`, announced cell position (caption → HD-10)                    | Done        | `316b929` | 2026-10-21 |
 | HD-08 | Table on a narrow screen — overflow, touch, `colwidth` override                           | Done        | `316b929` | 2026-10-21 |
 | HD-09 | A migration runner, so a `SCHEMA_VERSION` bump is survivable                              | Done        | `f55edd9` | 2026-11-20 |
-| HD-10 | Table `<caption>` — a `figure` wrapper (`F20`), so no bump; shares its shape with `PA-20` | Done        | —         | 2026-11-20 |
+| HD-10 | Table `<caption>` — a `figure` wrapper (`F20`), so no bump; shares its shape with `PA-20` | Done        | `80bd590` | 2026-11-20 |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
 | HD-13 | Pasting a long document, which still takes the quadratic path                             | Not started | —         | —          |
