@@ -30,8 +30,8 @@ editor runs it on `defaultValue`; `SG-04` fails CI when `SCHEMA_VERSION`
 moves without a migration, or when a frozen version 1 document no longer
 migrates to a valid current one. The `FC` block changed no stored
 shape — the `FC-03` placeholder lives only in the open editor and is swapped
-back on save — so it needed none. It reached npm as `@blockleaf/editor@0.6.0`
-and `@blockleaf/renderer@0.2.0`.
+back on save — so it needed none. It reached npm in editor `0.6.0` and
+renderer `0.2.0`.
 
 **Schema releases are held (decided 2026-11-19):** `HD-09` ships on its own,
 since it changes no stored shape. Every stored-shape change after it — `HD-10`,
