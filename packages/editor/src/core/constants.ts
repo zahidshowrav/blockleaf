@@ -60,6 +60,12 @@ export const BLOCK_NODE_TYPES = [
 ] as const;
 
 /**
+ * The name `@tiptap/extension-unique-id` registers under. Read to find its
+ * options, so ids made outside it match the ones it makes.
+ */
+export const UNIQUE_ID_EXTENSION_NAME = 'uniqueID';
+
+/**
  * The extension that keeps nodes and marks this editor does not know.
  *
  * Named so `BlockleafEditor` can hand it the resolved labels, and so the hook

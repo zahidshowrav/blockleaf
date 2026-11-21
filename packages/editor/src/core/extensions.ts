@@ -4,10 +4,10 @@ import { TableKit } from '@tiptap/extension-table';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
 import { Underline } from '@tiptap/extension-underline';
-import { UniqueID } from '@tiptap/extension-unique-id';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { StarterKit } from '@tiptap/starter-kit';
 
+import { PastedBlockIds, UniqueID } from './block-ids.js';
 import {
 	BLOCK_NODE_TYPES,
 	HEADING_LEVELS,
@@ -172,6 +172,7 @@ export const createExtensions = (
 			UniqueID.configure({
 				types: ['paragraph']
 			}),
+			PastedBlockIds,
 			PasteNormalizer,
 			UnknownContent
 		];
@@ -211,6 +212,7 @@ export const createExtensions = (
 		UniqueID.configure({
 			types: [...BLOCK_NODE_TYPES]
 		}),
+		PastedBlockIds,
 		Shortcuts,
 		TrailingNodeOnLoad,
 		PasteNormalizer,

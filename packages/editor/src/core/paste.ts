@@ -414,9 +414,23 @@ export const PasteNormalizer = Extension.create({
 								);
 								const tempDiv = document.createElement('div');
 								tempDiv.innerHTML = parsedHTML;
-								const slice = parser.parseSlice(tempDiv);
+								let slice = parser.parseSlice(tempDiv);
+								// The same hooks and tags a normal paste gets,
+								// so pasted blocks get their ids in one pass
+								// (`PastedBlockIds`, HD-13). Skipping
+								// `transformPasted` would also leave
+								// `UniqueID`'s paste flag set for the next drop.
+								view.someProp(
+									'transformPasted',
+									(transform) => {
+										slice = transform(slice, view, true);
+									}
+								);
 								view.dispatch(
-									view.state.tr.replaceSelection(slice)
+									view.state.tr
+										.replaceSelection(slice)
+										.setMeta('paste', true)
+										.setMeta('uiEvent', 'paste')
 								);
 								return true;
 							}

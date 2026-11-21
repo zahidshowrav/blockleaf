@@ -21,11 +21,11 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 `PA` → `TB` → `OP` → `UX` → `EX` → `V1`, the same ids `PROJECT_PLAN.md` §9 uses.
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
-`HD-10`, `HD-12` and `HD-14` are done; `HD-11` and `HD-13` are left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
+`HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
 site is deployed at `blockleaf.dev`.
 
-**Next:** `HD-13`, pasting a long document; `HD-11` waits for someone past
-ten thousand blocks to ask for it. Then `PA`. `HD-10` gave tables a caption
+**Next:** `PA`. `HD-11` waits for someone past ten thousand blocks to ask
+for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
 as a `figure` holding the table and a `caption` (`F20`, amended 2026-11-20),
 and needed no `SCHEMA_VERSION` bump: both are new node types and no existing
 node changed. `HD-09` added `migrate()`, and `SG-04` fails CI when
@@ -45,8 +45,8 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-20: 436 editor unit tests, 160 renderer, 52
-Playwright across two projects — 43 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 149.21 kB of 160 kB, schema entry at 405 B of 2 kB, code block
+**Last verified:** 2026-11-22: 444 editor unit tests, 160 renderer, 53
+Playwright across two projects — 44 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 149.55 kB of 160 kB, schema entry at 405 B of 2 kB, code block
 subpath at 80.33 kB of 85 kB. Lint, typecheck and build cover eight
 workspaces.
 
@@ -363,6 +363,16 @@ range. Fifty blocks is nothing; ten thousand is the 137-second path again.
 Fixing it here means fighting another extension for the same hook, so it may
 belong upstream.
 
+Fixed here (2026-11-22) without fighting for the hook. Two costs, both
+quadratic: the `setNodeMarkup` loop, and a duplicate check that recounts the
+range once per block. `PastedBlockIds` stamps ids onto the slice in
+`transformPasted`, which runs after `UniqueID`'s because `UniqueID` sets
+priority 10000, and does the duplicate check in one pass. Blockleaf's
+`UniqueID` is Tiptap's with `filterTransaction` defaulting to skip pastes, a
+default so `UniqueID.configure({ types })` keeps it. 5,000 blocks pasted in
+Chrome: 20.5s before, 1.7s after. Both costs are still in Tiptap; reporting
+them upstream is worth doing, not blocking.
+
 Settled while recording these, so nobody re-opens it: `contain: inline-size`
 has been in Safari since 16.0, Chrome since 105 and Firefox since 101. The
 containment `HD-08` leans on is three years old and needs no fallback.
@@ -385,7 +395,7 @@ this table is for.
 | HD-10 | Table `<caption>` — a `figure` wrapper (`F20`), so no bump; shares its shape with `PA-20` | Done        | `80bd590` | 2026-11-20 |
 | HD-11 | Virtualisation — only if someone past 10k blocks reports needing it                       | Not started | —         | —          |
 | HD-12 | A wide table in `@blockleaf/renderer`, which wrapped one in nothing                       | Done        | `a52d2dc` | 2026-10-22 |
-| HD-13 | Pasting a long document, which still takes the quadratic path                             | Not started | —         | —          |
+| HD-13 | Pasting a long document, which still takes the quadratic path                             | Done        | `f3b8165` | 2026-11-22 |
 | HD-14 | Autofocus threw on Android, iOS and Safari, and `create` never fired — Tiptap 8546        | Done        | `729dae6` | 2026-11-08 |
 
 ## FC — Forward compatibility (½–1 week)

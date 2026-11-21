@@ -19,6 +19,9 @@ const captionedTable = async (page: Page) => {
 		.getByRole('menu', { name: 'Row actions' })
 		.getByRole('menuitem', { name: 'Toggle caption' })
 		.click();
+	// Tiptap's `focus()` lands a frame later. Keys typed before it go to the
+	// menu item, which is about to unmount, and are lost.
+	await expect(page.locator(EDITOR)).toBeFocused();
 };
 
 test.describe('table caption', () => {

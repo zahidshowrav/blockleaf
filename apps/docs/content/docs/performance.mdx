@@ -4,9 +4,9 @@ description: What the editor costs on a document of ten thousand blocks, measure
 icon: Gauge
 ---
 
-The question a long document asks is not "is it fast" but "what grows". Two
-things used to grow faster than the document did; both were fixed by
-measuring, and `pnpm perf` is how.
+The question a long document asks is not "is it fast" but "what grows".
+Opening and pasting used to grow faster than the document did; both were
+fixed by measuring.
 
 ## Opening a document
 
@@ -39,6 +39,29 @@ load and keeps the job it is good at — the one new block at a time.
     ```
 
 </Callout>
+
+## Pasting into it
+
+**Pasting five thousand blocks takes under two seconds.** It used to take
+twenty.
+
+Same cause as opening, in a different place. When you paste, `UniqueID`
+clears the ids on the pasted blocks, because a copy must not share an id with
+the block it was copied from. Then it adds new ones one step per block, and
+checks for duplicates by recounting every id once per block. Both grow with
+the square of the paste.
+
+`PastedBlockIds` gives the pasted blocks their ids before they reach the
+document, so no steps are needed to add them. It also does the duplicate
+check, counting each id once. Blockleaf's `UniqueID` skips pastes and leaves
+them to it. Both come with the presets.
+
+| Blocks pasted | Before | Now  |
+| ------------- | ------ | ---- |
+| 5,000         | 20.5s  | 1.7s |
+
+Measured in Chrome by `e2e/performance.spec.ts`, which also fails if that
+paste ever takes more than ten seconds again.
 
 ## Typing in it
 
@@ -79,4 +102,5 @@ pnpm perf
 Boots the sandbox, opens documents of several sizes and times opening and
 typing in each. Numbers from one machine are a before and after, not a
 budget — the budget lives in `e2e/performance.spec.ts`, which fails if
-opening a five thousand block import ever takes more than ten seconds again.
+opening a five thousand block import, or pasting five thousand blocks, ever
+takes more than ten seconds again.
