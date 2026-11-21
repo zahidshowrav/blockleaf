@@ -177,6 +177,8 @@ test.describe('Chrome accessibility in a real browser', () => {
 		}
 		await page.keyboard.press('Control+Alt+r');
 		await page.getByRole('menuitem', { name: 'Toggle caption' }).click();
+		// Tiptap's `focus()` lands a frame later; keys typed before it are lost.
+		await expect(page.locator(EDITOR)).toBeFocused();
 		await page.keyboard.type('People');
 		await expect(page.locator(`${EDITOR} figcaption`)).toHaveText('People');
 
