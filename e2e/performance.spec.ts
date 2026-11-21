@@ -48,4 +48,41 @@ test.describe('A long document', () => {
 			'typed'
 		);
 	});
+
+	// HD-13. Pasting went through the same quadratic path loading did:
+	// `UniqueID` cleared the copied ids, then added new ones one step per
+	// block. A real `paste` event, so the browser's own clipboard path runs.
+	test('takes a paste of it without going quadratic', async ({ page }) => {
+		await page.goto('/?json=0');
+		await page.locator(`${EDITOR} p`).first().click();
+
+		const started = Date.now();
+		await page.locator(EDITOR).evaluate((editor, count) => {
+			const html = Array.from(
+				{ length: count },
+				(_, i) => `<p>Pasted ${i}</p>`
+			).join('');
+			const clipboardData = new DataTransfer();
+			clipboardData.setData('text/html', html);
+			editor.dispatchEvent(
+				new ClipboardEvent('paste', {
+					clipboardData,
+					bubbles: true,
+					cancelable: true
+				})
+			);
+		}, BLOCKS);
+		await expect(
+			page.locator(`${EDITOR} p`, { hasText: `Pasted ${BLOCKS - 1}` })
+		).toBeVisible({ timeout: CEILING_MS });
+		const elapsed = Date.now() - started;
+
+		const ids = await page
+			.locator(`${EDITOR} p`, { hasText: 'Pasted' })
+			.evaluateAll((nodes) => nodes.map((node) => node.dataset.id));
+		expect(ids).toHaveLength(BLOCKS);
+		expect(ids).not.toContain(undefined);
+		expect(new Set(ids).size).toBe(BLOCKS);
+		expect(elapsed).toBeLessThan(CEILING_MS);
+	});
 });

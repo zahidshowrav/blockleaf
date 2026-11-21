@@ -62,6 +62,7 @@ import {
 	Callout,
 	Image,
 	Link,
+	PastedBlockIds,
 	PasteNormalizer,
 	TableKit,
 	UniqueID,
@@ -141,6 +142,21 @@ Four consequences:
 
     Without an id the drag handle has nothing to key a block on, and the
     renderer emits no `data-id` for it.
+
+    Take `UniqueID` from `@blockleaf/editor/extensions`, not from Tiptap.
+    Blockleaf's copy leaves pastes to `PastedBlockIds`, which gives a long
+    paste its ids in one pass (see [long documents](./performance.mdx#pasting-into-it)).
+    Tiptap's copy takes the slow path. If you give it a `filterTransaction`
+    of your own, keep pastes out of it:
+
+    ```ts
+    import { isPasteTransaction, UniqueID } from '@blockleaf/editor/extensions';
+
+    UniqueID.configure({
+    	types: [...BLOCK_NODE_TYPES, 'mention'],
+    	filterTransaction: (tr) => !isPasteTransaction(tr) && yourCheck(tr)
+    });
+    ```
 
 3. **Pasted content is normalised.** `PasteNormalizer` rewrites pasted HTML
    and Markdown into the documented schema. It will not know how to produce

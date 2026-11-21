@@ -106,7 +106,7 @@ export {
 	type DocumentMigration,
 	type StoredDocument
 } from './migrate.js';
-export { UniqueID } from '@tiptap/extension-unique-id';
+export { isPasteTransaction, PastedBlockIds, UniqueID } from './block-ids.js';
 export { TableKit } from '@tiptap/extension-table';
 export {
 	SCHEMA_VERSION,

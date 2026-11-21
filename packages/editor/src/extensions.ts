@@ -30,5 +30,9 @@ export {
 	wrapUnknownContent,
 	type UnknownContentOptions
 } from './core/unknown-content.js';
-export { UniqueID } from '@tiptap/extension-unique-id';
+export {
+	isPasteTransaction,
+	PastedBlockIds,
+	UniqueID
+} from './core/block-ids.js';
 export { TableKit } from '@tiptap/extension-table';
