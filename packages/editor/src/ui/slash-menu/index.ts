@@ -11,6 +11,7 @@ export {
 	TableIcon,
 	TaskListIcon,
 	TextIcon,
+	ToggleIcon,
 	type IconProps
 } from './icons.js';
 export {

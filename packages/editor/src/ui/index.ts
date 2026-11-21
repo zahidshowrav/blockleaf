@@ -96,6 +96,7 @@ export {
 	TableIcon,
 	TaskListIcon,
 	TextIcon,
+	ToggleIcon,
 	createCommandRegistry,
 	createSlashCommands,
 	createSlashMenuExtension,

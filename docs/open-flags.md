@@ -8,11 +8,37 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22 · **Last reviewed:** 2026-11-10
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23 · **Last reviewed:** 2026-11-22
 
 ---
 
 ## Settled
+
+### F23 — where a toggle's title lives · decided 2026-11-22
+
+`details` has been in the schema since `0.1.0` as `{ open, id }` and a list
+of blocks, with no title field and no editor extension behind it. Both
+renderer targets wrote a bare `<details>`, so a browser showed its own
+"Details" label. `PA-01` adds the editor extension, and a toggle needs a
+title someone can type and click.
+
+**Decisions:**
+
+- **The first block inside `details` is its title.** The blocks after it are
+  the body that opens and closes. No new node, no new attribute, no
+  `SCHEMA_VERSION` bump, no migration — the stored shape is the one already
+  documented.
+- **The renderer wraps that first block in `<summary>`.** That is a change in
+  output, not in what is stored: a document built by hand that already uses
+  `details` now shows its first block as the title. Nothing the editor
+  wrote is affected, because the editor could not write a `details` before.
+- **Rejected: a separate `detailsSummary` node.** It is the shape Tiptap's
+  own details extension uses and it makes the title explicit, but it changes
+  the stored shape. That would have moved `PA-01` into the held v2 batch
+  instead of the early release (decided 2026-11-22).
+- **Content stays `block+`, like `callout`.** The title can be any block the
+  document allows. Narrowing it to a paragraph or heading in the editor would
+  make a valid stored document fail to open.
 
 ### F22 — may a column width written by a drag be stored · decided 2026-11-10
 

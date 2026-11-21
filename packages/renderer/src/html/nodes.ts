@@ -125,10 +125,16 @@ export const createHtmlNodes = (
 			children
 		),
 
-	details: ({ node, children }) =>
-		`<details${attributes({ 'data-id': blockId(node) })}${
+	// A toggle (F23): the first block is its title, inside `<summary>`.
+	details: ({ node, renderNode, combine }) => {
+		const [title, ...body] = node.content ?? [];
+		const summary = title
+			? `<summary>${renderNode(title, node)}</summary>`
+			: '';
+		return `<details${attributes({ 'data-id': blockId(node) })}${
 			node.attrs?.open === true ? ' open' : ''
-		}>${children}</details>`,
+		}>${summary}${combine(body.map((child) => renderNode(child, node)))}</details>`;
+	},
 
 	image: ({ node }) => {
 		const attrs = imageAttributes(node);

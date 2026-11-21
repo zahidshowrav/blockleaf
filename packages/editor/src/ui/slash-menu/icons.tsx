@@ -294,3 +294,20 @@ export const ImageIcon = (props: IconProps) => (
 		<path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21" />
 	</svg>
 );
+
+export const ToggleIcon = (props: IconProps) => (
+	<svg
+		viewBox="0 0 24 24"
+		width="16"
+		height="16"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<polyline points="4 7 8 11 4 15" />
+		<path d="M12 9h8M12 15h8" />
+	</svg>
+);

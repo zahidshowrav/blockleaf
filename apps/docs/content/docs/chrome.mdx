@@ -40,8 +40,8 @@ keywords and descriptions; `↑`/`↓` move, `Enter` runs, `Escape` dismisses.
 | `slashItems`    | —       | An array of commands, or `(defaults) => commands`. |
 | `slashRegistry` | —       | A `CommandRegistry` instance, for full control.    |
 
-The thirteen defaults are Text, Heading 1–3, Bullet list, Numbered list,
-To-do list, Quote, Code, Callout, Divider, Table and Image.
+The fourteen defaults are Text, Heading 1–3, Bullet list, Numbered list,
+To-do list, Quote, Code, Callout, Toggle, Divider, Table and Image.
 
 They are displayed grouped by their `group` — Basic blocks, Headings, Lists,
 Advanced — which is not the order the array is in. `↑` and `↓` follow the rows
@@ -98,6 +98,9 @@ command that cannot run.
 ```ts
 isAvailable?: (editor: Editor) => boolean;
 ```
+
+**Toggle** uses one too: it is hidden when the editor's extensions have no
+`details` node, as with the `minimal` preset.
 
 It is evaluated every time the menu opens, not once at startup, so a host that
 swaps its adapter at runtime gets the right list. A command without the
@@ -437,6 +440,41 @@ It renders as a `data-placeholder` attribute on a decorated node, styled by
 `.blockleaf-empty-node::before`, and disappears when the editor is read-only
 or when text is selected.
 
+## Toggle
+
+A toggle hides its content under a title. **Toggle** in the slash menu wraps
+the current block in one, open, and that block becomes the title. Everything
+after the title is the body.
+
+A button beside the title opens and closes it. The open state is stored, in
+the toggle's `open` attribute, so a document saved closed opens closed. The
+button's name comes from `labels.details.toggle`, and `aria-expanded` says
+whether it is open.
+
+| Where                       | Key           | Does                                                                  |
+| --------------------------- | ------------- | --------------------------------------------------------------------- |
+| Anywhere in a toggle        | `Mod`+`Enter` | Open or close it. Closing from the body moves the caret to the title. |
+| End of a closed title       | `Enter`       | Start a block after the toggle, not a hidden line inside it.          |
+| Middle of a closed title    | `Enter`       | Open the toggle, then split the title.                                |
+| Open title                  | `Enter`       | Add the first line of the body.                                       |
+| Start of the title          | `Backspace`   | Turn the toggle back into its blocks.                                 |
+| Empty last line of the body | `Enter`       | Leave the toggle.                                                     |
+
+The arrow keys go round a closed body. If anything else puts the caret inside
+one — undo, a search, a host's own `setTextSelection` — the toggle opens, so
+nobody types into text they cannot see.
+
+The button is out of the tab order, because `Tab` inside the editor belongs to
+the document. `Mod`+`Enter` is the keyboard path.
+
+<Callout title="With no gutter, the toggle covers the insert button">
+	With `--bl-content-padding` at `0`, the drag handle sits over the start of
+	the line — and the toggle's button is the start of the line. The button is
+	drawn above the handle, so beside a toggle it covers the handle's insert
+	button; the grip still works. [Give the content a gutter](#give-it-a-gutter)
+	and the two never meet.
+</Callout>
+
 ## Trailing node
 
 A document always ends somewhere you can click. Without this, a document
@@ -475,6 +513,7 @@ using only the keys below.
 | `Mod`+`Alt`+`M`       | Block menu, for keyboards without `F10`.               |
 | `Mod`+`Alt`+`R` / `C` | Row / column menu, inside a table.                     |
 | `Mod`+`Alt`+`T`       | Insert a 3 × 3 table, no menu involved.                |
+| `Mod`+`Enter`         | Open or close the toggle around the caret.             |
 | `Tab` / `Shift`+`Tab` | Next / previous cell, inside a table.                  |
 
 `Shift`+`F10` is the platform's context-menu key, and the one a screen reader

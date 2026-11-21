@@ -121,19 +121,21 @@ const Callout: NodeRenderer = ({ node, children }) => (
 );
 
 /**
- * `details` is in the schema and the validator but has no editor extension
- * yet, so only a host building documents by hand produces one. It renders
- * because the schema admits it — a node the document is allowed to contain
- * must not depend on which version of the editor happens to be installed.
+ * A toggle (`F23`): the first block is its title, inside `<summary>`, and the
+ * blocks after it are the body the browser opens and closes.
  */
-const Details: NodeRenderer = ({ node, children }) => (
-	<details
-		data-id={blockId(node)}
-		open={node.attrs?.open === true}
-	>
-		{children}
-	</details>
-);
+const Details: NodeRenderer = ({ node, renderNode, combine }) => {
+	const [title, ...body] = node.content ?? [];
+	return (
+		<details
+			data-id={blockId(node)}
+			open={node.attrs?.open === true}
+		>
+			{title ? <summary>{renderNode(title, node)}</summary> : null}
+			{combine(body.map((child) => renderNode(child, node)))}
+		</details>
+	);
+};
 
 const Image: NodeRenderer = ({ node }) => {
 	const attrs = imageAttributes(node);

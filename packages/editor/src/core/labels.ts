@@ -24,6 +24,7 @@ export type BlockTypeId =
 	| 'blockquote'
 	| 'code-block'
 	| 'callout'
+	| 'toggle'
 	| 'divider'
 	| 'table'
 	| 'image';
@@ -163,6 +164,11 @@ export type UnknownContentLabels = {
 	inline: (type: string) => string;
 };
 
+export type DetailsLabels = {
+	/** Accessible name of the button that opens and closes a toggle. Its open state is announced by `aria-expanded`, not by the name. */
+	toggle: string;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -173,6 +179,7 @@ export type ResolvedLabels = {
 	link: LinkLabels;
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
+	details: DetailsLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -200,6 +207,7 @@ export type BlockleafLabels = {
 	link?: Partial<LinkLabels>;
 	upload?: Partial<UploadLabels>;
 	codeBlock?: Partial<CodeBlockLabels>;
+	details?: Partial<DetailsLabels>;
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
 };
@@ -226,6 +234,7 @@ export const defaultLabels: ResolvedLabels = {
 		blockquote: 'Quote',
 		'code-block': 'Code',
 		callout: 'Callout',
+		toggle: 'Toggle',
 		divider: 'Divider',
 		table: 'Table',
 		image: 'Image'
@@ -249,6 +258,7 @@ export const defaultLabels: ResolvedLabels = {
 			blockquote: 'Capture a quotation.',
 			'code-block': 'Capture a code snippet.',
 			callout: 'Highlight important information.',
+			toggle: 'Hide content under a title that opens it.',
 			divider: 'Visually separate sections with a line.',
 			table: 'Pick a size, with a header row.',
 			image: 'Upload an image from your device.'
@@ -338,6 +348,9 @@ export const defaultLabels: ResolvedLabels = {
 		language: 'Code language',
 		plainText: 'Plain text'
 	},
+	details: {
+		toggle: 'Show or hide content'
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -399,6 +412,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	link: { ...defaultLabels.link, ...labels?.link },
 	upload: { ...defaultLabels.upload, ...labels?.upload },
 	codeBlock: { ...defaultLabels.codeBlock, ...labels?.codeBlock },
+	details: { ...defaultLabels.details, ...labels?.details },
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });

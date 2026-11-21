@@ -327,6 +327,87 @@
 	font-size: 0.875em;
 }
 
+/* A toggle (PA-01, F23): its first block is the title, the rest is the body.
+   In the editor a button beside the title opens and closes it, and a closed
+   toggle hides everything after the title. */
+.blockleaf-editor__content .blockleaf-details {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.25em;
+	margin: var(--bl-space-block) 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 1.5em;
+	height: calc(var(--bl-line-height) * 1em);
+	padding: 0;
+	border: 0;
+	border-radius: var(--bl-radius);
+	background: none;
+	color: var(--bl-color-muted);
+	cursor: pointer;
+	/* Above the block handle (40). With no gutter the handle is clamped over
+	   the start of the line, and hovering the chevron is what brings it up;
+	   underneath it, the chevron could not be clicked at all. On top, it
+	   covers the handle's insert button beside a toggle and nothing else. */
+	position: relative;
+	z-index: 41;
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle:hover {
+	color: var(--bl-color-fg);
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle svg {
+	transition: transform 120ms ease;
+}
+
+.blockleaf-editor__content
+	.blockleaf-details[data-open]
+	> .blockleaf-details__toggle
+	svg {
+	transform: rotate(90deg);
+}
+
+.blockleaf-editor__content .blockleaf-details__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__content > :first-child {
+	margin-top: 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__content > :last-child {
+	margin-bottom: 0;
+}
+
+.blockleaf-editor__content
+	.blockleaf-details:not([data-open])
+	> .blockleaf-details__content
+	> :not(:first-child) {
+	display: none;
+}
+
+/* The renderer's output: the title block sits beside the browser's own
+   marker rather than on a line under it. */
+.blockleaf-editor__content details {
+	margin: var(--bl-space-block) 0;
+}
+
+.blockleaf-editor__content details > summary {
+	cursor: pointer;
+}
+
+.blockleaf-editor__content details > summary > :first-child {
+	display: inline;
+	margin: 0;
+}
+
 /* The editing surface itself shows focus with the caret, not a ring — an
    outline around the whole document reads as an error state. Focusable
    chrome (menu buttons, the link editor) keeps its ring. */

@@ -165,6 +165,23 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, '.blockleaf-table-menu')).toEqual([]);
 	});
 
+	test('a toggle has no violations, open or closed', async ({ page }) => {
+		await openEditor(page);
+		await page.keyboard.type('/toggle');
+		await page.keyboard.press('Enter');
+		await page.keyboard.type('Title');
+		await page.keyboard.press('Enter');
+		await page.keyboard.type('Body');
+
+		expect(await violations(page, `${EDITOR} .blockleaf-details`)).toEqual(
+			[]
+		);
+		await page.locator('.blockleaf-details__toggle').click();
+		expect(await violations(page, `${EDITOR} .blockleaf-details`)).toEqual(
+			[]
+		);
+	});
+
 	test('a captioned table has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');

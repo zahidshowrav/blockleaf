@@ -1,5 +1,6 @@
 export {
 	CAPTION_NODE,
+	DETAILS_NODE,
 	FIGURE_NODE,
 	HEADING_LEVELS,
 	MAX_LIST_DEPTH,
@@ -31,6 +32,7 @@ export {
 	type BlockleafLabels,
 	type BubbleMenuLabels,
 	type CodeBlockLabels,
+	type DetailsLabels,
 	type ImageLabels,
 	type LinkLabels,
 	type PlaceholderLabels,
@@ -63,6 +65,7 @@ export {
 } from './incompatible-document.js';
 export { Link, sanitizeHref } from './marks/link.js';
 export { Callout, type CalloutOptions } from './nodes/callout.js';
+export { Details, type DetailsOptions } from './nodes/details.js';
 export { Caption, Figure } from './nodes/figure.js';
 export {
 	Image,

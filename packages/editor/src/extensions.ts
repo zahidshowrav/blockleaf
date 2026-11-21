@@ -7,6 +7,7 @@ export {
 } from './core/extensions.js';
 export { Link, sanitizeHref } from './core/marks/link.js';
 export { Callout, type CalloutOptions } from './core/nodes/callout.js';
+export { Details, type DetailsOptions } from './core/nodes/details.js';
 export { Caption, Figure } from './core/nodes/figure.js';
 export {
 	Image,
