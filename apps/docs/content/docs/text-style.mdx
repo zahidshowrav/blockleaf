@@ -1,6 +1,6 @@
 ---
 title: Text styles
-description: Subscript and superscript, as an opt-in subpath. More text styles join it as they ship.
+description: Subscript, superscript and text alignment, as an opt-in subpath. More text styles join it as they ship.
 icon: Type
 ---
 
@@ -38,11 +38,46 @@ They are new in schema version 2.
 - **`@blockleaf/renderer` writes `<sub>` and `<sup>`** on both targets, with
   no extra import.
 
+## Text alignment
+
+| Alignment | Shortcut          | Stored as                             |
+| --------- | ----------------- | ------------------------------------- |
+| Left      | `Mod`+`Shift`+`L` | `"attrs": { "textAlign": "left" }`    |
+| Center    | `Mod`+`Shift`+`E` | `"attrs": { "textAlign": "center" }`  |
+| Right     | `Mod`+`Shift`+`R` | `"attrs": { "textAlign": "right" }`   |
+| Justify   | `Mod`+`Shift`+`J` | `"attrs": { "textAlign": "justify" }` |
+
+- **Paragraphs and headings.** Every one in the selection, so a whole
+  section aligns at once. Other blocks are left alone.
+- **The same choice again takes it off**, and the block goes back to the
+  language's own direction — left in English, right in Arabic. An unaligned
+  block stores nothing at all.
+- **The block menu gains an Align group** — Left, Center, Right, Justify —
+  for a paragraph or heading.
+- **Only those four values are stored.** Pasted `text-align: center` arrives
+  aligned; anything else, such as `start`, arrives unaligned. A stored value
+  outside the four fails validation, and the renderer ignores it rather than
+  writing it into a `style` attribute.
+- **`@blockleaf/renderer` writes `style="text-align: …"`**, as the editor
+  does.
+
+### Why the attribute is not in the subpath
+
+The commands, shortcuts and menu entries come with
+`@blockleaf/editor/text-style`. The `textAlign` attribute itself is in every
+preset. An editor keeps a mark it does not know, but it drops an attribute
+it does not know — so if the attribute lived here, opening an aligned
+document in an editor without the subpath and saving it would remove the
+alignment, silently. With the attribute in the core, every editor shows and
+keeps it; only setting it needs the subpath. The reasoning is F25 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+
 ## Without the subpath
 
 An editor that does not load `@blockleaf/editor/text-style` still opens a
-document that uses these marks. The text shows plainly, and the marks are
-saved back exactly as they came in. See
+document that uses these styles. Subscript and superscript text shows
+plainly, and the marks are saved back exactly as they came in. Alignment
+shows and is kept, as above; it just cannot be changed. See
 [a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
 
 ## `withTextStyle` versus `createTextStyle`
@@ -55,5 +90,8 @@ extensions as a plain array, for a list you are assembling from scratch.
 ## Cost
 
 Measured with `size-limit`, minified and brotlied: the editor is
-**150.98 kB**, and the editor with text styles is **151.18 kB**, so
-**0.20 kB** for both marks. Without the import, nothing is added.
+**151.35 kB** — the alignment attribute and the block menu's Align entries
+included — and the editor with text styles is **151.80 kB**, so **0.45 kB**
+for the marks, the alignment commands and their shortcuts. Without the
+import, only the attribute and the menu entries are in the bundle, and the
+menu entries do not appear.

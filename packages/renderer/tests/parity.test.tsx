@@ -166,6 +166,21 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'aligned paragraph and heading',
+		docOf(
+			{
+				type: 'heading',
+				attrs: { level: 1, id: 'h', textAlign: 'center' },
+				content: [text('Title')]
+			},
+			{
+				type: 'paragraph',
+				attrs: { id: 'p', textAlign: 'justify' },
+				content: [text('Body')]
+			}
+		)
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

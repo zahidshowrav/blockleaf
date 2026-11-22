@@ -154,6 +154,7 @@ export {
 	type TableRowNode,
 	type TaskItemNode,
 	type TaskListNode,
+	type TextAlign,
 	type TextNode,
 	type UnderlineMark,
 	type UnrecognisedMark,

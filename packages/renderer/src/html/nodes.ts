@@ -17,7 +17,8 @@ import {
 	rowspan,
 	tableColumns,
 	tableMinWidth,
-	tableRows
+	tableRows,
+	textAlign
 } from '../attrs.js';
 import { type RenderableNode } from '../types.js';
 import { type NodeRender } from '../walk.js';
@@ -44,12 +45,16 @@ export const createHtmlNodes = (
 	doc: ({ children }) => children,
 
 	paragraph: ({ node, children }) =>
-		element('p', { 'data-id': blockId(node) }, children),
+		element(
+			'p',
+			{ 'data-id': blockId(node), style: alignStyle(node) },
+			children
+		),
 
 	heading: ({ node, children }) =>
 		element(
 			`h${headingLevel(node)}`,
-			{ 'data-id': blockId(node) },
+			{ 'data-id': blockId(node), style: alignStyle(node) },
 			children
 		),
 
@@ -251,6 +256,12 @@ export const createHtmlNodes = (
 		return element('span', attributes, escapeText(text));
 	}
 });
+
+/** The `style` a paragraph or heading carries for its alignment, if any. */
+const alignStyle = (node: RenderableNode): string | undefined => {
+	const align = textAlign(node);
+	return align ? `text-align: ${align}` : undefined;
+};
 
 /** Whether a row is made entirely of header cells, so its cells head columns. */
 const allHeaders = (row: RenderableNode | undefined): boolean =>

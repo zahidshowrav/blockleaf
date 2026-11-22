@@ -16,7 +16,8 @@ import {
 	rowspan,
 	tableColumns,
 	tableMinWidth,
-	tableRows
+	tableRows,
+	textAlign
 } from '../attrs.js';
 import { type RenderableNode } from '../types.js';
 
@@ -30,13 +31,31 @@ import { type RenderableNode } from '../types.js';
 
 const Doc: NodeRenderer = ({ children }) => <>{children}</>;
 
+/** A paragraph's or heading's alignment, as the editor writes it. */
+const alignStyle = (node: RenderableNode) => {
+	const align = textAlign(node);
+	return align ? { textAlign: align } : undefined;
+};
+
 const Paragraph: NodeRenderer = ({ node, children }) => (
-	<p data-id={blockId(node)}>{children}</p>
+	<p
+		data-id={blockId(node)}
+		style={alignStyle(node)}
+	>
+		{children}
+	</p>
 );
 
 const Heading: NodeRenderer = ({ node, children }) => {
 	const Tag = `h${headingLevel(node)}` as 'h1' | 'h2' | 'h3';
-	return <Tag data-id={blockId(node)}>{children}</Tag>;
+	return (
+		<Tag
+			data-id={blockId(node)}
+			style={alignStyle(node)}
+		>
+			{children}
+		</Tag>
+	);
 };
 
 const Blockquote: NodeRenderer = ({ node, children }) => (

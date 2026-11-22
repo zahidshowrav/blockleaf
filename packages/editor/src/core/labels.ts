@@ -71,8 +71,18 @@ export type BlockMenuLabels = {
 	handleHint: string;
 	/** The `+` button beside the handle. */
 	insert: string;
-	groups: Record<'turnInto' | 'actions', string>;
-	actions: Record<'move-up' | 'move-down' | 'duplicate' | 'delete', string>;
+	groups: Record<'turnInto' | 'align' | 'actions', string>;
+	actions: Record<
+		| 'move-up'
+		| 'move-down'
+		| 'duplicate'
+		| 'delete'
+		| 'align-left'
+		| 'align-center'
+		| 'align-right'
+		| 'align-justify',
+		string
+	>;
 };
 
 export type TableActionId =
@@ -304,12 +314,16 @@ export const defaultLabels: ResolvedLabels = {
 		handle: 'Block actions',
 		handleHint: 'Drag to move, click for actions',
 		insert: 'Insert a block below',
-		groups: { turnInto: 'Turn into', actions: 'Actions' },
+		groups: { turnInto: 'Turn into', align: 'Align', actions: 'Actions' },
 		actions: {
 			'move-up': 'Move up',
 			'move-down': 'Move down',
 			duplicate: 'Duplicate',
-			delete: 'Delete'
+			delete: 'Delete',
+			'align-left': 'Left',
+			'align-center': 'Center',
+			'align-right': 'Right',
+			'align-justify': 'Justify'
 		}
 	},
 	table: {

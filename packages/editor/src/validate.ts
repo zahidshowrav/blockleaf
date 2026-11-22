@@ -218,11 +218,18 @@ export const inlineNodeSchema: z.ZodType<InlineNode> = orUnrecognisedNode(
 /* Block Nodes                                                                */
 /* -------------------------------------------------------------------------- */
 
+/** Version 2 (`PA-06`, `F25`): four tokens or `null`, never a CSS value. */
+const textAlignSchema = z
+	.enum(['left', 'center', 'right', 'justify'])
+	.nullable()
+	.optional();
+
 export const paragraphNodeSchema: z.ZodType<ParagraphNode> = z.object({
 	type: z.literal('paragraph'),
 	attrs: z
 		.object({
-			id: z.string().optional()
+			id: z.string().optional(),
+			textAlign: textAlignSchema
 		})
 		.optional(),
 	content: z.array(inlineNodeSchema).optional()
@@ -232,7 +239,8 @@ export const headingNodeSchema: z.ZodType<HeadingNode> = z.object({
 	type: z.literal('heading'),
 	attrs: z.object({
 		level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
-		id: z.string().optional()
+		id: z.string().optional(),
+		textAlign: textAlignSchema
 	}),
 	content: z.array(inlineNodeSchema).optional()
 });

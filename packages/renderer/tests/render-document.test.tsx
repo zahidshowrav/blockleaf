@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { docOf, paragraph, text } from './fixtures.js';
-import { canonical, editorHTML, reactHTML } from './html.js';
+import { canonical, editorHTML, reactHTML, stringHTML } from './html.js';
 import { RenderDocument } from '../src/react.js';
 
 /**
@@ -54,6 +54,17 @@ describe('sanitisation', () => {
 		expect(html).toContain('click me');
 		expect(html).not.toContain('<a');
 		expect(html).not.toContain('javascript:');
+	});
+
+	it('writes no style for an alignment outside the four tokens (F18)', () => {
+		const doc = docOf({
+			type: 'paragraph',
+			attrs: { textAlign: 'center; background: url(x)' },
+			content: [text('x')]
+		});
+
+		expect(reactHTML(doc)).toBe('<p>x</p>');
+		expect(stringHTML(doc)).toBe('<p>x</p>');
 	});
 
 	it('allows mailto, relative paths and anchors', () => {

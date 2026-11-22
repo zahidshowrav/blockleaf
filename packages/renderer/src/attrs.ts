@@ -289,3 +289,24 @@ export const mentionAttributes = (
 		}
 	};
 };
+
+export type TextAlign = 'left' | 'center' | 'right' | 'justify';
+
+const TEXT_ALIGNMENTS: ReadonlySet<string> = new Set<TextAlign>([
+	'left',
+	'center',
+	'right',
+	'justify'
+]);
+
+/**
+ * A paragraph's or heading's alignment (`PA-06`), one of four tokens or
+ * nothing. Anything else in a stored document is ignored rather than
+ * written into a `style` attribute (`F18`).
+ */
+export const textAlign = (node: RenderableNode): TextAlign | undefined => {
+	const value = node.attrs?.textAlign;
+	return typeof value === 'string' && TEXT_ALIGNMENTS.has(value)
+		? (value as TextAlign)
+		: undefined;
+};

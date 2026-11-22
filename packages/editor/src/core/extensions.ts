@@ -20,6 +20,7 @@ import { Caption, Figure } from './nodes/figure.js';
 import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
 import { TableAccessibility } from './table-a11y.js';
+import { TextAlignAttribute } from './text-align.js';
 import { UnknownContent } from './unknown-content.js';
 
 export type PresetName = 'minimal' | 'standard';
@@ -170,6 +171,8 @@ export const createExtensions = (
 			}),
 			Underline,
 			Link,
+			// In every preset, so no editor drops a stored alignment (F25).
+			TextAlignAttribute,
 			UniqueID.configure({
 				types: ['paragraph']
 			}),
@@ -200,6 +203,9 @@ export const createExtensions = (
 		Callout,
 		Details,
 		Image,
+		// In every preset, so no editor drops a stored alignment (F25). The
+		// commands and buttons are in `@blockleaf/editor/text-style`.
+		TextAlignAttribute,
 		TableKit.configure({
 			table: {
 				resizable: false
