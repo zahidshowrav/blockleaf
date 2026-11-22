@@ -153,6 +153,34 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'subscript and superscript',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('H'),
+				text('2', [{ type: 'subscript' }]),
+				text('O and E = mc'),
+				text('2', [{ type: 'bold' }, { type: 'superscript' }])
+			]
+		})
+	],
+	[
+		'aligned paragraph and heading',
+		docOf(
+			{
+				type: 'heading',
+				attrs: { level: 1, id: 'h', textAlign: 'center' },
+				content: [text('Title')]
+			},
+			{
+				type: 'paragraph',
+				attrs: { id: 'p', textAlign: 'justify' },
+				content: [text('Body')]
+			}
+		)
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

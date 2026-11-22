@@ -200,6 +200,19 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} p`)).toEqual([]);
 	});
 
+	test('the emoji picker has no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?emoji');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type(':smile');
+		await expect(
+			page.locator('.blockleaf-emoji-menu [role="option"]').first()
+		).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-emoji-menu')).toEqual([]);
+	});
+
 	test('a captioned table has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');

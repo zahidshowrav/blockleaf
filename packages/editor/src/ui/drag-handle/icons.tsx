@@ -104,3 +104,39 @@ export const ArrowDownIcon = (props: IconProps) => (
 );
 
 export type { IconProps };
+
+export const AlignLeftIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M3 6h18M3 12h12M3 18h16" />
+	</svg>
+);
+
+export const AlignCenterIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M3 6h18M6 12h12M4 18h16" />
+	</svg>
+);
+
+export const AlignRightIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M3 6h18M9 12h12M5 18h16" />
+	</svg>
+);
+
+export const AlignJustifyIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M3 6h18M3 12h18M3 18h18" />
+	</svg>
+);

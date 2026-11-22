@@ -3,6 +3,7 @@ import { Editor } from '@tiptap/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createExtensions } from '../src/core/index.js';
+import { withTextStyle } from '../src/text-style.js';
 import {
 	BlockleafEditor,
 	BubbleMenu,
@@ -16,9 +17,10 @@ import {
 	type BubbleAction
 } from '../src/ui/index.js';
 
+// With the text styles, so every default action has its mark to toggle.
 const createEditor = (content = '<p>Hello world</p>') =>
 	new Editor({
-		extensions: createExtensions('standard'),
+		extensions: withTextStyle(createExtensions('standard')),
 		content
 	});
 
@@ -133,14 +135,16 @@ describe('Bubble menu on a preset without every mark', () => {
 });
 
 describe('Bubble menu actions (CH-02)', () => {
-	it('ships the six default mark toggles in reading order', () => {
+	it('ships the eight default mark toggles in reading order', () => {
 		expect(defaultBubbleActions.map((a) => a.id)).toEqual([
 			'bold',
 			'italic',
 			'underline',
 			'strike',
 			'code',
-			'highlight'
+			'highlight',
+			'subscript',
+			'superscript'
 		]);
 	});
 
@@ -278,7 +282,7 @@ describe('Bubble menu toolbar', () => {
 		const toolbar = screen.getByRole('toolbar');
 		const bold = screen.getByRole('button', { name: 'Bold' });
 		const italic = screen.getByRole('button', { name: 'Italic' });
-		const highlight = screen.getByRole('button', { name: 'Highlight' });
+		const last = screen.getByRole('button', { name: 'Superscript' });
 
 		expect(bold.getAttribute('tabindex')).toBe('0');
 		expect(italic.getAttribute('tabindex')).toBe('-1');
@@ -290,10 +294,10 @@ describe('Bubble menu toolbar', () => {
 		expect(document.activeElement).toBe(bold);
 
 		fireEvent.keyDown(toolbar, { key: 'ArrowLeft' });
-		expect(document.activeElement).toBe(highlight);
+		expect(document.activeElement).toBe(last);
 
 		fireEvent.keyDown(toolbar, { key: 'End' });
-		expect(document.activeElement).toBe(highlight);
+		expect(document.activeElement).toBe(last);
 	});
 
 	it('omits the link button when the link editor is disabled', () => {

@@ -1,0 +1,109 @@
+---
+title: Emoji
+description: Type a colon and a word to insert an emoji. It goes in as plain text, so nothing new is stored.
+icon: Smile
+---
+
+Type `:` and a word, pick from the list, and the emoji goes into the text.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withEmoji } from '@blockleaf/editor/emoji';
+
+const extensions = withEmoji(presets.standard());
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+## What is stored
+
+The emoji itself, as text:
+
+```json
+{ "type": "text", "text": "Shipped 🎉" }
+```
+
+No node, no mark, no attribute. A document with emoji in it reads the same
+in every editor and renderer, with or without this import, and it needs no
+schema version of its own.
+
+## Typing
+
+- **`:` after a space or at the start of a line, then two characters.**
+  `:)` and `10:30` stay text; `:ta` opens the list.
+- **Matched by name and by keyword.** `:rocket` finds 🚀, `:tada` finds 🎉,
+  `:+1` finds 👍, and `:thumbs_up` works too — an underscore counts as a
+  space. A name that starts with what you typed comes first.
+- **↑ and ↓ move, Enter or Tab picks, Escape closes** and keeps what you
+  typed. A click picks too, and the caret stays in the document.
+- **No space is added after it**, since an emoji often ends a word.
+- **Not inside code**, where `:` is only a colon.
+
+## The built-in list
+
+1,849 emoji: everything up to **Emoji 14.0** (2021), with names from
+Unicode and search keywords from
+[`emojilib`](https://github.com/muan/emojilib). Newer emoji are left out,
+because systems still in wide use draw them as an empty box. Skin tones are
+not offered; each emoji appears in its default form.
+
+The list is a separate file, **about 36 kB** brotli-compressed. It loads the
+first time someone types `:` and two characters, not when the editor opens,
+so an editor where nobody uses emoji never fetches it. Until it arrives the
+picker shows "Loading emoji…".
+
+## Your own list
+
+Pass `items` to use your own — custom emoji, a shorter list, newer
+versions. It gets what was typed after the `:` and returns matches, or a
+promise of them:
+
+```ts
+import {
+	searchEmoji,
+	withEmoji,
+	type EmojiItem
+} from '@blockleaf/editor/emoji';
+
+const team: EmojiItem[] = [
+	{ emoji: '🦊', name: 'fox', keywords: ['mascot'] },
+	{ emoji: '🚢', name: 'ship', keywords: ['release', 'deploy'] }
+];
+
+withEmoji(presets.standard(), {
+	items: ({ query }) => searchEmoji(team, query)
+});
+```
+
+`searchEmoji` is the same ranking the built-in list uses. Whatever `emoji`
+holds is inserted as text, so it must be text: a picture or a custom image
+is not an emoji to this picker.
+
+| Option           | Default  | What it does                                           |
+| ---------------- | -------- | ------------------------------------------------------ |
+| `items`          | built-in | Where the emoji come from.                             |
+| `char`           | `':'`    | The character that opens the picker.                   |
+| `limit`          | `8`      | How many matches the built-in list shows.              |
+| `minQueryLength` | `2`      | How much has to be typed after `char` before it opens. |
+
+## Translating the picker
+
+Its three strings are under `emoji` in `labels`: `menu`, `empty` and
+`loading`. The built-in emoji names are English; a translated list is a
+custom `items`.
+
+## Cost
+
+Measured with `size-limit`, minified and brotlied: the editor is
+**151.37 kB**, and the editor with emoji is **153.19 kB** — **1.82 kB** for
+the picker and its search, before the list. The list adds about **36 kB**
+the first time it is used.
+
+## Licences
+
+The built-in list is derived from
+[`unicode-emoji-json`](https://github.com/muan/unicode-emoji-json) and
+[`emojilib`](https://github.com/muan/emojilib), both MIT, by Mu-An Chiou.
+Their licence text ships with the list.

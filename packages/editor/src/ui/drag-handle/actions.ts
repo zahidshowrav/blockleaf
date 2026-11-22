@@ -1,12 +1,17 @@
 import type { Editor } from '@tiptap/core';
 
 import {
+	AlignCenterIcon,
+	AlignJustifyIcon,
+	AlignLeftIcon,
+	AlignRightIcon,
 	ArrowDownIcon,
 	ArrowUpIcon,
 	DuplicateIcon,
 	TrashIcon
 } from './icons.js';
 import type { BlockAction } from './types.js';
+import { TEXT_ALIGN_TYPES } from '../../core/constants.js';
 import {
 	defaultLabels,
 	type BlockMenuLabels,
@@ -105,6 +110,31 @@ const turnInto = (
 	run: apply
 });
 
+const ALIGNABLE: ReadonlySet<string> = new Set(TEXT_ALIGN_TYPES);
+
+/**
+ * An "Align" entry (`PA-06`). Offered only where the commands are — the
+ * attribute is in every preset, the commands come with
+ * `@blockleaf/editor/text-style` — and only on a paragraph or heading.
+ */
+const align = (
+	labels: BlockMenuLabels,
+	value: 'left' | 'center' | 'right' | 'justify',
+	icon: BlockAction['icon'],
+	shortcut: string
+): BlockAction => ({
+	id: `align-${value}`,
+	title: labels.actions[`align-${value}`],
+	group: labels.groups.align,
+	icon,
+	shortcut,
+	isActive: (editor, pos) => blockAt(editor, pos)?.attrs.textAlign === value,
+	isAvailable: (editor, pos) =>
+		'setTextAlign' in editor.commands &&
+		ALIGNABLE.has(blockAt(editor, pos)?.type.name ?? ''),
+	run: (editor, pos) => focusBlock(editor, pos).setTextAlign(value).run()
+});
+
 /**
  * The default block actions, built against a label set.
  *
@@ -190,6 +220,10 @@ export const createBlockActions = (
 		'codeBlock',
 		(editor, pos) => focusBlock(editor, pos).toggleCodeBlock().run()
 	),
+	/* @__PURE__ */ align(labels, 'left', AlignLeftIcon, 'Mod+Shift+L'),
+	/* @__PURE__ */ align(labels, 'center', AlignCenterIcon, 'Mod+Shift+E'),
+	/* @__PURE__ */ align(labels, 'right', AlignRightIcon, 'Mod+Shift+R'),
+	/* @__PURE__ */ align(labels, 'justify', AlignJustifyIcon, 'Mod+Shift+J'),
 	{
 		id: 'move-up',
 		title: labels.actions['move-up'],

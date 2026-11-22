@@ -53,6 +53,7 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     {
       "attrs": {
         "id": "para-1",
+        "textAlign": "center",
       },
       "content": [
         {
@@ -66,6 +67,32 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
             "label": "Ada",
           },
           "type": "mention",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "subscript",
+            },
+          ],
+          "text": "sub",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "superscript",
+            },
+          ],
+          "text": "sup",
+          "type": "text",
         },
         {
           "text": ", ",

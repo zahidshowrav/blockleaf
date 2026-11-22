@@ -13,6 +13,8 @@
 		"uploads",
 		"code-block",
 		"mentions",
+		"emoji",
+		"text-style",
 		"rendering",
 		"performance",
 		"---Integration---",

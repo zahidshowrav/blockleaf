@@ -441,6 +441,8 @@
 	.blockleaf-slash-menu *,
 	.blockleaf-mention-menu,
 	.blockleaf-mention-menu *,
+	.blockleaf-emoji-menu,
+	.blockleaf-emoji-menu *,
 	.blockleaf-bubble-menu,
 	.blockleaf-bubble-menu *,
 	.blockleaf-block-handle,
@@ -458,11 +460,12 @@
 }
 
 /*
- * Slash menu, and the mention picker, which shares its look
+ * Slash menu, and the mention and emoji pickers, which share its look
  */
 
 .blockleaf-slash-menu,
-.blockleaf-mention-menu {
+.blockleaf-mention-menu,
+.blockleaf-emoji-menu {
 	--bl-slash-bg: var(--bl-color-bg, #ffffff);
 	--bl-slash-fg: var(--bl-color-fg, #1f2328);
 	/*
@@ -498,7 +501,8 @@
 
 @media (prefers-color-scheme: dark) {
 	.blockleaf-slash-menu:not([data-theme='light']),
-	.blockleaf-mention-menu:not([data-theme='light']) {
+	.blockleaf-mention-menu:not([data-theme='light']),
+	.blockleaf-emoji-menu:not([data-theme='light']) {
 		--bl-slash-bg: #0d1117;
 		--bl-slash-fg: #e6edf3;
 		--bl-slash-muted: #8b949e;
@@ -512,7 +516,8 @@
 }
 
 .blockleaf-slash-menu[data-theme='dark'],
-.blockleaf-mention-menu[data-theme='dark'] {
+.blockleaf-mention-menu[data-theme='dark'],
+.blockleaf-emoji-menu[data-theme='dark'] {
 	--bl-slash-bg: #0d1117;
 	--bl-slash-fg: #e6edf3;
 	--bl-slash-muted: #8b949e;
@@ -525,7 +530,8 @@
 }
 
 .blockleaf-slash-menu:focus,
-.blockleaf-mention-menu:focus {
+.blockleaf-mention-menu:focus,
+.blockleaf-emoji-menu:focus {
 	outline: none;
 }
 
@@ -543,7 +549,8 @@
 }
 
 .blockleaf-slash-menu__item,
-.blockleaf-mention-menu__item {
+.blockleaf-mention-menu__item,
+.blockleaf-emoji-menu__item {
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -566,13 +573,16 @@
 .blockleaf-slash-menu__item:hover,
 .blockleaf-slash-menu__item[aria-selected='true'],
 .blockleaf-mention-menu__item:hover,
-.blockleaf-mention-menu__item[aria-selected='true'] {
+.blockleaf-mention-menu__item[aria-selected='true'],
+.blockleaf-emoji-menu__item:hover,
+.blockleaf-emoji-menu__item[aria-selected='true'] {
 	background-color: var(--bl-slash-selected);
 	color: var(--bl-slash-selected-fg);
 }
 
 .blockleaf-slash-menu__item:focus-visible,
-.blockleaf-mention-menu__item:focus-visible {
+.blockleaf-mention-menu__item:focus-visible,
+.blockleaf-emoji-menu__item:focus-visible {
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: -2px;
 }
@@ -619,11 +629,31 @@
 }
 
 .blockleaf-slash-menu__empty,
-.blockleaf-mention-menu__empty {
+.blockleaf-mention-menu__empty,
+.blockleaf-emoji-menu__empty {
 	padding: 16px 12px;
 	text-align: center;
 	color: var(--bl-slash-muted);
 	font-size: 0.8125rem;
+}
+
+/* An emoji and its name, on one line. */
+.blockleaf-emoji-menu {
+	width: 240px;
+}
+
+.blockleaf-emoji-menu__emoji {
+	flex-shrink: 0;
+	width: 1.5em;
+	font-size: 1.25rem;
+	line-height: 1;
+	text-align: center;
+}
+
+.blockleaf-emoji-menu__label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /* A person or page is two lines — a name and its description — with no icon. */
@@ -1448,6 +1478,7 @@
 
 	.blockleaf-slash-menu,
 	.blockleaf-mention-menu,
+	.blockleaf-emoji-menu,
 	.blockleaf-bubble-menu,
 	.blockleaf-block-handle-anchor,
 	.blockleaf-block-menu,

@@ -8,11 +8,43 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24 · **Last reviewed:** 2026-11-22
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25 · **Last reviewed:** 2026-11-23
 
 ---
 
 ## Settled
+
+### F25 — where text alignment lives · decided 2026-11-23
+
+`PA-06` adds `textAlign` to paragraphs and headings. It is the first
+version 2 change that is an attribute on an existing node rather than a new
+type, and that matters: an editor keeps an unknown node or mark as a
+placeholder, but it drops an unknown attribute.
+
+**Decisions:**
+
+- **The attribute is in the core schema, in every preset.** An editor that
+  skipped `@blockleaf/editor/text-style` would otherwise strip alignment
+  from every block it saved. The attribute costs a few hundred bytes in the
+  main bundle; losing an author's formatting silently costs more.
+- **The commands, shortcuts and block-menu entries are in the subpath.**
+  `setTextAlign`, `unsetTextAlign` and `Mod-Shift-L`, `E`, `R`, `J` come with
+  `withTextStyle`. The block menu's Align group is in the default chrome but
+  only appears where those commands exist.
+- **Four tokens or nothing:** `left`, `center`, `right`, `justify`. No CSS
+  value is stored (`F18`), and a pasted `text-align: start` reads as
+  nothing. Nothing means the language's own direction, which is what a
+  right-to-left document needs.
+- **Unaligned stores nothing.** The attribute defaults to `undefined`, not
+  `null`, so an unaligned block's JSON is byte for byte what it was before
+  version 2 — no `"textAlign": null` on every paragraph of every document.
+  `onChange` drops `undefined` attributes, so the object a host is handed
+  matches what it stores.
+- **Choosing the alignment a block already has takes it off**, from the
+  shortcut or the menu. There is no separate "reset" control to find.
+- **Rejected: attribute in the subpath.** Smallest main bundle, but an
+  editor without the subpath loses alignment on save, and no warning in the
+  docs makes that safe.
 
 ### F24 — what a stored mention carries · decided 2026-11-22
 

@@ -10,8 +10,10 @@ import type {
 	BlockleafLabels,
 	UploadFailure
 } from '@blockleaf/editor';
+import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
+import { withTextStyle } from '@blockleaf/editor/text-style';
 
 import { sandboxUpload } from './upload-adapter.js';
 
@@ -54,17 +56,33 @@ const PEOPLE: MentionItem[] = [
 	{ id: 'u_3', label: 'Alan Turing', description: 'alan@example.com' }
 ];
 
-const extensions = params.has('mentions')
-	? withMentions(presets.standard(), {
-			kind: 'user',
-			items: async ({ query }) => {
-				await new Promise((resolve) => setTimeout(resolve, 50));
-				return PEOPLE.filter((person) =>
-					person.label.toLowerCase().includes(query.toLowerCase())
-				);
-			}
-		})
-	: undefined;
+type Extensions = ReturnType<typeof presets.standard>;
+
+const withSandboxMentions = (base: Extensions): Extensions =>
+	withMentions(base, {
+		kind: 'user',
+		items: async ({ query }) => {
+			await new Promise((resolve) => setTimeout(resolve, 50));
+			return PEOPLE.filter((person) =>
+				person.label.toLowerCase().includes(query.toLowerCase())
+			);
+		}
+	});
+
+/**
+ * The opt-in subpaths, each behind its own flag so a test loads only what it
+ * exercises: `?mentions`, `?textstyle`, `?emoji`. With none, the editor is
+ * the default preset, as a host that installs nothing gets it.
+ */
+const extensions = (() => {
+	const flags = ['mentions', 'textstyle', 'emoji'];
+	if (!flags.some((flag) => params.has(flag))) return undefined;
+	let base = presets.standard();
+	if (params.has('mentions')) base = withSandboxMentions(base);
+	if (params.has('textstyle')) base = withTextStyle(base);
+	if (params.has('emoji')) base = withEmoji(base);
+	return base;
+})();
 
 /**
  * A table whose columns are wider than a phone, reached with `?wide`.

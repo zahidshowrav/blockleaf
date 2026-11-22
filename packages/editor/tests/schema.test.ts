@@ -8,6 +8,7 @@ import {
 	isBlockleafDocument,
 	withSchemaVersion
 } from '../src/core/schema.js';
+import { unwrapUnknownContent } from '../src/core/unknown-content.js';
 
 describe('document schema', () => {
 	it('stamps the current version on an empty document', () => {
@@ -172,12 +173,24 @@ describe('document schema', () => {
 				},
 				{
 					type: 'paragraph' as const,
-					attrs: { id: 'para-1' },
+					attrs: { id: 'para-1', textAlign: 'center' as const },
 					content: [
 						{ type: 'text' as const, text: 'Plain text, ' },
 						{
 							type: 'mention' as const,
 							attrs: { id: 'u_42', label: 'Ada', kind: 'user' }
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'sub',
+							marks: [{ type: 'subscript' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'sup',
+							marks: [{ type: 'superscript' as const }]
 						},
 						{ type: 'text' as const, text: ', ' },
 						{
@@ -573,8 +586,9 @@ describe('document schema', () => {
 		const secondRoundTripJSON = editor.getJSON();
 		expect(secondRoundTripJSON).toEqual(roundTrippedJSON);
 
-		// Verify snapshot
-		expect(roundTrippedJSON).toMatchSnapshot();
+		// The stored form, as `onChange` hands it over: no attribute that is
+		// `undefined`, such as an unaligned block's `textAlign`.
+		expect(unwrapUnknownContent(roundTrippedJSON)).toMatchSnapshot();
 
 		editor.destroy();
 	});

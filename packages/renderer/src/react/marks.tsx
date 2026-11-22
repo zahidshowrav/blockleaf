@@ -14,6 +14,10 @@ const Strike: MarkRenderer = ({ children }) => <s>{children}</s>;
 
 const Underline: MarkRenderer = ({ children }) => <u>{children}</u>;
 
+const Subscript: MarkRenderer = ({ children }) => <sub>{children}</sub>;
+
+const Superscript: MarkRenderer = ({ children }) => <sup>{children}</sup>;
+
 const Code: MarkRenderer = ({ children }) => <code>{children}</code>;
 
 const Highlight: MarkRenderer = ({ mark, children }) => {
@@ -58,6 +62,8 @@ export const defaultMarks: Record<string, MarkRenderer> = {
 	italic: Italic,
 	strike: Strike,
 	underline: Underline,
+	subscript: Subscript,
+	superscript: Superscript,
 	code: Code,
 	highlight: Highlight,
 	link: Link

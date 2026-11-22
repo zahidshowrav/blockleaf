@@ -260,6 +260,24 @@ const unwrapMarks = (marks: JsonMark[] | undefined): JsonMark[] | undefined => {
 	return restored;
 };
 
+/**
+ * The attributes without the ones that are `undefined`. ProseMirror keeps
+ * every attribute the schema defines on every node, and an attribute whose
+ * default is `undefined` — `textAlign` (`F25`) — would otherwise reach the
+ * host as a key with nothing in it. `JSON.stringify` drops it anyway; this
+ * makes the object a host is handed match what it stores.
+ */
+const definedAttrs = (
+	attrs: JsonNode['attrs']
+): JsonNode['attrs'] | undefined => {
+	if (!attrs) return attrs;
+	const entries = Object.entries(attrs);
+	if (!entries.some(([, value]) => value === undefined)) return attrs;
+	return Object.fromEntries(
+		entries.filter(([, value]) => value !== undefined)
+	);
+};
+
 const unwrapNode = (node: JsonNode): JsonNode => {
 	if (node.type === UNKNOWN_BLOCK_NODE || node.type === UNKNOWN_INLINE_NODE) {
 		const payload = node.attrs?.payload;
@@ -269,23 +287,28 @@ const unwrapNode = (node: JsonNode): JsonNode => {
 	}
 
 	const marks = unwrapMarks(node.marks);
+	const attrs = definedAttrs(node.attrs);
 	const content = node.content?.map(unwrapNode);
 	const contentChanged =
 		content?.some((child, index) => child !== node.content?.[index]) ??
 		false;
 
-	if (marks === node.marks && !contentChanged) return node;
+	if (marks === node.marks && attrs === node.attrs && !contentChanged) {
+		return node;
+	}
 	return {
 		...node,
 		...(marks === node.marks ? {} : { marks }),
+		...(attrs === node.attrs ? {} : { attrs }),
 		...(contentChanged ? { content } : {})
 	};
 };
 
 /**
  * Puts every node and mark `wrapUnknownContent` swapped out back where it
- * was, exactly as it came in. Run on what `editor.getJSON()` returns before
- * it is stored; the editor's own `onChange` already does.
+ * was, exactly as it came in, and drops attributes that are `undefined`.
+ * Run on what `editor.getJSON()` returns before it is stored; the editor's
+ * own `onChange` already does.
  */
 export const unwrapUnknownContent = <T>(doc: T): T => {
 	if (typeof doc !== 'object' || doc === null) return doc;

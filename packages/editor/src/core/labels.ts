@@ -50,7 +50,14 @@ export type BubbleMenuLabels = {
 	/** Accessible name of the toolbar. */
 	toolbar: string;
 	actions: Record<
-		'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'highlight',
+		| 'bold'
+		| 'italic'
+		| 'underline'
+		| 'strike'
+		| 'code'
+		| 'highlight'
+		| 'subscript'
+		| 'superscript',
 		string
 	>;
 };
@@ -64,8 +71,18 @@ export type BlockMenuLabels = {
 	handleHint: string;
 	/** The `+` button beside the handle. */
 	insert: string;
-	groups: Record<'turnInto' | 'actions', string>;
-	actions: Record<'move-up' | 'move-down' | 'duplicate' | 'delete', string>;
+	groups: Record<'turnInto' | 'align' | 'actions', string>;
+	actions: Record<
+		| 'move-up'
+		| 'move-down'
+		| 'duplicate'
+		| 'delete'
+		| 'align-left'
+		| 'align-center'
+		| 'align-right'
+		| 'align-justify',
+		string
+	>;
 };
 
 export type TableActionId =
@@ -178,6 +195,15 @@ export type MentionLabels = {
 	loading: string;
 };
 
+export type EmojiLabels = {
+	/** Accessible name of the list of emoji. */
+	menu: string;
+	/** Shown when nothing matches what was typed. */
+	empty: string;
+	/** Shown while the emoji list loads, the first time the picker opens. */
+	loading: string;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -190,6 +216,7 @@ export type ResolvedLabels = {
 	codeBlock: CodeBlockLabels;
 	details: DetailsLabels;
 	mentions: MentionLabels;
+	emoji: EmojiLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -219,6 +246,7 @@ export type BlockleafLabels = {
 	codeBlock?: Partial<CodeBlockLabels>;
 	details?: Partial<DetailsLabels>;
 	mentions?: Partial<MentionLabels>;
+	emoji?: Partial<EmojiLabels>;
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
 };
@@ -287,7 +315,9 @@ export const defaultLabels: ResolvedLabels = {
 			underline: 'Underline',
 			strike: 'Strikethrough',
 			code: 'Inline code',
-			highlight: 'Highlight'
+			highlight: 'Highlight',
+			subscript: 'Subscript',
+			superscript: 'Superscript'
 		}
 	},
 	blockMenu: {
@@ -295,12 +325,16 @@ export const defaultLabels: ResolvedLabels = {
 		handle: 'Block actions',
 		handleHint: 'Drag to move, click for actions',
 		insert: 'Insert a block below',
-		groups: { turnInto: 'Turn into', actions: 'Actions' },
+		groups: { turnInto: 'Turn into', align: 'Align', actions: 'Actions' },
 		actions: {
 			'move-up': 'Move up',
 			'move-down': 'Move down',
 			duplicate: 'Duplicate',
-			delete: 'Delete'
+			delete: 'Delete',
+			'align-left': 'Left',
+			'align-center': 'Center',
+			'align-right': 'Right',
+			'align-justify': 'Justify'
 		}
 	},
 	table: {
@@ -367,6 +401,11 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'No matches',
 		loading: 'Searching…'
 	},
+	emoji: {
+		menu: 'Emoji',
+		empty: 'No emoji found',
+		loading: 'Loading emoji…'
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -430,6 +469,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	codeBlock: { ...defaultLabels.codeBlock, ...labels?.codeBlock },
 	details: { ...defaultLabels.details, ...labels?.details },
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
+	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });

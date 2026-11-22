@@ -47,6 +47,16 @@ export interface HighlightMark {
 	};
 }
 
+/** Version 2 (`PA-07`). Excludes `superscript`: one run is never both. */
+export interface SubscriptMark {
+	type: 'subscript';
+}
+
+/** Version 2 (`PA-07`). Excludes `subscript`. */
+export interface SuperscriptMark {
+	type: 'superscript';
+}
+
 export type BlockleafMark =
 	| BoldMark
 	| ItalicMark
@@ -54,7 +64,9 @@ export type BlockleafMark =
 	| UnderlineMark
 	| CodeMark
 	| LinkMark
-	| HighlightMark;
+	| HighlightMark
+	| SubscriptMark
+	| SuperscriptMark;
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */
@@ -92,10 +104,14 @@ export type InlineNode = TextNode | HardBreakNode | MentionNode;
 /* Block Nodes                                                                */
 /* -------------------------------------------------------------------------- */
 
+/** Version 2 (`PA-06`, `F25`). `null` is the language's own direction. */
+export type TextAlign = 'left' | 'center' | 'right' | 'justify';
+
 export interface ParagraphNode {
 	type: 'paragraph';
 	attrs?: {
 		id?: string;
+		textAlign?: TextAlign | null;
 	};
 	content?: InlineNode[];
 }
@@ -105,6 +121,7 @@ export interface HeadingNode {
 	attrs: {
 		level: 1 | 2 | 3;
 		id?: string;
+		textAlign?: TextAlign | null;
 	};
 	content?: InlineNode[];
 }

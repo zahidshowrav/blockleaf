@@ -107,3 +107,21 @@ export const MENTIONS_EXTENSION_NAME = 'blockleafMentions';
 
 /** What a mention shows before its label, in the editor and the renderer. */
 export const MENTION_PREFIX = '@';
+
+/** Subscript and superscript (`PA-07`): marks in the schema from version 2, loaded from `@blockleaf/editor/text-style`. */
+export const SUBSCRIPT_MARK = 'subscript';
+export const SUPERSCRIPT_MARK = 'superscript';
+
+/**
+ * Text alignment (`PA-06`, `F25`): an attribute on paragraphs and headings,
+ * in the core schema so no editor drops it. `null` is the language's own
+ * direction; these are the only other values a document stores.
+ */
+export const TEXT_ALIGNMENTS = ['left', 'center', 'right', 'justify'] as const;
+export const TEXT_ALIGN_ATTRIBUTE_EXTENSION_NAME = 'blockleafTextAlign';
+export const TEXT_ALIGN_TYPES = ['paragraph', 'heading'] as const;
+/** The commands and shortcuts for `textAlign`, from `@blockleaf/editor/text-style`. */
+export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
+
+/** The `:` picker that inserts an emoji as plain text (`PA-03`). */
+export const EMOJI_EXTENSION_NAME = 'blockleafEmoji';
