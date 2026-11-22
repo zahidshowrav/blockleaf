@@ -1,6 +1,6 @@
 ---
 title: Text styles
-description: Subscript, superscript and text alignment, as an opt-in subpath. More text styles join it as they ship.
+description: Text colour, subscript, superscript and text alignment, as an opt-in subpath. More text styles join it as they ship.
 icon: Type
 ---
 
@@ -18,6 +18,56 @@ const extensions = withTextStyle(presets.standard());
 ```
 
 They are new in schema version 2.
+
+## Text colour
+
+Select text, then **Text color** in the bubble menu: Default and nine
+colours, as one radio group. The arrow keys move, Enter picks, Escape goes
+back to the toolbar.
+
+```json
+{ "type": "textColor", "attrs": { "color": "red" } }
+```
+
+- **A token, not a colour.** `red` resolves through `--bl-text-red`, which
+  the stylesheet sets to a red that reads on white and a lighter one on the
+  dark theme. Every built-in colour is at least 4.5:1 on its background. A
+  pasted `color: #f00` arrives uncoloured.
+- **One colour at a time.** Picking another replaces it; Default takes it
+  off.
+- **Your own colours.** Any lower-case token works — `setTextColor('brand')`
+  — once you define its custom property. The picker offers the built-in
+  nine; add yours with `editor.commands.setTextColor` from chrome of your
+  own.
+
+```css
+.blockleaf-editor {
+	--bl-text-brand: #0f766e;
+}
+```
+
+- **Rendered as** `<span data-color="red" style="color: var(--bl-text-red, currentColor)">`
+  by the editor and both `@blockleaf/renderer` targets. A token with no
+  custom property falls back to the text colour.
+
+| Token    | Light     | Dark      |
+| -------- | --------- | --------- |
+| `gray`   | `#6b7280` | `#9ca3af` |
+| `brown`  | `#8a5a3c` | `#d4a373` |
+| `orange` | `#c2410c` | `#fb923c` |
+| `yellow` | `#a16207` | `#facc15` |
+| `green`  | `#15803d` | `#4ade80` |
+| `blue`   | `#1d4ed8` | `#60a5fa` |
+| `purple` | `#7e22ce` | `#c084fc` |
+| `pink`   | `#be185d` | `#f472b6` |
+| `red`    | `#b91c1c` | `#f87171` |
+
+Coloured text on the yellow highlight can fall below 4.5:1 in the light
+theme — gray, orange, yellow and green do. Use the two together sparingly.
+
+Why colour is a mark of its own rather than part of a shared `textStyle`
+mark is F26 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
 
 ## Subscript and superscript
 
@@ -90,8 +140,8 @@ extensions as a plain array, for a list you are assembling from scratch.
 ## Cost
 
 Measured with `size-limit`, minified and brotlied: the editor is
-**151.35 kB** — the alignment attribute and the block menu's Align entries
-included — and the editor with text styles is **151.80 kB**, so **0.45 kB**
-for the marks, the alignment commands and their shortcuts. Without the
-import, only the attribute and the menu entries are in the bundle, and the
-menu entries do not appear.
+**151.81 kB**, and the editor with text styles is **152.40 kB**, so
+**0.59 kB** for the marks, the alignment and colour commands, and their
+shortcuts. Without the import, the main bundle still carries the alignment
+attribute and the chrome that offers these styles — the block menu's Align
+entries and the bubble menu's palette — and none of it appears.

@@ -1,5 +1,10 @@
 import { type MarkRenderer } from './types.js';
-import { highlightColor, linkAttributes } from '../attrs.js';
+import {
+	highlightColor,
+	linkAttributes,
+	textColorToken,
+	textColorValue
+} from '../attrs.js';
 
 /**
  * The default mark components. Same rule as the nodes: match what the editor
@@ -19,6 +24,19 @@ const Subscript: MarkRenderer = ({ children }) => <sub>{children}</sub>;
 const Superscript: MarkRenderer = ({ children }) => <sup>{children}</sup>;
 
 const Code: MarkRenderer = ({ children }) => <code>{children}</code>;
+
+const TextColor: MarkRenderer = ({ mark, children }) => {
+	const token = textColorToken(mark);
+	if (!token) return <>{children}</>;
+	return (
+		<span
+			data-color={token}
+			style={{ color: textColorValue(token) }}
+		>
+			{children}
+		</span>
+	);
+};
 
 const Highlight: MarkRenderer = ({ mark, children }) => {
 	const color = highlightColor(mark);
@@ -64,6 +82,7 @@ export const defaultMarks: Record<string, MarkRenderer> = {
 	underline: Underline,
 	subscript: Subscript,
 	superscript: Superscript,
+	textColor: TextColor,
 	code: Code,
 	highlight: Highlight,
 	link: Link

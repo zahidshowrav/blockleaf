@@ -181,6 +181,21 @@ const cases: Array<[string, RenderableDocument]> = [
 		)
 	],
 	[
+		'text color, built-in and a host token',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('red', [{ type: 'textColor', attrs: { color: 'red' } }]),
+				text(' and '),
+				text('brand', [
+					{ type: 'bold' },
+					{ type: 'textColor', attrs: { color: 'brand' } }
+				])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

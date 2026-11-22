@@ -204,6 +204,26 @@ export type EmojiLabels = {
 	loading: string;
 };
 
+export type TextColorLabels = {
+	/** The bubble-menu button that opens the palette, and the palette's name. */
+	button: string;
+	/** The swatch that takes the colour off. */
+	none: string;
+	/** Each built-in colour's name, as announced. A host's own tokens are named by their token. */
+	colors: Record<
+		| 'gray'
+		| 'brown'
+		| 'orange'
+		| 'yellow'
+		| 'green'
+		| 'blue'
+		| 'purple'
+		| 'pink'
+		| 'red',
+		string
+	>;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -217,6 +237,7 @@ export type ResolvedLabels = {
 	details: DetailsLabels;
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
+	textColor: TextColorLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -247,6 +268,9 @@ export type BlockleafLabels = {
 	details?: Partial<DetailsLabels>;
 	mentions?: Partial<MentionLabels>;
 	emoji?: Partial<EmojiLabels>;
+	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
+		colors?: Partial<TextColorLabels['colors']>;
+	};
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
 };
@@ -406,6 +430,21 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'No emoji found',
 		loading: 'Loading emoji…'
 	},
+	textColor: {
+		button: 'Text color',
+		none: 'Default',
+		colors: {
+			gray: 'Gray',
+			brown: 'Brown',
+			orange: 'Orange',
+			yellow: 'Yellow',
+			green: 'Green',
+			blue: 'Blue',
+			purple: 'Purple',
+			pink: 'Pink',
+			red: 'Red'
+		}
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -470,6 +509,14 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	details: { ...defaultLabels.details, ...labels?.details },
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
 	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
+	textColor: {
+		...defaultLabels.textColor,
+		...labels?.textColor,
+		colors: {
+			...defaultLabels.textColor.colors,
+			...labels?.textColor?.colors
+		}
+	},
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });

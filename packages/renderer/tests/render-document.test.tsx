@@ -56,6 +56,23 @@ describe('sanitisation', () => {
 		expect(html).not.toContain('javascript:');
 	});
 
+	it('keeps the words of a colour that is not a token and drops the span', () => {
+		const doc = docOf({
+			type: 'paragraph',
+			content: [
+				text('x', [
+					{
+						type: 'textColor',
+						attrs: { color: 'red); background: url(y' }
+					}
+				])
+			]
+		});
+
+		expect(reactHTML(doc)).toBe('<p>x</p>');
+		expect(stringHTML(doc)).toBe('<p>x</p>');
+	});
+
 	it('writes no style for an alignment outside the four tokens (F18)', () => {
 		const doc = docOf({
 			type: 'paragraph',

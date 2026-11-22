@@ -83,6 +83,7 @@ Planned for `EC`–`MC`:
 | `link`                                          | `href, target, rel`     | `href` is sanitised **at the schema level**, not in the UI: `https:`, `mailto:` and site-relative paths are allowed, everything else — `javascript:` above all — is dropped on parse. A sanitiser that only runs in the toolbar is not a sanitiser. |
 | `highlight`                                     | `color: string \| null` |                                                                                                                                                                                                                                                     |
 | `subscript`, `superscript`                      | —                       | Version 2. They exclude each other: a run is never both. See [text styles](./text-style.mdx).                                                                                                                                                       |
+| `textColor`                                     | `color: string`         | Version 2. A token — `red`, or one you define — never a CSS colour. See [text styles](./text-style.mdx#text-colour).                                                                                                                                |
 
 ### `colwidth`, the one presentation attribute
 
@@ -116,6 +117,7 @@ Version 2 adds node and mark types, and one optional attribute.
 
 - **`mention`** (`PA-02`) — `{ id: string, label: string, kind: string | null }`, inline. The reasoning is F24 in [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
 - **`subscript`** and **`superscript`** (`PA-07`) — marks with no attributes, which exclude each other.
+- **`textColor`** (`PA-05`) — a mark with `{ color }`, a token: lower case, a letter first, at most 32 characters. See F26.
 - **`textAlign`** on `paragraph` and `heading` (`PA-06`) — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it; see F25.
 - The rest of the batch — maths, the other text styles, a table of contents — joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
 

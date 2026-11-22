@@ -182,7 +182,7 @@ describe('Bubble menu actions (CH-02)', () => {
 });
 
 describe('Bubble menu toolbar', () => {
-	it('renders a labelled toolbar with one button per action plus link', () => {
+	it('renders a labelled toolbar with one button per action, text color and link', () => {
 		const editor = track(createEditor());
 		selectAll(editor);
 
@@ -198,8 +198,9 @@ describe('Bubble menu toolbar', () => {
 			name: 'Text formatting'
 		});
 		expect(toolbar).toBeDefined();
+		// The text color button is there because the editor loads text-style.
 		expect(toolbar.querySelectorAll('[data-bubble-button]')).toHaveLength(
-			defaultBubbleActions.length + 1
+			defaultBubbleActions.length + 2
 		);
 	});
 
@@ -282,7 +283,7 @@ describe('Bubble menu toolbar', () => {
 		const toolbar = screen.getByRole('toolbar');
 		const bold = screen.getByRole('button', { name: 'Bold' });
 		const italic = screen.getByRole('button', { name: 'Italic' });
-		const last = screen.getByRole('button', { name: 'Superscript' });
+		const last = screen.getByRole('button', { name: 'Text color' });
 
 		expect(bold.getAttribute('tabindex')).toBe('0');
 		expect(italic.getAttribute('tabindex')).toBe('-1');

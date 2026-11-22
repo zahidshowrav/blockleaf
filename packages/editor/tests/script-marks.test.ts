@@ -138,7 +138,8 @@ describe('subscript and superscript (PA-07)', () => {
 		expect(createTextStyle().map((extension) => extension.name)).toEqual([
 			SUBSCRIPT_MARK,
 			SUPERSCRIPT_MARK,
-			'textAlign'
+			'textAlign',
+			'textColor'
 		]);
 	});
 

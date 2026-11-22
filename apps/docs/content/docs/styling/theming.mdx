@@ -36,22 +36,29 @@ reaches it. Set shared colours on `:root`, or target
 
 The editing surface and everything the renderer produces.
 
-| Property                     | Default   | Used for                                |
-| ---------------------------- | --------- | --------------------------------------- |
-| `--bl-color-bg`              | `#ffffff` | Surface behind the document             |
-| `--bl-color-fg`              | `#1f2328` | Body text                               |
-| `--bl-color-muted`           | `#6b7280` | Placeholders, captions, the drag handle |
-| `--bl-color-border`          | `#e5e7eb` | Rules, dividers, menu borders           |
-| `--bl-color-accent`          | `#3b5bdb` | Links, selected menu items, focus       |
-| `--bl-color-code-bg`         | `#f4f4f5` | Inline code and code blocks             |
-| `--bl-color-quote-border`    | `#d1d5db` | Blockquote rule                         |
-| `--bl-color-selection`       | `#cfe0ff` | Text selection                          |
-| `--bl-color-callout-bg`      | `#f8fafc` | Callout background                      |
-| `--bl-color-callout-border`  | `#e2e8f0` | Callout border                          |
-| `--bl-color-highlight`       | `#fef08a` | The highlight mark                      |
-| `--bl-color-table-border`    | `#e2e8f0` | Table cell borders                      |
-| `--bl-color-table-header-bg` | `#f8fafc` | Table header row                        |
-| `--bl-color-danger`          | `#b42318` | Destructive actions, upload failures    |
+| Property                     | Default   | Used for                                         |
+| ---------------------------- | --------- | ------------------------------------------------ |
+| `--bl-color-bg`              | `#ffffff` | Surface behind the document                      |
+| `--bl-color-fg`              | `#1f2328` | Body text                                        |
+| `--bl-color-muted`           | `#6b7280` | Placeholders, captions, the drag handle          |
+| `--bl-color-border`          | `#e5e7eb` | Rules, dividers, menu borders                    |
+| `--bl-color-accent`          | `#3b5bdb` | Links, selected menu items, focus                |
+| `--bl-color-code-bg`         | `#f4f4f5` | Inline code and code blocks                      |
+| `--bl-color-quote-border`    | `#d1d5db` | Blockquote rule                                  |
+| `--bl-color-selection`       | `#cfe0ff` | Text selection                                   |
+| `--bl-color-callout-bg`      | `#f8fafc` | Callout background                               |
+| `--bl-color-callout-border`  | `#e2e8f0` | Callout border                                   |
+| `--bl-color-highlight`       | `#fef08a` | The highlight mark                               |
+| `--bl-color-table-border`    | `#e2e8f0` | Table cell borders                               |
+| `--bl-color-table-header-bg` | `#f8fafc` | Table header row                                 |
+| `--bl-color-danger`          | `#b42318` | Destructive actions, upload failures             |
+| `--bl-text-<token>`          | see below | Text colour, with `@blockleaf/editor/text-style` |
+
+The nine text colours — `--bl-text-gray`, `brown`, `orange`, `yellow`,
+`green`, `blue`, `purple`, `pink`, `red` — have their own light and dark
+values; the table is on [text styles](../text-style.mdx#text-colour). Define
+`--bl-text-<token>` for a token of your own. They are also set on
+`.blockleaf-bubble-menu`, so the palette's swatches match.
 
 ## Type and rhythm
 

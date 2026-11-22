@@ -43,6 +43,7 @@ export {
 	type SlashMenuLabels,
 	type TableActionId,
 	type TableLabels,
+	type TextColorLabels,
 	type UnknownContentLabels,
 	type UploadLabels
 } from './labels.js';
@@ -139,6 +140,7 @@ export {
 	type HighlightMark,
 	type SubscriptMark,
 	type SuperscriptMark,
+	type TextColorMark,
 	type HorizontalRuleNode,
 	type ImageNode,
 	type InlineNode,

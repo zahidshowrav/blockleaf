@@ -125,3 +125,21 @@ export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
 
 /** The `:` picker that inserts an emoji as plain text (`PA-03`). */
 export const EMOJI_EXTENSION_NAME = 'blockleafEmoji';
+
+/**
+ * Text colour (`PA-05`, `F18`, `F26`): a mark in the schema from version 2,
+ * loaded from `@blockleaf/editor/text-style`. It stores a token, never a CSS
+ * value; these are the ones the stylesheet defines and the picker offers.
+ */
+export const TEXT_COLOR_MARK = 'textColor';
+export const TEXT_COLORS = [
+	'gray',
+	'brown',
+	'orange',
+	'yellow',
+	'green',
+	'blue',
+	'purple',
+	'pink',
+	'red'
+] as const;

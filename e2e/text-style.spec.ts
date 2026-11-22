@@ -3,8 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR } from './helpers.js';
 
 /**
- * PA-06 and PA-07. Shortcuts, a bubble-menu button and a block-menu entry
- * acting on a real selection.
+ * PA-05, PA-06 and PA-07. Shortcuts, bubble-menu buttons, a palette and a
+ * block-menu entry acting on a real selection — and the colour a token
+ * actually resolves to, which only a browser computes.
  */
 
 const open = async (page: Page, text: string) => {
@@ -152,5 +153,60 @@ test.describe('text alignment', () => {
 		await expect(
 			menu.getByRole('menuitem', { name: 'Center' })
 		).toHaveCount(0);
+	});
+});
+
+test.describe('text color', () => {
+	test('the palette colours the selection with a token', async ({ page }) => {
+		await open(page, 'Warning');
+		await selectBack(page, 7);
+
+		await page.getByRole('button', { name: 'Text color' }).click();
+		const palette = page.getByRole('radiogroup', { name: 'Text color' });
+		await expect(palette).toBeVisible();
+		await palette.getByRole('radio', { name: 'Red' }).click();
+
+		const span = page.locator(`${EDITOR} span[data-color="red"]`);
+		await expect(span).toHaveText('Warning');
+		await expect(span).toHaveCSS('color', 'rgb(185, 28, 28)');
+		await expect(page.locator('.sandbox__json')).toContainText(
+			'"color": "red"'
+		);
+	});
+
+	test('the same token is a lighter red on the dark theme', async ({
+		page
+	}) => {
+		await page.emulateMedia({ colorScheme: 'dark' });
+		await open(page, 'Warning');
+		await selectBack(page, 7);
+		await page.getByRole('button', { name: 'Text color' }).click();
+		await page.getByRole('radio', { name: 'Red' }).click();
+
+		await expect(
+			page.locator(`${EDITOR} span[data-color="red"]`)
+		).toHaveCSS('color', 'rgb(248, 113, 113)');
+	});
+
+	test('the palette works from the keyboard', async ({ page }) => {
+		await open(page, 'Note');
+		await selectBack(page, 4);
+		const button = page.getByRole('button', { name: 'Text color' });
+		await expect(button).toBeVisible();
+		await button.focus();
+		await page.keyboard.press('Enter');
+
+		// Focus lands on "Default"; two steps right is Brown.
+		await expect(
+			page.getByRole('radio', { name: 'Default' })
+		).toBeFocused();
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('ArrowRight');
+		await expect(page.getByRole('radio', { name: 'Brown' })).toBeFocused();
+		await page.keyboard.press('Enter');
+
+		await expect(
+			page.locator(`${EDITOR} span[data-color="brown"]`)
+		).toHaveText('Note');
 	});
 });
