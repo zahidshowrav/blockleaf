@@ -489,32 +489,32 @@ a toggle; with a gutter they never meet. The browser tests wait for the
 editor's own selection after a click or a Home before the next key, because
 a key sent straight after one sometimes acted on the old selection.
 
-| Id    | Task                                                              | Ships as                       | Status      | Commit | Completed  |
-| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | ------ | ---------- |
-| PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | —      | 2026-11-22 |
-| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —      | —          |
-| PA-03 | Emoji                                                             | `./emoji`                      | Not started | —      | —          |
-| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —      | —          |
-| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —      | —          |
-| PA-06 | Text alignment                                                    | `./text-style`                 | Not started | —      | —          |
-| PA-07 | Subscript and superscript                                         | `./text-style`                 | Not started | —      | —          |
-| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —      | —          |
-| PA-09 | Character and word count                                          | `./toc`                        | Not started | —      | —          |
-| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —      | —          |
-| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —      | —          |
-| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —          |
-| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —          |
-| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —      | —          |
-| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —      | —          |
-| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —      | —          |
-| PA-17 | Columns                                                           | `./layout`                     | Not started | —      | —          |
-| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —      | —          |
-| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | —      | 2026-11-22 |
-| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —      | —          |
-| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —      | —          |
-| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —      | —          |
-| PA-23 | Block background colour                                           | core                           | Not started | —      | —          |
-| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —      | —          |
+| Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
+| PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
+| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —         | —          |
+| PA-03 | Emoji                                                             | `./emoji`                      | Not started | —         | —          |
+| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —         | —          |
+| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —         | —          |
+| PA-06 | Text alignment                                                    | `./text-style`                 | Not started | —         | —          |
+| PA-07 | Subscript and superscript                                         | `./text-style`                 | Not started | —         | —          |
+| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —         | —          |
+| PA-09 | Character and word count                                          | `./toc`                        | Not started | —         | —          |
+| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —         | —          |
+| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —         | —          |
+| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
+| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
+| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —         | —          |
+| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —         | —          |
+| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —         | —          |
+| PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
+| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —         | —          |
+| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
+| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —         | —          |
+| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —         | —          |
+| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —         | —          |
+| PA-23 | Block background colour                                           | core                           | Not started | —         | —          |
+| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —         | —          |
 
 `PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
 `--bl-font-size-lg` — not a CSS value. A `14px` written into a document is
