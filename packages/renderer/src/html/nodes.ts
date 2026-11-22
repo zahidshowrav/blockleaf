@@ -13,6 +13,7 @@ import {
 	isChecked,
 	isHeaderCell,
 	listStart,
+	mentionAttributes,
 	rowspan,
 	tableColumns,
 	tableMinWidth,
@@ -243,7 +244,12 @@ export const createHtmlNodes = (
 
 	text: ({ node }) => escapeText(node.text ?? ''),
 
-	hardBreak: () => voidElement('br', {})
+	hardBreak: () => voidElement('br', {}),
+
+	mention: ({ node }) => {
+		const { text, attributes } = mentionAttributes(node);
+		return element('span', attributes, escapeText(text));
+	}
 });
 
 /** Whether a row is made entirely of header cells, so its cells head columns. */

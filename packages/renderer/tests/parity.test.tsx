@@ -124,6 +124,35 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'mention',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('Hi '),
+				{
+					type: 'mention',
+					attrs: { id: 'u_42', label: 'Ada Lovelace', kind: 'user' }
+				},
+				text('!')
+			]
+		})
+	],
+	[
+		'mention without a kind, inside a mark, with markup in its label',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				{
+					type: 'mention',
+					attrs: { id: 'a&b', label: '<Ada> & "co"', kind: null },
+					marks: [{ type: 'bold' }]
+				}
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

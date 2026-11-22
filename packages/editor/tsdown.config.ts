@@ -5,7 +5,8 @@ export default defineConfig({
 		'src/index.ts',
 		'src/extensions.ts',
 		'src/validate.ts',
-		'src/code-block.ts'
+		'src/code-block.ts',
+		'src/mentions.ts'
 	],
 	format: ['esm'],
 	dts: true,

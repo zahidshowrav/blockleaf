@@ -2,15 +2,23 @@ import { Editor } from '@tiptap/core';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { createExtensions } from '@blockleaf/editor/extensions';
+import { withMentions } from '@blockleaf/editor/mentions';
 
 import { renderToHTML, type RenderToHTMLOptions } from '../src/html.js';
 import { RenderDocument, type RenderDocumentProps } from '../src/react.js';
 import { type RenderableDocument } from '../src/types.js';
 
-/** What the editor itself writes for a document. The parity target. */
+/**
+ * What the editor itself writes for a document. The parity target.
+ *
+ * With mentions loaded: the node is in the schema from version 2, and an
+ * editor without the subpath shows a placeholder instead of writing it.
+ */
 export const editorHTML = (doc: RenderableDocument): string => {
 	const editor = new Editor({
-		extensions: createExtensions('standard'),
+		extensions: withMentions(createExtensions('standard'), {
+			items: () => []
+		}),
 		content: doc
 	});
 	const html = editor.getHTML();

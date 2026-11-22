@@ -10,7 +10,8 @@ test.describe('Blockleaf editor smoke tests', () => {
 		await expect(editor).toBeVisible();
 
 		const jsonPane = page.locator('.sandbox__json');
-		await expect(jsonPane).toContainText('"schemaVersion": 1');
+		// The current SCHEMA_VERSION; `schema.test.ts` guards the number.
+		await expect(jsonPane).toContainText('"schemaVersion": 2');
 	});
 
 	test('converts markdown input rules into headings and lists', async ({

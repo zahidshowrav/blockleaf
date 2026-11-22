@@ -182,6 +182,24 @@ test.describe('Chrome accessibility in a real browser', () => {
 		);
 	});
 
+	test('the mention picker and a mention have no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?mentions');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('@a');
+		await expect(
+			page.locator('.blockleaf-mention-menu [role="option"]')
+		).toHaveCount(3);
+		expect(await violations(page, '.blockleaf-mention-menu')).toEqual([]);
+
+		await page.keyboard.press('Enter');
+		await expect(page.locator(`${EDITOR} .blockleaf-mention`)).toHaveCount(
+			1
+		);
+		expect(await violations(page, `${EDITOR} p`)).toEqual([]);
+	});
+
 	test('a captioned table has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');

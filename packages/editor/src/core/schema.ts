@@ -5,7 +5,7 @@ import { BLOCK_NODE_TYPES } from './constants.js';
  * people's databases, so it is versioned from the first release and every bump
  * ships a migration. See apps/docs/content/docs/schema.mdx.
  */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /* -------------------------------------------------------------------------- */
 /* Marks                                                                      */
@@ -71,7 +71,22 @@ export interface HardBreakNode {
 	marks?: BlockleafMark[];
 }
 
-export type InlineNode = TextNode | HardBreakNode;
+/**
+ * A reference to something the host knows about — a person, a page (`PA-02`,
+ * version 2). `id` is the host's key, `label` the name when it was mentioned,
+ * `kind` what sort of thing it is when a host has more than one (`F24`).
+ */
+export interface MentionNode {
+	type: 'mention';
+	attrs: {
+		id: string;
+		label: string;
+		kind?: string | null;
+	};
+	marks?: BlockleafMark[];
+}
+
+export type InlineNode = TextNode | HardBreakNode | MentionNode;
 
 /* -------------------------------------------------------------------------- */
 /* Block Nodes                                                                */

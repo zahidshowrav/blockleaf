@@ -93,3 +93,17 @@ export const CAPTION_NODE = 'caption';
 
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';
+
+/**
+ * An inline reference to a person, page or anything else a host can name
+ * (`PA-02`). Stored as `{ id, label, kind }`; see `F24`. The node is in the
+ * schema from version 2, but the editor only loads it from
+ * `@blockleaf/editor/mentions`.
+ */
+export const MENTION_NODE = 'mention';
+
+/** The suggestion extension that opens the mention picker. */
+export const MENTIONS_EXTENSION_NAME = 'blockleafMentions';
+
+/** What a mention shows before its label, in the editor and the renderer. */
+export const MENTION_PREFIX = '@';

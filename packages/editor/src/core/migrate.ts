@@ -24,7 +24,13 @@ export type DocumentMigration = (doc: StoredDocument) => StoredDocument;
  * `SCHEMA_VERSION` from `n` to `n + 1` means adding the key `n` here in the
  * same PR — `tests/migrate.test.ts` fails until it exists.
  */
-export const migrations: Readonly<Record<number, DocumentMigration>> = {};
+export const migrations: Readonly<Record<number, DocumentMigration>> = {
+	// Version 2 adds node types (`mention`, `PA-02`, and the rest of the
+	// `PA-02` to `PA-11` batch) and changes none, so every version 1
+	// document is already a valid version 2 one. The bump is what tells an
+	// older editor that a document may hold them.
+	1: (doc) => doc
+};
 
 const isStoredDocument = (value: unknown): value is StoredDocument => {
 	if (typeof value !== 'object' || value === null) return false;

@@ -10,6 +10,8 @@ import type {
 	BlockleafLabels,
 	UploadFailure
 } from '@blockleaf/editor';
+import { presets } from '@blockleaf/editor/extensions';
+import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 
 import { sandboxUpload } from './upload-adapter.js';
 
@@ -41,6 +43,28 @@ const params =
 		: new URLSearchParams(window.location.search);
 
 const labels = params.has('fr') ? FRENCH : undefined;
+
+/**
+ * Mentions, reached with `?mentions`. The lookup is async on purpose, as a
+ * host's always is, so the picker's loading line is exercised too.
+ */
+const PEOPLE: MentionItem[] = [
+	{ id: 'u_1', label: 'Ada Lovelace', description: 'ada@example.com' },
+	{ id: 'u_2', label: 'Grace Hopper', description: 'grace@example.com' },
+	{ id: 'u_3', label: 'Alan Turing', description: 'alan@example.com' }
+];
+
+const extensions = params.has('mentions')
+	? withMentions(presets.standard(), {
+			kind: 'user',
+			items: async ({ query }) => {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				return PEOPLE.filter((person) =>
+					person.label.toLowerCase().includes(query.toLowerCase())
+				);
+			}
+		})
+	: undefined;
 
 /**
  * A table whose columns are wider than a phone, reached with `?wide`.
@@ -167,6 +191,7 @@ export const App = () => {
 					<BlockleafEditor
 						defaultValue={doc}
 						labels={labels}
+						extensions={extensions}
 						autofocus
 						upload={sandboxUpload}
 						onUploadError={(failure: UploadFailure) =>

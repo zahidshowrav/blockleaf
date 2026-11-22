@@ -6,7 +6,7 @@ icon: Braces
 
 This is the contract. Everything else in the project can be refactored; this cannot, because it lives in other people's databases.
 
-Status: **version 1, unstable.** The shape below will change before `1.0`. Every change bumps `schemaVersion` and ships a migration.
+Status: **version 2, unstable.** The shape below will change before `1.0`. Every change bumps `schemaVersion` and ships a migration.
 
 ## Envelope
 
@@ -15,7 +15,7 @@ Every document is a single `doc` node carrying its schema version:
 ```json
 {
 	"type": "doc",
-	"attrs": { "schemaVersion": 1 },
+	"attrs": { "schemaVersion": 2 },
 	"content": [
 		{
 			"type": "paragraph",
@@ -50,7 +50,7 @@ const current = migrate(stored);
 - **It only goes forward.** A document **newer** than your editor comes back untouched; the editor opens it read-only (see `incompatibleDocument`).
 - **Anything that is not a Blockleaf document comes back untouched** — a value without a whole-number `attrs.schemaVersion` of 1 or more.
 
-`SCHEMA_VERSION` is `1` today, so there is nothing to migrate yet. `migrate()` exists now so that the first bump is survivable, and so your code can already call it.
+`SCHEMA_VERSION` is `2`. See [version 2](#version-2) for what changed from `1`.
 
 ## Node set
 
@@ -58,20 +58,21 @@ Shipped in `SC` (via Tiptap's StarterKit): `doc`, `paragraph`, `text`, `hardBrea
 
 Planned for `EC`–`MC`:
 
-| Node                                      | Attributes                    | Notes                                                                                                                                 |
-| ----------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `heading`                                 | `level: 1 \| 2 \| 3`          | Capped at three. Deeper levels are a document-structure smell and a renderer problem.                                                 |
-| `bulletList` / `orderedList` / `listItem` | —                             | Nesting capped at 3 levels.                                                                                                           |
-| `taskList` / `taskItem`                   | `checked: boolean`            | The single most-expected Notion feature.                                                                                              |
-| `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                     |
-| `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference. |
-| `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                          |
-| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                       |
-| `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                   |
-| `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                               |
-| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.     |
-| `figure`                                  | —                             | A captioned block: the block, then its `caption`, nothing else. Only a `table` takes a caption today. See [Captions](#captions).      |
-| `caption`                                 | —                             | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`.                            |
+| Node                                      | Attributes                    | Notes                                                                                                                                   |
+| ----------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `heading`                                 | `level: 1 \| 2 \| 3`          | Capped at three. Deeper levels are a document-structure smell and a renderer problem.                                                   |
+| `bulletList` / `orderedList` / `listItem` | —                             | Nesting capped at 3 levels.                                                                                                             |
+| `taskList` / `taskItem`                   | `checked: boolean`            | The single most-expected Notion feature.                                                                                                |
+| `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                       |
+| `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference.   |
+| `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                            |
+| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                         |
+| `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                     |
+| `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                 |
+| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.       |
+| `figure`                                  | —                             | A captioned block: the block, then its `caption`, nothing else. Only a `table` takes a caption today. See [Captions](#captions).        |
+| `caption`                                 | —                             | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`.                              |
+| `mention`                                 | `id, label, kind`             | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx). |
 
 ## Mark set
 
@@ -107,6 +108,17 @@ A table with a caption is stored inside a `figure`, with the caption beside it:
 - **One mechanism for every caption.** Image, video and embed captions on the [roadmap](./roadmap.mdx) use the same `figure` and `caption`.
 - **No `SCHEMA_VERSION` bump.** `figure` and `caption` are new node types, and no existing node changed, so a version 1 document stays a version 1 document. An editor older than this one keeps a captioned table as a placeholder and saves it back intact. An older `@blockleaf/renderer` renders nothing for it — the whole table, not only the caption — so upgrade the renderer before the editor.
 
+## Version 2
+
+Version 2 adds node types and changes none.
+
+- **`mention`** (`PA-02`) — `{ id: string, label: string, kind: string | null }`, inline. The reasoning is F24 in [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+- The rest of the batch — emoji, maths, text styles, a table of contents — joins version 2 before it is released. It is one bump for all of them, not one each.
+
+The migration from `1` changes nothing: every version 1 document is already a valid version 2 one, so `migrate()` only stamps the new number. The bump is there for the other direction. An editor that only knows version 1 opens a version 2 document read-only rather than editing around nodes it cannot show.
+
+Upgrade `@blockleaf/renderer` before the editor, as with any schema change. An older renderer skips a node it does not know, so a mention would go missing from the page.
+
 ## Types this document does not define
 
 A node or mark whose `type` is a string not listed above is **unrecognised**.
@@ -137,12 +149,14 @@ hold more.
 
 What is **not** kept is an unknown _attribute_ on a known node. The validator
 strips it and the editor drops it. That is why adding an attribute to an
-existing node is a schema change, with a `SCHEMA_VERSION` bump and a
-migration, and a new node type is not.
+existing node always needs a `SCHEMA_VERSION` bump and a migration: an
+older editor would lose it. A new node type survives an older editor as a
+placeholder, so new types are batched into one planned bump — version 2
+carries the whole `PA-02` to `PA-11` batch — rather than bumping for each.
 
 ## Explicitly out of v0.1
 
-Columns, embeds, footnotes, mentions, comments, math. Each is a project of its own, and saying so here is what lets every "can you also…" have somewhere to be pointed.
+Columns, embeds, footnotes, comments, math. Each is a project of its own, and saying so here is what lets every "can you also…" have somewhere to be pointed.
 
 Tables were on this list until 2026-10-10. They were moved into `EC` deliberately, with the reasoning written down in `PROJECT_PLAN.md` §3.1, because the schema cost of a table is lowest before the first release and rises permanently after it.
 
@@ -150,7 +164,7 @@ Tables were on this list until 2026-10-10. They were moved into `EC` deliberatel
 
 ### Before the first release — expired
 
-`SCHEMA_VERSION` is `1`. Until `0.1.0` the registry had no `@blockleaf/editor` at all, so nothing was in anyone's database: additive node work landed **inside version 1** rather than bumping to 2, and there was no migration to write because there was nothing to migrate. The table nodes used that exemption.
+Until `0.1.0` the registry had no `@blockleaf/editor` at all, so nothing was in anyone's database: additive node work landed **inside version 1** rather than bumping to 2, and there was no migration to write because there was nothing to migrate. The table nodes used that exemption.
 
 **It expired when `0.1.0` was published on 18 October 2026.** The numbered process below now governs every change, without exception. An additive change is cheap exactly once; the whole point of versioning the document is that nobody gets to decide it is cheap a second time.
 

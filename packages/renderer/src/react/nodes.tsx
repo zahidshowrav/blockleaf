@@ -12,6 +12,7 @@ import {
 	isChecked,
 	isHeaderCell,
 	listStart,
+	mentionAttributes,
 	rowspan,
 	tableColumns,
 	tableMinWidth,
@@ -158,6 +159,19 @@ const Image: NodeRenderer = ({ node }) => {
 const Text: NodeRenderer = ({ node }) => <>{node.text ?? ''}</>;
 
 const HardBreak: NodeRenderer = () => <br />;
+
+const Mention: NodeRenderer = ({ node }) => {
+	const { text, attributes } = mentionAttributes(node);
+	const { class: className, ...data } = attributes;
+	return (
+		<span
+			className={className}
+			{...data}
+		>
+			{text}
+		</span>
+	);
+};
 
 /**
  * A real table, with a real `<thead>`.
@@ -311,5 +325,6 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	tableHeader: TableHeader,
 	tableCell: TableCell,
 	text: Text,
-	hardBreak: HardBreak
+	hardBreak: HardBreak,
+	mention: Mention
 };

@@ -19,5 +19,12 @@
 		"import": "{ createCodeBlock }",
 		"limit": "85 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "mentions subpath, standalone (shares the runtime in practice)",
+		"path": "dist/mentions.js",
+		"import": "{ withMentions }",
+		"limit": "72 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

@@ -169,6 +169,15 @@ export type DetailsLabels = {
 	toggle: string;
 };
 
+export type MentionLabels = {
+	/** Accessible name of the list of people or pages to mention. */
+	menu: string;
+	/** Shown when nothing matches what was typed. */
+	empty: string;
+	/** Shown while the host is still looking. */
+	loading: string;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -180,6 +189,7 @@ export type ResolvedLabels = {
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
 	details: DetailsLabels;
+	mentions: MentionLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -208,6 +218,7 @@ export type BlockleafLabels = {
 	upload?: Partial<UploadLabels>;
 	codeBlock?: Partial<CodeBlockLabels>;
 	details?: Partial<DetailsLabels>;
+	mentions?: Partial<MentionLabels>;
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
 };
@@ -351,6 +362,11 @@ export const defaultLabels: ResolvedLabels = {
 	details: {
 		toggle: 'Show or hide content'
 	},
+	mentions: {
+		menu: 'Suggestions',
+		empty: 'No matches',
+		loading: 'Searching…'
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -413,6 +429,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	upload: { ...defaultLabels.upload, ...labels?.upload },
 	codeBlock: { ...defaultLabels.codeBlock, ...labels?.codeBlock },
 	details: { ...defaultLabels.details, ...labels?.details },
+	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });

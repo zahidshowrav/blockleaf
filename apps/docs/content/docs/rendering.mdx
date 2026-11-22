@@ -466,6 +466,7 @@ Every node in [the schema](./schema.mdx) renders:
 | `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">` |
 | `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                          |
 | `text` / `hardBreak`         | text / `<br>`                                                                  |
+| `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                |
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to
