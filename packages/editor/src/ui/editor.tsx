@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 
 import {
+	DETAILS_NODE,
 	TABLE_A11Y_EXTENSION_NAME,
 	UNKNOWN_CONTENT_EXTENSION_NAME,
 	UPLOAD_EXTENSION_NAME
@@ -160,15 +161,16 @@ export const BlockleafEditor = ({
 	const resolvedExtensions = useMemo(() => {
 		const resolved = resolveLabels(labels);
 		const base = extensions ?? createExtensions(preset);
-		// Three extensions render strings but are not assembled here: the
+		// Four extensions render strings but are not assembled here: the
 		// upload one is built by the host because it needs their adapter, and
-		// the table accessibility and unknown-content ones come with
+		// the table accessibility, unknown-content and toggle ones come with
 		// `createExtensions`, which knows nothing about labels. Each, if nobody
 		// gave it labels of its own, gets these rather than staying English.
 		const chrome = base.map((extension) =>
 			(extension.name === UPLOAD_EXTENSION_NAME ||
 				extension.name === TABLE_A11Y_EXTENSION_NAME ||
-				extension.name === UNKNOWN_CONTENT_EXTENSION_NAME) &&
+				extension.name === UNKNOWN_CONTENT_EXTENSION_NAME ||
+				extension.name === DETAILS_NODE) &&
 			(extension.options as { labels?: unknown }).labels === defaultLabels
 				? extension.configure({ labels: resolved })
 				: extension

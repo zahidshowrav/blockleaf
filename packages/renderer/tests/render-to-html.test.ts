@@ -149,6 +149,24 @@ describe('attribute presence', () => {
 			)
 		).toContain('<details open>');
 	});
+
+	// F23: the first block is the title, the rest is the body.
+	it('puts the first block of details in its summary', () => {
+		expect(
+			renderToHTML(
+				docOf({
+					type: 'details',
+					content: [paragraph('Title'), paragraph('Body')]
+				})
+			)
+		).toBe('<details><summary><p>Title</p></summary><p>Body</p></details>');
+	});
+
+	it('writes no summary for a details with no blocks in it', () => {
+		expect(renderToHTML(docOf({ type: 'details' }))).toBe(
+			'<details></details>'
+		);
+	});
 });
 
 describe('safety', () => {

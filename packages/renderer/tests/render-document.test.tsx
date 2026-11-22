@@ -211,22 +211,18 @@ describe('deliberate differences from the editor', () => {
 		expect(normalise(reactHTML(doc))).toBe(normalise(editorHTML(doc)));
 	});
 
-	/**
-	 * `details` is in the schema and the validator but has no editor
-	 * extension, so only a host building documents by hand produces one.
-	 */
-	it('renders a details node the editor cannot produce', () => {
+	// F23: the first block is the title, inside `<summary>`.
+	it('renders a toggle with its first block as the summary', () => {
 		const html = reactHTML(
 			docOf({
 				type: 'details',
 				attrs: { id: 'd', open: true },
-				content: [paragraph('inside')]
+				content: [paragraph('Title'), paragraph('inside')]
 			})
 		);
 
-		expect(html).toContain('<details');
-		expect(html).toContain('open');
-		expect(html).toContain('inside');
+		expect(html).toContain('<details data-id="d" open="">');
+		expect(html).toContain('<summary><p>Title</p></summary><p>inside</p>');
 	});
 });
 

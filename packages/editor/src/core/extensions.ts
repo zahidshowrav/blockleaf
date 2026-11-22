@@ -15,6 +15,7 @@ import {
 } from './constants.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
+import { Details } from './nodes/details.js';
 import { Caption, Figure } from './nodes/figure.js';
 import { Image } from './nodes/image.js';
 import { PasteNormalizer } from './paste.js';
@@ -197,6 +198,7 @@ export const createExtensions = (
 			nested: true
 		}),
 		Callout,
+		Details,
 		Image,
 		TableKit.configure({
 			table: {

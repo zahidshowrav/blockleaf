@@ -12,10 +12,11 @@ import {
 	QuoteIcon,
 	TableIcon,
 	TaskListIcon,
-	TextIcon
+	TextIcon,
+	ToggleIcon
 } from './icons.js';
 import type { SlashCommand } from './types.js';
-import { UPLOAD_EXTENSION_NAME } from '../../core/constants.js';
+import { DETAILS_NODE, UPLOAD_EXTENSION_NAME } from '../../core/constants.js';
 import {
 	defaultLabels,
 	type BlockTypeLabels,
@@ -132,6 +133,19 @@ export const createSlashCommands = (
 		icon: CalloutIcon,
 		keywords: ['callout', 'note', 'box', 'alert', 'info', 'emoji'],
 		run: (editor) => editor.chain().focus().toggleCallout().run()
+	},
+	{
+		id: 'toggle',
+		title: blockTypes['toggle'],
+		description: labels.descriptions['toggle'],
+		aliases: ['toggle', 'details', 'collapse', 'expand'],
+		group: labels.groups.basic,
+		icon: ToggleIcon,
+		keywords: ['toggle', 'details', 'collapse', 'expand', 'accordion'],
+		// A preset or host extension list without it has no toggle to insert.
+		isAvailable: (editor) =>
+			editor.schema.nodes[DETAILS_NODE] !== undefined,
+		run: (editor) => editor.chain().focus().toggleDetails().run()
 	},
 	{
 		id: 'divider',

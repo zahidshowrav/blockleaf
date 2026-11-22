@@ -22,10 +22,14 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` and `PA-19` are done.
 
-**Next:** `PA`. `HD-11` waits for someone past ten thousand blocks to ask
-for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
+**Next:** the early release (decided 2026-11-22): `PA-01` and `PA-19`
+change no stored shape, so they ship together as editor `0.10.0` before the
+hold. Every other `PA` and `TB` task then waits for the v2 release.
+`PA-09` waits with `PA-08`, which shares its `./toc` subpath, and `PA-18`
+comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
+waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
 as a `figure` holding the table and a `caption` (`F20`, amended 2026-11-20),
 and needed no `SCHEMA_VERSION` bump: both are new node types and no existing
 node changed. `HD-09` added `migrate()`, and `SG-04` fails CI when
@@ -45,9 +49,9 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-22: 444 editor unit tests, 160 renderer, 53
-Playwright across two projects — 44 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 149.55 kB of 160 kB, schema entry at 405 B of 2 kB, code block
-subpath at 80.33 kB of 85 kB. Lint, typecheck and build cover eight
+**Last verified:** 2026-11-22: 460 editor unit tests, 162 renderer, 64
+Playwright across two projects — 55 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 150.75 kB of 160 kB, schema entry at 407 B of 2 kB, code block
+subpath at 80.42 kB of 85 kB. Lint, typecheck and build cover eight
 workspaces.
 
 ---
@@ -476,32 +480,41 @@ change is the same work whether it runs once or six times.
 `validate.ts` and in both renderer targets, and has no editor extension
 behind it. `PA-18` and `PA-19` do not touch the stored shape either.
 
-| Id    | Task                                                              | Ships as                       | Status      | Commit | Completed |
-| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | ------ | --------- |
-| PA-01 | `details` — the toggle block the schema already carries           | core                           | Not started | —      | —         |
-| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —      | —         |
-| PA-03 | Emoji                                                             | `./emoji`                      | Not started | —      | —         |
-| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —      | —         |
-| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —      | —         |
-| PA-06 | Text alignment                                                    | `./text-style`                 | Not started | —      | —         |
-| PA-07 | Subscript and superscript                                         | `./text-style`                 | Not started | —      | —         |
-| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —      | —         |
-| PA-09 | Character and word count                                          | `./toc`                        | Not started | —      | —         |
-| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —      | —         |
-| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —      | —         |
-| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —         |
-| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —      | —         |
-| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —      | —         |
-| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —      | —         |
-| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —      | —         |
-| PA-17 | Columns                                                           | `./layout`                     | Not started | —      | —         |
-| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —      | —         |
-| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Not started | —      | —         |
-| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —      | —         |
-| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —      | —         |
-| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —      | —         |
-| PA-23 | Block background colour                                           | core                           | Not started | —      | —         |
-| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —      | —         |
+`PA-01` (2026-11-22): the schema never said where a toggle's title lives.
+`F23` settles it — the first block is the title — so the stored shape stays
+as documented, and the renderer now puts that block in `<summary>`. The
+toggle's button sits where the drag handle is clamped when there is no
+gutter, so it is drawn above the handle and covers the insert button beside
+a toggle; with a gutter they never meet. The browser tests wait for the
+editor's own selection after a click or a Home before the next key, because
+a key sent straight after one sometimes acted on the old selection.
+
+| Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
+| PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
+| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —         | —          |
+| PA-03 | Emoji                                                             | `./emoji`                      | Not started | —         | —          |
+| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —         | —          |
+| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —         | —          |
+| PA-06 | Text alignment                                                    | `./text-style`                 | Not started | —         | —          |
+| PA-07 | Subscript and superscript                                         | `./text-style`                 | Not started | —         | —          |
+| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —         | —          |
+| PA-09 | Character and word count                                          | `./toc`                        | Not started | —         | —          |
+| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —         | —          |
+| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —         | —          |
+| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
+| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
+| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —         | —          |
+| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —         | —          |
+| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —         | —          |
+| PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
+| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —         | —          |
+| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
+| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —         | —          |
+| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —         | —          |
+| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —         | —          |
+| PA-23 | Block background colour                                           | core                           | Not started | —         | —          |
+| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —         | —          |
 
 `PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
 `--bl-font-size-lg` — not a CSS value. A `14px` written into a document is

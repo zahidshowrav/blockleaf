@@ -106,7 +106,7 @@ the bubble menu.
 Out of the box the stylesheet follows the operating system:
 
 ```css
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
 	.blockleaf-editor:not([data-theme='light']) {
 		/* dark palette */
 	}
@@ -118,6 +118,10 @@ Read that selector carefully, because it is the whole model:
 - **No `data-theme`** — follow the OS.
 - **`data-theme="light"`** — stay light even when the OS is dark.
 - **`data-theme="dark"`** — force dark regardless.
+
+None of it reaches the printer. `screen` keeps the system theme off paper, and
+a forced dark theme prints with the light palette — see
+[printing](./index.mdx#printing).
 
 ### Forcing a theme
 

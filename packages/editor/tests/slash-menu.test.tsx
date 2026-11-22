@@ -19,11 +19,11 @@ import {
 } from '../src/ui/index.js';
 
 describe('Slash menu command registry (CH-01)', () => {
-	it('initializes with all 13 default commands', () => {
+	it('initializes with all 14 default commands', () => {
 		const registry = createCommandRegistry();
 		const commands = registry.getAll();
 
-		expect(commands).toHaveLength(13);
+		expect(commands).toHaveLength(14);
 		const ids = commands.map((c) => c.id);
 		expect(ids).toEqual([
 			'paragraph',
@@ -36,6 +36,7 @@ describe('Slash menu command registry (CH-01)', () => {
 			'blockquote',
 			'code-block',
 			'callout',
+			'toggle',
 			'divider',
 			'table',
 			'image'
@@ -78,7 +79,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		registry.remove('divider');
 		expect(registry.get('divider')).toBeUndefined();
-		expect(registry.getAll()).toHaveLength(12);
+		expect(registry.getAll()).toHaveLength(13);
 	});
 
 	it('reorders commands given an array of ids', () => {
@@ -87,15 +88,15 @@ describe('Slash menu command registry (CH-01)', () => {
 		const ids = registry.getAll().map((c) => c.id);
 		expect(ids[0]).toBe('table');
 		expect(ids[1]).toBe('task-list');
-		expect(ids).toHaveLength(13);
+		expect(ids).toHaveLength(14);
 	});
 
 	it('filters commands by query across titles, aliases, keywords, and descriptions', () => {
 		const registry = createCommandRegistry();
 
 		// Empty query returns all commands
-		expect(registry.filter('')).toHaveLength(13);
-		expect(registry.filter('   ')).toHaveLength(13);
+		expect(registry.filter('')).toHaveLength(14);
+		expect(registry.filter('   ')).toHaveLength(14);
 
 		// Exact title matches rank highest
 		const textResults = registry.filter('text');
@@ -297,7 +298,7 @@ describe('<SlashMenu /> UI Component', () => {
 
 			// Options
 			const options = screen.getAllByRole('option');
-			expect(options).toHaveLength(13);
+			expect(options).toHaveLength(14);
 			expect(options[0]?.getAttribute('aria-selected')).toBe('true');
 			expect(options[1]?.getAttribute('aria-selected')).toBe('false');
 		} finally {

@@ -44,7 +44,10 @@
 	line-height: var(--bl-line-height);
 }
 
-@media (prefers-color-scheme: dark) {
+/* `screen` so a dark system theme does not reach the printer: browsers drop
+   backgrounds when printing, and light text on white paper is unreadable.
+   See the print block at the end of this file (PA-19). */
+@media screen and (prefers-color-scheme: dark) {
 	.blockleaf-editor:not([data-theme='light']) {
 		--bl-color-bg: #0d1117;
 		--bl-color-fg: #e6edf3;
@@ -325,6 +328,87 @@
 	margin-top: 0.5em;
 	color: var(--bl-color-muted);
 	font-size: 0.875em;
+}
+
+/* A toggle (PA-01, F23): its first block is the title, the rest is the body.
+   In the editor a button beside the title opens and closes it, and a closed
+   toggle hides everything after the title. */
+.blockleaf-editor__content .blockleaf-details {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.25em;
+	margin: var(--bl-space-block) 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 1.5em;
+	height: calc(var(--bl-line-height) * 1em);
+	padding: 0;
+	border: 0;
+	border-radius: var(--bl-radius);
+	background: none;
+	color: var(--bl-color-muted);
+	cursor: pointer;
+	/* Above the block handle (40). With no gutter the handle is clamped over
+	   the start of the line, and hovering the chevron is what brings it up;
+	   underneath it, the chevron could not be clicked at all. On top, it
+	   covers the handle's insert button beside a toggle and nothing else. */
+	position: relative;
+	z-index: 41;
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle:hover {
+	color: var(--bl-color-fg);
+}
+
+.blockleaf-editor__content .blockleaf-details__toggle svg {
+	transition: transform 120ms ease;
+}
+
+.blockleaf-editor__content
+	.blockleaf-details[data-open]
+	> .blockleaf-details__toggle
+	svg {
+	transform: rotate(90deg);
+}
+
+.blockleaf-editor__content .blockleaf-details__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__content > :first-child {
+	margin-top: 0;
+}
+
+.blockleaf-editor__content .blockleaf-details__content > :last-child {
+	margin-bottom: 0;
+}
+
+.blockleaf-editor__content
+	.blockleaf-details:not([data-open])
+	> .blockleaf-details__content
+	> :not(:first-child) {
+	display: none;
+}
+
+/* The renderer's output: the title block sits beside the browser's own
+   marker rather than on a line under it. */
+.blockleaf-editor__content details {
+	margin: var(--bl-space-block) 0;
+}
+
+.blockleaf-editor__content details > summary {
+	cursor: pointer;
+}
+
+.blockleaf-editor__content details > summary > :first-child {
+	display: inline;
+	margin: 0;
 }
 
 /* The editing surface itself shows focus with the caret, not a ring — an
@@ -1283,4 +1367,104 @@
 .blockleaf-editor__content .blockleaf-unknown.ProseMirror-selectednode {
 	outline: 2px solid var(--bl-color-accent);
 	outline-offset: 1px;
+}
+
+/*
+ * Print (PA-19), so a browser's "Save as PDF" gives a readable document with
+ * no extra dependency. It covers the editor and `@blockleaf/renderer`'s
+ * output alike, since both sit inside `.blockleaf-editor__content`.
+ *
+ * - The chrome goes: menus, handles, the table controls, the code block's
+ *   language picker, upload progress and the toggle's button. None of it
+ *   means anything on paper.
+ * - Dark is undone. The system dark theme is already screen-only; a forced
+ *   `data-theme="dark"` gets the light palette back here. A host's own
+ *   palette, set on `.blockleaf-editor`, is left alone.
+ * - Blocks that read badly split — code, quotes, callouts, images, table
+ *   rows — stay on one page where they fit, and a heading stays with what
+ *   follows it.
+ * - What scrolled on screen is laid out in full: code wraps instead of
+ *   running off the page.
+ * - A link prints its address after its text, since paper cannot be clicked.
+ * - A closed toggle prints closed. Its state is the author's.
+ */
+@media print {
+	.blockleaf-editor[data-theme='dark'] {
+		--bl-color-bg: #ffffff;
+		--bl-color-fg: #1f2328;
+		--bl-color-muted: #6b7280;
+		--bl-color-border: #e5e7eb;
+		--bl-color-accent: #3b5bdb;
+		--bl-color-code-bg: #f4f4f5;
+		--bl-color-quote-border: #d1d5db;
+		--bl-color-selection: #cfe0ff;
+		--bl-color-callout-bg: #f8fafc;
+		--bl-color-callout-border: #e2e8f0;
+		--bl-color-highlight: #fef08a;
+		--bl-color-table-border: #e2e8f0;
+		--bl-color-table-header-bg: #f8fafc;
+		--bl-color-danger: #b42318;
+	}
+
+	.blockleaf-slash-menu,
+	.blockleaf-bubble-menu,
+	.blockleaf-block-handle-anchor,
+	.blockleaf-block-menu,
+	.blockleaf-table-controls,
+	.blockleaf-table-menu,
+	.blockleaf-grid-picker,
+	.blockleaf-code-block__language,
+	.blockleaf-upload,
+	.blockleaf-editor__content .blockleaf-details__toggle,
+	.blockleaf-editor__content .ProseMirror-gapcursor {
+		display: none;
+	}
+
+	/* An empty block's placeholder is a prompt to type, not content. */
+	.blockleaf-editor .blockleaf-empty-node::before {
+		content: none;
+	}
+
+	.blockleaf-editor__content .selectedCell::after {
+		content: none;
+	}
+
+	.blockleaf-editor__content {
+		orphans: 3;
+		widows: 3;
+	}
+
+	.blockleaf-editor__content h1,
+	.blockleaf-editor__content h2,
+	.blockleaf-editor__content h3 {
+		break-after: avoid;
+	}
+
+	.blockleaf-editor__content pre,
+	.blockleaf-editor__content blockquote,
+	.blockleaf-editor__content .blockleaf-callout,
+	.blockleaf-editor__content img,
+	.blockleaf-editor__content tr {
+		break-inside: avoid;
+	}
+
+	.blockleaf-editor__content pre {
+		overflow: visible;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+
+	/* A highlight is meaning, not decoration; keep its colour when the
+	   browser drops backgrounds. */
+	.blockleaf-editor__content mark {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	.blockleaf-editor__content a[href^='http']::after {
+		content: ' (' attr(href) ')';
+		color: var(--bl-color-muted);
+		font-size: 0.85em;
+		overflow-wrap: anywhere;
+	}
 }

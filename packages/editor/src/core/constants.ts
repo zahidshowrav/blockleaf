@@ -54,6 +54,7 @@ export const BLOCK_NODE_TYPES = [
 	'taskList',
 	'taskItem',
 	'callout',
+	'details',
 	'image',
 	'table',
 	'figure'
@@ -89,3 +90,6 @@ export const UNKNOWN_MARK = 'blockleafUnknownMark';
  */
 export const FIGURE_NODE = 'figure';
 export const CAPTION_NODE = 'caption';
+
+/** A toggle block: its first child is the title, the rest open and close (`F23`). */
+export const DETAILS_NODE = 'details';

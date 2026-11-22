@@ -93,6 +93,7 @@ export {
 	type BlockleafLabels,
 	type BubbleMenuLabels,
 	type CodeBlockLabels,
+	type DetailsLabels,
 	type ImageLabels,
 	type LinkLabels,
 	type ResolvedLabels,

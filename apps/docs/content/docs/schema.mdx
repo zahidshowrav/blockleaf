@@ -66,7 +66,7 @@ Planned for `EC`–`MC`:
 | `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                     |
 | `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference. |
 | `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                          |
-| `details`                                 | `open: boolean`               | Toggle blocks.                                                                                                                        |
+| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                       |
 | `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                   |
 | `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                               |
 | `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.     |
