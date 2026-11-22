@@ -22,11 +22,11 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` is done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` and `PA-19` are done.
 
-**Next:** `PA-19`, then the early release (decided 2026-11-22): `PA-01` and
-`PA-19` change no stored shape, so they ship together as editor `0.10.0`
-before the hold. Every other `PA` and `TB` task then waits for the v2 release.
+**Next:** the early release (decided 2026-11-22): `PA-01` and `PA-19`
+change no stored shape, so they ship together as editor `0.10.0` before the
+hold. Every other `PA` and `TB` task then waits for the v2 release.
 `PA-09` waits with `PA-08`, which shares its `./toc` subpath, and `PA-18`
 comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
 waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
@@ -49,8 +49,8 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-22: 460 editor unit tests, 162 renderer, 60
-Playwright across two projects — 51 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 150.75 kB of 160 kB, schema entry at 407 B of 2 kB, code block
+**Last verified:** 2026-11-22: 460 editor unit tests, 162 renderer, 64
+Playwright across two projects — 55 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 150.75 kB of 160 kB, schema entry at 407 B of 2 kB, code block
 subpath at 80.42 kB of 85 kB. Lint, typecheck and build cover eight
 workspaces.
 
@@ -509,7 +509,7 @@ a key sent straight after one sometimes acted on the old selection.
 | PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —      | —          |
 | PA-17 | Columns                                                           | `./layout`                     | Not started | —      | —          |
 | PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —      | —          |
-| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Not started | —      | —          |
+| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | —      | 2026-11-22 |
 | PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —      | —          |
 | PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —      | —          |
 | PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —      | —          |
