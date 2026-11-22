@@ -9,6 +9,8 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 	italic: ({ children }) => element('em', {}, children),
 	strike: ({ children }) => element('s', {}, children),
 	underline: ({ children }) => element('u', {}, children),
+	subscript: ({ children }) => element('sub', {}, children),
+	superscript: ({ children }) => element('sup', {}, children),
 	code: ({ children }) => element('code', {}, children),
 
 	highlight: ({ mark, children }) => {

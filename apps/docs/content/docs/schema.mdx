@@ -81,6 +81,7 @@ Planned for `EC`–`MC`:
 | `bold`, `italic`, `strike`, `underline`, `code` | —                       |                                                                                                                                                                                                                                                     |
 | `link`                                          | `href, target, rel`     | `href` is sanitised **at the schema level**, not in the UI: `https:`, `mailto:` and site-relative paths are allowed, everything else — `javascript:` above all — is dropped on parse. A sanitiser that only runs in the toolbar is not a sanitiser. |
 | `highlight`                                     | `color: string \| null` |                                                                                                                                                                                                                                                     |
+| `subscript`, `superscript`                      | —                       | Version 2. They exclude each other: a run is never both. See [text styles](./text-style.mdx).                                                                                                                                                       |
 
 ### `colwidth`, the one presentation attribute
 
@@ -110,9 +111,10 @@ A table with a caption is stored inside a `figure`, with the caption beside it:
 
 ## Version 2
 
-Version 2 adds node types and changes none.
+Version 2 adds node and mark types and changes none.
 
 - **`mention`** (`PA-02`) — `{ id: string, label: string, kind: string | null }`, inline. The reasoning is F24 in [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+- **`subscript`** and **`superscript`** (`PA-07`) — marks with no attributes, which exclude each other.
 - The rest of the batch — emoji, maths, text styles, a table of contents — joins version 2 before it is released. It is one bump for all of them, not one each.
 
 The migration from `1` changes nothing: every version 1 document is already a valid version 2 one, so `migrate()` only stamps the new number. The bump is there for the other direction. An editor that only knows version 1 opens a version 2 document read-only rather than editing around nodes it cannot show.

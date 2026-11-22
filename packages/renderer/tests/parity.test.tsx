@@ -153,6 +153,19 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'subscript and superscript',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('H'),
+				text('2', [{ type: 'subscript' }]),
+				text('O and E = mc'),
+				text('2', [{ type: 'bold' }, { type: 'superscript' }])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

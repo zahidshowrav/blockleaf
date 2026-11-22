@@ -47,6 +47,16 @@ export interface HighlightMark {
 	};
 }
 
+/** Version 2 (`PA-07`). Excludes `superscript`: one run is never both. */
+export interface SubscriptMark {
+	type: 'subscript';
+}
+
+/** Version 2 (`PA-07`). Excludes `subscript`. */
+export interface SuperscriptMark {
+	type: 'superscript';
+}
+
 export type BlockleafMark =
 	| BoldMark
 	| ItalicMark
@@ -54,7 +64,9 @@ export type BlockleafMark =
 	| UnderlineMark
 	| CodeMark
 	| LinkMark
-	| HighlightMark;
+	| HighlightMark
+	| SubscriptMark
+	| SuperscriptMark;
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */

@@ -26,5 +26,12 @@
 		"import": "{ withMentions }",
 		"limit": "72 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "text style subpath, standalone (shares the runtime in practice)",
+		"path": "dist/text-style.js",
+		"import": "{ withTextStyle }",
+		"limit": "60 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

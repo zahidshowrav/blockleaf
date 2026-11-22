@@ -1,0 +1,59 @@
+---
+title: Text styles
+description: Subscript and superscript, as an opt-in subpath. More text styles join it as they ship.
+icon: Type
+---
+
+Text styles ship as an opt-in subpath, not in the default bundle.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withTextStyle } from '@blockleaf/editor/text-style';
+
+const extensions = withTextStyle(presets.standard());
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+They are new in schema version 2.
+
+## Subscript and superscript
+
+| Style       | Shortcut  | Stored as                   | Written as |
+| ----------- | --------- | --------------------------- | ---------- |
+| Subscript   | `Mod`+`,` | `{ "type": "subscript" }`   | `<sub>`    |
+| Superscript | `Mod`+`.` | `{ "type": "superscript" }` | `<sup>`    |
+
+- **One or the other, never both.** Text cannot sit above and below the line
+  at once, so turning one on turns the other off. A stored run never carries
+  both.
+- **The bubble menu gains two buttons**, Subscript and Superscript, after
+  Highlight. An editor without the subpath has no such marks, so the buttons
+  are not offered there; see
+  [actions follow the extension set](./chrome.mdx#actions-follow-the-extension-set).
+- **Pasted `<sub>` and `<sup>` arrive as the marks**, from a web page or a
+  word processor.
+- **`@blockleaf/renderer` writes `<sub>` and `<sup>`** on both targets, with
+  no extra import.
+
+## Without the subpath
+
+An editor that does not load `@blockleaf/editor/text-style` still opens a
+document that uses these marks. The text shows plainly, and the marks are
+saved back exactly as they came in. See
+[a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
+
+## `withTextStyle` versus `createTextStyle`
+
+`withTextStyle` removes any extension with the same name before adding its
+own, so adding it twice, or over Tiptap's own subscript, never leaves two
+extensions fighting over one name. `createTextStyle()` returns the same
+extensions as a plain array, for a list you are assembling from scratch.
+
+## Cost
+
+Measured with `size-limit`, minified and brotlied: the editor is
+**150.98 kB**, and the editor with text styles is **151.18 kB**, so
+**0.20 kB** for both marks. Without the import, nothing is added.

@@ -36,6 +36,10 @@
 			"types": "./dist/mentions.d.ts",
 			"import": "./dist/mentions.js"
 		},
+		"./text-style": {
+			"types": "./dist/text-style.d.ts",
+			"import": "./dist/text-style.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"
@@ -62,6 +66,8 @@
 		"@tiptap/extension-code-block-lowlight": "3.31.4",
 		"@tiptap/extension-highlight": "3.31.4",
 		"@tiptap/extension-link": "3.31.4",
+		"@tiptap/extension-subscript": "3.31.4",
+		"@tiptap/extension-superscript": "3.31.4",
 		"@tiptap/extension-table": "3.31.4",
 		"@tiptap/extension-task-item": "3.31.4",
 		"@tiptap/extension-task-list": "3.31.4",

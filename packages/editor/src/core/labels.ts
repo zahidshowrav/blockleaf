@@ -50,7 +50,14 @@ export type BubbleMenuLabels = {
 	/** Accessible name of the toolbar. */
 	toolbar: string;
 	actions: Record<
-		'bold' | 'italic' | 'underline' | 'strike' | 'code' | 'highlight',
+		| 'bold'
+		| 'italic'
+		| 'underline'
+		| 'strike'
+		| 'code'
+		| 'highlight'
+		| 'subscript'
+		| 'superscript',
 		string
 	>;
 };
@@ -287,7 +294,9 @@ export const defaultLabels: ResolvedLabels = {
 			underline: 'Underline',
 			strike: 'Strikethrough',
 			code: 'Inline code',
-			highlight: 'Highlight'
+			highlight: 'Highlight',
+			subscript: 'Subscript',
+			superscript: 'Superscript'
 		}
 	},
 	blockMenu: {

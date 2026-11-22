@@ -17,6 +17,8 @@ import type {
 	HardBreakNode,
 	HeadingNode,
 	HighlightMark,
+	SubscriptMark,
+	SuperscriptMark,
 	HorizontalRuleNode,
 	ImageNode,
 	InlineNode,
@@ -77,7 +79,9 @@ const MARK_TYPES: ReadonlySet<string> = new Set([
 	'underline',
 	'code',
 	'link',
-	'highlight'
+	'highlight',
+	'subscript',
+	'superscript'
 ]);
 
 /**
@@ -156,6 +160,16 @@ export const highlightMarkSchema: z.ZodType<HighlightMark> = z.object({
 		.optional()
 });
 
+/** Version 2 (`PA-07`). */
+export const subscriptMarkSchema: z.ZodType<SubscriptMark> = z.object({
+	type: z.literal('subscript')
+});
+
+/** Version 2 (`PA-07`). */
+export const superscriptMarkSchema: z.ZodType<SuperscriptMark> = z.object({
+	type: z.literal('superscript')
+});
+
 export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 	z.union([
 		boldMarkSchema,
@@ -164,7 +178,9 @@ export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 		underlineMarkSchema,
 		codeMarkSchema,
 		linkMarkSchema,
-		highlightMarkSchema
+		highlightMarkSchema,
+		subscriptMarkSchema,
+		superscriptMarkSchema
 	])
 );
 

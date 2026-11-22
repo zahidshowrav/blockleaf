@@ -4,9 +4,12 @@ import {
 	InlineCodeIcon,
 	ItalicIcon,
 	StrikeIcon,
+	SubscriptIcon,
+	SuperscriptIcon,
 	UnderlineIcon
 } from './icons.js';
 import type { BubbleAction } from './types.js';
+import { SUBSCRIPT_MARK, SUPERSCRIPT_MARK } from '../../core/constants.js';
 import { defaultLabels, type BubbleMenuLabels } from '../../core/labels.js';
 import { whenMarkExists } from '../schema-guard.js';
 
@@ -84,6 +87,30 @@ export const createBubbleActions = (
 			editor.can().toggleHighlight()
 		),
 		run: (editor) => editor.chain().focus().toggleHighlight().run()
+	},
+	// PA-07. Offered only where `@blockleaf/editor/text-style` is loaded:
+	// without it the marks are not in the schema.
+	{
+		id: 'subscript',
+		title: labels.actions['subscript'],
+		shortcut: 'Mod+,',
+		icon: SubscriptIcon,
+		isActive: (editor) => editor.isActive(SUBSCRIPT_MARK),
+		isAvailable: whenMarkExists(SUBSCRIPT_MARK, (editor) =>
+			editor.can().toggleSubscript()
+		),
+		run: (editor) => editor.chain().focus().toggleSubscript().run()
+	},
+	{
+		id: 'superscript',
+		title: labels.actions['superscript'],
+		shortcut: 'Mod+.',
+		icon: SuperscriptIcon,
+		isActive: (editor) => editor.isActive(SUPERSCRIPT_MARK),
+		isAvailable: whenMarkExists(SUPERSCRIPT_MARK, (editor) =>
+			editor.can().toggleSuperscript()
+		),
+		run: (editor) => editor.chain().focus().toggleSuperscript().run()
 	}
 ];
 

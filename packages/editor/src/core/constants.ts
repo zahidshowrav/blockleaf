@@ -107,3 +107,7 @@ export const MENTIONS_EXTENSION_NAME = 'blockleafMentions';
 
 /** What a mention shows before its label, in the editor and the renderer. */
 export const MENTION_PREFIX = '@';
+
+/** Subscript and superscript (`PA-07`): marks in the schema from version 2, loaded from `@blockleaf/editor/text-style`. */
+export const SUBSCRIPT_MARK = 'subscript';
+export const SUPERSCRIPT_MARK = 'superscript';

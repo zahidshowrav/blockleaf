@@ -136,6 +136,8 @@ export {
 	type MentionNode,
 	type HeadingNode,
 	type HighlightMark,
+	type SubscriptMark,
+	type SuperscriptMark,
 	type HorizontalRuleNode,
 	type ImageNode,
 	type InlineNode,

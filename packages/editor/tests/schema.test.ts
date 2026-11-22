@@ -182,6 +182,18 @@ describe('document schema', () => {
 						{ type: 'text' as const, text: ', ' },
 						{
 							type: 'text' as const,
+							text: 'sub',
+							marks: [{ type: 'subscript' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
+							text: 'sup',
+							marks: [{ type: 'superscript' as const }]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
 							text: 'bold',
 							marks: [{ type: 'bold' as const }]
 						},

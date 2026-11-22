@@ -74,6 +74,32 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
         {
           "marks": [
             {
+              "type": "subscript",
+            },
+          ],
+          "text": "sub",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
+              "type": "superscript",
+            },
+          ],
+          "text": "sup",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
               "type": "bold",
             },
           ],
