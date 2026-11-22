@@ -19,7 +19,7 @@ A Notion-style block editor for React, built on [Tiptap](https://tiptap.dev) v3.
 | **Server rendering in the box**           | `@blockleaf/renderer` turns stored JSON into React or an HTML string with no ProseMirror runtime. Content is read a thousand times for every time it is written.                                                                |
 | **Headless core, replaceable chrome**     | Every menu is a component you can replace. Defaults exist so `pnpm add` works on day one; nothing is welded shut.                                                                                                               |
 
-Where it loses today: no collaboration, no comments, no mentions. Those are [out of v0.1 on purpose, and scheduled](#roadmap).
+Where it loses today: no collaboration, no comments. Those are [out of v0.1 on purpose, and scheduled](#roadmap).
 
 ## Install
 

@@ -1,0 +1,195 @@
+---
+title: Mentions
+description: Type @ to mention a person or a page. Your app supplies the names; Blockleaf stores a reference and the name at the time.
+icon: AtSign
+---
+
+Type `@` and a name, pick from the list, and the document holds a mention:
+an uneditable chip that stores your own key for the person or page, and the
+name at the time.
+
+Mentions ship as an opt-in subpath. They are new in schema version 2.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withMentions } from '@blockleaf/editor/mentions';
+
+const extensions = withMentions(presets.standard(), {
+	items: async ({ query }) => {
+		const people = await searchPeople(query);
+		return people.map((person) => ({
+			id: person.id,
+			label: person.name,
+			description: person.email
+		}));
+	}
+});
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+## Where the names come from
+
+Blockleaf has no idea who your users are, so `items` is yours. It gets what
+was typed after the `@` and returns the matches, or a promise of them.
+
+- **It runs on every keystroke** while the list is open. If it calls a
+  server, debounce it or cache it on your side.
+- **A slow answer shows a loading line** straight away. An answer that
+  arrives after a newer query's is dropped, so the list never jumps back to
+  an older search.
+- **A lookup that throws shows "No matches"**, not an error. The person
+  typing can keep typing.
+- **`description`** is a second line in the list — an email, a team, a page
+  path. It is never stored.
+
+Return a short list. The picker shows everything it is given.
+
+## What is stored
+
+```json
+{
+	"type": "mention",
+	"attrs": { "id": "u_42", "label": "Ada Lovelace", "kind": "user" }
+}
+```
+
+| Attribute | Type             | What it is                                                                            |
+| --------- | ---------------- | ------------------------------------------------------------------------------------- |
+| `id`      | `string`         | Your key for the person or page. Blockleaf never reads it.                            |
+| `label`   | `string`         | The name when it was mentioned. Shown wherever the mention is shown.                  |
+| `kind`    | `string \| null` | What sort of thing it is, when you have more than one. Blockleaf gives it no meaning. |
+
+The label is a snapshot. If someone changes their name, old mentions keep
+the old one until you rewrite them — walk the stored JSON for `mention`
+nodes with their `id` and update `label`. Storing the name is what lets
+[`@blockleaf/renderer`](./rendering.mdx) show a page without asking you
+about every mention on it.
+
+The reasoning, and what was turned down, is F24 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+
+## People and pages
+
+One trigger is the shorthand above. For more than one, pass `triggers`, each
+with its own character, `kind` and lookup:
+
+```ts
+withMentions(presets.standard(), {
+	triggers: [
+		{ char: '@', kind: 'user', items: searchPeople },
+		{ char: '#', kind: 'page', items: searchPages }
+	]
+});
+```
+
+An item's own `kind` wins over its trigger's, so one lookup can return both
+sorts.
+
+Every mention shows as `@` and its label, whatever its kind. To tell them
+apart on the page, style the `data-kind` attribute:
+
+```css
+.blockleaf-mention[data-kind='page'] {
+	color: var(--bl-color-fg);
+}
+```
+
+## Typing around a mention
+
+- **The list opens after a space or at the start of a line.** `ada@example`
+  is an email address, not a mention.
+- **Not inside code.** An `@` in a code block or inline code is an `@`.
+- **↑ and ↓ move, Enter or Tab picks, Escape closes** and leaves what you
+  typed as text. A click picks too, and the caret stays in the document.
+- **A space follows the mention**, so you keep typing.
+- **Backspace removes the whole mention** in one step. It is one character
+  to the editor, never half a name.
+
+## Inserting one from code
+
+`insertMention` is there for your own chrome — a "mention someone" button,
+an assignee picker:
+
+```ts
+editor
+	.chain()
+	.focus()
+	.insertMention({ id: 'u_42', label: 'Ada Lovelace', kind: 'user' })
+	.run();
+```
+
+It only exists when the mention node is loaded. Guard an action of yours with
+`'mention' in editor.schema.nodes`; see
+[actions follow the extension set](./chrome.mdx#actions-follow-the-extension-set).
+
+## Without the subpath
+
+An editor that does not load `@blockleaf/editor/mentions` still opens a
+document with mentions in it. Each one shows as a placeholder and is saved
+back exactly as it came in. See
+[a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
+
+## Rendering
+
+`@blockleaf/renderer` renders a mention on both targets, with no extra
+import:
+
+```html
+<span
+	class="blockleaf-mention"
+	data-type="mention"
+	data-mention-id="u_42"
+	data-label="Ada Lovelace"
+	data-kind="user"
+	>@Ada Lovelace</span
+>
+```
+
+That is exactly what the editor writes, so one stylesheet fits both.
+`toPlainText` reads a mention as `@Ada Lovelace`.
+
+To link a mention to a profile page, override the node:
+
+```tsx
+<RenderDocument
+	doc={doc}
+	components={{
+		mention: ({ node }) => (
+			<a href={`/people/${String(node.attrs?.id)}`}>
+				@{String(node.attrs?.label)}
+			</a>
+		)
+	}}
+/>
+```
+
+## Translating the picker
+
+The picker's three strings are under `mentions` in `labels`:
+
+```tsx
+<BlockleafEditor
+	extensions={extensions}
+	labels={{
+		mentions: {
+			menu: 'Suggestions',
+			empty: 'Personne',
+			loading: 'Recherche…'
+		}
+	}}
+/>
+```
+
+`BlockleafEditor` hands its labels to the picker. If you build the editor
+yourself, pass `labels` to `withMentions` instead.
+
+## Cost
+
+Measured with `size-limit`, minified and brotlied: the editor is
+**150.81 kB**, and the editor with mentions is **151.67 kB** — **0.86 kB**
+for the node and the picker. The 68.78 kB the subpath measures on its own is
+almost all the Tiptap runtime the editor already ships. Without the import,
+the default bundle is unchanged.

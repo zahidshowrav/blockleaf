@@ -8,11 +8,44 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23 · **Last reviewed:** 2026-11-22
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24 · **Last reviewed:** 2026-11-22
 
 ---
 
 ## Settled
+
+### F24 — what a stored mention carries · decided 2026-11-22
+
+`PA-02` opens the batch that moves the schema to version 2. Changing a
+mention's attributes later would cost another bump, so they are settled
+before anything is stored.
+
+**Decisions:**
+
+- **`{ id, label, kind }`.** `id` is the host's own key and Blockleaf never
+  reads it. `label` is the name at the time it was mentioned, so the
+  renderer can show something without asking the host. `kind` is an
+  optional string — `'user'`, `'page'` — so one document can mention more
+  than one sort of thing without another bump. Blockleaf gives `kind` no
+  meaning of its own.
+- **`data-mention-id` in HTML, not `data-id`.** `data-id` is a block's id
+  everywhere else in the editor and the renderer. The editor still reads
+  `data-id` on a pasted mention, because that is what other editors write.
+- **The text is `@` and the label, whatever the kind.** It is what a
+  copied mention pastes as and what `toPlainText` returns. A host that
+  wants pages to look different styles `[data-kind]`.
+- **The node is in the schema from version 2, the editor loads it from
+  `@blockleaf/editor/mentions`.** An editor without the subpath keeps a
+  stored mention as a placeholder and saves it back unchanged.
+- **Version 2 carries the whole `PA-02` to `PA-11` batch.** The migration
+  from 1 changes nothing — every version 1 document is a valid version 2 one
+  — and the later tasks in the batch add to version 2 before it is
+  released, without bumping again.
+- **Rejected: `id` only.** No stale names, but the renderer would have
+  nothing to show for a mention without the host's help, and a server
+  rendering a page would need a lookup per mention.
+- **Rejected: `id` and `label` only.** Tiptap's own shape, but a second sort
+  of mention would mean another bump.
 
 ### F23 — where a toggle's title lives · decided 2026-11-22
 

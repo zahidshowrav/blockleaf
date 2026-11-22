@@ -1,4 +1,4 @@
-import { blockId, headingLevel } from './attrs.js';
+import { blockId, headingLevel, mentionAttributes } from './attrs.js';
 import {
 	type HeadingLevel,
 	type RenderableDocument,
@@ -71,6 +71,11 @@ export const toPlainText = (
 
 		if (node.type === 'hardBreak') {
 			parts.push('\n');
+			return;
+		}
+
+		if (node.type === 'mention') {
+			parts.push(mentionAttributes(node).text);
 			return;
 		}
 

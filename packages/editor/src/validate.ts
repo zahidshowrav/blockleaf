@@ -23,6 +23,7 @@ import type {
 	ItalicMark,
 	LinkMark,
 	ListItemNode,
+	MentionNode,
 	OrderedListNode,
 	ParagraphNode,
 	StrikeMark,
@@ -65,7 +66,8 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'tableHeader',
 	'tableCell',
 	'text',
-	'hardBreak'
+	'hardBreak',
+	'mention'
 ]);
 
 const MARK_TYPES: ReadonlySet<string> = new Set([
@@ -181,8 +183,19 @@ export const hardBreakNodeSchema: z.ZodType<HardBreakNode> = z.object({
 	marks: z.array(blockleafMarkSchema).optional()
 });
 
+/** Version 2 (`PA-02`, `F24`). */
+export const mentionNodeSchema: z.ZodType<MentionNode> = z.object({
+	type: z.literal('mention'),
+	attrs: z.object({
+		id: z.string(),
+		label: z.string(),
+		kind: z.string().nullable().optional()
+	}),
+	marks: z.array(blockleafMarkSchema).optional()
+});
+
 export const inlineNodeSchema: z.ZodType<InlineNode> = orUnrecognisedNode(
-	z.union([textNodeSchema, hardBreakNodeSchema])
+	z.union([textNodeSchema, hardBreakNodeSchema, mentionNodeSchema])
 );
 
 /* -------------------------------------------------------------------------- */
@@ -524,7 +537,8 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				tableHeaderNodeSchema,
 				tableCellNodeSchema,
 				textNodeSchema,
-				hardBreakNodeSchema
+				hardBreakNodeSchema,
+				mentionNodeSchema
 			])
 		)
 );

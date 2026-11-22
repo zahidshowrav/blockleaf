@@ -48,6 +48,18 @@ describe('toPlainText', () => {
 		expect(toPlainText(doc)).toBe('a\nb');
 	});
 
+	it('reads a mention as its label, as the editor does', () => {
+		const doc = docOf({
+			type: 'paragraph',
+			content: [
+				text('Hi '),
+				{ type: 'mention', attrs: { id: 'u_42', label: 'Ada' } }
+			]
+		});
+
+		expect(toPlainText(doc)).toBe('Hi @Ada');
+	});
+
 	it('leaves image alt text out by default and includes it on request', () => {
 		const doc = docOf(
 			paragraph('before'),

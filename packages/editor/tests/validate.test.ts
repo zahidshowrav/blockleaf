@@ -254,7 +254,7 @@ describe('unrecognised types (FC-04)', () => {
 			},
 			paragraph([
 				{ type: 'text', text: 'Hi ' },
-				{ type: 'mention', attrs: { id: 'u1' } }
+				{ type: 'footnote', attrs: { n: 1 } }
 			])
 		]);
 

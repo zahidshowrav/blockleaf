@@ -15,12 +15,9 @@ Do not rebuild the extension list by hand. Start from the preset and append:
 ```tsx
 import { BlockleafEditor } from '@blockleaf/editor';
 import { presets } from '@blockleaf/editor/extensions';
-import { Mention } from '@tiptap/extension-mention';
+import { Typography } from '@tiptap/extension-typography';
 
-const extensions = [
-	...presets.standard(),
-	Mention.configure({ suggestion: mentionSuggestion })
-];
+const extensions = [...presets.standard(), Typography];
 
 <BlockleafEditor
 	extensions={extensions}
@@ -28,6 +25,10 @@ const extensions = [
 	onChange={save}
 />;
 ```
+
+Mentions are already built: use [`@blockleaf/editor/mentions`](./mentions.mdx)
+rather than `@tiptap/extension-mention`. Both name their node `mention`, and
+Blockleaf's stores the shape its schema documents.
 
 `presets.standard()` and `presets.minimal()` return a fresh array each call —
 Tiptap extensions carry per-editor state, so sharing one array between two
@@ -97,7 +98,7 @@ Blockleaf depends on Tiptap at an **exact** version — `3.31.4` today, pinned
 rather than ranged. Install your extension at the same one:
 
 ```package-install
-@tiptap/extension-mention@3.31.4
+@tiptap/extension-typography@3.31.4
 ```
 
 Two different Tiptap or ProseMirror copies in one `node_modules` is the
@@ -138,7 +139,7 @@ Four consequences:
     ```ts
     import { BLOCK_NODE_TYPES, UniqueID } from '@blockleaf/editor/extensions';
 
-    UniqueID.configure({ types: [...BLOCK_NODE_TYPES, 'mention'] });
+    UniqueID.configure({ types: [...BLOCK_NODE_TYPES, 'poll'] });
     ```
 
     Without an id the drag handle has nothing to key a block on, and the
@@ -154,7 +155,7 @@ Four consequences:
     import { isPasteTransaction, UniqueID } from '@blockleaf/editor/extensions';
 
     UniqueID.configure({
-    	types: [...BLOCK_NODE_TYPES, 'mention'],
+    	types: [...BLOCK_NODE_TYPES, 'poll'],
     	filterTransaction: (tr) => !isPasteTransaction(tr) && yourCheck(tr)
     });
     ```

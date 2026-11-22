@@ -38,8 +38,9 @@ describe('document schema', () => {
 	 * the contract, so bumping it must be deliberate and must come with a
 	 * migration. See apps/docs/content/docs/schema.mdx.
 	 */
+	// 2 since PA-02: `mention`, and the rest of the PA-02 to PA-11 batch.
 	it('has not changed version by accident', () => {
-		expect(SCHEMA_VERSION).toBe(1);
+		expect(SCHEMA_VERSION).toBe(2);
 	});
 
 	it('validates and types a rich document with discriminated union nodes and marks', () => {
@@ -174,6 +175,11 @@ describe('document schema', () => {
 					attrs: { id: 'para-1' },
 					content: [
 						{ type: 'text' as const, text: 'Plain text, ' },
+						{
+							type: 'mention' as const,
+							attrs: { id: 'u_42', label: 'Ada', kind: 'user' }
+						},
+						{ type: 'text' as const, text: ', ' },
 						{
 							type: 'text' as const,
 							text: 'bold',

@@ -32,6 +32,10 @@
 			"types": "./dist/code-block.d.ts",
 			"import": "./dist/code-block.js"
 		},
+		"./mentions": {
+			"types": "./dist/mentions.d.ts",
+			"import": "./dist/mentions.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"

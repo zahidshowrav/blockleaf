@@ -257,3 +257,35 @@ export const columnStyle = (column: TableColumn): string =>
 	column.width !== undefined
 		? `width: ${column.width}px`
 		: `min-width: ${CELL_MIN_WIDTH}px`;
+
+/** What a mention shows before its label. Matches the editor's `MENTION_PREFIX`. */
+const MENTION_PREFIX = '@';
+
+const stringAttr = (node: RenderableNode, name: string): string => {
+	const value = node.attrs?.[name];
+	return typeof value === 'string' ? value : '';
+};
+
+/**
+ * A mention's attributes and the text it shows (`PA-02`), as the editor
+ * writes them. `data-mention-id` rather than `data-id`, which is a block's.
+ */
+export const mentionAttributes = (
+	node: RenderableNode
+): {
+	text: string;
+	attributes: Record<string, string | undefined>;
+} => {
+	const label = stringAttr(node, 'label');
+	const kind = stringAttr(node, 'kind');
+	return {
+		text: `${MENTION_PREFIX}${label}`,
+		attributes: {
+			class: 'blockleaf-mention',
+			'data-type': 'mention',
+			'data-mention-id': stringAttr(node, 'id'),
+			'data-label': label,
+			'data-kind': kind || undefined
+		}
+	};
+};

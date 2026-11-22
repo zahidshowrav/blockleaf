@@ -402,6 +402,20 @@
 	margin: var(--bl-space-block) 0;
 }
 
+/*
+ * Mention (PA-02). The same in the editor and in rendered output.
+ */
+
+.blockleaf-editor__content .blockleaf-mention {
+	padding: 0 0.2em;
+	border-radius: calc(var(--bl-radius, 6px) - 2px);
+	background: var(--bl-color-code-bg);
+	color: var(--bl-color-accent);
+	font-weight: 500;
+	white-space: nowrap;
+	box-decoration-break: clone;
+}
+
 .blockleaf-editor__content details > summary {
 	cursor: pointer;
 }
@@ -425,6 +439,8 @@
 	.blockleaf-editor *::after,
 	.blockleaf-slash-menu,
 	.blockleaf-slash-menu *,
+	.blockleaf-mention-menu,
+	.blockleaf-mention-menu *,
 	.blockleaf-bubble-menu,
 	.blockleaf-bubble-menu *,
 	.blockleaf-block-handle,
@@ -442,10 +458,11 @@
 }
 
 /*
- * Slash menu
+ * Slash menu, and the mention picker, which shares its look
  */
 
-.blockleaf-slash-menu {
+.blockleaf-slash-menu,
+.blockleaf-mention-menu {
 	--bl-slash-bg: var(--bl-color-bg, #ffffff);
 	--bl-slash-fg: var(--bl-color-fg, #1f2328);
 	/*
@@ -480,7 +497,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	.blockleaf-slash-menu:not([data-theme='light']) {
+	.blockleaf-slash-menu:not([data-theme='light']),
+	.blockleaf-mention-menu:not([data-theme='light']) {
 		--bl-slash-bg: #0d1117;
 		--bl-slash-fg: #e6edf3;
 		--bl-slash-muted: #8b949e;
@@ -493,7 +511,8 @@
 	}
 }
 
-.blockleaf-slash-menu[data-theme='dark'] {
+.blockleaf-slash-menu[data-theme='dark'],
+.blockleaf-mention-menu[data-theme='dark'] {
 	--bl-slash-bg: #0d1117;
 	--bl-slash-fg: #e6edf3;
 	--bl-slash-muted: #8b949e;
@@ -505,7 +524,8 @@
 		0 6px 18px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-.blockleaf-slash-menu:focus {
+.blockleaf-slash-menu:focus,
+.blockleaf-mention-menu:focus {
 	outline: none;
 }
 
@@ -522,7 +542,8 @@
 	letter-spacing: 0.04em;
 }
 
-.blockleaf-slash-menu__item {
+.blockleaf-slash-menu__item,
+.blockleaf-mention-menu__item {
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -543,12 +564,15 @@
 }
 
 .blockleaf-slash-menu__item:hover,
-.blockleaf-slash-menu__item[aria-selected='true'] {
+.blockleaf-slash-menu__item[aria-selected='true'],
+.blockleaf-mention-menu__item:hover,
+.blockleaf-mention-menu__item[aria-selected='true'] {
 	background-color: var(--bl-slash-selected);
 	color: var(--bl-slash-selected-fg);
 }
 
-.blockleaf-slash-menu__item:focus-visible {
+.blockleaf-slash-menu__item:focus-visible,
+.blockleaf-mention-menu__item:focus-visible {
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: -2px;
 }
@@ -585,7 +609,8 @@
 	white-space: nowrap;
 }
 
-.blockleaf-slash-menu__description {
+.blockleaf-slash-menu__description,
+.blockleaf-mention-menu__description {
 	font-size: 0.75rem;
 	color: var(--bl-slash-muted);
 	overflow: hidden;
@@ -593,11 +618,26 @@
 	white-space: nowrap;
 }
 
-.blockleaf-slash-menu__empty {
+.blockleaf-slash-menu__empty,
+.blockleaf-mention-menu__empty {
 	padding: 16px 12px;
 	text-align: center;
 	color: var(--bl-slash-muted);
 	font-size: 0.8125rem;
+}
+
+/* A person or page is two lines — a name and its description — with no icon. */
+.blockleaf-mention-menu__label {
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.blockleaf-mention-menu__item {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0;
 }
 
 /*
@@ -1407,6 +1447,7 @@
 	}
 
 	.blockleaf-slash-menu,
+	.blockleaf-mention-menu,
 	.blockleaf-bubble-menu,
 	.blockleaf-block-handle-anchor,
 	.blockleaf-block-menu,
