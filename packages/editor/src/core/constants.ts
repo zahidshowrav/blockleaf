@@ -122,3 +122,6 @@ export const TEXT_ALIGN_ATTRIBUTE_EXTENSION_NAME = 'blockleafTextAlign';
 export const TEXT_ALIGN_TYPES = ['paragraph', 'heading'] as const;
 /** The commands and shortcuts for `textAlign`, from `@blockleaf/editor/text-style`. */
 export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
+
+/** The `:` picker that inserts an emoji as plain text (`PA-03`). */
+export const EMOJI_EXTENSION_NAME = 'blockleafEmoji';

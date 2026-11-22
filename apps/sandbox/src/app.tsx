@@ -10,6 +10,7 @@ import type {
 	BlockleafLabels,
 	UploadFailure
 } from '@blockleaf/editor';
+import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
@@ -70,14 +71,16 @@ const withSandboxMentions = (base: Extensions): Extensions =>
 
 /**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
- * exercises: `?mentions`, `?textstyle`. Neither flag leaves the default
- * preset alone, as a host that installs nothing gets it.
+ * exercises: `?mentions`, `?textstyle`, `?emoji`. With none, the editor is
+ * the default preset, as a host that installs nothing gets it.
  */
 const extensions = (() => {
-	if (!params.has('mentions') && !params.has('textstyle')) return undefined;
+	const flags = ['mentions', 'textstyle', 'emoji'];
+	if (!flags.some((flag) => params.has(flag))) return undefined;
 	let base = presets.standard();
 	if (params.has('mentions')) base = withSandboxMentions(base);
 	if (params.has('textstyle')) base = withTextStyle(base);
+	if (params.has('emoji')) base = withEmoji(base);
 	return base;
 })();
 

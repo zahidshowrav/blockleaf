@@ -33,5 +33,12 @@
 		"import": "{ withTextStyle }",
 		"limit": "60 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "emoji subpath, standalone (shares the runtime; the emoji list is a lazy chunk)",
+		"path": "dist/emoji.js",
+		"import": "{ withEmoji }",
+		"limit": "72 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

@@ -23,6 +23,7 @@ import {
 } from '../../core/constants.js';
 import { defaultLabels } from '../../core/labels.js';
 import { Mention } from '../../core/nodes/mention.js';
+import { allowOutsideCode } from '../suggestion-list/allow.js';
 
 /** The triggers the options describe: the list, or the one shorthand trigger. */
 const triggersOf = (options: MentionsOptions): MentionTrigger[] => {
@@ -63,22 +64,9 @@ export const MentionsExtension =
 					editor: this.editor,
 					char: trigger.char ?? MENTION_PREFIX,
 					pluginKey: new PluginKey(`blockleafMentions${index}`),
-					allow: ({ state, range }) => {
-						if (!state.schema.nodes[MENTION_NODE]) return false;
-						const $from = state.doc.resolve(range.from);
-						// Code is literal: an `@` in it is an `@`, in a code
-						// block or under an inline code mark.
-						if ($from.parent.type.spec.code) return false;
-						let inCode = false;
-						state.doc.nodesBetween(range.from, range.to, (node) => {
-							if (
-								node.marks.some((mark) => mark.type.spec.code)
-							) {
-								inCode = true;
-							}
-						});
-						return !inCode && $from.parent.inlineContent;
-					},
+					allow: ({ state, range }) =>
+						state.schema.nodes[MENTION_NODE] !== undefined &&
+						allowOutsideCode(state, range),
 					// The menu asks the host itself; see `MentionMenu`.
 					items: () => [],
 					command: ({ editor, range, props }) => {

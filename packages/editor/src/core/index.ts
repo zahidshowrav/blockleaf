@@ -34,6 +34,7 @@ export {
 	type BubbleMenuLabels,
 	type CodeBlockLabels,
 	type DetailsLabels,
+	type EmojiLabels,
 	type ImageLabels,
 	type LinkLabels,
 	type MentionLabels,

@@ -7,7 +7,8 @@ export default defineConfig({
 		'src/validate.ts',
 		'src/code-block.ts',
 		'src/mentions.ts',
-		'src/text-style.ts'
+		'src/text-style.ts',
+		'src/emoji.ts'
 	],
 	format: ['esm'],
 	dts: true,

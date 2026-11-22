@@ -195,6 +195,15 @@ export type MentionLabels = {
 	loading: string;
 };
 
+export type EmojiLabels = {
+	/** Accessible name of the list of emoji. */
+	menu: string;
+	/** Shown when nothing matches what was typed. */
+	empty: string;
+	/** Shown while the emoji list loads, the first time the picker opens. */
+	loading: string;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -207,6 +216,7 @@ export type ResolvedLabels = {
 	codeBlock: CodeBlockLabels;
 	details: DetailsLabels;
 	mentions: MentionLabels;
+	emoji: EmojiLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -236,6 +246,7 @@ export type BlockleafLabels = {
 	codeBlock?: Partial<CodeBlockLabels>;
 	details?: Partial<DetailsLabels>;
 	mentions?: Partial<MentionLabels>;
+	emoji?: Partial<EmojiLabels>;
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
 };
@@ -390,6 +401,11 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'No matches',
 		loading: 'Searching…'
 	},
+	emoji: {
+		menu: 'Emoji',
+		empty: 'No emoji found',
+		loading: 'Loading emoji…'
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -453,6 +469,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	codeBlock: { ...defaultLabels.codeBlock, ...labels?.codeBlock },
 	details: { ...defaultLabels.details, ...labels?.details },
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
+	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }
 });
