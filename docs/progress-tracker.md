@@ -22,11 +22,13 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` and `PA-19` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01`, `PA-02` and `PA-19` are done.
 
-**Next:** the early release (decided 2026-11-22): `PA-01` and `PA-19`
-change no stored shape, so they ship together as editor `0.10.0` before the
-hold. Every other `PA` and `TB` task then waits for the v2 release.
+**Next:** `PA-03`. The early release shipped `PA-01` and `PA-19` as
+editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
+`SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
+changes nothing; `PA-03` to `PA-11` join version 2 without bumping again.
+Every other `PA` and `TB` task waits for the v2 release.
 `PA-09` waits with `PA-08`, which shares its `./toc` subpath, and `PA-18`
 comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
 waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
@@ -49,9 +51,10 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-22: 460 editor unit tests, 162 renderer, 64
-Playwright across two projects — 55 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 150.75 kB of 160 kB, schema entry at 407 B of 2 kB, code block
-subpath at 80.42 kB of 85 kB. Lint, typecheck and build cover eight
+**Last verified:** 2026-11-22: 478 editor unit tests, 167 renderer, 71
+Playwright across two projects — 62 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 150.81 kB of 160 kB, schema entry at 393 B of 2 kB, code block
+subpath at 80.52 kB of 85 kB, mentions subpath at 68.83 kB of 72 kB (0.86 kB
+on top of the editor). Lint, typecheck and build cover eight
 workspaces.
 
 ---
@@ -489,10 +492,18 @@ a toggle; with a gutter they never meet. The browser tests wait for the
 editor's own selection after a click or a Home before the next key, because
 a key sent straight after one sometimes acted on the old selection.
 
+`PA-02` (2026-11-22): the first task of the version 2 batch, so it carries
+the bump. A mention stores `{ id, label, kind }` (`F24`): the host's key,
+the name at the time so the renderer needs no lookup, and an optional kind
+so `@` people and `#` pages share one node. The picker asks the host itself
+rather than through the suggestion plugin, which waits for an answer before
+it shows anything; a slow lookup shows a loading line and a stale answer is
+dropped. The HTML uses `data-mention-id`, because `data-id` is a block's.
+
 | Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
-| PA-02 | Mentions                                                          | `./mentions`                   | Not started | —         | —          |
+| PA-02 | Mentions                                                          | `./mentions`                   | Done        | `10a117b` | 2026-11-22 |
 | PA-03 | Emoji                                                             | `./emoji`                      | Not started | —         | —          |
 | PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —         | —          |
 | PA-05 | Text colour                                                       | `./text-style`                 | Not started | —         | —          |
