@@ -1,5 +1,6 @@
 /**
- * The table of contents, as an opt-in subpath (`PA-08`).
+ * The table of contents and the word count, as an opt-in subpath (`PA-08`,
+ * `PA-09`).
  *
  * The `tableOfContents` node is in the stored schema from version 2, but an
  * editor that never lists its headings should not ship it. Importing from
@@ -13,6 +14,9 @@
  *
  * const extensions = withTableOfContents(presets.standard());
  * ```
+ *
+ * The word count is React and needs no extension: put `<TextCount />` inside
+ * `BlockleafEditor`, or call `useTextCount`.
  */
 export { TABLE_OF_CONTENTS_NODE } from './core/constants.js';
 export {
@@ -23,3 +27,6 @@ export {
 } from './core/nodes/table-of-contents.js';
 export { getTableOfContents, type TableOfContentsEntry } from './core/toc.js';
 export { useTableOfContents } from './react/use-table-of-contents.js';
+export { countText, type TextCounts } from './core/text-count.js';
+export { useTextCount, type TextCountState } from './react/use-text-count.js';
+export { TextCount, type TextCountProps } from './ui/text-count/text-count.js';

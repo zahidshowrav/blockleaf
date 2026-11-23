@@ -1,0 +1,103 @@
+---
+title: Word count
+description: Words and characters for the whole document and the selection, as a footer you place or a hook you read.
+icon: Hash
+---
+
+Put `<TextCount />` inside the editor and it shows how many words and
+characters the document has. Select some text and it shows the selection's
+count out of the total.
+
+```tsx
+import { TextCount } from '@blockleaf/editor/toc';
+
+<BlockleafEditor defaultValue={doc}>
+	<TextCount />
+</BlockleafEditor>;
+```
+
+```
+412 words · 2,380 characters
+12 of 412 words · 64 of 2,380 characters   ← with text selected
+```
+
+It ships in `@blockleaf/editor/toc`, with the
+[table of contents](./table-of-contents.mdx). It needs no extension and
+stores nothing, so it works with any preset and changes no document.
+
+## What counts
+
+- **Words split the way the language does**, using the browser's
+  `Intl.Segmenter`. `don't` is one word, and so is each word of Chinese or
+  Japanese text, which has no spaces between words.
+- **Characters are what a reader sees, spaces included.** `👍🏽` is one
+  character, not four. Line breaks between blocks are not counted.
+- **Blocks never run together.** The last word of one paragraph and the first
+  of the next are two words.
+- **Code blocks, headings, captions and table cells count.** So do mentions,
+  as `@` and the name. Image alt text does not.
+
+Where `Intl.Segmenter` is missing, words are split at spaces and characters
+are counted by code point.
+
+## The numbers yourself
+
+`useTextCount` returns the same counts for your own display, a progress bar
+towards a word limit, say:
+
+```tsx
+import { useTextCount } from '@blockleaf/editor/toc';
+
+const Limit = () => {
+	const { words, characters, selection } = useTextCount();
+	return (
+		<progress
+			value={words}
+			max={500}
+		/>
+	);
+};
+```
+
+`selection` is `null` when nothing is selected, and `{ words, characters }`
+when something is. Inside `BlockleafEditor` the hook finds the editor by
+itself; with `useBlockleafEditor`, pass it: `useTextCount(editor)`.
+
+A long document is cheap to count as you type. Each block's count is kept
+until that block changes, so a keystroke recounts one block, not the whole
+document.
+
+For a stored document, with no editor, `countText(doc)` returns
+`{ words, characters }`. This subpath loads Tiptap, though; on a server,
+count `toPlainText` from `@blockleaf/renderer` instead.
+
+## Translating it
+
+The footer's strings are under `textCount` in the label types. The footer is
+your component rather than the editor's, so pass them to it directly:
+
+```tsx
+<TextCount
+	labels={{
+		words: (count) => `${count} mots`,
+		characters: (count) => `${count} caractères`,
+		selected: (selected, total) => `${selected} sur ${total}`,
+		label: 'Nombre de mots'
+	}}
+/>
+```
+
+`selected` gets the selected number and the total already worded, so
+`selected(12, '412 words')` gives `12 of 412 words`. `label` is the footer's
+accessible name.
+
+## Styling
+
+The footer is `.blockleaf-text-count`: muted, small, aligned to the end of
+the line, with figures that keep their width as they change. It is left out
+when printing. Add `className` for your own.
+
+## Cost
+
+The footer, the hook and the counting add about 0.6 kB on top of the
+editor, and nothing without the import.

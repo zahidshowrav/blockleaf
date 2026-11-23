@@ -70,3 +70,30 @@ test.describe('table of contents', () => {
 		]);
 	});
 });
+
+/**
+ * PA-09. The footer follows typing and the selection — a real selection made
+ * with the keyboard, which jsdom cannot make.
+ */
+test.describe('word count', () => {
+	test('counts what is typed, and the selection out of the total', async ({
+		page
+	}) => {
+		await page.goto('/?toc');
+		await page.locator(EDITOR).click();
+		const footer = page.getByLabel('Word count');
+		await expect(footer).toHaveText('0 words · 0 characters');
+
+		await page.keyboard.type('one two three');
+		await expect(footer).toHaveText('3 words · 13 characters');
+
+		await page.keyboard.press('Shift+Home');
+		await expect(footer).toHaveText('3 of 3 words · 13 of 13 characters');
+
+		await page.keyboard.press('End');
+		for (let index = 0; index < 5; index += 1) {
+			await page.keyboard.press('Shift+ArrowLeft');
+		}
+		await expect(footer).toHaveText('1 of 3 words · 5 of 13 characters');
+	});
+});

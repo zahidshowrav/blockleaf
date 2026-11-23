@@ -266,6 +266,17 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, 'nav.blockleaf-toc')).toEqual([]);
 	});
 
+	test('the word count has no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?toc');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('Counted words');
+		await expect(page.getByLabel('Word count')).toContainText('2 words');
+
+		expect(await violations(page, '.blockleaf-text-count')).toEqual([]);
+	});
+
 	test('a captioned table has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');

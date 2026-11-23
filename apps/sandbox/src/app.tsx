@@ -14,7 +14,7 @@ import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
-import { withTableOfContents } from '@blockleaf/editor/toc';
+import { TextCount, withTableOfContents } from '@blockleaf/editor/toc';
 
 import { sandboxUpload } from './upload-adapter.js';
 
@@ -226,7 +226,10 @@ export const App = () => {
 							setDoc(next);
 							setDirty(false);
 						}}
-					/>
+					>
+						{/* The word count footer, with `?toc`. */}
+						{params.has('toc') && <TextCount />}
+					</BlockleafEditor>
 				</div>
 
 				{/*
