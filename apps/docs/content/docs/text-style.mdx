@@ -1,6 +1,6 @@
 ---
 title: Text styles
-description: Text colour, subscript, superscript and text alignment, as an opt-in subpath. More text styles join it as they ship.
+description: Text colour, font family, subscript, superscript and text alignment, as an opt-in subpath.
 icon: Type
 ---
 
@@ -65,9 +65,35 @@ back to the toolbar.
 Coloured text on the yellow highlight can fall below 4.5:1 in the light
 theme — gray, orange, yellow and green do. Use the two together sparingly.
 
-Why colour is a mark of its own rather than part of a shared `textStyle`
-mark is F26 in
+Why colour and font are marks of their own rather than parts of a shared
+`textStyle` mark is F26 in
 [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+
+## Font family
+
+Select text, then **Font** in the bubble menu: Default, Sans serif, Serif
+and Monospace, each shown in its own face.
+
+```json
+{ "type": "fontFamily", "attrs": { "family": "serif" } }
+```
+
+- **A token, never a font name.** `serif` resolves through
+  `--bl-font-serif`. Change the property and every document changes with
+  it; a font the reader does not have never reaches the page by name. A
+  pasted `font-family: Arial` arrives in the default face.
+- **Built in:** `sans` (your `--bl-font-body`), `serif` (the system serif)
+  and `mono` (your `--bl-font-mono`). Any other lower-case token works once
+  you define `--bl-font-<token>`:
+
+```css
+.blockleaf-editor {
+	--bl-font-display: 'Fraunces', var(--bl-font-serif);
+}
+```
+
+- **Rendered as** `<span data-font-family="serif" style="font-family: var(--bl-font-serif, inherit)">`
+  by the editor and both renderer targets.
 
 ## Subscript and superscript
 
@@ -140,8 +166,8 @@ extensions as a plain array, for a list you are assembling from scratch.
 ## Cost
 
 Measured with `size-limit`, minified and brotlied: the editor is
-**151.81 kB**, and the editor with text styles is **152.40 kB**, so
-**0.59 kB** for the marks, the alignment and colour commands, and their
-shortcuts. Without the import, the main bundle still carries the alignment
+**152.22 kB**, and the editor with text styles is **152.87 kB**, so
+**0.65 kB** for the marks, the alignment, colour and font commands, and
+their shortcuts. Without the import, the main bundle still carries the alignment
 attribute and the chrome that offers these styles — the block menu's Align
-entries and the bubble menu's palette — and none of it appears.
+entries and the bubble menu's font and colour panels — and none of it appears.

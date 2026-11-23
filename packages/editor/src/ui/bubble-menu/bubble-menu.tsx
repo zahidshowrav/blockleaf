@@ -8,14 +8,15 @@ import {
 } from 'react';
 
 import { ColorPanel } from './color-panel.js';
-import { LinkIcon, TextColorIcon } from './icons.js';
+import { FontPanel } from './font-panel.js';
+import { FontIcon, LinkIcon, TextColorIcon } from './icons.js';
 import { LinkEditor } from './link-editor.js';
 import type {
 	BubbleAction,
 	BubbleMenuPanel,
 	BubbleMenuProps
 } from './types.js';
-import { TEXT_COLOR_MARK } from '../../core/constants.js';
+import { FONT_FAMILY_MARK, TEXT_COLOR_MARK } from '../../core/constants.js';
 import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: BubbleAction['icon']) => {
@@ -52,6 +53,18 @@ const colorPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
 	icon: TextColorIcon,
 	isActive: (editor) => editor.isActive(TEXT_COLOR_MARK),
 	component: ColorPanel
+});
+
+/**
+ * The font panel (`PA-10`), offered only where `@blockleaf/editor/text-style`
+ * put a font mark in the schema.
+ */
+const fontPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
+	id: 'font',
+	label: () => labels.font.button,
+	icon: FontIcon,
+	isActive: (editor) => editor.isActive(FONT_FAMILY_MARK),
+	component: FontPanel
 });
 
 /**
@@ -120,13 +133,15 @@ export const BubbleMenu = ({
 	const pendingFocusRef = useRef<string | null>(null);
 
 	const hasTextColor = TEXT_COLOR_MARK in editor.schema.marks;
+	const hasFont = FONT_FAMILY_MARK in editor.schema.marks;
 	const panels = useMemo(() => {
 		const resolved: BubbleMenuPanel[] = [];
+		if (hasFont) resolved.push(fontPanel(labels));
 		if (hasTextColor) resolved.push(colorPanel(labels));
 		if (link) resolved.push(LINK_PANEL);
 		if (panel) resolved.push(panel);
 		return resolved;
-	}, [hasTextColor, labels, link, panel]);
+	}, [hasFont, hasTextColor, labels, link, panel]);
 
 	// Subscribing re-runs this component whenever the marks under the
 	// selection change, which is what keeps `aria-pressed` honest.

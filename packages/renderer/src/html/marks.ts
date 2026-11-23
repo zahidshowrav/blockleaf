@@ -1,5 +1,7 @@
 import { element } from './escape.js';
 import {
+	fontFamilyToken,
+	fontFamilyValue,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -17,6 +19,19 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 	subscript: ({ children }) => element('sub', {}, children),
 	superscript: ({ children }) => element('sup', {}, children),
 	code: ({ children }) => element('code', {}, children),
+
+	fontFamily: ({ mark, children }) => {
+		const token = fontFamilyToken(mark);
+		if (!token) return children;
+		return element(
+			'span',
+			{
+				'data-font-family': token,
+				style: `font-family: ${fontFamilyValue(token)}`
+			},
+			children
+		);
+	},
 
 	textColor: ({ mark, children }) => {
 		const token = textColorToken(mark);

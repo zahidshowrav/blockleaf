@@ -220,6 +220,19 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} p`)).toEqual([]);
 	});
 
+	test('the font panel has no violations', async ({ page }) => {
+		await page.goto('/?textstyle');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('Type');
+		for (let index = 0; index < 4; index += 1) {
+			await page.keyboard.press('Shift+ArrowLeft');
+		}
+		await page.getByRole('button', { name: 'Font' }).click();
+		await expect(page.locator('.blockleaf-font-panel')).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-font-panel')).toEqual([]);
+	});
+
 	test('the emoji picker has no violations, contrast included', async ({
 		page
 	}) => {

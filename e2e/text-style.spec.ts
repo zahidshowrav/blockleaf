@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR } from './helpers.js';
 
 /**
- * PA-05, PA-06 and PA-07. Shortcuts, bubble-menu buttons, a palette and a
+ * PA-05, PA-06, PA-07 and PA-10. Shortcuts, bubble-menu buttons, a palette and a
  * block-menu entry acting on a real selection — and the colour a token
  * actually resolves to, which only a browser computes.
  */
@@ -208,5 +208,29 @@ test.describe('text color', () => {
 		await expect(
 			page.locator(`${EDITOR} span[data-color="brown"]`)
 		).toHaveText('Note');
+	});
+});
+
+test.describe('font family', () => {
+	test('the font panel sets the selection in a family token', async ({
+		page
+	}) => {
+		await open(page, 'Quote');
+		await selectBack(page, 5);
+
+		await page.getByRole('button', { name: 'Font' }).click();
+		const group = page.getByRole('radiogroup', { name: 'Typeface' });
+		await expect(group).toBeVisible();
+		await expect(
+			group.getByRole('radio', { name: 'Default' })
+		).toBeFocused();
+		await group.getByRole('radio', { name: 'Serif', exact: true }).click();
+
+		const span = page.locator(`${EDITOR} span[data-font-family="serif"]`);
+		await expect(span).toHaveText('Quote');
+		await expect(span).toHaveCSS('font-family', /serif/);
+		await expect(page.locator('.sandbox__json')).toContainText(
+			'"family": "serif"'
+		);
 	});
 });

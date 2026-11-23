@@ -206,6 +206,17 @@ describe('document schema', () => {
 						{ type: 'text' as const, text: ', ' },
 						{
 							type: 'text' as const,
+							text: 'serif',
+							marks: [
+								{
+									type: 'fontFamily' as const,
+									attrs: { family: 'serif' }
+								}
+							]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
 							text: 'bold',
 							marks: [{ type: 'bold' as const }]
 						},

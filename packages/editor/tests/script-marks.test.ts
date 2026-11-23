@@ -139,7 +139,8 @@ describe('subscript and superscript (PA-07)', () => {
 			SUBSCRIPT_MARK,
 			SUPERSCRIPT_MARK,
 			'textAlign',
-			'textColor'
+			'textColor',
+			'fontFamily'
 		]);
 	});
 

@@ -224,6 +224,17 @@ export type TextColorLabels = {
 	>;
 };
 
+export type FontLabels = {
+	/** The bubble-menu button that opens the font panel. */
+	button: string;
+	/** The group of families. */
+	family: string;
+	/** The option that takes the style off. */
+	none: string;
+	/** Each built-in family's name. A host's own tokens are named by their token. */
+	families: Record<'sans' | 'serif' | 'mono', string>;
+};
+
 export type ResolvedLabels = {
 	blockTypes: BlockTypeLabels;
 	slashMenu: SlashMenuLabels;
@@ -238,6 +249,7 @@ export type ResolvedLabels = {
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
 	textColor: TextColorLabels;
+	font: FontLabels;
 	placeholder: Required<PlaceholderLabels>;
 	unknown: UnknownContentLabels;
 };
@@ -270,6 +282,9 @@ export type BlockleafLabels = {
 	emoji?: Partial<EmojiLabels>;
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
 		colors?: Partial<TextColorLabels['colors']>;
+	};
+	font?: Partial<Omit<FontLabels, 'families'>> & {
+		families?: Partial<FontLabels['families']>;
 	};
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
@@ -445,6 +460,12 @@ export const defaultLabels: ResolvedLabels = {
 			red: 'Red'
 		}
 	},
+	font: {
+		button: 'Font',
+		family: 'Typeface',
+		none: 'Default',
+		families: { sans: 'Sans serif', serif: 'Serif', mono: 'Monospace' }
+	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
 		block: (type) => `Unsupported block: ${type}`,
@@ -516,6 +537,11 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 			...defaultLabels.textColor.colors,
 			...labels?.textColor?.colors
 		}
+	},
+	font: {
+		...defaultLabels.font,
+		...labels?.font,
+		families: { ...defaultLabels.font.families, ...labels?.font?.families }
 	},
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }

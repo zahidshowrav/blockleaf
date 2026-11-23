@@ -38,6 +38,9 @@
 	--bl-font-body:
 		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 	--bl-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+	/* font family tokens (PA-10): `fontFamily` resolves through --bl-font-<token> */
+	--bl-font-sans: var(--bl-font-body);
+	--bl-font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
 	--bl-font-size: 1rem;
 	--bl-line-height: 1.7;
 
@@ -704,6 +707,9 @@
  */
 
 .blockleaf-bubble-menu {
+	--bl-font-sans: var(--bl-font-body, ui-sans-serif, system-ui, sans-serif);
+	--bl-font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+	--bl-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
 	--bl-text-gray: #6b7280;
 	--bl-text-brown: #8a5a3c;
 	--bl-text-orange: #c2410c;
@@ -797,7 +803,7 @@
 	padding: 2px;
 }
 
-.blockleaf-color-panel__swatch {
+.blockleaf-color-panel__option {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -811,15 +817,61 @@
 	cursor: pointer;
 }
 
-.blockleaf-color-panel__swatch:hover {
+.blockleaf-color-panel__option:hover {
 	background: var(--bl-bubble-hover);
 }
 
-.blockleaf-color-panel__swatch[aria-checked='true'] {
+.blockleaf-color-panel__option[aria-checked='true'] {
 	border-color: currentColor;
 }
 
-.blockleaf-color-panel__swatch:focus-visible {
+.blockleaf-color-panel__option:focus-visible {
+	outline: 2px solid var(--bl-color-accent, #3b5bdb);
+	outline-offset: -2px;
+}
+
+/*
+ * Font panel (PA-10), a panel of the bubble menu: one radio group per style
+ */
+
+.blockleaf-font-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 2px;
+	min-width: 160px;
+}
+
+.blockleaf-font-panel__group {
+	display: flex;
+	flex-direction: column;
+}
+
+.blockleaf-font-panel__group + .blockleaf-font-panel__group {
+	padding-top: 4px;
+	border-top: 1px solid var(--bl-bubble-border);
+}
+
+.blockleaf-font-panel__group__option {
+	padding: 6px 8px;
+	border: 1px solid transparent;
+	border-radius: calc(var(--bl-radius, 6px) - 2px);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.blockleaf-font-panel__group__option:hover {
+	background: var(--bl-bubble-hover);
+}
+
+.blockleaf-font-panel__group__option[aria-checked='true'] {
+	border-color: currentColor;
+}
+
+.blockleaf-font-panel__group__option:focus-visible {
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: -2px;
 }

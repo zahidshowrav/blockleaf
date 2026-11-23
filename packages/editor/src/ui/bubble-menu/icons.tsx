@@ -132,3 +132,12 @@ export const TextColorIcon = (props: IconProps) => (
 		<path d="m6 16 6-12 6 12M8.5 11h7M4 20h16" />
 	</svg>
 );
+
+export const FontIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M4 7V5h11v2M9.5 5v14M7 19h5M14 13v-1h6v1M17 12v7M15.5 19h3" />
+	</svg>
+);

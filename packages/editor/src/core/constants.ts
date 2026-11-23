@@ -143,3 +143,20 @@ export const TEXT_COLORS = [
 	'pink',
 	'red'
 ] as const;
+
+/**
+ * Font family (`PA-10`, `F26`): a token mark in the schema from version 2,
+ * loaded from `@blockleaf/editor/text-style`. These are the families the
+ * stylesheet defines and the picker offers; a host may define more.
+ */
+export const FONT_FAMILY_MARK = 'fontFamily';
+export const FONT_FAMILIES = ['sans', 'serif', 'mono'] as const;
+
+/**
+ * What a style token may look like (`F18`): lower case, a letter first, at
+ * most 32 characters. Checked wherever one is read, because it ends up inside
+ * a `style` attribute and nothing that could close the `var()` may get there.
+ * Here rather than beside the marks so the validator can use it without
+ * importing Tiptap.
+ */
+export const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
