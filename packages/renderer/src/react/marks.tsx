@@ -2,6 +2,8 @@ import { type MarkRenderer } from './types.js';
 import {
 	fontFamilyToken,
 	fontFamilyValue,
+	fontSizeToken,
+	fontSizeValue,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -34,6 +36,19 @@ const FontFamily: MarkRenderer = ({ mark, children }) => {
 		<span
 			data-font-family={token}
 			style={{ fontFamily: fontFamilyValue(token) }}
+		>
+			{children}
+		</span>
+	);
+};
+
+const FontSize: MarkRenderer = ({ mark, children }) => {
+	const token = fontSizeToken(mark);
+	if (!token) return <>{children}</>;
+	return (
+		<span
+			data-font-size={token}
+			style={{ fontSize: fontSizeValue(token) }}
 		>
 			{children}
 		</span>
@@ -99,6 +114,7 @@ export const defaultMarks: Record<string, MarkRenderer> = {
 	superscript: Superscript,
 	textColor: TextColor,
 	fontFamily: FontFamily,
+	fontSize: FontSize,
 	code: Code,
 	highlight: Highlight,
 	link: Link

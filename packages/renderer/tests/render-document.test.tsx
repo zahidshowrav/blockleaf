@@ -56,6 +56,18 @@ describe('sanitisation', () => {
 		expect(html).not.toContain('javascript:');
 	});
 
+	it('keeps the words of a size that is not a token and drops the span', () => {
+		const doc = docOf({
+			type: 'paragraph',
+			content: [
+				text('x', [{ type: 'fontSize', attrs: { size: '99px' } }])
+			]
+		});
+
+		expect(reactHTML(doc)).toBe('<p>x</p>');
+		expect(stringHTML(doc)).toBe('<p>x</p>');
+	});
+
 	it('keeps the words of a font that is not a token and drops the span', () => {
 		const doc = docOf({
 			type: 'paragraph',

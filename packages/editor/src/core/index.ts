@@ -143,6 +143,7 @@ export {
 	type SuperscriptMark,
 	type TextColorMark,
 	type FontFamilyMark,
+	type FontSizeMark,
 	type HorizontalRuleNode,
 	type ImageNode,
 	type InlineNode,

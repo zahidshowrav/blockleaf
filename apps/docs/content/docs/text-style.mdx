@@ -1,6 +1,6 @@
 ---
 title: Text styles
-description: Text colour, font family, subscript, superscript and text alignment, as an opt-in subpath.
+description: Text colour, font family and size, subscript, superscript and text alignment, as an opt-in subpath.
 icon: Type
 ---
 
@@ -95,6 +95,33 @@ and Monospace, each shown in its own face.
 - **Rendered as** `<span data-font-family="serif" style="font-family: var(--bl-font-serif, inherit)">`
   by the editor and both renderer targets.
 
+## Font size
+
+The **Font** panel's second group: Default, Small, Large and Extra large.
+`Tab` moves between the family group and the size group.
+
+```json
+{ "type": "fontSize", "attrs": { "size": "lg" } }
+```
+
+| Token | Default value | Shown as    |
+| ----- | ------------- | ----------- |
+| `sm`  | `0.875em`     | Small       |
+| `lg`  | `1.25em`      | Large       |
+| `xl`  | `1.5em`       | Extra large |
+
+- **A token, never a length.** Each resolves through `--bl-font-size-<token>`,
+  in `em`, so it scales with the editor's own size and with a reader's text
+  size setting — a stored `18px` would do neither. A pasted
+  `font-size: 18px` arrives at the normal size.
+- **There is no "medium".** The body size is no mark at all. Anything bigger
+  than `xl` is a heading's job, and headings carry meaning a big font does
+  not.
+- **Your own sizes** work like your own colours: any lower-case token, once
+  you define `--bl-font-size-<token>`.
+- **Rendered as** `<span data-font-size="lg" style="font-size: var(--bl-font-size-lg, 1em)">`
+  by the editor and both renderer targets.
+
 ## Subscript and superscript
 
 | Style       | Shortcut  | Stored as                   | Written as |
@@ -166,8 +193,8 @@ extensions as a plain array, for a list you are assembling from scratch.
 ## Cost
 
 Measured with `size-limit`, minified and brotlied: the editor is
-**152.22 kB**, and the editor with text styles is **152.87 kB**, so
-**0.65 kB** for the marks, the alignment, colour and font commands, and
+**152.29 kB**, and the editor with text styles is **152.84 kB**, so
+**0.55 kB** for the marks, the alignment, colour and font commands, and
 their shortcuts. Without the import, the main bundle still carries the alignment
 attribute and the chrome that offers these styles — the block menu's Align
 entries and the bubble menu's font and colour panels — and none of it appears.

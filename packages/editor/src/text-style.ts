@@ -1,6 +1,6 @@
 /**
- * Text styles, as an opt-in subpath (`PA-05`, `PA-06`, `PA-07`, and later
- * `PA-10`, `PA-11`, `PA-22`).
+ * Text styles, as an opt-in subpath (`PA-05`, `PA-06`, `PA-07`, `PA-10`,
+ * `PA-11`, and later `PA-22`).
  *
  * The marks are in the stored schema from version 2. An editor that does not
  * load them keeps a stored one as a placeholder and saves it back unchanged.
@@ -21,9 +21,11 @@ import {
 	SUPERSCRIPT_MARK,
 	TEXT_ALIGN_EXTENSION_NAME,
 	TEXT_COLOR_MARK,
-	FONT_FAMILY_MARK
+	FONT_FAMILY_MARK,
+	FONT_SIZE_MARK
 } from './core/constants.js';
 import { FontFamily } from './core/marks/font-family.js';
+import { FontSize } from './core/marks/font-size.js';
 import { Subscript, Superscript } from './core/marks/script.js';
 import { TextColor } from './core/marks/text-color.js';
 import { TextAlign } from './core/text-align.js';
@@ -36,9 +38,12 @@ export {
 	TEXT_COLORS,
 	TEXT_COLOR_MARK,
 	FONT_FAMILIES,
-	FONT_FAMILY_MARK
+	FONT_FAMILY_MARK,
+	FONT_SIZES,
+	FONT_SIZE_MARK
 } from './core/constants.js';
 export { FontFamily } from './core/marks/font-family.js';
+export { FontSize } from './core/marks/font-size.js';
 export { Subscript, Superscript } from './core/marks/script.js';
 export { TextColor, readColorToken } from './core/marks/text-color.js';
 export { readStyleToken } from './core/marks/token-mark.js';
@@ -50,7 +55,8 @@ export const createTextStyle = (): Extensions => [
 	Superscript,
 	TextAlign,
 	TextColor,
-	FontFamily
+	FontFamily,
+	FontSize
 ];
 
 const NAMES: ReadonlySet<string> = new Set([
@@ -58,7 +64,8 @@ const NAMES: ReadonlySet<string> = new Set([
 	SUPERSCRIPT_MARK,
 	TEXT_ALIGN_EXTENSION_NAME,
 	TEXT_COLOR_MARK,
-	FONT_FAMILY_MARK
+	FONT_FAMILY_MARK,
+	FONT_SIZE_MARK
 ]);
 
 /**

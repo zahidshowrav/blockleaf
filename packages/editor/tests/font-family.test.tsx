@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Editor, type JSONContent } from '@tiptap/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -166,6 +166,7 @@ describe('font family (PA-10)', () => {
 			);
 
 			const group = screen.getByRole('radiogroup', { name: 'Typeface' });
+			// The size group (PA-11) follows; only the family takes focus.
 			expect(
 				[...group.querySelectorAll('[role="radio"]')].map((radio) =>
 					radio.getAttribute('aria-label')
@@ -202,7 +203,11 @@ describe('font family (PA-10)', () => {
 					onClose={vi.fn()}
 				/>
 			);
-			fireEvent.click(screen.getByRole('radio', { name: 'Default' }));
+			fireEvent.click(
+				within(
+					screen.getByRole('radiogroup', { name: 'Typeface' })
+				).getByRole('radio', { name: 'Default' })
+			);
 			expect(runs(instance)).toEqual([
 				{ type: 'text', text: 'one two three' }
 			]);

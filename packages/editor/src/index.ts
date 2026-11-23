@@ -59,6 +59,7 @@ export {
 	type SuperscriptMark,
 	type TextColorMark,
 	type FontFamilyMark,
+	type FontSizeMark,
 	type HorizontalRuleNode,
 	type ImageAlign,
 	type ImageAttributes,
