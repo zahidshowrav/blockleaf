@@ -205,8 +205,12 @@ export type EmojiLabels = {
 };
 
 export type TextColorLabels = {
-	/** The bubble-menu button that opens the palette, and the palette's name. */
+	/** The bubble-menu button that opens the palette. */
 	button: string;
+	/** The group of text colours. */
+	text: string;
+	/** The group of background colours (`PA-22`). */
+	background: string;
 	/** The swatch that takes the colour off. */
 	none: string;
 	/** Each built-in colour's name, as announced. A host's own tokens are named by their token. */
@@ -233,6 +237,10 @@ export type FontLabels = {
 	none: string;
 	/** Each built-in family's name. A host's own tokens are named by their token. */
 	families: Record<'sans' | 'serif' | 'mono', string>;
+	/** The group of sizes. */
+	size: string;
+	/** Each built-in size's name. */
+	sizes: Record<'sm' | 'lg' | 'xl', string>;
 };
 
 export type ResolvedLabels = {
@@ -283,8 +291,9 @@ export type BlockleafLabels = {
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
 		colors?: Partial<TextColorLabels['colors']>;
 	};
-	font?: Partial<Omit<FontLabels, 'families'>> & {
+	font?: Partial<Omit<FontLabels, 'families' | 'sizes'>> & {
 		families?: Partial<FontLabels['families']>;
+		sizes?: Partial<FontLabels['sizes']>;
 	};
 	placeholder?: PlaceholderLabels;
 	unknown?: Partial<UnknownContentLabels>;
@@ -446,7 +455,9 @@ export const defaultLabels: ResolvedLabels = {
 		loading: 'Loading emoji…'
 	},
 	textColor: {
-		button: 'Text color',
+		button: 'Color',
+		text: 'Text',
+		background: 'Background',
 		none: 'Default',
 		colors: {
 			gray: 'Gray',
@@ -464,7 +475,9 @@ export const defaultLabels: ResolvedLabels = {
 		button: 'Font',
 		family: 'Typeface',
 		none: 'Default',
-		families: { sans: 'Sans serif', serif: 'Serif', mono: 'Monospace' }
+		families: { sans: 'Sans serif', serif: 'Serif', mono: 'Monospace' },
+		size: 'Size',
+		sizes: { sm: 'Small', lg: 'Large', xl: 'Extra large' }
 	},
 	placeholder: defaultPlaceholderLabels,
 	unknown: {
@@ -541,7 +554,8 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	font: {
 		...defaultLabels.font,
 		...labels?.font,
-		families: { ...defaultLabels.font.families, ...labels?.font?.families }
+		families: { ...defaultLabels.font.families, ...labels?.font?.families },
+		sizes: { ...defaultLabels.font.sizes, ...labels?.font?.sizes }
 	},
 	placeholder: { ...defaultLabels.placeholder, ...labels?.placeholder },
 	unknown: { ...defaultLabels.unknown, ...labels?.unknown }

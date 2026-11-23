@@ -16,6 +16,9 @@ import {
 
 const ALIGNMENTS = new Set<string>(['left', 'center', 'right']);
 
+/** A style token (`F18`): lower case, a letter first, at most 32 characters. */
+const STYLE_TOKEN_PATTERN = /^[a-z][a-z0-9-]{0,31}$/;
+
 /**
  * The block id, stored as `attrs.id` and rendered as `data-id` to match the
  * editor's own output. A host that saved documents before `UniqueID` was
@@ -146,13 +149,33 @@ export const linkAttributes = (mark: RenderableMark): LinkAttributes | null => {
 	};
 };
 
+/** A highlight colour written before tokens: hex, `rgb()` or `hsl()`. */
+const LEGACY_HIGHLIGHT = /^(#[0-9a-f]{3,8}|(rgb|hsl)a?\(\s*[\d.%\s,/]+\))$/i;
+
+/**
+ * A highlight's stored `color`, when it is one the renderers will draw: a
+ * token (`PA-22`) or a colour written before tokens. Anything else — a value
+ * with a `;` in it above all — is treated as no colour.
+ */
 export const highlightColor = (mark: RenderableMark): string | undefined => {
 	const color = mark.attrs?.color;
-	return typeof color === 'string' && color ? color : undefined;
+	if (typeof color !== 'string') return undefined;
+	const value = color.trim();
+	return STYLE_TOKEN_PATTERN.test(value) || LEGACY_HIGHLIGHT.test(value)
+		? value
+		: undefined;
 };
 
-/** A style token (`F18`), checked as the editor checks it. */
-const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
+/**
+ * The CSS background a highlight's colour resolves to (`PA-22`), as the
+ * editor writes it: a token through `--bl-highlight-<token>`, falling back to
+ * the token itself so a colour name stored before tokens still shows; an
+ * older hex or `rgb()` value as it is.
+ */
+export const highlightBackground = (color: string): string =>
+	STYLE_TOKEN_PATTERN.test(color)
+		? `var(--bl-highlight-${color}, ${color})`
+		: color;
 
 /**
  * A token mark's token (`F26`), or nothing when it is not one. The token goes
@@ -164,7 +187,7 @@ const markToken = (
 	attribute: string
 ): string | undefined => {
 	const value = mark.attrs?.[attribute];
-	return typeof value === 'string' && STYLE_TOKEN.test(value)
+	return typeof value === 'string' && STYLE_TOKEN_PATTERN.test(value)
 		? value
 		: undefined;
 };
@@ -176,6 +199,14 @@ export const textColorToken = (mark: RenderableMark): string | undefined =>
 /** A `fontFamily` mark's token (`PA-10`). */
 export const fontFamilyToken = (mark: RenderableMark): string | undefined =>
 	markToken(mark, 'family');
+
+/** A `fontSize` mark's token (`PA-11`). */
+export const fontSizeToken = (mark: RenderableMark): string | undefined =>
+	markToken(mark, 'size');
+
+/** The size a token resolves to: its custom property, else the surrounding size. */
+export const fontSizeValue = (token: string): string =>
+	`var(--bl-font-size-${token}, 1em)`;
 
 /** The family a token resolves to: its custom property, else the surrounding font. */
 export const fontFamilyValue = (token: string): string =>

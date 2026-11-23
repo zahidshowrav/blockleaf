@@ -213,6 +213,33 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'font size, with a family on the same text',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('big', [{ type: 'fontSize', attrs: { size: 'xl' } }]),
+				text(' '),
+				text('both', [
+					{ type: 'fontFamily', attrs: { family: 'serif' } },
+					{ type: 'fontSize', attrs: { size: 'sm' } }
+				])
+			]
+		})
+	],
+	[
+		'background colour token, and a colour name stored before tokens',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('blue', [{ type: 'highlight', attrs: { color: 'blue' } }]),
+				text(' '),
+				text('gold', [{ type: 'highlight', attrs: { color: 'gold' } }])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

@@ -283,7 +283,7 @@ describe('Bubble menu toolbar', () => {
 		const toolbar = screen.getByRole('toolbar');
 		const bold = screen.getByRole('button', { name: 'Bold' });
 		const italic = screen.getByRole('button', { name: 'Italic' });
-		const last = screen.getByRole('button', { name: 'Text color' });
+		const last = screen.getByRole('button', { name: 'Color' });
 
 		expect(bold.getAttribute('tabindex')).toBe('0');
 		expect(italic.getAttribute('tabindex')).toBe('-1');

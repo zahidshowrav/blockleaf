@@ -2,6 +2,9 @@ import { element } from './escape.js';
 import {
 	fontFamilyToken,
 	fontFamilyValue,
+	fontSizeToken,
+	fontSizeValue,
+	highlightBackground,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -33,6 +36,19 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 		);
 	},
 
+	fontSize: ({ mark, children }) => {
+		const token = fontSizeToken(mark);
+		if (!token) return children;
+		return element(
+			'span',
+			{
+				'data-font-size': token,
+				style: `font-size: ${fontSizeValue(token)}`
+			},
+			children
+		);
+	},
+
 	textColor: ({ mark, children }) => {
 		const token = textColorToken(mark);
 		if (!token) return children;
@@ -50,7 +66,7 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 			{
 				'data-color': color,
 				style: color
-					? `background-color: ${color}; color: inherit`
+					? `background-color: ${highlightBackground(color)}; color: inherit`
 					: undefined
 			},
 			children

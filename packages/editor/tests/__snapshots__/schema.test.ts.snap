@@ -133,6 +133,22 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
         {
           "marks": [
             {
+              "attrs": {
+                "size": "lg",
+              },
+              "type": "fontSize",
+            },
+          ],
+          "text": "large",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
               "type": "bold",
             },
           ],

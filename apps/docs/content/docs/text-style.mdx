@@ -1,6 +1,6 @@
 ---
 title: Text styles
-description: Text colour, font family, subscript, superscript and text alignment, as an opt-in subpath.
+description: Text and background colour, font family and size, subscript, superscript and text alignment, as an opt-in subpath.
 icon: Type
 ---
 
@@ -21,9 +21,10 @@ They are new in schema version 2.
 
 ## Text colour
 
-Select text, then **Text color** in the bubble menu: Default and nine
-colours, as one radio group. The arrow keys move, Enter picks, Escape goes
-back to the toolbar.
+Select text, then **Color** in the bubble menu. The panel has two radio
+groups, **Text** and **Background**, each Default and nine colours. The
+arrow keys move within a group, `Tab` goes to the next, Enter picks, Escape
+goes back to the toolbar.
 
 ```json
 { "type": "textColor", "attrs": { "color": "red" } }
@@ -65,6 +66,42 @@ back to the toolbar.
 Coloured text on the yellow highlight can fall below 4.5:1 in the light
 theme — gray, orange, yellow and green do. Use the two together sparingly.
 
+## Background colour
+
+The **Color** panel's second group. A background is the `highlight` mark
+the schema has had since `0.1.0`, with a token in its `color`:
+
+```json
+{ "type": "highlight", "attrs": { "color": "blue" } }
+```
+
+- **The same nine names as text colour**, each with a pale tint for the
+  light theme and a deep one for the dark theme. Body text is at least
+  4.5:1 on every one of them, and so are links.
+- **The plain highlight is unchanged.** The bubble menu's Highlight button
+  still stores `{ "color": null }` and draws `--bl-color-highlight`.
+- **A colour stored before tokens still shows.** A host that called
+  Tiptap's `setHighlight({ color: '#ffee00' })` keeps its yellow: a hex,
+  `rgb()` or `hsl()` value is drawn as it is, and a colour name such as
+  `gold` falls back to itself. Anything else — a value with a `;` in it —
+  is dropped and the text is drawn with the plain highlight.
+- **Rendered as** `<mark data-color="blue" style="background-color: var(--bl-highlight-blue, blue); color: inherit">`
+  by the editor and both renderer targets.
+- **The background group needs the highlight mark**, so the minimal preset
+  shows only the Text group.
+
+| Token    | Light     | Dark      |
+| -------- | --------- | --------- |
+| `gray`   | `#ebeced` | `#2d333b` |
+| `brown`  | `#f2e6dc` | `#3d2b1f` |
+| `orange` | `#fde3cf` | `#4a2b12` |
+| `yellow` | `#fef08a` | `#38330c` |
+| `green`  | `#d9f5e1` | `#12351f` |
+| `blue`   | `#dbe8fe` | `#152b4f` |
+| `purple` | `#ece6fd` | `#2f2150` |
+| `pink`   | `#fce4f1` | `#47162f` |
+| `red`    | `#fde0e0` | `#4b1818` |
+
 Why colour and font are marks of their own rather than parts of a shared
 `textStyle` mark is F26 in
 [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
@@ -93,6 +130,33 @@ and Monospace, each shown in its own face.
 ```
 
 - **Rendered as** `<span data-font-family="serif" style="font-family: var(--bl-font-serif, inherit)">`
+  by the editor and both renderer targets.
+
+## Font size
+
+The **Font** panel's second group: Default, Small, Large and Extra large.
+`Tab` moves between the family group and the size group.
+
+```json
+{ "type": "fontSize", "attrs": { "size": "lg" } }
+```
+
+| Token | Default value | Shown as    |
+| ----- | ------------- | ----------- |
+| `sm`  | `0.875em`     | Small       |
+| `lg`  | `1.25em`      | Large       |
+| `xl`  | `1.5em`       | Extra large |
+
+- **A token, never a length.** Each resolves through `--bl-font-size-<token>`,
+  in `em`, so it scales with the editor's own size and with a reader's text
+  size setting — a stored `18px` would do neither. A pasted
+  `font-size: 18px` arrives at the normal size.
+- **There is no "medium".** The body size is no mark at all. Anything bigger
+  than `xl` is a heading's job, and headings carry meaning a big font does
+  not.
+- **Your own sizes** work like your own colours: any lower-case token, once
+  you define `--bl-font-size-<token>`.
+- **Rendered as** `<span data-font-size="lg" style="font-size: var(--bl-font-size-lg, 1em)">`
   by the editor and both renderer targets.
 
 ## Subscript and superscript
@@ -166,8 +230,8 @@ extensions as a plain array, for a list you are assembling from scratch.
 ## Cost
 
 Measured with `size-limit`, minified and brotlied: the editor is
-**152.22 kB**, and the editor with text styles is **152.87 kB**, so
-**0.65 kB** for the marks, the alignment, colour and font commands, and
+**152.58 kB**, and the editor with text styles is **153.03 kB**, so
+**0.45 kB** for the marks, the alignment, colour and font commands, and
 their shortcuts. Without the import, the main bundle still carries the alignment
 attribute and the chrome that offers these styles — the block menu's Align
 entries and the bubble menu's font and colour panels — and none of it appears.

@@ -22,6 +22,7 @@ import type {
 	SuperscriptMark,
 	TextColorMark,
 	FontFamilyMark,
+	FontSizeMark,
 	HorizontalRuleNode,
 	ImageNode,
 	InlineNode,
@@ -86,7 +87,8 @@ const MARK_TYPES: ReadonlySet<string> = new Set([
 	'subscript',
 	'superscript',
 	'textColor',
-	'fontFamily'
+	'fontFamily',
+	'fontSize'
 ]);
 
 /**
@@ -194,6 +196,14 @@ export const fontFamilyMarkSchema: z.ZodType<FontFamilyMark> = z.object({
 	})
 });
 
+/** Version 2 (`PA-11`). A token, as for `textColor`. */
+export const fontSizeMarkSchema: z.ZodType<FontSizeMark> = z.object({
+	type: z.literal('fontSize'),
+	attrs: z.object({
+		size: z.string().regex(STYLE_TOKEN)
+	})
+});
+
 export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 	z.union([
 		boldMarkSchema,
@@ -206,7 +216,8 @@ export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 		subscriptMarkSchema,
 		superscriptMarkSchema,
 		textColorMarkSchema,
-		fontFamilyMarkSchema
+		fontFamilyMarkSchema,
+		fontSizeMarkSchema
 	])
 );
 

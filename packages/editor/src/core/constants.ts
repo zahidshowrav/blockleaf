@@ -160,3 +160,19 @@ export const FONT_FAMILIES = ['sans', 'serif', 'mono'] as const;
  * importing Tiptap.
  */
 export const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
+
+/**
+ * Font size (`PA-11`, `F26`): a token mark in the schema from version 2,
+ * loaded from `@blockleaf/editor/text-style`. Steps around the body size;
+ * the body size itself is no mark at all, and anything bigger than `xl` is
+ * a heading's job.
+ */
+export const FONT_SIZE_MARK = 'fontSize';
+export const FONT_SIZES = ['sm', 'lg', 'xl'] as const;
+
+/**
+ * Background colour (`PA-22`): a token in the `highlight` mark's existing
+ * `color`, resolved through `--bl-highlight-<token>`. The same nine names as
+ * text colour, each with a light and a dark tint.
+ */
+export const HIGHLIGHT_MARK = 'highlight';

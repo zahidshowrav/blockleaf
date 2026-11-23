@@ -2,6 +2,9 @@ import { type MarkRenderer } from './types.js';
 import {
 	fontFamilyToken,
 	fontFamilyValue,
+	fontSizeToken,
+	fontSizeValue,
+	highlightBackground,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -40,6 +43,19 @@ const FontFamily: MarkRenderer = ({ mark, children }) => {
 	);
 };
 
+const FontSize: MarkRenderer = ({ mark, children }) => {
+	const token = fontSizeToken(mark);
+	if (!token) return <>{children}</>;
+	return (
+		<span
+			data-font-size={token}
+			style={{ fontSize: fontSizeValue(token) }}
+		>
+			{children}
+		</span>
+	);
+};
+
 const TextColor: MarkRenderer = ({ mark, children }) => {
 	const token = textColorToken(mark);
 	if (!token) return <>{children}</>;
@@ -59,7 +75,12 @@ const Highlight: MarkRenderer = ({ mark, children }) => {
 		<mark
 			data-color={color}
 			style={
-				color ? { backgroundColor: color, color: 'inherit' } : undefined
+				color
+					? {
+							backgroundColor: highlightBackground(color),
+							color: 'inherit'
+						}
+					: undefined
 			}
 		>
 			{children}
@@ -99,6 +120,7 @@ export const defaultMarks: Record<string, MarkRenderer> = {
 	superscript: Superscript,
 	textColor: TextColor,
 	fontFamily: FontFamily,
+	fontSize: FontSize,
 	code: Code,
 	highlight: Highlight,
 	link: Link
