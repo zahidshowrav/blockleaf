@@ -4,6 +4,7 @@ import {
 	fontFamilyValue,
 	fontSizeToken,
 	fontSizeValue,
+	highlightBackground,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -74,7 +75,12 @@ const Highlight: MarkRenderer = ({ mark, children }) => {
 		<mark
 			data-color={color}
 			style={
-				color ? { backgroundColor: color, color: 'inherit' } : undefined
+				color
+					? {
+							backgroundColor: highlightBackground(color),
+							color: 'inherit'
+						}
+					: undefined
 			}
 		>
 			{children}

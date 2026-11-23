@@ -56,6 +56,23 @@ describe('sanitisation', () => {
 		expect(html).not.toContain('javascript:');
 	});
 
+	it('draws a highlight with an unsafe colour as a plain highlight', () => {
+		const doc = docOf({
+			type: 'paragraph',
+			content: [
+				text('x', [
+					{
+						type: 'highlight',
+						attrs: { color: 'red; position: fixed' }
+					}
+				])
+			]
+		});
+
+		expect(reactHTML(doc)).toBe('<p><mark>x</mark></p>');
+		expect(stringHTML(doc)).toBe('<p><mark>x</mark></p>');
+	});
+
 	it('keeps the words of a size that is not a token and drops the span', () => {
 		const doc = docOf({
 			type: 'paragraph',

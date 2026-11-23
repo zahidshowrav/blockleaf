@@ -33,6 +33,16 @@
 	--bl-text-purple: #7e22ce;
 	--bl-text-pink: #be185d;
 	--bl-text-red: #b91c1c;
+	/* background colours (PA-22): body text is at least 4.5:1 on each */
+	--bl-highlight-gray: #ebeced;
+	--bl-highlight-brown: #f2e6dc;
+	--bl-highlight-orange: #fde3cf;
+	--bl-highlight-yellow: #fef08a;
+	--bl-highlight-green: #d9f5e1;
+	--bl-highlight-blue: #dbe8fe;
+	--bl-highlight-purple: #ece6fd;
+	--bl-highlight-pink: #fce4f1;
+	--bl-highlight-red: #fde0e0;
 
 	/* type */
 	--bl-font-body:
@@ -90,6 +100,15 @@
 		--bl-text-purple: #c084fc;
 		--bl-text-pink: #f472b6;
 		--bl-text-red: #f87171;
+		--bl-highlight-gray: #2d333b;
+		--bl-highlight-brown: #3d2b1f;
+		--bl-highlight-orange: #4a2b12;
+		--bl-highlight-yellow: #38330c;
+		--bl-highlight-green: #12351f;
+		--bl-highlight-blue: #152b4f;
+		--bl-highlight-purple: #2f2150;
+		--bl-highlight-pink: #47162f;
+		--bl-highlight-red: #4b1818;
 	}
 }
 
@@ -117,6 +136,15 @@
 	--bl-text-purple: #c084fc;
 	--bl-text-pink: #f472b6;
 	--bl-text-red: #f87171;
+	--bl-highlight-gray: #2d333b;
+	--bl-highlight-brown: #3d2b1f;
+	--bl-highlight-orange: #4a2b12;
+	--bl-highlight-yellow: #38330c;
+	--bl-highlight-green: #12351f;
+	--bl-highlight-blue: #152b4f;
+	--bl-highlight-purple: #2f2150;
+	--bl-highlight-pink: #47162f;
+	--bl-highlight-red: #4b1818;
 }
 
 .blockleaf-editor__content {
@@ -723,6 +751,15 @@
 	--bl-text-purple: #7e22ce;
 	--bl-text-pink: #be185d;
 	--bl-text-red: #b91c1c;
+	--bl-highlight-gray: #ebeced;
+	--bl-highlight-brown: #f2e6dc;
+	--bl-highlight-orange: #fde3cf;
+	--bl-highlight-yellow: #fef08a;
+	--bl-highlight-green: #d9f5e1;
+	--bl-highlight-blue: #dbe8fe;
+	--bl-highlight-purple: #ece6fd;
+	--bl-highlight-pink: #fce4f1;
+	--bl-highlight-red: #fde0e0;
 	--bl-bubble-bg: var(--bl-color-bg, #ffffff);
 	--bl-bubble-fg: var(--bl-color-fg, #1f2328);
 	--bl-bubble-muted: #5f6673;
@@ -761,6 +798,15 @@
 		--bl-text-purple: #c084fc;
 		--bl-text-pink: #f472b6;
 		--bl-text-red: #f87171;
+		--bl-highlight-gray: #2d333b;
+		--bl-highlight-brown: #3d2b1f;
+		--bl-highlight-orange: #4a2b12;
+		--bl-highlight-yellow: #38330c;
+		--bl-highlight-green: #12351f;
+		--bl-highlight-blue: #152b4f;
+		--bl-highlight-purple: #2f2150;
+		--bl-highlight-pink: #47162f;
+		--bl-highlight-red: #4b1818;
 		--bl-bubble-bg: #0d1117;
 		--bl-bubble-fg: #e6edf3;
 		--bl-bubble-muted: #8b949e;
@@ -784,6 +830,15 @@
 	--bl-text-purple: #c084fc;
 	--bl-text-pink: #f472b6;
 	--bl-text-red: #f87171;
+	--bl-highlight-gray: #2d333b;
+	--bl-highlight-brown: #3d2b1f;
+	--bl-highlight-orange: #4a2b12;
+	--bl-highlight-yellow: #38330c;
+	--bl-highlight-green: #12351f;
+	--bl-highlight-blue: #152b4f;
+	--bl-highlight-purple: #2f2150;
+	--bl-highlight-pink: #47162f;
+	--bl-highlight-red: #4b1818;
 	--bl-bubble-bg: #0d1117;
 	--bl-bubble-fg: #e6edf3;
 	--bl-bubble-muted: #8b949e;
@@ -797,17 +852,28 @@
 }
 
 /*
- * Text colour palette (PA-05), a panel of the bubble menu
+ * Colour panel (PA-05, PA-22), a panel of the bubble menu: text, then background
  */
 
 .blockleaf-color-panel {
-	display: grid;
-	grid-template-columns: repeat(5, 32px);
-	gap: 2px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 	padding: 2px;
 }
 
-.blockleaf-color-panel__option {
+.blockleaf-color-panel__group {
+	display: grid;
+	grid-template-columns: repeat(5, 32px);
+	gap: 2px;
+}
+
+.blockleaf-color-panel__group + .blockleaf-color-panel__group {
+	padding-top: 4px;
+	border-top: 1px solid var(--bl-bubble-border);
+}
+
+.blockleaf-color-panel__group__option {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -821,17 +887,27 @@
 	cursor: pointer;
 }
 
-.blockleaf-color-panel__option:hover {
+.blockleaf-color-panel__group__option:hover {
 	background: var(--bl-bubble-hover);
 }
 
-.blockleaf-color-panel__option[aria-checked='true'] {
+.blockleaf-color-panel__group__option[aria-checked='true'] {
 	border-color: currentColor;
 }
 
-.blockleaf-color-panel__option:focus-visible {
+.blockleaf-color-panel__group__option:focus-visible {
 	outline: 2px solid var(--bl-color-accent, #3b5bdb);
 	outline-offset: -2px;
+}
+
+/* A background swatch: the tint behind a letter, as it would look. */
+.blockleaf-color-panel__background {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 4px;
 }
 
 /*
@@ -1633,6 +1709,15 @@
 		--bl-text-purple: #7e22ce;
 		--bl-text-pink: #be185d;
 		--bl-text-red: #b91c1c;
+		--bl-highlight-gray: #ebeced;
+		--bl-highlight-brown: #f2e6dc;
+		--bl-highlight-orange: #fde3cf;
+		--bl-highlight-yellow: #fef08a;
+		--bl-highlight-green: #d9f5e1;
+		--bl-highlight-blue: #dbe8fe;
+		--bl-highlight-purple: #ece6fd;
+		--bl-highlight-pink: #fce4f1;
+		--bl-highlight-red: #fde0e0;
 	}
 
 	.blockleaf-slash-menu,

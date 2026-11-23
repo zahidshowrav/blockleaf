@@ -19,6 +19,7 @@ import type {
 import {
 	FONT_FAMILY_MARK,
 	FONT_SIZE_MARK,
+	HIGHLIGHT_MARK,
 	TEXT_COLOR_MARK
 } from '../../core/constants.js';
 import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
@@ -48,14 +49,17 @@ const LINK_PANEL: BubbleMenuPanel = {
 };
 
 /**
- * The text colour palette (`PA-05`), offered only where
- * `@blockleaf/editor/text-style` put the mark in the schema.
+ * The colour panel (`PA-05`, `PA-22`), offered only where
+ * `@blockleaf/editor/text-style` put text colour in the schema. Pressed when
+ * the selection has a text colour or a coloured background.
  */
 const colorPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
-	id: 'textColor',
+	id: 'color',
 	label: () => labels.textColor.button,
 	icon: TextColorIcon,
-	isActive: (editor) => editor.isActive(TEXT_COLOR_MARK),
+	isActive: (editor) =>
+		editor.isActive(TEXT_COLOR_MARK) ||
+		Boolean(editor.getAttributes(HIGHLIGHT_MARK).color),
 	component: ColorPanel
 });
 

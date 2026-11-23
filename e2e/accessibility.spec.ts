@@ -209,8 +209,11 @@ test.describe('Chrome accessibility in a real browser', () => {
 		for (let index = 0; index < 6; index += 1) {
 			await page.keyboard.press('Shift+ArrowLeft');
 		}
-		await page.getByRole('button', { name: 'Text color' }).click();
-		const palette = page.getByRole('radiogroup', { name: 'Text color' });
+		await page.getByRole('button', { name: 'Color', exact: true }).click();
+		const palette = page.getByRole('radiogroup', {
+			name: 'Text',
+			exact: true
+		});
 		await expect(palette).toBeVisible();
 
 		expect(await violations(page, '.blockleaf-color-panel')).toEqual([]);

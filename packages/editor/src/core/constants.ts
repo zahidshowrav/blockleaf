@@ -169,3 +169,10 @@ export const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
  */
 export const FONT_SIZE_MARK = 'fontSize';
 export const FONT_SIZES = ['sm', 'lg', 'xl'] as const;
+
+/**
+ * Background colour (`PA-22`): a token in the `highlight` mark's existing
+ * `color`, resolved through `--bl-highlight-<token>`. The same nine names as
+ * text colour, each with a light and a dark tint.
+ */
+export const HIGHLIGHT_MARK = 'highlight';
