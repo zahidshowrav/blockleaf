@@ -1,5 +1,7 @@
 import { type MarkRenderer } from './types.js';
 import {
+	fontFamilyToken,
+	fontFamilyValue,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -24,6 +26,19 @@ const Subscript: MarkRenderer = ({ children }) => <sub>{children}</sub>;
 const Superscript: MarkRenderer = ({ children }) => <sup>{children}</sup>;
 
 const Code: MarkRenderer = ({ children }) => <code>{children}</code>;
+
+const FontFamily: MarkRenderer = ({ mark, children }) => {
+	const token = fontFamilyToken(mark);
+	if (!token) return <>{children}</>;
+	return (
+		<span
+			data-font-family={token}
+			style={{ fontFamily: fontFamilyValue(token) }}
+		>
+			{children}
+		</span>
+	);
+};
 
 const TextColor: MarkRenderer = ({ mark, children }) => {
 	const token = textColorToken(mark);
@@ -83,6 +98,7 @@ export const defaultMarks: Record<string, MarkRenderer> = {
 	subscript: Subscript,
 	superscript: Superscript,
 	textColor: TextColor,
+	fontFamily: FontFamily,
 	code: Code,
 	highlight: Highlight,
 	link: Link

@@ -151,20 +151,35 @@ export const highlightColor = (mark: RenderableMark): string | undefined => {
 	return typeof color === 'string' && color ? color : undefined;
 };
 
-/** A text colour token (`PA-05`), checked as the editor checks it. */
-const COLOR_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
+/** A style token (`F18`), checked as the editor checks it. */
+const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
 
 /**
- * A `textColor` mark's token, or nothing when it is not one. The token goes
+ * A token mark's token (`F26`), or nothing when it is not one. The token goes
  * inside a `style`, so anything that could close the `var()` is refused
  * rather than escaped.
  */
-export const textColorToken = (mark: RenderableMark): string | undefined => {
-	const color = mark.attrs?.color;
-	return typeof color === 'string' && COLOR_TOKEN.test(color)
-		? color
+const markToken = (
+	mark: RenderableMark,
+	attribute: string
+): string | undefined => {
+	const value = mark.attrs?.[attribute];
+	return typeof value === 'string' && STYLE_TOKEN.test(value)
+		? value
 		: undefined;
 };
+
+/** A `textColor` mark's token (`PA-05`). */
+export const textColorToken = (mark: RenderableMark): string | undefined =>
+	markToken(mark, 'color');
+
+/** A `fontFamily` mark's token (`PA-10`). */
+export const fontFamilyToken = (mark: RenderableMark): string | undefined =>
+	markToken(mark, 'family');
+
+/** The family a token resolves to: its custom property, else the surrounding font. */
+export const fontFamilyValue = (token: string): string =>
+	`var(--bl-font-${token}, inherit)`;
 
 /** The colour a token resolves to: its custom property, else the text colour. */
 export const textColorValue = (token: string): string =>

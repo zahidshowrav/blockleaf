@@ -68,6 +68,14 @@ export interface TextColorMark {
 	};
 }
 
+/** Version 2 (`PA-10`, `F26`). `family` is a token — `serif`, or one a host defines. */
+export interface FontFamilyMark {
+	type: 'fontFamily';
+	attrs: {
+		family: string;
+	};
+}
+
 export type BlockleafMark =
 	| BoldMark
 	| ItalicMark
@@ -78,7 +86,8 @@ export type BlockleafMark =
 	| HighlightMark
 	| SubscriptMark
 	| SuperscriptMark
-	| TextColorMark;
+	| TextColorMark
+	| FontFamilyMark;
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */

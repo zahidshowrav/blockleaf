@@ -196,6 +196,23 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'font family, with a colour on the same text',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('serif', [
+					{ type: 'fontFamily', attrs: { family: 'serif' } }
+				]),
+				text(' '),
+				text('both', [
+					{ type: 'textColor', attrs: { color: 'blue' } },
+					{ type: 'fontFamily', attrs: { family: 'mono' } }
+				])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

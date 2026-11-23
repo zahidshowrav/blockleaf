@@ -20,8 +20,10 @@ import {
 	SUBSCRIPT_MARK,
 	SUPERSCRIPT_MARK,
 	TEXT_ALIGN_EXTENSION_NAME,
-	TEXT_COLOR_MARK
+	TEXT_COLOR_MARK,
+	FONT_FAMILY_MARK
 } from './core/constants.js';
+import { FontFamily } from './core/marks/font-family.js';
 import { Subscript, Superscript } from './core/marks/script.js';
 import { TextColor } from './core/marks/text-color.js';
 import { TextAlign } from './core/text-align.js';
@@ -32,10 +34,14 @@ export {
 	TEXT_ALIGNMENTS,
 	TEXT_ALIGN_EXTENSION_NAME,
 	TEXT_COLORS,
-	TEXT_COLOR_MARK
+	TEXT_COLOR_MARK,
+	FONT_FAMILIES,
+	FONT_FAMILY_MARK
 } from './core/constants.js';
+export { FontFamily } from './core/marks/font-family.js';
 export { Subscript, Superscript } from './core/marks/script.js';
 export { TextColor, readColorToken } from './core/marks/text-color.js';
+export { readStyleToken } from './core/marks/token-mark.js';
 export { TextAlign, type TextAlignment } from './core/text-align.js';
 
 /** Every text style this subpath has, ready to add to an extension list. */
@@ -43,14 +49,16 @@ export const createTextStyle = (): Extensions => [
 	Subscript,
 	Superscript,
 	TextAlign,
-	TextColor
+	TextColor,
+	FontFamily
 ];
 
 const NAMES: ReadonlySet<string> = new Set([
 	SUBSCRIPT_MARK,
 	SUPERSCRIPT_MARK,
 	TEXT_ALIGN_EXTENSION_NAME,
-	TEXT_COLOR_MARK
+	TEXT_COLOR_MARK,
+	FONT_FAMILY_MARK
 ]);
 
 /**

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { STYLE_TOKEN } from './core/constants.js';
 import type {
 	BlockleafDocument,
 	BlockleafMark,
@@ -20,6 +21,7 @@ import type {
 	SubscriptMark,
 	SuperscriptMark,
 	TextColorMark,
+	FontFamilyMark,
 	HorizontalRuleNode,
 	ImageNode,
 	InlineNode,
@@ -83,7 +85,8 @@ const MARK_TYPES: ReadonlySet<string> = new Set([
 	'highlight',
 	'subscript',
 	'superscript',
-	'textColor'
+	'textColor',
+	'fontFamily'
 ]);
 
 /**
@@ -179,7 +182,15 @@ export const superscriptMarkSchema: z.ZodType<SuperscriptMark> = z.object({
 export const textColorMarkSchema: z.ZodType<TextColorMark> = z.object({
 	type: z.literal('textColor'),
 	attrs: z.object({
-		color: z.string().regex(/^[a-z][a-z0-9-]{0,31}$/)
+		color: z.string().regex(STYLE_TOKEN)
+	})
+});
+
+/** Version 2 (`PA-10`). A token, as for `textColor`. */
+export const fontFamilyMarkSchema: z.ZodType<FontFamilyMark> = z.object({
+	type: z.literal('fontFamily'),
+	attrs: z.object({
+		family: z.string().regex(STYLE_TOKEN)
 	})
 });
 
@@ -194,7 +205,8 @@ export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 		highlightMarkSchema,
 		subscriptMarkSchema,
 		superscriptMarkSchema,
-		textColorMarkSchema
+		textColorMarkSchema,
+		fontFamilyMarkSchema
 	])
 );
 

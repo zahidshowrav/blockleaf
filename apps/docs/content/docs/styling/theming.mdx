@@ -62,15 +62,17 @@ values; the table is on [text styles](../text-style.mdx#text-colour). Define
 
 ## Type and rhythm
 
-| Property               | Default           | Used for                                 |
-| ---------------------- | ----------------- | ---------------------------------------- |
-| `--bl-font-body`       | system sans stack | Everything but code                      |
-| `--bl-font-mono`       | system mono stack | Inline code and code blocks              |
-| `--bl-font-size`       | `1rem`            | Base size; block sizes are `em`-relative |
-| `--bl-line-height`     | `1.7`             | Body leading                             |
-| `--bl-space-block`     | `0.75em`          | Gap between sibling blocks               |
-| `--bl-radius`          | `6px`             | Corners, everywhere                      |
-| `--bl-content-padding` | `0`               | Inset on `.blockleaf-editor__content`    |
+| Property               | Default               | Used for                                             |
+| ---------------------- | --------------------- | ---------------------------------------------------- |
+| `--bl-font-body`       | system sans stack     | Everything but code                                  |
+| `--bl-font-mono`       | system mono stack     | Inline code and code blocks; the `mono` family token |
+| `--bl-font-sans`       | `var(--bl-font-body)` | The `sans` family token, with text-style             |
+| `--bl-font-serif`      | system serif stack    | The `serif` family token, with text-style            |
+| `--bl-font-size`       | `1rem`                | Base size; block sizes are `em`-relative             |
+| `--bl-line-height`     | `1.7`                 | Body leading                                         |
+| `--bl-space-block`     | `0.75em`              | Gap between sibling blocks                           |
+| `--bl-radius`          | `6px`                 | Corners, everywhere                                  |
+| `--bl-content-padding` | `0`                   | Inset on `.blockleaf-editor__content`                |
 
 Because headings and code are sized in `em`, changing `--bl-font-size`
 rescales the whole document proportionally. That is usually what you want

@@ -182,7 +182,7 @@ describe('Bubble menu actions (CH-02)', () => {
 });
 
 describe('Bubble menu toolbar', () => {
-	it('renders a labelled toolbar with one button per action, text color and link', () => {
+	it('renders a labelled toolbar with one button per action, font, text color and link', () => {
 		const editor = track(createEditor());
 		selectAll(editor);
 
@@ -198,9 +198,9 @@ describe('Bubble menu toolbar', () => {
 			name: 'Text formatting'
 		});
 		expect(toolbar).toBeDefined();
-		// The text color button is there because the editor loads text-style.
+		// Font and text color are there because the editor loads text-style.
 		expect(toolbar.querySelectorAll('[data-bubble-button]')).toHaveLength(
-			defaultBubbleActions.length + 2
+			defaultBubbleActions.length + 3
 		);
 	});
 
