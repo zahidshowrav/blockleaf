@@ -213,6 +213,21 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'font size, with a family on the same text',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('big', [{ type: 'fontSize', attrs: { size: 'xl' } }]),
+				text(' '),
+				text('both', [
+					{ type: 'fontFamily', attrs: { family: 'serif' } },
+					{ type: 'fontSize', attrs: { size: 'sm' } }
+				])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',

@@ -2,6 +2,8 @@ import { element } from './escape.js';
 import {
 	fontFamilyToken,
 	fontFamilyValue,
+	fontSizeToken,
+	fontSizeValue,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -28,6 +30,19 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 			{
 				'data-font-family': token,
 				style: `font-family: ${fontFamilyValue(token)}`
+			},
+			children
+		);
+	},
+
+	fontSize: ({ mark, children }) => {
+		const token = fontSizeToken(mark);
+		if (!token) return children;
+		return element(
+			'span',
+			{
+				'data-font-size': token,
+				style: `font-size: ${fontSizeValue(token)}`
 			},
 			children
 		);

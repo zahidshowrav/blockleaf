@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR } from './helpers.js';
 
 /**
- * PA-05, PA-06, PA-07 and PA-10. Shortcuts, bubble-menu buttons, a palette and a
+ * PA-05, PA-06, PA-07, PA-10 and PA-11. Shortcuts, bubble-menu buttons, a palette and a
  * block-menu entry acting on a real selection — and the colour a token
  * actually resolves to, which only a browser computes.
  */
@@ -232,5 +232,42 @@ test.describe('font family', () => {
 		await expect(page.locator('.sandbox__json')).toContainText(
 			'"family": "serif"'
 		);
+	});
+});
+
+test.describe('font size', () => {
+	test('Tab reaches the size group, and Large is 1.25 times the text', async ({
+		page
+	}) => {
+		await open(page, 'Big');
+		await selectBack(page, 3);
+		await page.getByRole('button', { name: 'Font' }).click();
+		await expect(
+			page
+				.getByRole('radiogroup', { name: 'Typeface' })
+				.getByRole('radio', {
+					name: 'Default'
+				})
+		).toBeFocused();
+
+		await page.keyboard.press('Tab');
+		const size = page.getByRole('radiogroup', { name: 'Size' });
+		await expect(
+			size.getByRole('radio', { name: 'Default' })
+		).toBeFocused();
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('ArrowRight');
+		await expect(
+			size.getByRole('radio', { name: 'Large', exact: true })
+		).toBeFocused();
+		await page.keyboard.press('Enter');
+
+		const span = page.locator(`${EDITOR} span[data-font-size="lg"]`);
+		await expect(span).toHaveText('Big');
+		const [inner, outer] = await span.evaluate((element) => [
+			Number.parseFloat(getComputedStyle(element).fontSize),
+			Number.parseFloat(getComputedStyle(element.parentElement!).fontSize)
+		]);
+		expect(inner).toBeCloseTo(outer * 1.25, 1);
 	});
 });

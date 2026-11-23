@@ -177,6 +177,14 @@ export const textColorToken = (mark: RenderableMark): string | undefined =>
 export const fontFamilyToken = (mark: RenderableMark): string | undefined =>
 	markToken(mark, 'family');
 
+/** A `fontSize` mark's token (`PA-11`). */
+export const fontSizeToken = (mark: RenderableMark): string | undefined =>
+	markToken(mark, 'size');
+
+/** The size a token resolves to: its custom property, else the surrounding size. */
+export const fontSizeValue = (token: string): string =>
+	`var(--bl-font-size-${token}, 1em)`;
+
 /** The family a token resolves to: its custom property, else the surrounding font. */
 export const fontFamilyValue = (token: string): string =>
 	`var(--bl-font-${token}, inherit)`;

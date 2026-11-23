@@ -76,6 +76,14 @@ export interface FontFamilyMark {
 	};
 }
 
+/** Version 2 (`PA-11`, `F26`). `size` is a token — `sm`, `lg`, `xl`, or one a host defines. */
+export interface FontSizeMark {
+	type: 'fontSize';
+	attrs: {
+		size: string;
+	};
+}
+
 export type BlockleafMark =
 	| BoldMark
 	| ItalicMark
@@ -87,7 +95,8 @@ export type BlockleafMark =
 	| SubscriptMark
 	| SuperscriptMark
 	| TextColorMark
-	| FontFamilyMark;
+	| FontFamilyMark
+	| FontSizeMark;
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */

@@ -16,7 +16,11 @@ import type {
 	BubbleMenuPanel,
 	BubbleMenuProps
 } from './types.js';
-import { FONT_FAMILY_MARK, TEXT_COLOR_MARK } from '../../core/constants.js';
+import {
+	FONT_FAMILY_MARK,
+	FONT_SIZE_MARK,
+	TEXT_COLOR_MARK
+} from '../../core/constants.js';
 import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: BubbleAction['icon']) => {
@@ -56,14 +60,15 @@ const colorPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
 });
 
 /**
- * The font panel (`PA-10`), offered only where `@blockleaf/editor/text-style`
- * put a font mark in the schema.
+ * The font panel (`PA-10`, `PA-11`), offered only where
+ * `@blockleaf/editor/text-style` put a font mark in the schema.
  */
 const fontPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
 	id: 'font',
 	label: () => labels.font.button,
 	icon: FontIcon,
-	isActive: (editor) => editor.isActive(FONT_FAMILY_MARK),
+	isActive: (editor) =>
+		editor.isActive(FONT_FAMILY_MARK) || editor.isActive(FONT_SIZE_MARK),
 	component: FontPanel
 });
 
@@ -133,7 +138,9 @@ export const BubbleMenu = ({
 	const pendingFocusRef = useRef<string | null>(null);
 
 	const hasTextColor = TEXT_COLOR_MARK in editor.schema.marks;
-	const hasFont = FONT_FAMILY_MARK in editor.schema.marks;
+	const hasFont =
+		FONT_FAMILY_MARK in editor.schema.marks ||
+		FONT_SIZE_MARK in editor.schema.marks;
 	const panels = useMemo(() => {
 		const resolved: BubbleMenuPanel[] = [];
 		if (hasFont) resolved.push(fontPanel(labels));

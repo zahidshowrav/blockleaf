@@ -42,6 +42,10 @@
 	--bl-font-sans: var(--bl-font-body);
 	--bl-font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
 	--bl-font-size: 1rem;
+	/* font size tokens (PA-11): `em`, so they scale with the text around them */
+	--bl-font-size-sm: 0.875em;
+	--bl-font-size-lg: 1.25em;
+	--bl-font-size-xl: 1.5em;
 	--bl-line-height: 1.7;
 
 	/* rhythm */

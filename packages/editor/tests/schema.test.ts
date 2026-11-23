@@ -217,6 +217,17 @@ describe('document schema', () => {
 						{ type: 'text' as const, text: ', ' },
 						{
 							type: 'text' as const,
+							text: 'large',
+							marks: [
+								{
+									type: 'fontSize' as const,
+									attrs: { size: 'lg' }
+								}
+							]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
 							text: 'bold',
 							marks: [{ type: 'bold' as const }]
 						},
