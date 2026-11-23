@@ -57,7 +57,8 @@ export const BLOCK_NODE_TYPES = [
 	'details',
 	'image',
 	'table',
-	'figure'
+	'figure',
+	'tableOfContents'
 ] as const;
 
 /**
@@ -93,6 +94,13 @@ export const CAPTION_NODE = 'caption';
 
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';
+
+/**
+ * A table of contents (`PA-08`, `F27`). It stores no entries: the editor and
+ * the renderer list the document's headings each time they draw it. In the
+ * schema from version 2; the editor loads it from `@blockleaf/editor/toc`.
+ */
+export const TABLE_OF_CONTENTS_NODE = 'tableOfContents';
 
 /**
  * An inline reference to a person, page or anything else a host can name

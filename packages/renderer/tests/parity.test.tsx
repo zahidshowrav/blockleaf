@@ -258,6 +258,12 @@ const cases: Array<[string, RenderableDocument]> = [
 			attrs: { id: 'p' },
 			content: [text('both', [{ type: 'bold' }, { type: 'italic' }])]
 		})
+	],
+	[
+		// With headings the renderer fills the list in and the editor cannot;
+		// that difference is asserted in `table-of-contents.test.tsx`.
+		'table of contents, before any heading exists',
+		docOf({ type: 'tableOfContents', attrs: { id: 't' } }, paragraph('x'))
 	]
 ];
 

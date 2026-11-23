@@ -26,6 +26,12 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "toc-1",
+      },
+      "type": "tableOfContents",
+    },
+    {
+      "attrs": {
         "id": "heading-2",
         "level": 2,
       },

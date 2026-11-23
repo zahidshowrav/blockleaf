@@ -11,12 +11,17 @@ import {
 	OrderedListIcon,
 	QuoteIcon,
 	TableIcon,
+	TableOfContentsIcon,
 	TaskListIcon,
 	TextIcon,
 	ToggleIcon
 } from './icons.js';
 import type { SlashCommand } from './types.js';
-import { DETAILS_NODE, UPLOAD_EXTENSION_NAME } from '../../core/constants.js';
+import {
+	DETAILS_NODE,
+	TABLE_OF_CONTENTS_NODE,
+	UPLOAD_EXTENSION_NAME
+} from '../../core/constants.js';
 import {
 	defaultLabels,
 	type BlockTypeLabels,
@@ -190,6 +195,19 @@ export const createSlashCommands = (
 				(extension) => extension.name === UPLOAD_EXTENSION_NAME
 			),
 		run: (editor) => editor.chain().focus().openUploadPicker().run()
+	},
+	{
+		id: 'table-of-contents',
+		title: blockTypes['table-of-contents'],
+		description: labels.descriptions['table-of-contents'],
+		aliases: ['toc', 'contents', 'outline'],
+		group: labels.groups.advanced,
+		icon: TableOfContentsIcon,
+		keywords: ['table', 'contents', 'toc', 'outline', 'headings', 'index'],
+		// Only where `@blockleaf/editor/toc` added the block.
+		isAvailable: (editor) =>
+			editor.schema.nodes[TABLE_OF_CONTENTS_NODE] !== undefined,
+		run: (editor) => editor.chain().focus().insertTableOfContents().run()
 	}
 ];
 

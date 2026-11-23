@@ -18,6 +18,12 @@ import { type RenderableMark, type RenderableNode } from './types.js';
 export interface NodeContext<TOut> {
 	node: RenderableNode;
 	parent: RenderableNode | undefined;
+	/**
+	 * The document being rendered. A node that shows something drawn from
+	 * elsewhere in it — a table of contents listing its headings — reads it
+	 * here.
+	 */
+	root: RenderableNode;
 	/** The node's already-rendered content. */
 	children: TOut;
 	/**
@@ -59,27 +65,30 @@ export const createRenderer = <TOut>(target: RenderTarget<TOut>) => {
 	const renderNode = (
 		node: RenderableNode,
 		parent: RenderableNode | undefined,
-		key: string
+		key: string,
+		root: RenderableNode
 	): TOut => {
 		const type = node.type ?? '';
 		const render = target.nodes[type] ?? target.unknownNode;
 
 		const children = target.combine(
 			(node.content ?? []).map((child, index) =>
-				renderNode(child, node, `${key}.${index}`)
+				renderNode(child, node, `${key}.${index}`, root)
 			)
 		);
 
 		const rendered = render({
 			node,
 			parent,
+			root,
 			children,
 			combine: target.combine,
 			renderNode: (child, childParent) =>
 				renderNode(
 					child,
 					childParent,
-					`${key}.${childIndex(node, child)}`
+					`${key}.${childIndex(node, child)}`,
+					root
 				)
 		});
 
@@ -103,7 +112,7 @@ export const createRenderer = <TOut>(target: RenderTarget<TOut>) => {
 	};
 
 	return (document_: RenderableNode): TOut =>
-		renderNode(document_, undefined, '0');
+		renderNode(document_, undefined, '0', document_);
 };
 
 /**

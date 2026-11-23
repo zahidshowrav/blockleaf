@@ -249,6 +249,23 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, '.blockleaf-emoji-menu')).toEqual([]);
 	});
 
+	test('a table of contents has no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?toc');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('# Intro');
+		await page.keyboard.press('Enter');
+		await page.keyboard.type('/contents');
+		await expect(
+			page.getByRole('option', { name: /Table of contents/ })
+		).toBeVisible();
+		await page.keyboard.press('Enter');
+		await expect(page.locator('nav.blockleaf-toc a')).toHaveText('Intro');
+
+		expect(await violations(page, 'nav.blockleaf-toc')).toEqual([]);
+	});
+
 	test('a captioned table has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('||| ');

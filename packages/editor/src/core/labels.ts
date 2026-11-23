@@ -27,7 +27,8 @@ export type BlockTypeId =
 	| 'toggle'
 	| 'divider'
 	| 'table'
-	| 'image';
+	| 'image'
+	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
 
@@ -186,6 +187,13 @@ export type DetailsLabels = {
 	toggle: string;
 };
 
+export type TableOfContentsLabels = {
+	/** Accessible name of the list of headings. */
+	label: string;
+	/** Shown in the editor while the document has no headings to list. */
+	empty: string;
+};
+
 export type MentionLabels = {
 	/** Accessible name of the list of people or pages to mention. */
 	menu: string;
@@ -256,6 +264,7 @@ export type ResolvedLabels = {
 	details: DetailsLabels;
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
+	tableOfContents: TableOfContentsLabels;
 	textColor: TextColorLabels;
 	font: FontLabels;
 	placeholder: Required<PlaceholderLabels>;
@@ -288,6 +297,7 @@ export type BlockleafLabels = {
 	details?: Partial<DetailsLabels>;
 	mentions?: Partial<MentionLabels>;
 	emoji?: Partial<EmojiLabels>;
+	tableOfContents?: Partial<TableOfContentsLabels>;
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
 		colors?: Partial<TextColorLabels['colors']>;
 	};
@@ -324,7 +334,8 @@ export const defaultLabels: ResolvedLabels = {
 		toggle: 'Toggle',
 		divider: 'Divider',
 		table: 'Table',
-		image: 'Image'
+		image: 'Image',
+		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
 		menu: 'Slash commands',
@@ -348,7 +359,8 @@ export const defaultLabels: ResolvedLabels = {
 			toggle: 'Hide content under a title that opens it.',
 			divider: 'Visually separate sections with a line.',
 			table: 'Pick a size, with a header row.',
-			image: 'Upload an image from your device.'
+			image: 'Upload an image from your device.',
+			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
 		tableSizeCell: (rows, columns) => `${rows} by ${columns}`,
@@ -454,6 +466,10 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'No emoji found',
 		loading: 'Loading emoji…'
 	},
+	tableOfContents: {
+		label: 'Table of contents',
+		empty: 'Add a heading and it will be listed here.'
+	},
 	textColor: {
 		button: 'Color',
 		text: 'Text',
@@ -543,6 +559,10 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	details: { ...defaultLabels.details, ...labels?.details },
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
 	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
+	tableOfContents: {
+		...defaultLabels.tableOfContents,
+		...labels?.tableOfContents
+	},
 	textColor: {
 		...defaultLabels.textColor,
 		...labels?.textColor,

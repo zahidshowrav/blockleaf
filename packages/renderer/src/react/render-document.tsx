@@ -2,7 +2,12 @@ import { Fragment, type ReactElement, type ReactNode } from 'react';
 
 import { resolveRendererLabels, type RendererLabels } from '../labels.js';
 import { defaultMarks, unhandledMark } from './marks.js';
-import { defaultNodes, tableRenderer, unhandledNode } from './nodes.js';
+import {
+	defaultNodes,
+	tableOfContentsRenderer,
+	tableRenderer,
+	unhandledNode
+} from './nodes.js';
 import { type MarkRenderer, type NodeRenderer } from './types.js';
 import { type RenderableDocument } from '../types.js';
 import { createRenderer } from '../walk.js';
@@ -70,10 +75,12 @@ export const RenderDocument = ({
 	// component has to work in a server component, where hooks do not exist.
 	// Merging two objects is cheap next to walking a document; hoisting the
 	// override map to module scope makes it cheaper still.
-	const base_nodes = labels
+	const resolved = labels ? resolveRendererLabels(labels) : undefined;
+	const base_nodes = resolved
 		? {
 				...defaultNodes,
-				table: tableRenderer(resolveRendererLabels(labels))
+				table: tableRenderer(resolved),
+				tableOfContents: tableOfContentsRenderer(resolved)
 			}
 		: defaultNodes;
 

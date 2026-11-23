@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createExtensions } from '@blockleaf/editor/extensions';
 import { withMentions } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
+import { withTableOfContents } from '@blockleaf/editor/toc';
 
 import { renderToHTML, type RenderToHTMLOptions } from '../src/html.js';
 import { RenderDocument, type RenderDocumentProps } from '../src/react.js';
@@ -18,8 +19,10 @@ import { type RenderableDocument } from '../src/types.js';
  */
 export const editorHTML = (doc: RenderableDocument): string => {
 	const editor = new Editor({
-		extensions: withTextStyle(
-			withMentions(createExtensions('standard'), { items: () => [] })
+		extensions: withTableOfContents(
+			withTextStyle(
+				withMentions(createExtensions('standard'), { items: () => [] })
+			)
 		),
 		content: doc
 	});

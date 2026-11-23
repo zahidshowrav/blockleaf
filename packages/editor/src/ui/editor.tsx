@@ -5,6 +5,7 @@ import {
 	EMOJI_EXTENSION_NAME,
 	MENTIONS_EXTENSION_NAME,
 	TABLE_A11Y_EXTENSION_NAME,
+	TABLE_OF_CONTENTS_NODE,
 	UNKNOWN_CONTENT_EXTENSION_NAME,
 	UPLOAD_EXTENSION_NAME
 } from '../core/constants.js';
@@ -163,11 +164,11 @@ export const BlockleafEditor = ({
 	const resolvedExtensions = useMemo(() => {
 		const resolved = resolveLabels(labels);
 		const base = extensions ?? createExtensions(preset);
-		// Six extensions render strings but are not assembled here: the
+		// Seven extensions render strings but are not assembled here: the
 		// upload one is built by the host because it needs their adapter, and
 		// the table accessibility, unknown-content and toggle ones come with
-		// `createExtensions`, and the mention and emoji pickers with their
-		// subpaths; none knows anything about labels. Each, if nobody gave it labels
+		// `createExtensions`, and the mention and emoji pickers and the table
+		// of contents with their subpaths; none knows anything about labels. Each, if nobody gave it labels
 		// of its own, gets these rather than staying English.
 		const chrome = base.map((extension) =>
 			(extension.name === UPLOAD_EXTENSION_NAME ||
@@ -175,7 +176,8 @@ export const BlockleafEditor = ({
 				extension.name === UNKNOWN_CONTENT_EXTENSION_NAME ||
 				extension.name === DETAILS_NODE ||
 				extension.name === MENTIONS_EXTENSION_NAME ||
-				extension.name === EMOJI_EXTENSION_NAME) &&
+				extension.name === EMOJI_EXTENSION_NAME ||
+				extension.name === TABLE_OF_CONTENTS_NODE) &&
 			(extension.options as { labels?: unknown }).labels === defaultLabels
 				? extension.configure({ labels: resolved })
 				: extension

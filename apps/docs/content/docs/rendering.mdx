@@ -203,6 +203,12 @@ Pass [`unknown`](#a-node-type-nobody-named) to decide for yourself.
 
 **Tables get a `<thead>`.** See above.
 
+**A table of contents is filled in.** The editor's `getHTML` writes an empty
+`nav`, because a node can only write itself and the list is made of other
+nodes. The renderer lists the headings, and gives each heading an `id` to
+link to, but only in a document that has a table of contents. See
+[table of contents](./table-of-contents.mdx#rendering).
+
 **URLs are sanitised again.** See below.
 
 ## Safety
@@ -324,11 +330,14 @@ over `unknown`.
 | ------------ | ------------------------------------- |
 | `node`       | The stored node, attributes and all   |
 | `parent`     | Its parent, or `undefined` at the top |
+| `root`       | The whole document being rendered     |
 | `children`   | The node's content, already rendered  |
 | `renderNode` | Renders one child by hand             |
 | `combine`    | Joins rendered pieces                 |
 
-Most overrides need the first three. `renderNode` and `combine` are there for
+Most overrides need `node` and `children`. `root` is for a node that shows
+something from elsewhere in the document, as a table of contents lists its
+headings. `renderNode` and `combine` are there for
 a component that has to group or reorder its children — a table splitting rows
 into `<thead>` and `<tbody>` — since `children` arrives already assembled in
 document order.
@@ -397,13 +406,16 @@ it. Image alt text is left out unless you ask for it with
 useful signal in an index.
 
 `extractHeadings` returns `{ level, text, id }` in document order, where `id`
-is the block id.
+is the block id. `tableOfContents` returns the same without empty headings,
+plus `depth`, how far in to indent each one; it is what the
+[table of contents](./table-of-contents.mdx) block lists.
 
 ### Linking to a heading
 
 The block id is written as `data-id`, not as `id`, because that is what the
-editor writes and the two must match. An anchor link needs a real `id`, so add
-one with an override:
+editor writes and the two must match. In a document with a table of contents
+block, the renderer adds the `id` itself. Anywhere else, an anchor link needs
+a real `id`, so add one with an override:
 
 ```tsx
 const components = {
@@ -437,9 +449,9 @@ root entry and installs nothing else.
 
 | Entry                             |    Size |
 | --------------------------------- | ------: |
-| `RenderDocument`                  | 1.87 kB |
-| `renderToHTML`                    | 1.97 kB |
-| `toPlainText` + `extractHeadings` |   445 B |
+| `RenderDocument`                  | 2.82 kB |
+| `renderToHTML`                    | 2.90 kB |
+| `toPlainText` + `extractHeadings` |   565 B |
 | `sanitizeHref` + `sanitizeSrc`    |   217 B |
 
 Minified and brotlied, with all dependencies.
@@ -467,6 +479,7 @@ Every node in [the schema](./schema.mdx) renders:
 | `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                          |
 | `text` / `hardBreak`         | text / `<br>`                                                                  |
 | `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                |
+| `tableOfContents`            | `<nav class="blockleaf-toc">` with a link to each heading                      |
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to

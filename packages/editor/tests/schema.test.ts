@@ -158,6 +158,10 @@ describe('document schema', () => {
 					]
 				},
 				{
+					type: 'tableOfContents' as const,
+					attrs: { id: 'toc-1' }
+				},
+				{
 					type: 'heading' as const,
 					attrs: { level: 2 as const, id: 'heading-2' },
 					content: [

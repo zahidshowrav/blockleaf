@@ -8,7 +8,8 @@ export default defineConfig({
 		'src/code-block.ts',
 		'src/mentions.ts',
 		'src/text-style.ts',
-		'src/emoji.ts'
+		'src/emoji.ts',
+		'src/toc.ts'
 	],
 	format: ['esm'],
 	dts: true,

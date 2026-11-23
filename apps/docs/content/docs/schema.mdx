@@ -58,22 +58,23 @@ Shipped in `SC` (via Tiptap's StarterKit): `doc`, `paragraph`, `text`, `hardBrea
 
 Planned for `EC`–`MC`:
 
-| Node                                      | Attributes                    | Notes                                                                                                                                                       |
-| ----------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `paragraph`                               | `textAlign`                   | Version 2, optional: `left`, `center`, `right` or `justify`; absent means the language's own direction. See [text styles](./text-style.mdx#text-alignment). |
-| `heading`                                 | `level: 1 \| 2 \| 3`          | Capped at three. Deeper levels are a document-structure smell and a renderer problem. Takes `textAlign`, as `paragraph` does.                               |
-| `bulletList` / `orderedList` / `listItem` | —                             | Nesting capped at 3 levels.                                                                                                                                 |
-| `taskList` / `taskItem`                   | `checked: boolean`            | The single most-expected Notion feature.                                                                                                                    |
-| `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                                           |
-| `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference.                       |
-| `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                                                |
-| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                                             |
-| `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                                         |
-| `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                                     |
-| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.                           |
-| `figure`                                  | —                             | A captioned block: the block, then its `caption`, nothing else. Only a `table` takes a caption today. See [Captions](#captions).                            |
-| `caption`                                 | —                             | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`.                                                  |
-| `mention`                                 | `id, label, kind`             | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                     |
+| Node                                      | Attributes                    | Notes                                                                                                                                                               |
+| ----------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `paragraph`                               | `textAlign`                   | Version 2, optional: `left`, `center`, `right` or `justify`; absent means the language's own direction. See [text styles](./text-style.mdx#text-alignment).         |
+| `heading`                                 | `level: 1 \| 2 \| 3`          | Capped at three. Deeper levels are a document-structure smell and a renderer problem. Takes `textAlign`, as `paragraph` does.                                       |
+| `bulletList` / `orderedList` / `listItem` | —                             | Nesting capped at 3 levels.                                                                                                                                         |
+| `taskList` / `taskItem`                   | `checked: boolean`            | The single most-expected Notion feature.                                                                                                                            |
+| `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                                                   |
+| `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference.                               |
+| `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                                                        |
+| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                                                     |
+| `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                                                 |
+| `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                                             |
+| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.                                   |
+| `figure`                                  | —                             | A captioned block: the block, then its `caption`, nothing else. Only a `table` takes a caption today. See [Captions](#captions).                                    |
+| `caption`                                 | —                             | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`.                                                          |
+| `mention`                                 | `id, label, kind`             | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                             |
+| `tableOfContents`                         | —                             | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx). |
 
 ## Mark set
 
@@ -121,8 +122,9 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`subscript`** and **`superscript`** (`PA-07`) — marks with no attributes, which exclude each other.
 - **`textColor`** (`PA-05`) — a mark with `{ color }`, a token: lower case, a letter first, at most 32 characters. See F26.
 - **`fontFamily`** (`PA-10`) and **`fontSize`** (`PA-11`) — marks with `{ family }` and `{ size }`, tokens like `textColor`'s.
+- **`tableOfContents`** (`PA-08`) — a block with no attributes beyond its id. It never stores its entries, so it cannot go stale; see F27.
 - **`textAlign`** on `paragraph` and `heading` (`PA-06`) — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it; see F25.
-- The rest of the batch — maths, the other text styles, a table of contents — joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
+- The rest of the batch, such as maths and media, joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
 
 The migration from `1` changes nothing: every version 1 document is already a valid version 2 one, so `migrate()` only stamps the new number. The bump is there for the other direction. An editor that only knows version 1 opens a version 2 document read-only rather than editing around nodes it cannot show.
 

@@ -19,6 +19,7 @@ export {
 	type RendererLabels
 } from './labels.js';
 export { sanitizeHref, sanitizeSrc } from './sanitize.js';
+export { tableOfContents, type TableOfContentsItem } from './toc.js';
 export {
 	extractHeadings,
 	toPlainText,
