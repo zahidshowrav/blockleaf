@@ -123,3 +123,12 @@ export const ExternalLinkIcon = (props: IconProps) => (
 );
 
 export type { IconProps };
+
+export const TextColorIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="m6 16 6-12 6 12M8.5 11h7M4 20h16" />
+	</svg>
+);

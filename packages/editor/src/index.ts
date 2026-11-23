@@ -57,6 +57,7 @@ export {
 	type HighlightMark,
 	type SubscriptMark,
 	type SuperscriptMark,
+	type TextColorMark,
 	type HorizontalRuleNode,
 	type ImageAlign,
 	type ImageAttributes,
@@ -106,6 +107,7 @@ export {
 	type SlashMenuLabels,
 	type TableActionId,
 	type TableLabels,
+	type TextColorLabels,
 	type UploadLabels
 } from './core/index.js';
 export {

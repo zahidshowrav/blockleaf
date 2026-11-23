@@ -101,6 +101,22 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
         {
           "marks": [
             {
+              "attrs": {
+                "color": "red",
+              },
+              "type": "textColor",
+            },
+          ],
+          "text": "red",
+          "type": "text",
+        },
+        {
+          "text": ", ",
+          "type": "text",
+        },
+        {
+          "marks": [
+            {
               "type": "bold",
             },
           ],

@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-06`, `PA-07` and `PA-19` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-07` and `PA-19` are done.
 
-**Next:** `PA-05`, text colour, which `PA-10`, `PA-11` and `PA-22` build on. The early release shipped `PA-01` and `PA-19` as
+**Next:** `PA-10` and `PA-11`, font family and size, each a mark of its own as `PA-05` set out (`F26`). The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing; `PA-03` to `PA-11` join version 2 without bumping again.
@@ -51,13 +51,12 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-23: 512 editor unit tests, 172 renderer, 82
-Playwright across two projects — 73 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 151.37 kB of 160 kB, schema entry at 397 B of 2 kB. Subpaths
+**Last verified:** 2026-11-23: 526 editor unit tests, 175 renderer, 86
+Playwright across two projects — 77 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 151.81 kB of 160 kB, schema entry at 397 B of 2 kB. Subpaths
 measured on their own, most of each being the shared runtime: code block
-80.5 kB of 85 kB, mentions 68.96 of 72, text style 56.87 of 60, emoji 69.81
-of 72. On top of the editor: mentions 0.86 kB, text style 0.45 kB, emoji
-1.82 kB plus a 36 kB emoji list loaded on first use. Lint, typecheck and build cover eight
-workspaces.
+80.68 kB of 85 kB, mentions 69.08 of 72, text style 57.04 of 60, emoji 69.88
+of 72. On top of the editor: mentions 0.86 kB, text style 0.59 kB, emoji
+1.82 kB plus a 36 kB emoji list loaded on first use.
 
 ---
 
@@ -513,13 +512,21 @@ every preset while its commands and menu stay in `./text-style` (`F25`). It
 defaults to `undefined`, not `null`, so an unaligned block stores what it
 stored in version 1, and `onChange` drops `undefined` attributes.
 
+`PA-05` (2026-11-23): text colour is a `textColor` mark of its own, not an
+attribute on a shared `textStyle` mark (`F26`), so `PA-10` and `PA-11` add
+marks rather than attributes an older editor would drop. It stores a token;
+the nine built in have light and dark values at 4.5:1 or better, and a host
+token needs only its `--bl-text-<token>` property, since the output is
+`style="color: var(--bl-text-<token>, currentColor)"`. The token is checked
+before it reaches `style` in the editor, validator and both renderers.
+
 | Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
 | PA-02 | Mentions                                                          | `./mentions`                   | Done        | `10a117b` | 2026-11-22 |
 | PA-03 | Emoji                                                             | `./emoji`                      | Done        | `f4b8327` | 2026-11-23 |
 | PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —         | —          |
-| PA-05 | Text colour                                                       | `./text-style`                 | Not started | —         | —          |
+| PA-05 | Text colour                                                       | `./text-style`                 | Done        | `9cc3941` | 2026-11-23 |
 | PA-06 | Text alignment                                                    | `./text-style`                 | Done        | `acbe2a0` | 2026-11-23 |
 | PA-07 | Subscript and superscript                                         | `./text-style`                 | Done        | `897531e` | 2026-11-23 |
 | PA-08 | Table of contents                                                 | `./toc`                        | Not started | —         | —          |

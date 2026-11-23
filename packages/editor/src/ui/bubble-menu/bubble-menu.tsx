@@ -7,14 +7,16 @@ import {
 	type KeyboardEvent as ReactKeyboardEvent
 } from 'react';
 
-import { LinkIcon } from './icons.js';
+import { ColorPanel } from './color-panel.js';
+import { LinkIcon, TextColorIcon } from './icons.js';
 import { LinkEditor } from './link-editor.js';
 import type {
 	BubbleAction,
 	BubbleMenuPanel,
 	BubbleMenuProps
 } from './types.js';
-import { defaultLabels } from '../../core/labels.js';
+import { TEXT_COLOR_MARK } from '../../core/constants.js';
+import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 
 const renderIcon = (icon: BubbleAction['icon']) => {
 	if (!icon) return null;
@@ -39,6 +41,18 @@ const LINK_PANEL: BubbleMenuPanel = {
 	isActive: (editor) => editor.isActive('link'),
 	component: LinkEditor
 };
+
+/**
+ * The text colour palette (`PA-05`), offered only where
+ * `@blockleaf/editor/text-style` put the mark in the schema.
+ */
+const colorPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
+	id: 'textColor',
+	label: () => labels.textColor.button,
+	icon: TextColorIcon,
+	isActive: (editor) => editor.isActive(TEXT_COLOR_MARK),
+	component: ColorPanel
+});
 
 /**
  * Re-renders only when the active or available set actually changes, rather
@@ -105,12 +119,14 @@ export const BubbleMenu = ({
 	// closes — and that needs no re-render of its own.
 	const pendingFocusRef = useRef<string | null>(null);
 
+	const hasTextColor = TEXT_COLOR_MARK in editor.schema.marks;
 	const panels = useMemo(() => {
 		const resolved: BubbleMenuPanel[] = [];
+		if (hasTextColor) resolved.push(colorPanel(labels));
 		if (link) resolved.push(LINK_PANEL);
 		if (panel) resolved.push(panel);
 		return resolved;
-	}, [link, panel]);
+	}, [hasTextColor, labels, link, panel]);
 
 	// Subscribing re-runs this component whenever the marks under the
 	// selection change, which is what keeps `aria-pressed` honest.

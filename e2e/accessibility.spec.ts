@@ -200,6 +200,26 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} p`)).toEqual([]);
 	});
 
+	test('the text color palette has no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?textstyle');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('Colour');
+		for (let index = 0; index < 6; index += 1) {
+			await page.keyboard.press('Shift+ArrowLeft');
+		}
+		await page.getByRole('button', { name: 'Text color' }).click();
+		const palette = page.getByRole('radiogroup', { name: 'Text color' });
+		await expect(palette).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-color-panel')).toEqual([]);
+
+		await palette.getByRole('radio', { name: 'Yellow' }).click();
+		await expect(page.locator(`${EDITOR} span[data-color]`)).toBeVisible();
+		expect(await violations(page, `${EDITOR} p`)).toEqual([]);
+	});
+
 	test('the emoji picker has no violations, contrast included', async ({
 		page
 	}) => {

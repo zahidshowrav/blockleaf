@@ -195,6 +195,17 @@ describe('document schema', () => {
 						{ type: 'text' as const, text: ', ' },
 						{
 							type: 'text' as const,
+							text: 'red',
+							marks: [
+								{
+									type: 'textColor' as const,
+									attrs: { color: 'red' }
+								}
+							]
+						},
+						{ type: 'text' as const, text: ', ' },
+						{
+							type: 'text' as const,
 							text: 'bold',
 							marks: [{ type: 'bold' as const }]
 						},

@@ -8,11 +8,37 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25 · **Last reviewed:** 2026-11-23
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26 · **Last reviewed:** 2026-11-23
 
 ---
 
 ## Settled
+
+### F26 — one mark per text style · decided 2026-11-23
+
+`PA-05` adds text colour, and `PA-10` and `PA-11` will add font family and
+size, all stored as tokens (`F18`). Tiptap keeps all three as attributes on
+one `textStyle` mark.
+
+**Decisions:**
+
+- **A mark of its own for each:** `textColor` now, `fontFamily` and
+  `fontSize` later. An editor keeps a mark it does not know but drops an
+  attribute it does not know (`F25`), so a shared mark would have meant
+  `PA-10` and `PA-11` adding attributes that an editor from before them
+  strips on save. Separate marks never change once shipped.
+- **`textColor` stores `{ color }`, a token:** lower case, a letter first,
+  at most 32 characters. The nine built in — gray, brown, orange, yellow,
+  green, blue, purple, pink, red — have light and dark values in the
+  stylesheet, each at least 4.5:1 on its background. A host may use any
+  other token and define `--bl-text-<token>` itself.
+- **Rendered as `style="color: var(--bl-text-<token>, currentColor)"`** in
+  the editor and both renderer targets, plus `data-color`. A host token
+  needs only its custom property, no selector; an undefined one falls back
+  to the text colour rather than to nothing. The token is checked before it
+  reaches `style`, everywhere it is read.
+- **Rejected: one `textStyle` mark.** Fewer types and Tiptap's own shape,
+  but every later style would change a shipped mark.
 
 ### F25 — where text alignment lives · decided 2026-11-23
 

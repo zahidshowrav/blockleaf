@@ -57,6 +57,17 @@ export interface SuperscriptMark {
 	type: 'superscript';
 }
 
+/**
+ * Version 2 (`PA-05`, `F26`). `color` is a token — one of the built-in nine
+ * or one a host defines in CSS — never a CSS colour (`F18`).
+ */
+export interface TextColorMark {
+	type: 'textColor';
+	attrs: {
+		color: string;
+	};
+}
+
 export type BlockleafMark =
 	| BoldMark
 	| ItalicMark
@@ -66,7 +77,8 @@ export type BlockleafMark =
 	| LinkMark
 	| HighlightMark
 	| SubscriptMark
-	| SuperscriptMark;
+	| SuperscriptMark
+	| TextColorMark;
 
 /* -------------------------------------------------------------------------- */
 /* Inline Nodes                                                               */

@@ -19,6 +19,7 @@ import type {
 	HighlightMark,
 	SubscriptMark,
 	SuperscriptMark,
+	TextColorMark,
 	HorizontalRuleNode,
 	ImageNode,
 	InlineNode,
@@ -81,7 +82,8 @@ const MARK_TYPES: ReadonlySet<string> = new Set([
 	'link',
 	'highlight',
 	'subscript',
-	'superscript'
+	'superscript',
+	'textColor'
 ]);
 
 /**
@@ -170,6 +172,17 @@ export const superscriptMarkSchema: z.ZodType<SuperscriptMark> = z.object({
 	type: z.literal('superscript')
 });
 
+/**
+ * Version 2 (`PA-05`). A token, not a colour: lower case, a letter first, at
+ * most 32 characters, because the renderers put it inside a `style`.
+ */
+export const textColorMarkSchema: z.ZodType<TextColorMark> = z.object({
+	type: z.literal('textColor'),
+	attrs: z.object({
+		color: z.string().regex(/^[a-z][a-z0-9-]{0,31}$/)
+	})
+});
+
 export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 	z.union([
 		boldMarkSchema,
@@ -180,7 +193,8 @@ export const blockleafMarkSchema: z.ZodType<BlockleafMark> = orUnrecognisedMark(
 		linkMarkSchema,
 		highlightMarkSchema,
 		subscriptMarkSchema,
-		superscriptMarkSchema
+		superscriptMarkSchema,
+		textColorMarkSchema
 	])
 );
 

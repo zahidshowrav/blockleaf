@@ -1,5 +1,10 @@
 import { element } from './escape.js';
-import { highlightColor, linkAttributes } from '../attrs.js';
+import {
+	highlightColor,
+	linkAttributes,
+	textColorToken,
+	textColorValue
+} from '../attrs.js';
 import { type MarkRender } from '../walk.js';
 
 export type HtmlMarkRenderer = MarkRender<string>;
@@ -12,6 +17,16 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 	subscript: ({ children }) => element('sub', {}, children),
 	superscript: ({ children }) => element('sup', {}, children),
 	code: ({ children }) => element('code', {}, children),
+
+	textColor: ({ mark, children }) => {
+		const token = textColorToken(mark);
+		if (!token) return children;
+		return element(
+			'span',
+			{ 'data-color': token, style: `color: ${textColorValue(token)}` },
+			children
+		);
+	},
 
 	highlight: ({ mark, children }) => {
 		const color = highlightColor(mark);
