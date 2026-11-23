@@ -22,15 +22,15 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-07`, `PA-10`, `PA-11`, `PA-19` and `PA-22` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-11`, `PA-19` and `PA-22` are done.
 
-**Next:** the table of contents stack, `PA-08` then `PA-09`. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** the media stack, `PA-20` → `PA-21` → `PA-12`/`PA-13`/`PA-14` → `PA-24`. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing; `PA-03` to `PA-11` join version 2 without bumping again.
 Every other `PA` and `TB` task waits for the v2 release.
-`PA-09` waits with `PA-08`, which shares its `./toc` subpath, and `PA-18`
-comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
+`PA-08` and `PA-09` share the `./toc` subpath; the table of contents stores
+nothing but its id (`F27`). `PA-18` comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
 waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
 as a `figure` holding the table and a `caption` (`F20`, amended 2026-11-20),
 and needed no `SCHEMA_VERSION` bump: both are new node types and no existing
@@ -541,8 +541,8 @@ and Size. Each panel's groups are separate tab stops.
 | PA-05 | Text colour                                                       | `./text-style`                 | Done        | `9cc3941` | 2026-11-23 |
 | PA-06 | Text alignment                                                    | `./text-style`                 | Done        | `acbe2a0` | 2026-11-23 |
 | PA-07 | Subscript and superscript                                         | `./text-style`                 | Done        | `897531e` | 2026-11-23 |
-| PA-08 | Table of contents                                                 | `./toc`                        | Not started | —         | —          |
-| PA-09 | Character and word count                                          | `./toc`                        | Not started | —         | —          |
+| PA-08 | Table of contents                                                 | `./toc`                        | Done        | `9dd7ece` | 2026-11-23 |
+| PA-09 | Character and word count                                          | `./toc`                        | Done        | `280a25f` | 2026-11-23 |
 | PA-10 | Font family, stored as a token                                    | `./text-style`                 | Done        | `b810f8e` | 2026-11-23 |
 | PA-11 | Font size, stored as a token                                      | `./text-style`                 | Done        | `8ac43bd` | 2026-11-23 |
 | PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
