@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-07` and `PA-19` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-07`, `PA-10`, `PA-11`, `PA-19` and `PA-22` are done.
 
-**Next:** `PA-10` and `PA-11`, font family and size, each a mark of its own as `PA-05` set out (`F26`). The early release shipped `PA-01` and `PA-19` as
+**Next:** the table of contents stack, `PA-08` then `PA-09`. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing; `PA-03` to `PA-11` join version 2 without bumping again.
@@ -51,12 +51,12 @@ the Changesets release PR open meanwhile; non-schema fixes wait with it.
 `HD-10` turned out to be outside this: it adds node types and bumps nothing.
 `SG-05` keeps `blockleaf.dev` from documenting the held work before it ships.
 
-**Last verified:** 2026-11-23: 526 editor unit tests, 175 renderer, 86
-Playwright across two projects — 77 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 151.81 kB of 160 kB, schema entry at 397 B of 2 kB. Subpaths
-measured on their own, most of each being the shared runtime: code block
-80.68 kB of 85 kB, mentions 69.08 of 72, text style 57.04 of 60, emoji 69.88
-of 72. On top of the editor: mentions 0.86 kB, text style 0.59 kB, emoji
-1.82 kB plus a 36 kB emoji list loaded on first use.
+**Last verified:** 2026-11-23: 552 editor unit tests, 184 renderer, 90
+Playwright across two projects — 81 on desktop Chrome, 9 on an emulated Pixel 7. Bundle at 152.58 kB of 160 kB, schema entry at 397 B of 2 kB. Subpaths
+measured on their own, most of each being the shared runtime: code block,
+mentions, text style and emoji all within their budgets. On top of the
+editor: mentions 0.86 kB, text style 0.45 kB, emoji 1.82 kB plus a 36 kB
+emoji list loaded on first use.
 
 ---
 
@@ -520,6 +520,18 @@ token needs only its `--bl-text-<token>` property, since the output is
 `style="color: var(--bl-text-<token>, currentColor)"`. The token is checked
 before it reaches `style` in the editor, validator and both renderers.
 
+`PA-10`, `PA-11`, `PA-22` (2026-11-23), one stack. Font family and size
+are marks of their own like text colour (`F26`), and the three now share
+one token-mark helper in the core and one radio-group component in the
+chrome. Family tokens `sans`, `serif`, `mono` resolve through
+`--bl-font-<token>`; size tokens `sm`, `lg`, `xl` through
+`--bl-font-size-<token>`, in `em`. Background colour needed no new mark:
+`highlight` has carried `color` since `0.1.0`, so it now holds a token,
+resolved through `--bl-highlight-<token>` with the token itself as the
+fallback, and a hex or `rgb()` stored before still renders. The colour panel
+became "Color", with Text and Background groups; the font panel has Typeface
+and Size. Each panel's groups are separate tab stops.
+
 | Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
@@ -531,8 +543,8 @@ before it reaches `style` in the editor, validator and both renderers.
 | PA-07 | Subscript and superscript                                         | `./text-style`                 | Done        | `897531e` | 2026-11-23 |
 | PA-08 | Table of contents                                                 | `./toc`                        | Not started | —         | —          |
 | PA-09 | Character and word count                                          | `./toc`                        | Not started | —         | —          |
-| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Not started | —         | —          |
-| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Not started | —         | —          |
+| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Done        | `b810f8e` | 2026-11-23 |
+| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Done        | `8ac43bd` | 2026-11-23 |
 | PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
 | PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
 | PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —         | —          |
@@ -543,7 +555,7 @@ before it reaches `style` in the editor, validator and both renderers.
 | PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
 | PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —         | —          |
 | PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —         | —          |
-| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Not started | —         | —          |
+| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Done        | `bcea22e` | 2026-11-23 |
 | PA-23 | Block background colour                                           | core                           | Not started | —         | —          |
 | PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —         | —          |
 
