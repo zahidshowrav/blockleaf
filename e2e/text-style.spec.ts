@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR } from './helpers.js';
 
 /**
- * PA-05, PA-06, PA-07, PA-10 and PA-11. Shortcuts, bubble-menu buttons, a palette and a
+ * PA-05, PA-06, PA-07, PA-10, PA-11 and PA-22. Shortcuts, bubble-menu buttons, a palette and a
  * block-menu entry acting on a real selection — and the colour a token
  * actually resolves to, which only a browser computes.
  */
@@ -161,8 +161,11 @@ test.describe('text color', () => {
 		await open(page, 'Warning');
 		await selectBack(page, 7);
 
-		await page.getByRole('button', { name: 'Text color' }).click();
-		const palette = page.getByRole('radiogroup', { name: 'Text color' });
+		await page.getByRole('button', { name: 'Color', exact: true }).click();
+		const palette = page.getByRole('radiogroup', {
+			name: 'Text',
+			exact: true
+		});
 		await expect(palette).toBeVisible();
 		await palette.getByRole('radio', { name: 'Red' }).click();
 
@@ -180,8 +183,11 @@ test.describe('text color', () => {
 		await page.emulateMedia({ colorScheme: 'dark' });
 		await open(page, 'Warning');
 		await selectBack(page, 7);
-		await page.getByRole('button', { name: 'Text color' }).click();
-		await page.getByRole('radio', { name: 'Red' }).click();
+		await page.getByRole('button', { name: 'Color', exact: true }).click();
+		await page
+			.getByRole('radiogroup', { name: 'Text', exact: true })
+			.getByRole('radio', { name: 'Red' })
+			.click();
 
 		await expect(
 			page.locator(`${EDITOR} span[data-color="red"]`)
@@ -191,18 +197,22 @@ test.describe('text color', () => {
 	test('the palette works from the keyboard', async ({ page }) => {
 		await open(page, 'Note');
 		await selectBack(page, 4);
-		const button = page.getByRole('button', { name: 'Text color' });
+		const button = page.getByRole('button', { name: 'Color', exact: true });
 		await expect(button).toBeVisible();
 		await button.focus();
 		await page.keyboard.press('Enter');
 
-		// Focus lands on "Default"; two steps right is Brown.
+		// Focus lands on the text group's "Default"; two steps right is Brown.
+		const text = page.getByRole('radiogroup', {
+			name: 'Text',
+			exact: true
+		});
 		await expect(
-			page.getByRole('radio', { name: 'Default' })
+			text.getByRole('radio', { name: 'Default' })
 		).toBeFocused();
 		await page.keyboard.press('ArrowRight');
 		await page.keyboard.press('ArrowRight');
-		await expect(page.getByRole('radio', { name: 'Brown' })).toBeFocused();
+		await expect(text.getByRole('radio', { name: 'Brown' })).toBeFocused();
 		await page.keyboard.press('Enter');
 
 		await expect(
@@ -269,5 +279,27 @@ test.describe('font size', () => {
 			Number.parseFloat(getComputedStyle(element.parentElement!).fontSize)
 		]);
 		expect(inner).toBeCloseTo(outer * 1.25, 1);
+	});
+});
+
+test.describe('background colour', () => {
+	test('the colour panel sets a background token on the highlight', async ({
+		page
+	}) => {
+		await open(page, 'Shaded');
+		await selectBack(page, 6);
+		await page.getByRole('button', { name: 'Color', exact: true }).click();
+
+		await page
+			.getByRole('radiogroup', { name: 'Background' })
+			.getByRole('radio', { name: 'Blue' })
+			.click();
+
+		const mark = page.locator(`${EDITOR} mark[data-color="blue"]`);
+		await expect(mark).toHaveText('Shaded');
+		await expect(mark).toHaveCSS('background-color', 'rgb(219, 232, 254)');
+		await expect(page.locator('.sandbox__json')).toContainText(
+			'"type": "highlight"'
+		);
 	});
 });

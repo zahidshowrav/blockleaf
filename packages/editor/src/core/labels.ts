@@ -205,8 +205,12 @@ export type EmojiLabels = {
 };
 
 export type TextColorLabels = {
-	/** The bubble-menu button that opens the palette, and the palette's name. */
+	/** The bubble-menu button that opens the palette. */
 	button: string;
+	/** The group of text colours. */
+	text: string;
+	/** The group of background colours (`PA-22`). */
+	background: string;
 	/** The swatch that takes the colour off. */
 	none: string;
 	/** Each built-in colour's name, as announced. A host's own tokens are named by their token. */
@@ -451,7 +455,9 @@ export const defaultLabels: ResolvedLabels = {
 		loading: 'Loading emoji…'
 	},
 	textColor: {
-		button: 'Text color',
+		button: 'Color',
+		text: 'Text',
+		background: 'Background',
 		none: 'Default',
 		colors: {
 			gray: 'Gray',

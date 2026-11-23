@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Editor, type JSONContent } from '@tiptap/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -146,9 +146,7 @@ describe('text color (PA-05)', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole('button', { name: 'Text color' })
-			).toBeTruthy();
+			expect(screen.getByRole('button', { name: 'Color' })).toBeTruthy();
 		});
 
 		it('does not offer it where it is not', () => {
@@ -165,9 +163,7 @@ describe('text color (PA-05)', () => {
 				/>
 			);
 
-			expect(
-				screen.queryByRole('button', { name: 'Text color' })
-			).toBeNull();
+			expect(screen.queryByRole('button', { name: 'Color' })).toBeNull();
 		});
 	});
 
@@ -184,27 +180,28 @@ describe('text color (PA-05)', () => {
 			return onClose;
 		};
 
+		const textGroup = () =>
+			screen.getByRole('radiogroup', { name: 'Text' });
+		const textRadio = (name: string) =>
+			within(textGroup()).getByRole('radio', { name });
+
 		it('is a radio group of "Default" and the nine colours, the current one checked', () => {
 			const instance = open('<p>one two three</p>');
 			selectTwo(instance);
 			instance.commands.setTextColor('orange');
 			renderPanel(instance);
 
-			const radios = screen.getAllByRole('radio');
+			const radios = within(textGroup()).getAllByRole('radio');
 			expect(
 				radios.map((radio) => radio.getAttribute('aria-label'))
 			).toEqual([
 				'Default',
 				...Object.values(defaultLabels.textColor.colors)
 			]);
-			expect(
-				screen
-					.getByRole('radio', { name: 'Orange' })
-					.getAttribute('aria-checked')
-			).toBe('true');
-			expect(document.activeElement).toBe(
-				screen.getByRole('radio', { name: 'Orange' })
+			expect(textRadio('Orange').getAttribute('aria-checked')).toBe(
+				'true'
 			);
+			expect(document.activeElement).toBe(textRadio('Orange'));
 		});
 
 		it('applies a colour and closes', () => {
@@ -212,7 +209,7 @@ describe('text color (PA-05)', () => {
 			selectTwo(instance);
 			const onClose = renderPanel(instance);
 
-			fireEvent.click(screen.getByRole('radio', { name: 'Pink' }));
+			fireEvent.click(textRadio('Pink'));
 
 			expect(runs(instance)[1]?.marks).toEqual([
 				{ type: 'textColor', attrs: { color: 'pink' } }
@@ -226,7 +223,7 @@ describe('text color (PA-05)', () => {
 			instance.commands.setTextColor('red');
 			renderPanel(instance);
 
-			fireEvent.click(screen.getByRole('radio', { name: 'Default' }));
+			fireEvent.click(textRadio('Default'));
 
 			expect(runs(instance)).toEqual([
 				{ type: 'text', text: 'one two three' }
@@ -237,17 +234,13 @@ describe('text color (PA-05)', () => {
 			const instance = open('<p>one two three</p>');
 			selectTwo(instance);
 			const onClose = renderPanel(instance);
-			const group = screen.getByRole('radiogroup');
+			const group = textGroup();
 
 			fireEvent.keyDown(group, { key: 'ArrowRight' });
-			expect(document.activeElement).toBe(
-				screen.getByRole('radio', { name: 'Gray' })
-			);
+			expect(document.activeElement).toBe(textRadio('Gray'));
 			fireEvent.keyDown(group, { key: 'ArrowLeft' });
 			fireEvent.keyDown(group, { key: 'ArrowLeft' });
-			expect(document.activeElement).toBe(
-				screen.getByRole('radio', { name: 'Red' })
-			);
+			expect(document.activeElement).toBe(textRadio('Red'));
 
 			fireEvent.keyDown(group, { key: 'Escape' });
 			expect(onClose).toHaveBeenCalled();
@@ -259,15 +252,17 @@ describe('text color (PA-05)', () => {
 			renderPanel(
 				instance,
 				resolveLabels({
-					textColor: { button: 'Couleur', colors: { red: 'Rouge' } }
+					textColor: { text: 'Couleur', colors: { red: 'Rouge' } }
 				})
 			);
 
+			const group = screen.getByRole('radiogroup', { name: 'Couleur' });
 			expect(
-				screen.getByRole('radiogroup').getAttribute('aria-label')
-			).toBe('Couleur');
-			expect(screen.getByRole('radio', { name: 'Rouge' })).toBeTruthy();
-			expect(screen.getByRole('radio', { name: 'Blue' })).toBeTruthy();
+				within(group).getByRole('radio', { name: 'Rouge' })
+			).toBeTruthy();
+			expect(
+				within(group).getByRole('radio', { name: 'Blue' })
+			).toBeTruthy();
 		});
 	});
 });

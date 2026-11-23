@@ -1,5 +1,4 @@
 import { Extension, InputRule, type Extensions } from '@tiptap/core';
-import { Highlight } from '@tiptap/extension-highlight';
 import { TableKit } from '@tiptap/extension-table';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
@@ -13,6 +12,7 @@ import {
 	HEADING_LEVELS,
 	NORMALISATION_META
 } from './constants.js';
+import { Highlight } from './marks/highlight.js';
 import { Link } from './marks/link.js';
 import { Callout } from './nodes/callout.js';
 import { Details } from './nodes/details.js';
@@ -193,9 +193,7 @@ export const createExtensions = (
 		}),
 		Underline,
 		Link,
-		Highlight.configure({
-			multicolor: true
-		}),
+		Highlight,
 		TaskList,
 		TaskItem.configure({
 			nested: true

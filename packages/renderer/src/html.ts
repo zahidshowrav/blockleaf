@@ -17,6 +17,7 @@ export {
 	calloutTone,
 	codeLanguage,
 	headingLevel,
+	highlightBackground,
 	highlightColor,
 	imageAttributes,
 	isChecked,

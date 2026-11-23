@@ -4,6 +4,7 @@ import {
 	fontFamilyValue,
 	fontSizeToken,
 	fontSizeValue,
+	highlightBackground,
 	highlightColor,
 	linkAttributes,
 	textColorToken,
@@ -65,7 +66,7 @@ const defaults: Record<string, HtmlMarkRenderer> = {
 			{
 				'data-color': color,
 				style: color
-					? `background-color: ${color}; color: inherit`
+					? `background-color: ${highlightBackground(color)}; color: inherit`
 					: undefined
 			},
 			children

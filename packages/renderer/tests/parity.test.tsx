@@ -228,6 +228,18 @@ const cases: Array<[string, RenderableDocument]> = [
 		})
 	],
 	[
+		'background colour token, and a colour name stored before tokens',
+		docOf({
+			type: 'paragraph',
+			attrs: { id: 'p' },
+			content: [
+				text('blue', [{ type: 'highlight', attrs: { color: 'blue' } }]),
+				text(' '),
+				text('gold', [{ type: 'highlight', attrs: { color: 'gold' } }])
+			]
+		})
+	],
+	[
 		'highlight',
 		docOf({
 			type: 'paragraph',
