@@ -25,6 +25,9 @@ import type {
 	FontSizeMark,
 	HorizontalRuleNode,
 	ImageNode,
+	VideoNode,
+	AudioNode,
+	AttachmentNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -66,6 +69,9 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'callout',
 	'details',
 	'image',
+	'video',
+	'audio',
+	'attachment',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -317,6 +323,45 @@ export const imageNodeSchema: z.ZodType<ImageNode> = z.object({
 	})
 });
 
+const mediaAlignSchema = z
+	.enum(['left', 'center', 'right'])
+	.nullable()
+	.optional();
+
+/** Version 2 (`PA-12`). */
+export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
+	type: z.literal('video'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		poster: z.string().nullable().optional(),
+		width: z.number().nullable().optional(),
+		align: mediaAlignSchema
+	})
+});
+
+/** Version 2 (`PA-13`). */
+export const audioNodeSchema: z.ZodType<AudioNode> = z.object({
+	type: z.literal('audio'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		title: z.string().nullable().optional()
+	})
+});
+
+/** Version 2 (`PA-14`). `size` is a whole number of bytes. */
+export const attachmentNodeSchema: z.ZodType<AttachmentNode> = z.object({
+	type: z.literal('attachment'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		name: z.string(),
+		size: z.number().int().nonnegative().nullable().optional(),
+		mime: z.string().nullable().optional()
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -491,6 +536,9 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
+				audioNodeSchema,
+				attachmentNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -555,9 +603,19 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 			id: z.string().optional()
 		})
 		.optional(),
-	// A table, or since version 2 an image (`PA-20`), then its caption.
+	// A table, or since version 2 an image (`PA-20`) or a media block
+	// (`PA-12` to `PA-14`), then its caption.
 	content: z
-		.tuple([z.union([tableNodeSchema, imageNodeSchema]), captionNodeSchema])
+		.tuple([
+			z.union([
+				tableNodeSchema,
+				imageNodeSchema,
+				videoNodeSchema,
+				audioNodeSchema,
+				attachmentNodeSchema
+			]),
+			captionNodeSchema
+		])
 		.optional()
 });
 
@@ -582,6 +640,9 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
+				audioNodeSchema,
+				attachmentNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -610,6 +671,9 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
+				audioNodeSchema,
+				attachmentNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

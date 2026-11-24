@@ -58,7 +58,10 @@ export const BLOCK_NODE_TYPES = [
 	'image',
 	'table',
 	'figure',
-	'tableOfContents'
+	'tableOfContents',
+	'video',
+	'audio',
+	'attachment'
 ] as const;
 
 /**
@@ -105,6 +108,17 @@ export const CAPTIONABLE_GROUP = 'captionable';
  * `BlockleafEditor` can hand it the resolved labels.
  */
 export const CAPTION_MENU_EXTENSION_NAME = 'captionMenu';
+
+/**
+ * The media blocks (`PA-12` to `PA-14`, `F29`): in the schema from version
+ * 2, loaded from `@blockleaf/editor/media`. Each is captionable.
+ */
+export const VIDEO_NODE = 'video';
+export const AUDIO_NODE = 'audio';
+export const ATTACHMENT_NODE = 'attachment';
+
+/** The toolbar for a selected video, audio clip or file (`PA-12` to `PA-14`). */
+export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';

@@ -28,6 +28,9 @@ const BLOCKS = new Set([
 	'callout',
 	'details',
 	'image',
+	'video',
+	'audio',
+	'attachment',
 	'table',
 	'figure',
 	'caption',
@@ -76,6 +79,13 @@ export const toPlainText = (
 
 		if (node.type === 'mention') {
 			parts.push(mentionAttributes(node).text);
+			return;
+		}
+
+		// A file is its name, as the editor's plain text has it (`PA-14`).
+		if (node.type === 'attachment') {
+			const name = node.attrs?.name;
+			if (typeof name === 'string') parts.push(name);
 			return;
 		}
 

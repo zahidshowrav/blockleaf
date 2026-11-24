@@ -9,6 +9,8 @@ import {
 	columnStyle,
 	headerRowCount,
 	headingLevel,
+	attachmentAttributes,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -18,7 +20,8 @@ import {
 	tableColumns,
 	tableMinWidth,
 	tableRows,
-	textAlign
+	textAlign,
+	videoAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -196,6 +199,76 @@ export const createHtmlNodes = (
 			'data-align': attrs.align,
 			class: 'blockleaf-image'
 		});
+	},
+
+	// Video, audio and a file (`PA-12` to `PA-14`), as the editor writes
+	// them. An unsafe source renders nothing, as an image's does.
+	video: ({ node }) => {
+		const attrs = videoAttributes(node);
+		if (!attrs) return '';
+		return element(
+			'video',
+			{
+				'data-id': blockId(node),
+				src: attrs.src,
+				poster: attrs.poster,
+				width: attrs.width,
+				'data-align': attrs.align,
+				class: 'blockleaf-video',
+				controls: '',
+				preload: 'metadata',
+				'aria-label': labels.video
+			},
+			''
+		);
+	},
+
+	audio: ({ node }) => {
+		const attrs = audioAttributes(node);
+		if (!attrs) return '';
+		return element(
+			'audio',
+			{
+				'data-id': blockId(node),
+				src: attrs.src,
+				title: attrs.title,
+				class: 'blockleaf-audio',
+				controls: '',
+				preload: 'metadata',
+				'aria-label': attrs.title ?? labels.audio
+			},
+			''
+		);
+	},
+
+	attachment: ({ node }) => {
+		const attrs = attachmentAttributes(node);
+		if (!attrs) return '';
+		const size =
+			attrs.size === undefined ? '' : labels.fileSize(attrs.size);
+		return element(
+			'a',
+			{
+				'data-id': blockId(node),
+				'data-type': 'attachment',
+				class: 'blockleaf-attachment',
+				href: attrs.src,
+				download: attrs.name,
+				'data-size': attrs.size,
+				'data-mime': attrs.mime,
+				'aria-label': labels.file(attrs.name, size)
+			},
+			element(
+				'span',
+				{ class: 'blockleaf-attachment__name' },
+				escapeText(attrs.name)
+			) +
+				element(
+					'span',
+					{ class: 'blockleaf-attachment__size' },
+					escapeText(size)
+				)
+		);
 	},
 
 	// A real table with a real `<thead>`, the renderer's one deliberate

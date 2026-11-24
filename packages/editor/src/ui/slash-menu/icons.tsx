@@ -327,3 +327,37 @@ export const ToggleIcon = (props: IconProps) => (
 		<path d="M12 9h8M12 15h8" />
 	</svg>
 );
+
+const mediaIcon = (path: string) => {
+	const Icon = (props: IconProps) => (
+		<svg
+			viewBox="0 0 24 24"
+			width="16"
+			height="16"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...props}
+		>
+			<path d={path} />
+		</svg>
+	);
+	return Icon;
+};
+
+/** A film frame with a play triangle. */
+export const VideoIcon = /* @__PURE__ */ mediaIcon(
+	'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM10 9v6l5-3z'
+);
+
+/** A note. */
+export const AudioIcon = /* @__PURE__ */ mediaIcon(
+	'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
+);
+
+/** A page with a folded corner. */
+export const FileIcon = /* @__PURE__ */ mediaIcon(
+	'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5'
+);

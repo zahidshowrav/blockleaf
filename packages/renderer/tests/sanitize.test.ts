@@ -4,8 +4,13 @@ import {
 	sanitizeHref as editorHref,
 	sanitizeSrc as editorSrc
 } from '@blockleaf/editor/extensions';
+import { sanitizeMediaSrc as editorMediaSrc } from '@blockleaf/editor/media';
 
-import { sanitizeHref, sanitizeSrc } from '../src/sanitize.js';
+import {
+	sanitizeHref,
+	sanitizeMediaSrc,
+	sanitizeSrc
+} from '../src/sanitize.js';
 
 /**
  * The renderer carries its own copy of the editor's URL rules, because it
@@ -85,5 +90,24 @@ describe('the rules themselves', () => {
 		''
 	])('rejects %j as an image source', (src) => {
 		expect(sanitizeSrc(src)).toBeNull();
+	});
+});
+
+describe('sanitizeMediaSrc agrees with the editor (F29)', () => {
+	it.each([
+		...SRCS,
+		'https://cdn.test/a.mp4',
+		'/uploads/a.mp3',
+		'media/a.pdf',
+		'data:video/mp4;base64,AAAA',
+		'data:application/pdf;base64,JVBERi0='
+	])('%j', (src) => {
+		expect(sanitizeMediaSrc(src)).toBe(editorMediaSrc(src));
+	});
+
+	it('refuses every data URL, raster images included', () => {
+		expect(
+			sanitizeMediaSrc('data:image/png;base64,iVBORw0KGgo=')
+		).toBeNull();
 	});
 });

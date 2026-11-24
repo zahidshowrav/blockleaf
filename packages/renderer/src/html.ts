@@ -19,11 +19,17 @@ export {
 	headingLevel,
 	highlightBackground,
 	highlightColor,
+	attachmentAttributes,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	linkAttributes,
 	listStart,
+	videoAttributes,
+	type AttachmentAttributes,
+	type AudioAttributes,
 	type ImageAttributes,
+	type VideoAttributes,
 	type LinkAttributes
 } from './attrs.js';
 export {
@@ -31,7 +37,7 @@ export {
 	resolveRendererLabels,
 	type RendererLabels
 } from './labels.js';
-export { sanitizeHref, sanitizeSrc } from './sanitize.js';
+export { sanitizeHref, sanitizeMediaSrc, sanitizeSrc } from './sanitize.js';
 export {
 	extractHeadings,
 	toPlainText,

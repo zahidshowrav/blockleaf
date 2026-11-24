@@ -8,11 +8,26 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28 · **Last reviewed:** 2026-11-24
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29 · **Last reviewed:** 2026-11-24
 
 ---
 
 ## Settled
+
+### F29 — what video, audio and a file store · decided 2026-11-24
+
+`PA-12` to `PA-14` add three blocks to the `./media` subpath. Each is a new
+node type in version 2, an atom, and in the `captionable` group (`F28`).
+
+**Decisions:**
+
+- **`video { id, src, poster, width, align }`.** The image's shape, so the same toolbar and, in `PA-24`, the same resize apply. `poster` is a still, held to the image rule.
+- **`audio { id, src, title }`.** The title is the player's accessible name; without one, a page of players is "audio, audio, audio". An upload titles it from the file name, as an image's `alt` is.
+- **`attachment { id, src, name, size, mime }`.** Named `attachment`, not `file`, so stored JSON never reads like a browser `File`. The name, the size in bytes and the type are stored because the block shows them before anyone fetches the file. In the editor a click selects the block and never opens the file.
+- **Sources: `https:` or relative, and no `data:` URL of any kind.** The image rule allows raster data URLs because a clipboard image arrives as one. A video or a PDF never does; megabytes of base64 in a document cost every host; and a `data:` link is a way to serve HTML from the host's origin. The renderer carries the same rule (`F15`), and its tests run both copies over one table.
+- **Uploads go to the block for the file's type**: `image/*`, `video/*`, `audio/*`, then anything else to a file block, each only if its block is loaded. Left at its default, the upload's `accept` follows what is loaded; a host's own `accept` is used as given.
+- **The renderer renders all three, built in.** It costs 0.44 kB on each target and took both past 3 kB, so both budgets are now 3.5 kB (decided 2026-11-24). An opt-in renderer subpath was the alternative and was turned down: a renderer that silently drops a stored video from a published page is worse than the weight.
+- **Why:** each block stores what it needs to be drawn without a fetch, and nothing that a screen or a session would make wrong.
 
 ### F28 — which blocks a figure may caption · decided 2026-11-24
 

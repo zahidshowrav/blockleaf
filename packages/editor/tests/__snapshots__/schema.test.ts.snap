@@ -433,6 +433,51 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "figure-video",
+      },
+      "content": [
+        {
+          "attrs": {
+            "align": "center",
+            "id": "video-1",
+            "poster": "https://example.com/clip.png",
+            "src": "https://example.com/clip.mp4",
+            "width": 640,
+          },
+          "type": "video",
+        },
+        {
+          "content": [
+            {
+              "text": "Launch",
+              "type": "text",
+            },
+          ],
+          "type": "caption",
+        },
+      ],
+      "type": "figure",
+    },
+    {
+      "attrs": {
+        "id": "audio-1",
+        "src": "https://example.com/talk.mp3",
+        "title": "The talk",
+      },
+      "type": "audio",
+    },
+    {
+      "attrs": {
+        "id": "file-1",
+        "mime": "application/pdf",
+        "name": "report.pdf",
+        "size": 1572864,
+        "src": "https://example.com/report.pdf",
+      },
+      "type": "attachment",
+    },
+    {
+      "attrs": {
         "id": "figure-image",
       },
       "content": [

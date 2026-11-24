@@ -37,12 +37,22 @@ export const sandboxUpload: UploadAdapter = {
 					return;
 				}
 
-				resolve({
-					id: `${file.name}-${seen}`,
-					src: PIXEL,
-					width: 240,
-					height: 160
-				});
+				// A video, sound or other file cannot be a `data:` URL (F29), so
+				// it gets a path. Nothing is served there; the block is what
+				// the sandbox exercises, not playback.
+				resolve(
+					file.type.startsWith('image/')
+						? {
+								id: `${file.name}-${seen}`,
+								src: PIXEL,
+								width: 240,
+								height: 160
+							}
+						: {
+								id: `${file.name}-${seen}`,
+								src: `/media/${encodeURIComponent(file.name)}`
+							}
+				);
 			}, STEP_MS);
 
 			signal.addEventListener('abort', () => {

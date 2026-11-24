@@ -339,6 +339,32 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
+	test('video, audio, a file and the media toolbar have no violations', async ({
+		page
+	}) => {
+		await page.goto('/?media');
+		await page.locator(EDITOR).click();
+		await dropFile(page, 'report.pdf', 'start', 'application/pdf');
+		await dropFile(page, 'voice_memo.m4a', 'start', 'audio/mp4');
+		await dropFile(page, 'launch.mp4', 'start', 'video/mp4');
+		await expect(page.locator(`${EDITOR} video`)).toBeVisible({
+			timeout: 10000
+		});
+		await expect(page.locator(`${EDITOR} audio`)).toBeAttached();
+		const file = page.locator(`${EDITOR} .blockleaf-attachment`);
+		await expect(file).toBeVisible();
+
+		expect(await violations(page, EDITOR)).toEqual([]);
+
+		await file.click();
+		await expect(
+			page.getByRole('toolbar', { name: 'Media' })
+		).toBeVisible();
+		expect(
+			await violations(page, '[role="toolbar"][aria-label="Media"]')
+		).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

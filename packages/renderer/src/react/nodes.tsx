@@ -8,6 +8,8 @@ import {
 	colspan,
 	headerRowCount,
 	headingLevel,
+	attachmentAttributes,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -17,7 +19,8 @@ import {
 	tableColumns,
 	tableMinWidth,
 	tableRows,
-	textAlign
+	textAlign,
+	videoAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -364,6 +367,68 @@ export const tableOfContentsRenderer =
 		);
 	};
 
+/**
+ * Video, audio and a file (`PA-12` to `PA-14`), as the editor writes them.
+ * A factory, because each puts a translatable name in its output.
+ */
+export const mediaRenderers = (
+	labels: RendererLabels = defaultRendererLabels
+): Record<'video' | 'audio' | 'attachment', NodeRenderer> => ({
+	video: ({ node }) => {
+		const attrs = videoAttributes(node);
+		if (!attrs) return null;
+		return (
+			<video
+				data-id={blockId(node)}
+				src={attrs.src}
+				poster={attrs.poster}
+				width={attrs.width}
+				data-align={attrs.align}
+				className="blockleaf-video"
+				controls
+				preload="metadata"
+				aria-label={labels.video}
+			/>
+		);
+	},
+	audio: ({ node }) => {
+		const attrs = audioAttributes(node);
+		if (!attrs) return null;
+		return (
+			<audio
+				data-id={blockId(node)}
+				src={attrs.src}
+				title={attrs.title}
+				className="blockleaf-audio"
+				controls
+				preload="metadata"
+				aria-label={attrs.title ?? labels.audio}
+			/>
+		);
+	},
+	attachment: ({ node }) => {
+		const attrs = attachmentAttributes(node);
+		if (!attrs) return null;
+		const size =
+			attrs.size === undefined ? '' : labels.fileSize(attrs.size);
+		return (
+			<a
+				data-id={blockId(node)}
+				data-type="attachment"
+				className="blockleaf-attachment"
+				href={attrs.src}
+				download={attrs.name}
+				data-size={attrs.size}
+				data-mime={attrs.mime}
+				aria-label={labels.file(attrs.name, size)}
+			>
+				<span className="blockleaf-attachment__name">{attrs.name}</span>
+				<span className="blockleaf-attachment__size">{size}</span>
+			</a>
+		);
+	}
+});
+
 export const defaultNodes: Record<string, NodeRenderer> = {
 	doc: Doc,
 	paragraph: Paragraph,
@@ -381,6 +446,7 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	image: Image,
 	table: tableRenderer(),
 	tableOfContents: tableOfContentsRenderer(),
+	...mediaRenderers(),
 	figure: Figure,
 	caption: Caption,
 	tableRow: TableRow,

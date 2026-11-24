@@ -12,19 +12,23 @@ export const EDITOR = '.tiptap.ProseMirror';
 export const dropFile = async (
 	page: Page,
 	name: string,
-	where: 'start' | 'end' = 'start'
+	where: 'start' | 'end' = 'start',
+	type = 'image/png'
 ) => {
 	const editor = page.locator(EDITOR);
 
-	const dataTransfer = await page.evaluateHandle((fileName: string) => {
-		const transfer = new DataTransfer();
-		transfer.items.add(
-			new File([new Uint8Array([137, 80, 78, 71])], fileName, {
-				type: 'image/png'
-			})
-		);
-		return transfer;
-	}, name);
+	const dataTransfer = await page.evaluateHandle(
+		([fileName, fileType]: [string, string]) => {
+			const transfer = new DataTransfer();
+			transfer.items.add(
+				new File([new Uint8Array([137, 80, 78, 71])], fileName, {
+					type: fileType
+				})
+			);
+			return transfer;
+		},
+		[name, type] as [string, string]
+	);
 
 	const box = await editor.boundingBox();
 	if (!box) throw new Error('the editor has no box to drop onto');

@@ -1,11 +1,11 @@
 ---
 title: Media
-description: The caption toolbar, from the opt-in media subpath.
+description: Video, audio and file blocks, and the caption toolbar, from the opt-in media subpath.
 icon: Film
 ---
 
-`@blockleaf/editor/media` is the opt-in subpath for media. Today it adds the
-**caption toolbar**.
+`@blockleaf/editor/media` adds three blocks — **video**, **audio** and a
+**file** to download — a toolbar for each, and the **caption toolbar**.
 
 ```ts
 import { presets } from '@blockleaf/editor/extensions';
@@ -15,15 +15,111 @@ const extensions = withMedia(presets.standard());
 ```
 
 ```tsx
-<BlockleafEditor extensions={extensions} />
+<BlockleafEditor
+	extensions={extensions}
+	upload={adapter}
+/>
 ```
+
+The blocks are new in schema version 2. An editor without this subpath keeps
+a stored one as a placeholder and saves it back unchanged.
+
+## Getting a file in
+
+Media comes in the way images do: dropped, pasted, or picked from the slash
+menu's **Video**, **Audio** and **File** items. All three go through your
+[upload adapter](./uploads.mdx), and the slash items only show when you gave
+one.
+
+What a file becomes depends on its type:
+
+| File type | Becomes                                    |
+| --------- | ------------------------------------------ |
+| `image/*` | an image                                   |
+| `video/*` | a video                                    |
+| `audio/*` | an audio clip, titled from its file name   |
+| any other | a file block, with its name, size and type |
+
+With this subpath loaded, the upload accepts all of them. Without it, only
+images, as before. If you pass your own `uploadAccept`, that is what is
+accepted, whatever is loaded. So `uploadAccept={['image/*', 'application/pdf']}`
+gives you images and PDFs and nothing else.
+
+Raise `uploadMaxBytes` for video. The default, 10 MB, suits a photo, not a
+film.
+
+Each block also has a command, for host code or your own chrome:
+
+```ts
+editor.commands.setVideo({ src: '/media/launch.mp4', width: 640 });
+editor.commands.setAudio({ src: '/media/talk.mp3', title: 'The talk' });
+editor.commands.setAttachment({
+	src: '/files/report.pdf',
+	name: 'report.pdf',
+	size: 1572864,
+	mime: 'application/pdf'
+});
+```
+
+## What is stored
+
+```json
+{ "type": "video", "attrs": { "id": "…", "src": "https://cdn.test/launch.mp4", "poster": null, "width": 640, "align": "center" } }
+{ "type": "audio", "attrs": { "id": "…", "src": "https://cdn.test/talk.mp3", "title": "The talk" } }
+{ "type": "attachment", "attrs": { "id": "…", "src": "https://cdn.test/report.pdf", "name": "report.pdf", "size": 1572864, "mime": "application/pdf" } }
+```
+
+- **Video** is stored like an image: a source, a width, an alignment, plus
+  an optional `poster`, the still shown before it plays.
+- **Audio** stores a `title`. It is the player's accessible name, so a page
+  with three players does not announce "audio" three times.
+- **A file** stores its `name`, its `size` in bytes and its `mime` type, so
+  the block can say what it is before anyone downloads it.
+
+The reasoning is F29 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+
+### Sources are sanitised by the schema
+
+`src` follows the image rule — `https:` or a relative path, never
+`javascript:`, `http:`, `blob:` or a protocol-relative URL — with one
+difference: **no `data:` URLs at all.** An image can come off the clipboard
+as one. A video or a PDF never does, and a document holding megabytes of
+base64 is one every host pays to store and send. A `data:` link is also how
+a page serves HTML from your own origin.
+
+A pasted `<video>`, `<audio>` or file link with an unsafe source is dropped.
+The commands refuse the same sources. A video's `poster` follows the image
+rule, data URLs included, and an unsafe one is dropped while the video stays.
+
+## In the editor
+
+Video and audio play in the browser's own players. A video lines up left,
+centre or right like an image; audio fills the line.
+
+A file is a card with its name and size. **A click selects it; it does not
+open the file.** The editor is for writing, and a stray click must not leave
+the page. Published through [the renderer](./rendering.mdx), it is an
+ordinary link with `download`.
+
+Select any of the three and a toolbar appears:
+
+| Button         | For                    |
+| -------------- | ---------------------- |
+| Align left     | video                  |
+| Align centre   | video                  |
+| Align right    | video                  |
+| Toggle caption | video, audio and files |
+| Delete         | video, audio and files |
+
+To select a video, click near its top, away from its controls; or arrow onto
+it from the line above, as for an image.
 
 ## Captions
 
-An image or a table can have a caption without this subpath. The core adds
-one from the image toolbar or the table's row menu, and stores it as a
-`figure` holding the block and a `caption`. See
-[Captions](/docs/schema#captions), and
+Every media block takes a caption, the same way an image or a table does:
+**Toggle caption** in its toolbar. It is stored as a `figure` holding the
+block and a `caption`. See [Captions](/docs/schema#captions), and
 [caption or alt text](/docs/uploads#caption-or-alt-text) for what a caption
 is for.
 
@@ -31,18 +127,18 @@ is for.
 
 Put the caret in a caption and a toolbar appears above it:
 
-| Button              | Does                                                         |
-| ------------------- | ------------------------------------------------------------ |
-| Align caption left  | Gives the caption its own alignment.                         |
-| Centre caption      | The same, centred.                                           |
-| Align caption right | The same, on the right.                                      |
-| Remove caption      | Takes the caption away. The image or table stays, as it was. |
+| Button              | Does                                                |
+| ------------------- | --------------------------------------------------- |
+| Align caption left  | Gives the caption its own alignment.                |
+| Centre caption      | The same, centred.                                  |
+| Align caption right | The same, on the right.                             |
+| Remove caption      | Takes the caption away. The block stays, as it was. |
 
-**A caption follows its block until you align it.** Under a centred image, a
-caption with no alignment of its own is centred too, and the toolbar shows
-**Centre caption** pressed. Press a different alignment and the caption keeps
-it. Press the caption's own alignment again and it goes back to following
-the block.
+**A caption follows its block until you align it.** Under a centred image or
+video, a caption with no alignment of its own is centred too, and the
+toolbar shows **Centre caption** pressed. Press a different alignment and the
+caption keeps it. Press the caption's own alignment again and it goes back to
+following the block.
 
 The toolbar only shows for a caret, not for a selection. Select some of the
 caption and the ordinary text toolbar takes over, so you can bold it or add
@@ -53,8 +149,6 @@ other toolbar in the editor. `Escape` goes back to the caption. With
 [`@blockleaf/editor/text-style`](./text-style.mdx) loaded, its alignment
 shortcuts work in a caption too.
 
-### Without the toolbar
-
 Everything the toolbar does is a command, so your own chrome can do it:
 
 ```ts
@@ -63,20 +157,30 @@ editor.commands.setCaptionAlign(null); // follow the block again
 editor.commands.toggleCaption(); // add or remove
 ```
 
-### Options
+## Options
 
 ```ts
 withMedia(presets.standard(), {
-	captionMenu: {
-		actions: (defaults) => defaults.filter((a) => a.id !== 'remove-caption')
-	}
+	mediaMenu: {
+		actions: (defaults) => defaults.filter((a) => a.id !== 'delete')
+	},
+	captionMenu: false
 });
 ```
 
-`captionMenu: false` leaves the toolbar out. Its strings are under
-`labels.caption`; see [i18n](./i18n.mdx).
+`mediaMenu: false` or `captionMenu: false` leaves that toolbar out. The
+blocks are always added. Their strings are under `labels.media` and
+`labels.caption`, including how a file size is written; see
+[i18n](./i18n.mdx).
+
+## Rendering
+
+[`@blockleaf/renderer`](./rendering.mdx) renders all three, on both targets,
+with no setup: `<video controls>`, `<audio controls>`, and an `<a download>`
+holding the name and size. Its `labels` name the players and write the file
+size.
 
 ## What it costs
 
-The subpath adds about 0.2 kB on top of the editor, because the toolbar is the editor's own bubble menu. The editor's own bundle
-does not change unless you import it.
+The subpath adds about 1.2 kB on top of the editor. The editor's own bundle
+does not carry the blocks unless you import it.
