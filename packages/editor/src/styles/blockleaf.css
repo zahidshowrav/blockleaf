@@ -390,6 +390,16 @@
 	border-radius: var(--bl-radius);
 }
 
+/* Word count (PA-09). A footer a host places, so not scoped to the content. */
+.blockleaf-text-count {
+	margin: 0.5em 0 0;
+	color: var(--bl-color-muted);
+	font-family: var(--bl-font-body);
+	font-size: 0.85em;
+	font-variant-numeric: tabular-nums;
+	text-align: end;
+}
+
 .blockleaf-editor__content table {
 	border-collapse: collapse;
 	width: 100%;
@@ -1720,7 +1730,7 @@
  * output alike, since both sit inside `.blockleaf-editor__content`.
  *
  * - The chrome goes: menus, handles, the table controls, the code block's
- *   language picker, upload progress and the toggle's button. None of it
+ *   language picker, upload progress, the toggle's button and the word count. None of it
  *   means anything on paper.
  * - Dark is undone. The system dark theme is already screen-only; a forced
  *   `data-theme="dark"` gets the light palette back here. A host's own
@@ -1772,6 +1782,7 @@
 	.blockleaf-slash-menu,
 	.blockleaf-mention-menu,
 	.blockleaf-emoji-menu,
+	.blockleaf-text-count,
 	.blockleaf-bubble-menu,
 	.blockleaf-block-handle-anchor,
 	.blockleaf-block-menu,

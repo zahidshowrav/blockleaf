@@ -104,6 +104,7 @@ export {
 	type DetailsLabels,
 	type EmojiLabels,
 	type TableOfContentsLabels,
+	type TextCountLabels,
 	type FontLabels,
 	type ImageLabels,
 	type LinkLabels,

@@ -1,4 +1,5 @@
 import { type Editor } from '@tiptap/core';
+import { useCurrentEditor } from '@tiptap/react';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 import {
@@ -15,7 +16,8 @@ const EMPTY: TableOfContentsEntry[] = [];
  * `tableOfContents` node.
  *
  * The array is the same object until the list itself changes, so typing in a
- * paragraph does not redraw the sidebar.
+ * paragraph does not redraw the sidebar. Without an `editor`, it reads the
+ * one it is rendered inside: a child of `BlockleafEditor` needs no prop.
  *
  * ```tsx
  * const headings = useTableOfContents(editor);
@@ -27,8 +29,10 @@ const EMPTY: TableOfContentsEntry[] = [];
  * ```
  */
 export const useTableOfContents = (
-	editor: Editor | null | undefined
+	given?: Editor | null
 ): TableOfContentsEntry[] => {
+	const { editor: current } = useCurrentEditor();
+	const editor = given ?? current;
 	const last = useRef<TableOfContentsEntry[]>(EMPTY);
 
 	const subscribe = useCallback(

@@ -1,5 +1,5 @@
-import { EditorContent } from '@tiptap/react';
-import type { ReactNode } from 'react';
+import { EditorContent, EditorContext } from '@tiptap/react';
+import { useMemo, type ReactNode } from 'react';
 
 import {
 	useBlockleafEditor,
@@ -11,6 +11,11 @@ export type BlockleafEditorProps = UseBlockleafEditorOptions & {
 	className?: string;
 	/** Rendered before the editor is ready, so layout does not jump. */
 	fallback?: ReactNode;
+	/**
+	 * Rendered after the document, inside the editor's box. Tiptap's
+	 * `useCurrentEditor()` reaches the editor from here, so a word count or
+	 * an outline needs no prop.
+	 */
 	children?: ReactNode;
 };
 
@@ -21,6 +26,7 @@ export const BlockleafEditor = ({
 	...options
 }: BlockleafEditorProps) => {
 	const editor = useBlockleafEditor(options);
+	const context = useMemo(() => ({ editor }), [editor]);
 
 	if (!editor) return <>{fallback}</>;
 
@@ -33,7 +39,9 @@ export const BlockleafEditor = ({
 			}
 		>
 			<EditorContent editor={editor} />
-			{children}
+			<EditorContext.Provider value={context}>
+				{children}
+			</EditorContext.Provider>
 		</div>
 	);
 };

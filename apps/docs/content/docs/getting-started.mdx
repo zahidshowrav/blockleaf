@@ -258,8 +258,14 @@ Passing your own `extensions` array replaces the preset entirely. See
 | `placeholder`          | `string \| object \| false`          | built-in       | Empty-block hint                                  |
 | `className`            | `string`                             | —              | Added alongside `blockleaf-editor`                |
 | `fallback`             | `ReactNode`                          | `null`         | Rendered before the editor is ready               |
+| `children`             | `ReactNode`                          | —              | Rendered after the document; see below            |
 | `onContentError`       | `(props) => void`                    | —              | The document could not be read. See above         |
 | `incompatibleDocument` | `'readonly' \| 'discard' \| 'throw'` | `'readonly'`   | What happens to a document the editor cannot read |
+
+`children` render inside the editor's box, after the document, and can
+reach the editor with Tiptap's `useCurrentEditor()`. That is how a
+[word count](./word-count.mdx) footer or an outline finds the editor without
+a prop.
 
 Upload props are documented in [uploads](./uploads.mdx); every chrome prop —
 `slashItems`, `bubbleActions`, `blockActions`, `tableActions` and the rest —

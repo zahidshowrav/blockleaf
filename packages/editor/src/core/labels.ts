@@ -194,6 +194,17 @@ export type TableOfContentsLabels = {
 	empty: string;
 };
 
+export type TextCountLabels = {
+	/** The word count. */
+	words: (count: number) => string;
+	/** The character count. */
+	characters: (count: number) => string;
+	/** Either count while text is selected: what is selected, out of the total already worded. */
+	selected: (selected: number, total: string) => string;
+	/** Accessible name of the footer. */
+	label: string;
+};
+
 export type MentionLabels = {
 	/** Accessible name of the list of people or pages to mention. */
 	menu: string;
@@ -265,6 +276,7 @@ export type ResolvedLabels = {
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
 	tableOfContents: TableOfContentsLabels;
+	textCount: TextCountLabels;
 	textColor: TextColorLabels;
 	font: FontLabels;
 	placeholder: Required<PlaceholderLabels>;
@@ -298,6 +310,7 @@ export type BlockleafLabels = {
 	mentions?: Partial<MentionLabels>;
 	emoji?: Partial<EmojiLabels>;
 	tableOfContents?: Partial<TableOfContentsLabels>;
+	textCount?: Partial<TextCountLabels>;
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
 		colors?: Partial<TextColorLabels['colors']>;
 	};
@@ -470,6 +483,15 @@ export const defaultLabels: ResolvedLabels = {
 		label: 'Table of contents',
 		empty: 'Add a heading and it will be listed here.'
 	},
+	textCount: {
+		words: (count) =>
+			`${count.toLocaleString('en')} ${count === 1 ? 'word' : 'words'}`,
+		characters: (count) =>
+			`${count.toLocaleString('en')} ${count === 1 ? 'character' : 'characters'}`,
+		selected: (selected, total) =>
+			`${selected.toLocaleString('en')} of ${total}`,
+		label: 'Word count'
+	},
 	textColor: {
 		button: 'Color',
 		text: 'Text',
@@ -563,6 +585,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 		...defaultLabels.tableOfContents,
 		...labels?.tableOfContents
 	},
+	textCount: { ...defaultLabels.textCount, ...labels?.textCount },
 	textColor: {
 		...defaultLabels.textColor,
 		...labels?.textColor,
