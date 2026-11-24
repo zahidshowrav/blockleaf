@@ -1,5 +1,5 @@
 /**
- * Emoji, as an opt-in subpath (`PA-03`).
+ * Emoji, as an opt-in subpath.
  *
  * Type `:` and a word, pick from the list, and the emoji goes in as plain
  * text. Nothing new is stored, so a document with emoji in it is readable by

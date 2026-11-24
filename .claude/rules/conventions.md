@@ -127,3 +127,15 @@ Two places, and they are not interchangeable:
 
 The build plan and milestones live in `docs/PROJECT_PLAN.md`; read the relevant
 section before starting work rather than re-deriving decisions.
+
+**Keep internal references out of anything published.** Tracker task ids
+(`PA-24`), flag ids (`F29`), milestone codes (`EC`, `MC`) and links to the
+files in `docs/` mean nothing to a reader. They never go in
+`apps/docs/content`, in `/** */` comments on exported code (those ship in the
+`.d.ts` files), in changesets or in `CHANGELOG.md`. Say the reason in one
+plain sentence instead. They are fine in `docs/`, commits, PR text and `//`
+comments.
+
+**Changelog entries are short.** A changeset is one or two sentences: what
+changed, the names a user needs (subpath, export, command), and any schema
+or breaking note. The explanation belongs on the docs page.

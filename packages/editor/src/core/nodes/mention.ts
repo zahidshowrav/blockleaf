@@ -2,7 +2,7 @@ import { mergeAttributes, Node } from '@tiptap/core';
 
 import { MENTION_NODE, MENTION_PREFIX } from '../constants.js';
 
-/** What a stored mention carries (`F24`). */
+/** What a stored mention carries. */
 export interface MentionAttributes {
 	/** The host's own key for what is mentioned. Blockleaf never reads it. */
 	id: string;
@@ -33,7 +33,7 @@ export const mentionText = (label: unknown): string =>
 	`${MENTION_PREFIX}${text(label)}`;
 
 /**
- * A mention (`PA-02`): an inline, uneditable reference to something the
+ * A mention: an inline, uneditable reference to something the
  * host knows about — a person, a page. It stores the host's key and the name
  * at the time, never anything Blockleaf would have to look up.
  *

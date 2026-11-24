@@ -57,7 +57,7 @@ export const labelFor = (
  * which declares no `sideEffects: false` — so a bundler keeps the whole
  * 60 kB package even for a consumer that imports nothing but
  * `createEmptyDocument`. The 2 kB schema-only budget exists to catch exactly
- * that, and it did. See F13 in `docs/open-flags.md`.
+ * that, and it did.
  *
  * Only the current block is labelled. Labelling every empty block at once
  * turns a new document into a wall of grey text, which reads as content

@@ -3,7 +3,7 @@ import { Highlight as TiptapHighlight } from '@tiptap/extension-highlight';
 import { STYLE_TOKEN } from '../constants.js';
 
 /**
- * A colour written before tokens (`PA-22`): a hex, `rgb()` or `hsl()` value a
+ * A colour written before tokens: a hex, `rgb()` or `hsl()` value a
  * host stored through Tiptap's own `setHighlight`. It still renders, so no
  * stored document changes; anything else that is not a token — a value with
  * a `;` in it above all — is dropped rather than written into `style`.
@@ -24,9 +24,9 @@ export const highlightBackground = (color: unknown): string | undefined => {
 };
 
 /**
- * The highlight mark, which is also text background colour (`PA-22`). Its
+ * The highlight mark, which is also text background colour. Its
  * `color` has been in the schema since `0.1.0`; what changes is that the
- * editor now writes a token there (`F18`) and resolves it per theme, while a
+ * editor now writes a token there and resolves it per theme, while a
  * colour stored before still renders as it did.
  */
 export const Highlight = /* @__PURE__ */ TiptapHighlight.extend({

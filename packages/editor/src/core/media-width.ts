@@ -1,5 +1,5 @@
 /**
- * The width an image or a video is shown at (`PA-24`, `F21`): a number of
+ * The width an image or a video is shown at: a number of
  * pixels, the named value `'full'`, or nothing for the file's own size.
  *
  * Full width is a name and not a pixel count, because a number measured on

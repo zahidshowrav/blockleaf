@@ -58,7 +58,7 @@ export type ImageAlign = 'left' | 'center' | 'right';
 export interface ImageAttributes {
 	src: string;
 	alt?: string | null;
-	/** Pixels, or `'full'` for the width of the page (`PA-24`). */
+	/** Pixels, or `'full'` for the width of the page. */
 	width?: MediaWidth | null;
 	align?: ImageAlign | null;
 }

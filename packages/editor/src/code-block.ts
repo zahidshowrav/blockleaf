@@ -4,7 +4,7 @@
  * Not part of `@blockleaf/editor` itself: `lowlight` and its grammars cost
  * 16.53 kB, which is more than the default bundle has left, and most
  * documents contain no code at all. Importing from here is what adds the
- * weight. See F14 in `docs/open-flags.md`.
+ * weight.
  *
  * ```ts
  * import { createExtensions } from '@blockleaf/editor/extensions';

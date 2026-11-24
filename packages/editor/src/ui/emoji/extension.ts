@@ -44,8 +44,8 @@ const builtInItems =
 		searchEmoji(await loadBuiltIn(), query, limit);
 
 /**
- * Opens the emoji picker on `:` and inserts the chosen emoji as plain text
- * (`PA-03`). Nothing new is stored: an emoji in a document is the character.
+ * Opens the emoji picker on `:` and inserts the chosen emoji as plain text.
+ * Nothing new is stored: an emoji in a document is the character.
  */
 export const EmojiExtension = /* @__PURE__ */ Extension.create<EmojiOptions>({
 	name: EMOJI_EXTENSION_NAME,

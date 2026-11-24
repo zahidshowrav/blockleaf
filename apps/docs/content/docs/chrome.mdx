@@ -13,8 +13,8 @@ your own surface.
 
 **The chrome never owns logic.** Each button calls a command that already
 exists in `src/core` and already has tests. If a menu needs behaviour the
-command API cannot express, the command is what is missing — see "How a feature
-that spans blocks is split" in [`progress-tracker.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/progress-tracker.md).
+command API cannot express, the command is what is missing, and it is added
+to the core first.
 
 ```tsx
 import { BlockleafEditor } from '@blockleaf/editor';
@@ -313,8 +313,7 @@ type BlockAction = {
 **Why it is hand-rolled.** `@tiptap/extension-drag-handle` imports
 `@tiptap/y-tiptap` and `@tiptap/extension-collaboration` at module scope, so a
 document that will never be collaborative would still ship yjs — 32.87 kB,
-which is over the whole bundle ceiling. See F12 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md). The trade is that this handle moves one
+which is over the whole bundle ceiling. The trade is that this handle moves one
 block at a time; multi-block range dragging is not implemented.
 
 ---
@@ -340,7 +339,7 @@ takes it away. In the caption, Enter moves to a new paragraph below, and
 Backspace in an empty caption removes it. Deleting the table deletes its
 caption too. See [Captions](/docs/schema#captions) for how it is stored.
 
-Every entry calls a command from EC-14 or EC-15, and asks that same command
+Every entry calls a table command, and asks that same command
 whether it can run — `editor.can().mergeCells()` rather than re-deriving the
 answer. Two implementations of "can you merge this" would eventually
 disagree, and the command is the one that is already tested. An entry whose
@@ -375,9 +374,9 @@ toggle header cell, insert row or column, delete row, and delete table.
 | `cellActions` | —       | An array of actions, or `(defaults) => actions`. |
 
 It is the same surface as the text bubble menu — a second instance with its
-own plugin key, its own actions and its own `shouldShow` — which is why
-CH-02's bubble menu was built around the framework-agnostic plugin rather
-than a fixed React component.
+own plugin key, its own actions and its own `shouldShow`. That is why the
+bubble menu is built on the framework-agnostic plugin rather than a fixed
+React component.
 
 The two never appear together. A cell selection belongs to the cell menu, and
 the text menu stands down for it; a caret inside a single cell is ordinary
@@ -525,8 +524,8 @@ normalisation flag, stays out of the undo history, and does not reach
 
 ## Keyboard reference
 
-Everything the chrome does is reachable without a pointer. This is the CH
-block's exit condition, not a nice-to-have, and
+Everything the chrome does is reachable without a pointer. This is a
+requirement, not a nice-to-have, and
 `e2e/accessibility.spec.ts` builds a document — heading, list and table —
 using only the keys below.
 
@@ -580,7 +579,7 @@ Conventions the chrome holds to:
 <BlockleafEditor label="Release notes" />
 ```
 
-Known and deferred to HD-01: the slash menu is a listbox driven by
+Known limitation: the slash menu is a listbox driven by
 `aria-activedescendant` on itself rather than on the editor that holds focus.
 The full combobox pattern wants the relationship expressed on the textbox.
 

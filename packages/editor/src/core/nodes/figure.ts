@@ -23,20 +23,20 @@ declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		figure: {
 			/**
-			 * Gives the selected block a caption, or takes its caption away
-			 * (`PA-20`). The block is the table around the caret, or a
+			 * Gives the selected block a caption, or takes its caption away.
+			 * The block is the table around the caret, or a
 			 * selected image or other captionable block. Adding one puts the
 			 * caret in the new caption.
 			 */
 			toggleCaption: () => ReturnType;
 			/**
 			 * `toggleCaption`, for a table only: false anywhere else. Kept
-			 * from `HD-10`, which captioned tables before anything else.
+			 * because tables could be captioned before anything else.
 			 */
 			toggleTableCaption: () => ReturnType;
 			/**
 			 * Aligns the caption of the figure around the selection; `null`
-			 * goes back to following its block (`PA-20`).
+			 * goes back to following its block.
 			 */
 			setCaptionAlign: (alignment: TextAlignment | null) => ReturnType;
 		};
@@ -112,9 +112,9 @@ const dropOrphanedFigures = (
 
 /**
  * The text under a captioned block. Rich text, so a credit can carry its
- * link (`F20`). It only exists as the last child of a `figure`.
+ * link. It only exists as the last child of a `figure`.
  *
- * Its alignment is the `textAlign` attribute every preset carries (`F25`):
+ * Its alignment is the `textAlign` attribute every preset carries:
  * unset, it follows its block's, so a centred image has a centred caption
  * without anyone asking for one.
  */
@@ -189,9 +189,9 @@ export const Caption = /* @__PURE__ */ Node.create({
  * Wraps a block that has a caption: the block first, its `caption` last.
  *
  * The caption is beside the block rather than inside it because
- * `prosemirror-tables` reads every child of a `table` as a row (`F20`), and
- * because it leaves an image the atom it always was (`PA-20`). The block is
- * a table, or any node in the `captionable` group (`F28`).
+ * `prosemirror-tables` reads every child of a `table` as a row, and
+ * because it leaves an image the atom it always was. The block is
+ * a table, or any node in the `captionable` group.
  */
 export const Figure = /* @__PURE__ */ Node.create({
 	name: FIGURE_NODE,

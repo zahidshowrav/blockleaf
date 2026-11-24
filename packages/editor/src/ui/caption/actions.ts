@@ -24,7 +24,7 @@ const figureAround = (editor: Editor): ProseMirrorNode | null =>
 
 /**
  * The alignment the caption shows: its own, or else its block's, as the
- * stylesheet draws it (`PA-20`). The toolbar reports what is on the page,
+ * stylesheet draws it. The toolbar reports what is on the page,
  * the way the image toolbar treats an unset alignment as left.
  */
 export const captionAlignment = (editor: Editor): Alignment | null => {
@@ -65,7 +65,7 @@ const align = (
 });
 
 /**
- * The button every captionable block's toolbar shares (`PA-21`): adds a
+ * The button every captionable block's toolbar shares: adds a
  * caption under the selected block, or takes it away. Pressed while the
  * block has one.
  */
@@ -81,7 +81,7 @@ export const createToggleCaptionAction = (title: string): BubbleAction => ({
 	run: (editor) => editor.chain().focus().toggleCaption().run()
 });
 
-/** The caption toolbar's actions, built against a label set (`PA-21`). */
+/** The caption toolbar's actions, built against a label set. */
 export const createCaptionActions = (
 	labels: CaptionLabels = defaultLabels.caption
 ): BubbleAction[] => [

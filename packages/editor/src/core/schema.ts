@@ -47,19 +47,19 @@ export interface HighlightMark {
 	};
 }
 
-/** Version 2 (`PA-07`). Excludes `superscript`: one run is never both. */
+/** Version 2. Excludes `superscript`: one run is never both. */
 export interface SubscriptMark {
 	type: 'subscript';
 }
 
-/** Version 2 (`PA-07`). Excludes `subscript`. */
+/** Version 2. Excludes `subscript`. */
 export interface SuperscriptMark {
 	type: 'superscript';
 }
 
 /**
- * Version 2 (`PA-05`, `F26`). `color` is a token — one of the built-in nine
- * or one a host defines in CSS — never a CSS colour (`F18`).
+ * Version 2. `color` is a token — one of the built-in nine
+ * or one a host defines in CSS — never a CSS colour.
  */
 export interface TextColorMark {
 	type: 'textColor';
@@ -68,7 +68,7 @@ export interface TextColorMark {
 	};
 }
 
-/** Version 2 (`PA-10`, `F26`). `family` is a token — `serif`, or one a host defines. */
+/** Version 2. `family` is a token — `serif`, or one a host defines. */
 export interface FontFamilyMark {
 	type: 'fontFamily';
 	attrs: {
@@ -76,7 +76,7 @@ export interface FontFamilyMark {
 	};
 }
 
-/** Version 2 (`PA-11`, `F26`). `size` is a token — `sm`, `lg`, `xl`, or one a host defines. */
+/** Version 2. `size` is a token — `sm`, `lg`, `xl`, or one a host defines. */
 export interface FontSizeMark {
 	type: 'fontSize';
 	attrs: {
@@ -114,9 +114,9 @@ export interface HardBreakNode {
 }
 
 /**
- * A reference to something the host knows about — a person, a page (`PA-02`,
- * version 2). `id` is the host's key, `label` the name when it was mentioned,
- * `kind` what sort of thing it is when a host has more than one (`F24`).
+ * A reference to something the host knows about — a person, a page (version
+ * 2). `id` is the host's key, `label` the name when it was mentioned,
+ * `kind` what sort of thing it is when a host has more than one.
  */
 export interface MentionNode {
 	type: 'mention';
@@ -134,7 +134,7 @@ export type InlineNode = TextNode | HardBreakNode | MentionNode;
 /* Block Nodes                                                                */
 /* -------------------------------------------------------------------------- */
 
-/** Version 2 (`PA-06`, `F25`). `null` is the language's own direction. */
+/** Version 2. `null` is the language's own direction. */
 export type TextAlign = 'left' | 'center' | 'right' | 'justify';
 
 export interface ParagraphNode {
@@ -181,8 +181,8 @@ export interface HorizontalRuleNode {
 }
 
 /**
- * A table of contents (`PA-08`, version 2). It stores nothing but its id: the
- * entries are the document's headings, listed whenever it is drawn (`F27`).
+ * A table of contents (version 2). It stores nothing but its id: the
+ * entries are the document's headings, listed whenever it is drawn.
  */
 export interface TableOfContentsNode {
 	type: 'tableOfContents';
@@ -262,15 +262,15 @@ export interface ImageNode {
 		id: string;
 		src: string;
 		alt?: string | null;
-		/** Pixels, or `'full'` since version 2 (`PA-24`, `F21`). */
+		/** Pixels, or `'full'` since version 2. */
 		width?: number | 'full' | null;
 		align?: 'left' | 'center' | 'right' | null;
 	};
 }
 
 /**
- * A video (`PA-12`, version 2). `src` is `https:` or a relative path, never
- * a `data:` URL; `poster` follows the image rule (`F29`).
+ * A video (version 2). `src` is `https:` or a relative path, never
+ * a `data:` URL; `poster` follows the image rule.
  */
 export interface VideoNode {
 	type: 'video';
@@ -278,13 +278,13 @@ export interface VideoNode {
 		id: string;
 		src: string;
 		poster?: string | null;
-		/** Pixels, or `'full'` since version 2 (`PA-24`, `F21`). */
+		/** Pixels, or `'full'` since version 2. */
 		width?: number | 'full' | null;
 		align?: 'left' | 'center' | 'right' | null;
 	};
 }
 
-/** An audio clip (`PA-13`, version 2). `title` is the player's name. */
+/** An audio clip (version 2). `title` is the player's name. */
 export interface AudioNode {
 	type: 'audio';
 	attrs: {
@@ -295,7 +295,7 @@ export interface AudioNode {
 }
 
 /**
- * A file to download (`PA-14`, version 2): its address, its name, and the
+ * A file to download (version 2): its address, its name, and the
  * size in bytes and MIME type the upload had, when known.
  */
 export interface AttachmentNode {
@@ -318,14 +318,14 @@ export interface TableNode {
 }
 
 /**
- * The blocks a `figure` may caption (`F20`, `F28`): a table, and since
- * version 2 an image (`PA-20`) and the media blocks (`PA-12` to `PA-14`).
+ * The blocks a `figure` may caption: a table, and since
+ * version 2 an image and the media blocks.
  */
 export type CaptionedNode =
 	TableNode | ImageNode | VideoNode | AudioNode | AttachmentNode;
 
 /**
- * A block with a caption: the block, then its `caption` (`F20`). The caption
+ * A block with a caption: the block, then its `caption`. The caption
  * sits beside the block rather than inside it, so the block is stored exactly
  * as it would be without one.
  */
@@ -339,7 +339,7 @@ export interface FigureNode {
 
 /**
  * A figure's caption. Rich text, so a credit can carry its link. Version 2
- * (`PA-20`) gives it `textAlign`; absent, it follows its block's alignment.
+ * gives it `textAlign`; absent, it follows its block's alignment.
  */
 export interface CaptionNode {
 	type: 'caption';

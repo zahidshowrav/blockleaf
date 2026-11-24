@@ -4,7 +4,7 @@ import { formatFileSize } from './media-src.js';
 /**
  * Every string the editor and its default chrome put on screen.
  *
- * HD-02. The chrome is replaceable, but replacing all of it to change one
+ * The chrome is replaceable, but replacing all of it to change one
  * word is not a translation story — so each surface takes its strings from
  * here, and a host hands in as many or as few as it wants.
  *
@@ -149,7 +149,7 @@ export type ImageLabels = {
 };
 
 export type CaptionLabels = {
-	/** Accessible name of the caption toolbar (`PA-21`). */
+	/** Accessible name of the caption toolbar. */
 	toolbar: string;
 	actions: Record<
 		'align-left' | 'align-center' | 'align-right' | 'remove-caption',
@@ -268,7 +268,7 @@ export type TextColorLabels = {
 	button: string;
 	/** The group of text colours. */
 	text: string;
-	/** The group of background colours (`PA-22`). */
+	/** The group of background colours. */
 	background: string;
 	/** The swatch that takes the colour off. */
 	none: string;

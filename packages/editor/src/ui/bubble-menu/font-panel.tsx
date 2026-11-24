@@ -11,7 +11,7 @@ import {
 import { defaultLabels } from '../../core/labels.js';
 
 /**
- * The font panel (`PA-10`, `PA-11`): the family and the size, each a radio
+ * The font panel: the family and the size, each a radio
  * group and each option shown as it would look. Picking applies it and
  * closes. A group whose mark is not loaded is left out.
  */

@@ -1,11 +1,10 @@
 /**
- * Text styles, as an opt-in subpath (`PA-05`, `PA-06`, `PA-07`, `PA-10`,
- * `PA-11`, and later `PA-22`).
+ * Text styles, as an opt-in subpath.
  *
  * The marks are in the stored schema from version 2. An editor that does not
  * load them keeps a stored one as a placeholder and saves it back unchanged.
  * Text alignment is the exception: it is an attribute, so the attribute is
- * in every preset and only its commands and shortcuts are here (`F25`).
+ * in every preset and only its commands and shortcuts are here.
  *
  * ```ts
  * import { presets } from '@blockleaf/editor/extensions';

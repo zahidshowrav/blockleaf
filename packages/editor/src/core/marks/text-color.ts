@@ -22,12 +22,12 @@ declare module '@tiptap/core' {
 }
 
 /**
- * Text colour (`PA-05`). A mark of its own rather than an attribute on a
- * shared `textStyle` mark (`F26`): font family and size are marks of their
+ * Text colour. A mark of its own rather than an attribute on a
+ * shared `textStyle` mark: font family and size are marks of their
  * own too, so none of them ever adds an attribute an older editor would
  * drop.
  *
- * Stores a token, not a colour (`F18`): `red` is a red that reads on white
+ * Stores a token, not a colour: `red` is a red that reads on white
  * and a different one that reads on the dark theme.
  */
 export const TextColor = /* @__PURE__ */ Mark.create({

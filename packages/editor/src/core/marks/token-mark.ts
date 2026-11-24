@@ -16,7 +16,7 @@ interface TokenMarkOptions {
 }
 
 /**
- * The parts every token mark shares (`F26`): one attribute holding a token,
+ * The parts every token mark shares: one attribute holding a token,
  * a `<span>` that carries it in a data attribute and resolves it through a
  * custom property, and parsing that keeps only a valid token. Text colour,
  * font family and font size are each this plus their own commands.

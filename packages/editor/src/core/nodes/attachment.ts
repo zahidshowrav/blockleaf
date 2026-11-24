@@ -81,7 +81,7 @@ const anchorOf = (
 };
 
 /**
- * A file to download (`PA-14`, `F29`): a link to the file, with its name and
+ * A file to download: a link to the file, with its name and
  * size. It stores the name, the size and the MIME type the upload had, so
  * the block can say what it is before anyone fetches it. Captionable.
  *

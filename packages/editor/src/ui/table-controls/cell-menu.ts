@@ -31,7 +31,7 @@ export const CELL_MENU_PLUGIN_KEY = 'blockleafCellMenu';
  * `prosemirror-tables` declares no `sideEffects: false`, so that one import
  * drags the whole package into every consumer — it put 15 kB into the 2 kB
  * schema-only budget. `$anchorCell` and `$headCell` are the two properties
- * that define a cell selection, and they survive minification. See F13.
+ * that define a cell selection, and they survive minification.
  */
 export const isCellSelection = (selection: Selection): boolean =>
 	'$anchorCell' in selection && '$headCell' in selection;
@@ -49,7 +49,7 @@ export const cellMenuShouldShow: BubbleMenuShouldShow = ({ editor, state }) => {
 };
 
 /**
- * Every entry calls a command EC-14 or EC-15 already ships. `isAvailable`
+ * Every entry calls a table command the editor already ships. `isAvailable`
  * asks the command itself, so the toolbar cannot claim an operation the
  * editor would refuse.
  */
@@ -140,7 +140,7 @@ export type CellMenuOptions = {
 
 /**
  * A second bubble menu instance, with its own plugin key and `shouldShow`.
- * The surface is CH-02's; only what it offers and when it appears differ.
+ * The surface is the text toolbar's; only what it offers and when it appears differ.
  */
 export const createCellMenuExtension = ({
 	labels = defaultLabels,

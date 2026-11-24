@@ -42,7 +42,7 @@ const hasUpload = (editor: Editor) =>
 	);
 
 /**
- * An item that uploads into one media block (`PA-12` to `PA-14`). Only
+ * An item that uploads into one media block. Only
  * where `@blockleaf/editor/media` added the block and the host gave an
  * upload adapter; the picker shows only that kind of file.
  */

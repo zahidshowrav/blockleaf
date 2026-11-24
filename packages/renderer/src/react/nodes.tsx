@@ -147,7 +147,7 @@ const Callout: NodeRenderer = ({ node, children }) => (
 );
 
 /**
- * A toggle (`F23`): the first block is its title, inside `<summary>`, and the
+ * A toggle: the first block is its title, inside `<summary>`, and the
  * blocks after it are the body the browser opens and closes.
  */
 const Details: NodeRenderer = ({ node, renderNode, combine }) => {
@@ -265,7 +265,7 @@ export const tableRenderer =
 		);
 	};
 
-/** A captioned table or image (F20, PA-20): the block, then its caption. */
+/** A captioned table or image: the block, then its caption. */
 const Figure: NodeRenderer = ({ node, children }) => (
 	<figure
 		data-id={blockId(node)}
@@ -324,7 +324,7 @@ const allHeaders = (row: RenderableNode | undefined): boolean =>
  * not.
  */
 /**
- * A node type this package does not know renders nothing. FC-05.
+ * A node type this package does not know renders nothing.
  *
  * Its children are not a safe stand-in: a wrapper's meaning is often the
  * point — columns, a toggle, an embed — and its text out of context can
@@ -334,7 +334,7 @@ const allHeaders = (row: RenderableNode | undefined): boolean =>
 export const unhandledNode: NodeRenderer = () => null;
 
 /**
- * A table of contents (`PA-08`, `F27`). The editor's `getHTML` writes the
+ * A table of contents. The editor's `getHTML` writes the
  * `nav` alone; the list is filled in here, from the document's headings.
  */
 export const tableOfContentsRenderer =
@@ -369,7 +369,7 @@ export const tableOfContentsRenderer =
 	};
 
 /**
- * Video, audio and a file (`PA-12` to `PA-14`), as the editor writes them.
+ * Video, audio and a file, as the editor writes them.
  * A factory, because each puts a translatable name in its output.
  */
 export const mediaRenderers = (

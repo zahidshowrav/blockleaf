@@ -19,10 +19,10 @@ declare module '@tiptap/core' {
 }
 
 /**
- * Font family (`PA-10`). A token, never a font name (`F18`): `serif`
+ * Font family. A token, never a font name: `serif`
  * resolves through `--bl-font-serif`, so a host that changes its type
  * changes every document at once, and a font a reader does not have never
- * reaches the page by name. A mark of its own (`F26`).
+ * reaches the page by name. A mark of its own.
  */
 export const FontFamily = /* @__PURE__ */ Mark.create({
 	name: FONT_FAMILY_MARK,

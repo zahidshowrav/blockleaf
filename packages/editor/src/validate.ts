@@ -175,18 +175,18 @@ export const highlightMarkSchema: z.ZodType<HighlightMark> = z.object({
 		.optional()
 });
 
-/** Version 2 (`PA-07`). */
+/** Version 2. */
 export const subscriptMarkSchema: z.ZodType<SubscriptMark> = z.object({
 	type: z.literal('subscript')
 });
 
-/** Version 2 (`PA-07`). */
+/** Version 2. */
 export const superscriptMarkSchema: z.ZodType<SuperscriptMark> = z.object({
 	type: z.literal('superscript')
 });
 
 /**
- * Version 2 (`PA-05`). A token, not a colour: lower case, a letter first, at
+ * Version 2. A token, not a colour: lower case, a letter first, at
  * most 32 characters, because the renderers put it inside a `style`.
  */
 export const textColorMarkSchema: z.ZodType<TextColorMark> = z.object({
@@ -196,7 +196,7 @@ export const textColorMarkSchema: z.ZodType<TextColorMark> = z.object({
 	})
 });
 
-/** Version 2 (`PA-10`). A token, as for `textColor`. */
+/** Version 2. A token, as for `textColor`. */
 export const fontFamilyMarkSchema: z.ZodType<FontFamilyMark> = z.object({
 	type: z.literal('fontFamily'),
 	attrs: z.object({
@@ -204,7 +204,7 @@ export const fontFamilyMarkSchema: z.ZodType<FontFamilyMark> = z.object({
 	})
 });
 
-/** Version 2 (`PA-11`). A token, as for `textColor`. */
+/** Version 2. A token, as for `textColor`. */
 export const fontSizeMarkSchema: z.ZodType<FontSizeMark> = z.object({
 	type: z.literal('fontSize'),
 	attrs: z.object({
@@ -244,7 +244,7 @@ export const hardBreakNodeSchema: z.ZodType<HardBreakNode> = z.object({
 	marks: z.array(blockleafMarkSchema).optional()
 });
 
-/** Version 2 (`PA-02`, `F24`). */
+/** Version 2. */
 export const mentionNodeSchema: z.ZodType<MentionNode> = z.object({
 	type: z.literal('mention'),
 	attrs: z.object({
@@ -263,7 +263,7 @@ export const inlineNodeSchema: z.ZodType<InlineNode> = orUnrecognisedNode(
 /* Block Nodes                                                                */
 /* -------------------------------------------------------------------------- */
 
-/** Version 2 (`PA-06`, `F25`): four tokens or `null`, never a CSS value. */
+/** Version 2: four tokens or `null`, never a CSS value. */
 const textAlignSchema = z
 	.enum(['left', 'center', 'right', 'justify'])
 	.nullable()
@@ -312,7 +312,7 @@ export const codeBlockNodeSchema: z.ZodType<CodeBlockNode> = z.object({
 	content: z.array(textNodeSchema).optional()
 });
 
-/** Pixels, or since version 2 `'full'` (`PA-24`, `F21`). */
+/** Pixels, or since version 2 `'full'`. */
 const mediaWidthSchema = z
 	.union([z.number(), z.literal('full')])
 	.nullable()
@@ -334,7 +334,7 @@ const mediaAlignSchema = z
 	.nullable()
 	.optional();
 
-/** Version 2 (`PA-12`). */
+/** Version 2. */
 export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
 	type: z.literal('video'),
 	attrs: z.object({
@@ -346,7 +346,7 @@ export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
 	})
 });
 
-/** Version 2 (`PA-13`). */
+/** Version 2. */
 export const audioNodeSchema: z.ZodType<AudioNode> = z.object({
 	type: z.literal('audio'),
 	attrs: z.object({
@@ -356,7 +356,7 @@ export const audioNodeSchema: z.ZodType<AudioNode> = z.object({
 	})
 });
 
-/** Version 2 (`PA-14`). `size` is a whole number of bytes. */
+/** Version 2. `size` is a whole number of bytes. */
 export const attachmentNodeSchema: z.ZodType<AttachmentNode> = z.object({
 	type: z.literal('attachment'),
 	attrs: z.object({

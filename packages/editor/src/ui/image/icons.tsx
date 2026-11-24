@@ -47,7 +47,7 @@ export const AltTextIcon = (props: IconProps) => (
 	</svg>
 );
 
-/** Two arrows pointing out to the sides (`PA-24`). */
+/** Two arrows pointing out to the sides. */
 export const FullWidthIcon = (props: IconProps) => (
 	<svg
 		{...strokeProps}

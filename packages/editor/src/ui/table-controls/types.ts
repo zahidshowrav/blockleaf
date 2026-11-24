@@ -9,7 +9,7 @@ export type TableAxis = 'row' | 'column';
 /**
  * An entry in a row or column menu.
  *
- * Every one calls a command `EC-14` or `EC-15` already ships and already
+ * Every one calls a table command the editor already ships and already
  * tests. The handle is the affordance; the structure change is not
  * implemented here.
  */

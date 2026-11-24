@@ -31,7 +31,7 @@ export const TableControlsExtension =
 		addKeyboardShortcuts() {
 			/**
 			 * The handles are rendered whenever the cursor is in a table, but
-			 * `Tab` inside a table is cell navigation (EC-16), so there is no
+			 * `Tab` inside a table is cell navigation, so there is no
 			 * tab-stop route to them. These are the keyboard route.
 			 */
 			const open = (axis: 'row' | 'column') => () => {

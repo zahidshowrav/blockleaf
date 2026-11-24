@@ -113,7 +113,7 @@ const turnInto = (
 const ALIGNABLE: ReadonlySet<string> = new Set(TEXT_ALIGN_TYPES);
 
 /**
- * An "Align" entry (`PA-06`). Offered only where the commands are — the
+ * An "Align" entry. Offered only where the commands are — the
  * attribute is in every preset, the commands come with
  * `@blockleaf/editor/text-style` — and only on a paragraph or heading.
  */

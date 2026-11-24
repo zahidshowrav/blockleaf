@@ -86,8 +86,8 @@ const draw = (
 };
 
 /**
- * A table of contents (`PA-08`): a block that lists the document's headings,
- * each linking to its heading. It stores nothing but its id (`F27`) — the
+ * A table of contents: a block that lists the document's headings,
+ * each linking to its heading. It stores nothing but its id — the
  * list is worked out each time it is drawn, so it is never stale.
  *
  * The node is plain DOM, with no React, so it stays in the core.

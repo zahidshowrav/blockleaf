@@ -14,7 +14,7 @@ export interface VideoAttributes {
 	src: string;
 	/** A still shown before it plays. Held to the image rule. */
 	poster?: string | null;
-	/** Pixels, or `'full'` for the width of the page (`PA-24`). */
+	/** Pixels, or `'full'` for the width of the page. */
 	width?: MediaWidth | null;
 	align?: ImageAlign | null;
 }
@@ -39,7 +39,7 @@ const parseAlign = (value: string | null): ImageAlign | null =>
 	value === 'left' || value === 'center' || value === 'right' ? value : null;
 
 /**
- * A video (`PA-12`, `F29`): an uploaded or linked file played by the
+ * A video: an uploaded or linked file played by the
  * browser's own `<video controls>`. Stored like an image — a source, a
  * width, an alignment — plus an optional poster. Captionable.
  *

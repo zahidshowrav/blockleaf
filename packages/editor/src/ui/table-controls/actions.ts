@@ -17,7 +17,7 @@ import { whenNodeExists } from '../schema-guard.js';
 /**
  * Row and column operations, in the order the handle menus show them.
  *
- * Each `run` is one command from EC-14 or EC-15. `isAvailable` asks the same
+ * Each `run` is one table command the editor already ships. `isAvailable` asks the same
  * command whether it can run, rather than re-deriving the answer — the
  * command already knows, and two implementations of "can you delete this
  * column" would eventually disagree.

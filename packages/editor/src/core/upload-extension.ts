@@ -29,15 +29,15 @@ export const UPLOAD_PLUGIN_KEY = /* @__PURE__ */ new PluginKey<UploadState>(
 export const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 /**
- * What an upload accepts when the host does not say: images, and since
- * `PA-12` whatever else the loaded blocks can hold — video and audio with
- * `@blockleaf/editor/media`, and any file once it adds the file block. Left
+ * What an upload accepts when the host does not say: images, plus whatever
+ * else the loaded blocks can hold — video, audio and any file with
+ * `@blockleaf/editor/media`. Left
  * as this array, `accept` is worked out from the schema; a host's own array,
  * even an equal one, is used as given.
  */
 export const DEFAULT_UPLOAD_ACCEPT = ['image/*'];
 
-/** What a file of each kind becomes, in the order it is checked (`F29`). */
+/** What a file of each kind becomes, in the order it is checked. */
 const MEDIA_ACCEPT: ReadonlyArray<readonly [string, string]> = [
 	['image/*', 'image'],
 	['video/*', VIDEO_NODE],
@@ -261,7 +261,7 @@ const nextUploadId = (): string => `upload-${++uploadCounter}`;
  * A widget rather than a real node: it holds a position that ProseMirror maps
  * for free through every edit made while the upload is in flight, without
  * putting a placeholder into the document the host would then have to strip
- * before saving. MC-03 renders progress into this element.
+ * before saving. Upload progress is drawn into this element.
  */
 const button = (
 	label: string,

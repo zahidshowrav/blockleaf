@@ -1,6 +1,5 @@
 /**
- * The table of contents and the word count, as an opt-in subpath (`PA-08`,
- * `PA-09`).
+ * The table of contents and the word count, as an opt-in subpath.
  *
  * The `tableOfContents` node is in the stored schema from version 2, but an
  * editor that never lists its headings should not ship it. Importing from
