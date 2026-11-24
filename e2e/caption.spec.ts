@@ -98,8 +98,8 @@ test.describe('table caption', () => {
  * image stays an atom beside its caption, so the caret moving between the two
  * is again the browser's selection, not jsdom's.
  */
-const captionedImage = async (page: Page) => {
-	await page.goto('/');
+const captionedImage = async (page: Page, path = '/') => {
+	await page.goto(path);
 	await page.locator(EDITOR).click();
 	await dropFile(page, 'red-balloon.png');
 	const image = page.locator(`${EDITOR} img.blockleaf-image`);
@@ -172,5 +172,73 @@ test.describe('image caption', () => {
 		await expect(editor.locator('figure')).toHaveCount(0);
 		await expect(editor.locator('figcaption')).toHaveCount(0);
 		await expect(page.locator('.sandbox__json')).not.toContainText('gone');
+	});
+});
+
+/**
+ * PA-21. The caption toolbar, from `@blockleaf/editor/media`: it appears for
+ * a caret in a caption, and stands down for a selection, which the text
+ * toolbar owns.
+ */
+test.describe('caption toolbar', () => {
+	test('aligns a caption on its own, and back to following the image', async ({
+		page
+	}) => {
+		await captionedImage(page, '/?media');
+		await page.keyboard.type('Photo: Ada');
+
+		const toolbar = page.getByRole('toolbar', { name: 'Caption' });
+		await expect(toolbar).toBeVisible();
+		const left = toolbar.getByRole('button', {
+			name: 'Align caption left'
+		});
+		const right = toolbar.getByRole('button', {
+			name: 'Align caption right'
+		});
+		// The image is unaligned, so the caption reads as left.
+		await expect(left).toHaveAttribute('aria-pressed', 'true');
+
+		await right.click();
+		const caption = page.locator(`${EDITOR} figcaption`);
+		await expect(caption).toHaveCSS('text-align', 'right');
+		await expect(right).toHaveAttribute('aria-pressed', 'true');
+		await expect(page.locator('.sandbox__json')).toContainText(
+			'"textAlign": "right"'
+		);
+
+		await right.click();
+		await expect(caption).toHaveCSS('text-align', 'start');
+		await expect(page.locator('.sandbox__json')).not.toContainText(
+			'"textAlign"'
+		);
+	});
+
+	test('stands down for a selection, so the text toolbar can link it', async ({
+		page
+	}) => {
+		await captionedImage(page, '/?media');
+		await page.keyboard.type('Photo');
+		await expect(
+			page.getByRole('toolbar', { name: 'Caption' })
+		).toBeVisible();
+
+		await page.keyboard.press('Shift+Home');
+		await expect(
+			page.getByRole('toolbar', { name: 'Caption' })
+		).toBeHidden();
+		await expect(
+			page.getByRole('toolbar', { name: 'Text formatting' })
+		).toBeVisible();
+	});
+
+	test('removes the caption', async ({ page }) => {
+		await captionedImage(page, '/?media');
+		await page.keyboard.type('gone');
+		await page
+			.getByRole('toolbar', { name: 'Caption' })
+			.getByRole('button', { name: 'Remove caption' })
+			.click();
+		await expect(page.locator(`${EDITOR} figure`)).toHaveCount(0);
+		await expect(page.locator(`${EDITOR} img`)).toBeVisible();
 	});
 });
