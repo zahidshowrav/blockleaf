@@ -9,7 +9,7 @@ import { type RenderableMark, type RenderableNode } from './types.js';
  * own `getHTML` puts it outermost. `[bold, italic]` renders as
  * `<em><strong>` there and `<strong><em>` here. The two look identical until a
  * stylesheet says `a > code`, and both packages are meant to share one
- * stylesheet. See F15.
+ * stylesheet.
  *
  * Nothing in this file knows what it is rendering to. The React and
  * HTML-string targets supply the pieces.

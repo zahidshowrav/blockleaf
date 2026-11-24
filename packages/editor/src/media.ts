@@ -1,5 +1,5 @@
 /**
- * Media, as an opt-in subpath (`PA-12` to `PA-14`, `PA-21`, `PA-24`).
+ * Media, as an opt-in subpath.
  *
  * Three blocks — video, audio and a file to download — each uploaded through
  * the host's adapter and each captionable, with a toolbar for a selected one.
@@ -7,7 +7,7 @@
  * caption's own alignment and a button to remove it. Captions themselves are
  * in the core — any image or table takes one.
  *
- * Images and videos get resize handles and a full width (`PA-24`).
+ * Images and videos get resize handles and a full width.
  *
  * The blocks are in the stored schema from version 2. An editor without this
  * subpath keeps a stored one as a placeholder and saves it back unchanged.

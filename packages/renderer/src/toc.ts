@@ -3,8 +3,8 @@ import { type DocumentHeading } from './text.js';
 import { type RenderableNode } from './types.js';
 
 /**
- * A table of contents (`PA-08`), worked out from the document it sits in.
- * The stored block holds nothing but its id (`F27`); both render targets
+ * A table of contents, worked out from the document it sits in.
+ * The stored block holds nothing but its id; both render targets
  * call this to fill it in.
  */
 

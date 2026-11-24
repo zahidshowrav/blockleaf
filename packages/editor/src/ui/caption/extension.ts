@@ -36,7 +36,7 @@ export type CaptionMenuOptions = {
 };
 
 /**
- * The caption toolbar (`PA-21`): the caption's own alignment, and a button
+ * The caption toolbar: the caption's own alignment, and a button
  * to remove it. Another instance of the bubble menu, like the image and
  * cell menus.
  *

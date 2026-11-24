@@ -26,7 +26,7 @@ interface Snapshot {
 
 /**
  * The open document's word and character counts, kept current as it is
- * edited (`PA-09`), plus the selection's while text is selected.
+ * edited, plus the selection's while text is selected.
  *
  * Each block's count is kept until that block changes, so a keystroke
  * recounts one block, not the document. Without an `editor`, it reads the

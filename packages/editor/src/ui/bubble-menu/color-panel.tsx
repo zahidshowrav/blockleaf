@@ -10,7 +10,7 @@ import {
 import { defaultLabels } from '../../core/labels.js';
 
 /**
- * The colour panel (`PA-05`, `PA-22`): text colour and background colour,
+ * The colour panel: text colour and background colour,
  * each "Default" and the nine built-in tokens, each its own radio group.
  * Picking applies the colour and closes. The background group is left out
  * where there is no highlight mark — the minimal preset.

@@ -13,7 +13,7 @@ export interface TextCountProps {
 }
 
 /**
- * A footer with the word and character counts (`PA-09`). Put it inside
+ * A footer with the word and character counts. Put it inside
  * `BlockleafEditor` and it counts that editor:
  *
  * ```tsx

@@ -19,10 +19,10 @@ declare module '@tiptap/core' {
 }
 
 /**
- * Font size (`PA-11`). A token, never a length (`F18`): `lg` resolves
+ * Font size. A token, never a length: `lg` resolves
  * through `--bl-font-size-lg`, an `em` value, so it scales with the editor
  * and with a reader's own text size, which a stored `18px` would not. A
- * mark of its own (`F26`).
+ * mark of its own.
  */
 export const FontSize = /* @__PURE__ */ Mark.create({
 	name: FONT_SIZE_MARK,

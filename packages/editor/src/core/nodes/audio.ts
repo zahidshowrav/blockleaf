@@ -27,7 +27,7 @@ declare module '@tiptap/core' {
 }
 
 /**
- * An audio clip (`PA-13`, `F29`), played by the browser's own
+ * An audio clip, played by the browser's own
  * `<audio controls>`. It stores a source and a title; the title is the
  * player's accessible name, since a row of identical players is otherwise
  * announced as "audio" over and over. Captionable.

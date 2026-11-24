@@ -14,7 +14,7 @@ import {
 /**
  * What a table owes a screen reader, and what it owes a narrow screen.
  *
- * HD-07 and HD-08. None of this is stored: the semantics are decided from the
+ * None of this is stored: the semantics are decided from the
  * document's shape every time it is rendered, so no `SCHEMA_VERSION` moves
  * and nothing in anyone's database has to be migrated.
  */

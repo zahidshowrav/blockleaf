@@ -4,7 +4,7 @@ import { type Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { MENTION_NODE, MENTION_PREFIX } from './constants.js';
 import { type BlockleafDocument, type HeadingNode } from './schema.js';
 
-/** One heading, as a table of contents lists it (`PA-08`). */
+/** One heading, as a table of contents lists it. */
 export interface TableOfContentsEntry {
 	/** The heading's block id, which a link points at. `null` on a heading without one. */
 	id: string | null;
@@ -59,7 +59,7 @@ const childrenOf = (node: JsonNode): JsonNode[] =>
 
 /**
  * The headings of a stored document, in order, for a table of contents or a
- * sidebar outline (`PA-08`). Headings with no text are left out.
+ * sidebar outline. Headings with no text are left out.
  *
  * Works on the JSON alone, so a server can call it with no editor.
  *

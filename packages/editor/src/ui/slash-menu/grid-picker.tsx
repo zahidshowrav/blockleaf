@@ -16,7 +16,7 @@ const range = (length: number) => Array.from({ length }, (_, i) => i + 1);
 /**
  * A rows × columns grid, chosen by pointer or by arrow key.
  *
- * It calls `insertTable` — the command EC-13 already ships and already
+ * It calls `insertTable` — the command the editor already ships and already
  * tests. The picker is the affordance; the table is not built here.
  */
 export const GridPicker = /* @__PURE__ */ forwardRef<

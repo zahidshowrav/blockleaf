@@ -1,6 +1,6 @@
 /**
- * Sanitises a video, audio or file source at the schema level (`PA-12` to
- * `PA-14`, `F29`). The image rule without its data URLs.
+ * Sanitises a video, audio or file source at the schema level.
+ * The image rule without its data URLs.
  *
  * Allowed:
  * - `https:`

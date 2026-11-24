@@ -50,8 +50,8 @@ const align = (
 });
 
 /**
- * The toolbar for a selected video, audio clip or file (`PA-12` to
- * `PA-14`). Alignment shows for video only.
+ * The toolbar for a selected video, audio clip or file.
+ * Alignment shows for video only.
  */
 export const createMediaActions = (
 	labels: MediaLabels = defaultLabels.media

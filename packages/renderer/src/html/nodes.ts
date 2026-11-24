@@ -41,8 +41,8 @@ export type HtmlNodeRenderer = NodeRender<string>;
  * The default node map, built against a label set.
  *
  * A factory rather than a constant because one node — the table — puts a
- * string in its output, and the editor has had translatable chrome since
- * HD-02. A renderer hard-coding English would be the odd one out.
+ * string in its output, and the editor has had translatable chrome. A
+ * renderer hard-coding English would be the odd one out.
  */
 export const createHtmlNodes = (
 	labels: RendererLabels = defaultRendererLabels

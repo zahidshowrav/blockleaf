@@ -8,7 +8,7 @@
  * trusts its input is a renderer with a vulnerability.
  *
  * `tests/sanitize.test.ts` runs both packages' implementations over one shared
- * table of vectors, so the two cannot drift apart quietly. See F15.
+ * table of vectors, so the two cannot drift apart quietly.
  */
 
 /**
@@ -71,8 +71,8 @@ export const sanitizeSrc = (src: string): string | null => {
 };
 
 /**
- * Allows `https:` and relative paths, for video, audio and file sources
- * (`F29`). The `src` rule without data URLs: a video or a file never
+ * Allows `https:` and relative paths, for video, audio and file sources.
+ * The `src` rule without data URLs: a video or a file never
  * arrives as one, and a `data:` link is how HTML is served from your own
  * origin.
  */

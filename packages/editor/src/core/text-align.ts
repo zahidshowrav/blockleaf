@@ -19,7 +19,7 @@ export const readTextAlign = (value: unknown): TextAlignment | undefined =>
 		: undefined;
 
 /**
- * Text alignment as an attribute (`PA-06`, `F25`) — only the attribute.
+ * Text alignment as an attribute — only the attribute.
  *
  * It is in every preset, not in `@blockleaf/editor/text-style` with the
  * commands and buttons, because an editor drops an attribute it does not
@@ -27,7 +27,7 @@ export const readTextAlign = (value: unknown): TextAlignment | undefined =>
  * another that skipped the subpath. A mark survives that; an attribute
  * does not.
  *
- * Stored as a token, never a CSS value (`F18`). Anything else — pasted
+ * Stored as a token, never a CSS value. Anything else — pasted
  * `text-align: start`, a hand-edited `"middle"` — reads as `null`.
  */
 export const TextAlignAttribute = /* @__PURE__ */ Extension.create({
@@ -76,7 +76,7 @@ declare module '@tiptap/core' {
 }
 
 /**
- * The commands and shortcuts for `textAlign` (`PA-06`): `Mod-Shift-L`, `E`,
+ * The commands and shortcuts for `textAlign`: `Mod-Shift-L`, `E`,
  * `R` and `J`. Exported from `@blockleaf/editor/text-style`, not the root —
  * the attribute itself is `TextAlignAttribute`, in every preset.
  */

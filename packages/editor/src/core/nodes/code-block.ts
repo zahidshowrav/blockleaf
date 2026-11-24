@@ -18,7 +18,7 @@ import { createLowlight } from 'lowlight';
  * Seven, not `common`'s thirty-seven. `common` costs 39.27 kB against 16.69 kB
  * curated, and a syntax highlighter is not worth more of the budget than the
  * rest of the editor. Hosts that need Rust or Kotlin register them; hosts that
- * need neither do not pay for them. See F10 and F14.
+ * need neither do not pay for them.
  *
  * `xml` covers HTML — highlight.js has no separate HTML grammar.
  */

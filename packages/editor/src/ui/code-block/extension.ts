@@ -21,7 +21,7 @@ export interface CodeBlockUIOptions extends CodeBlockOptions {
  *
  * Exported from `@blockleaf/editor/code-block` rather than the package root:
  * `lowlight` and its grammars cost 16.53 kB, which is more than the default
- * bundle has left. See F14.
+ * bundle has left.
  */
 export const createCodeBlock = ({
 	picker = true,

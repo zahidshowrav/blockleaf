@@ -120,8 +120,8 @@ export type UseBlockleafEditorOptions = {
 	 * A `contenteditable` is an ARIA textbox, and an unnamed one is read out
 	 * as nothing at all — axe files it as `aria-input-field-name`. It is a
 	 * prop rather than a constant because the right name depends on what the
-	 * host is editing; `labels` in HD-02 will fold it into the wider i18n
-	 * surface.
+	 * host is editing; `labels` may fold it into the wider i18n surface
+	 * later.
 	 */
 	label?: string;
 	/**

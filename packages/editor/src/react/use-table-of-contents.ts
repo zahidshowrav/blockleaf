@@ -11,7 +11,7 @@ import {
 const EMPTY: TableOfContentsEntry[] = [];
 
 /**
- * The open document's headings, kept current as it is edited (`PA-08`). For
+ * The open document's headings, kept current as it is edited. For
  * a sidebar outline drawn outside the document; the in-document block is the
  * `tableOfContents` node.
  *

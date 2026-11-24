@@ -17,7 +17,7 @@ const alignOf = (editor: Editor): string | null => {
 };
 
 /**
- * Full width for a selected image or video (`PA-24`). Offered only where
+ * Full width for a selected image or video. Offered only where
  * `@blockleaf/editor/media` added the resize commands; pressed while the
  * width is `'full'`.
  */

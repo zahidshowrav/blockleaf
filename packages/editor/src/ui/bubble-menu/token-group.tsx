@@ -29,7 +29,7 @@ export interface TokenGroupProps {
 }
 
 /**
- * One choice of a style token, as a radio group (`PA-05`, `PA-10`): the
+ * One choice of a style token, as a radio group: the
  * arrow keys move and wrap, Home and End jump, Enter or Space picks, Escape
  * leaves. A panel with two groups — family and size, text and background —
  * is two tab stops, one per group, as the radio pattern has it.

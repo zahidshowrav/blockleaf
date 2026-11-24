@@ -8,7 +8,7 @@ import { type Node as ProseMirrorNode, type Schema } from '@tiptap/pm/model';
 import { MENTION_NODE, MENTION_PREFIX } from './constants.js';
 import { type BlockleafDocument } from './schema.js';
 
-/** How much text there is (`PA-09`). */
+/** How much text there is. */
 export interface TextCounts {
 	/** Words, as the language's own rules split them: `don't` is one, and so is each Chinese word. */
 	words: number;
@@ -94,7 +94,7 @@ const TEXTBLOCKS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Counts a stored document's words and characters (`PA-09`), with no
+ * Counts a stored document's words and characters, with no
  * editor. Code blocks and captions count; image alt text does not.
  *
  * ```ts

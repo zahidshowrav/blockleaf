@@ -19,7 +19,7 @@ export const IMAGE_MENU_PLUGIN_KEY = 'blockleafImageMenu';
  *
  * `instanceof NodeSelection` would need the value import from
  * `@tiptap/pm/state`, and ProseMirror packages declare no `sideEffects` — the
- * same trap F13 recorded for `CellSelection`. `node` is the property that
+ * same trap as `CellSelection`. `node` is the property that
  * defines a node selection and it survives minification.
  */
 export const isImageSelection = (selection: Selection): boolean => {
@@ -48,8 +48,8 @@ export type ImageMenuOptions = {
 };
 
 /**
- * A third bubble menu instance, after the text toolbar (CH-02) and the cell
- * menu (CH-08). The surface is CH-02's; only what it offers and when it
+ * A third bubble menu instance, after the text toolbar and the cell
+ * menu. The surface is the text toolbar's; only what it offers and when it
  * appears differ.
  */
 export const createImageMenuExtension = ({

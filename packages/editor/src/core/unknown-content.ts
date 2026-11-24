@@ -10,7 +10,7 @@ import {
 import { defaultLabels, type ResolvedLabels } from './labels.js';
 
 /**
- * FC-03. Nodes and marks this editor does not know, kept intact.
+ * Nodes and marks this editor does not know, kept intact.
  *
  * ProseMirror has no hook for an unknown type: a schema is a lookup by name,
  * and `nodeFromJSON` throws before any extension runs. So the work happens
@@ -263,7 +263,7 @@ const unwrapMarks = (marks: JsonMark[] | undefined): JsonMark[] | undefined => {
 /**
  * The attributes without the ones that are `undefined`. ProseMirror keeps
  * every attribute the schema defines on every node, and an attribute whose
- * default is `undefined` — `textAlign` (`F25`) — would otherwise reach the
+ * default is `undefined` — `textAlign` — would otherwise reach the
  * host as a key with nothing in it. `JSON.stringify` drops it anyway; this
  * makes the object a host is handed match what it stores.
  */

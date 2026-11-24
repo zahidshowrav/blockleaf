@@ -1,5 +1,5 @@
 /**
- * Mentions, as an opt-in subpath (`PA-02`).
+ * Mentions, as an opt-in subpath.
  *
  * The `mention` node is in the stored schema from version 2, but an editor
  * that never mentions anyone should not ship the picker. Importing from here

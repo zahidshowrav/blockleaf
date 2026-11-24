@@ -49,7 +49,7 @@ const LINK_PANEL: BubbleMenuPanel = {
 };
 
 /**
- * The colour panel (`PA-05`, `PA-22`), offered only where
+ * The colour panel, offered only where
  * `@blockleaf/editor/text-style` put text colour in the schema. Pressed when
  * the selection has a text colour or a coloured background.
  */
@@ -64,7 +64,7 @@ const colorPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({
 });
 
 /**
- * The font panel (`PA-10`, `PA-11`), offered only where
+ * The font panel, offered only where
  * `@blockleaf/editor/text-style` put a font mark in the schema.
  */
 const fontPanel = (labels: ResolvedLabels): BubbleMenuPanel => ({

@@ -42,9 +42,8 @@ export interface UploadResult {
 /**
  * Everything the editor hands an adapter besides the file.
  *
- * PROJECT_PLAN §4 sketches `upload(file, signal)`. This is that signature
- * with the second argument widened to an object, because MC-03 needs
- * determinate progress and a bare `AbortSignal` has nowhere to put it.
+ * The second argument is an object rather than a bare `AbortSignal`,
+ * because upload progress needs somewhere to go.
  * Widening now costs nothing; adding a third positional argument later
  * would be a breaking change.
  */
@@ -98,7 +97,7 @@ const isValidDimension = (value: unknown): boolean =>
  * document.
  *
  * The adapter is host code returning data that is about to be stored, which
- * makes it a boundary, and PROJECT_PLAN §3 puts validation at every boundary.
+ * makes it a boundary, and data is validated at every boundary.
  * A host whose endpoint returns `{ url }` instead of `{ src }` should get a
  * clear error at the point of the mistake, not an image node with
  * `src: undefined` saved into their database.

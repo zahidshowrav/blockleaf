@@ -107,7 +107,7 @@ const unwrapAt = (tr: Transaction, found: FoundDetails): void => {
 
 /**
  * Reads `<details>` from HTML another app wrote. Its `<summary>` becomes the
- * title paragraph (`F23`); the editor's own output has no `<summary>` and
+ * title paragraph; the editor's own output has no `<summary>` and
  * needs nothing.
  */
 const parseDetailsContent = (dom: HTMLElement, schema: Schema): Fragment => {
@@ -187,8 +187,8 @@ const revealSelection = (
 };
 
 /**
- * A toggle block (`PA-01`). The first block inside it is its title; the
- * blocks after it are the body, shown or hidden by `open` (`F23`).
+ * A toggle block. The first block inside it is its title; the
+ * blocks after it are the body, shown or hidden by `open`.
  *
  * The stored shape is the one `details` has had since `0.1.0` — this adds the
  * editing, not the node.

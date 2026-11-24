@@ -189,12 +189,12 @@ const settlePastedIds = (
 };
 
 /**
- * Gives pasted blocks their ids without the quadratic path (`HD-13`).
+ * Gives pasted blocks their ids without the quadratic path.
  *
  * `UniqueID` adds ids after a paste one `setNodeMarkup` step per block, each
  * applied to the document the one before it produced, and checks for
  * duplicates by recounting the range once per block. Both are quadratic —
- * the same problem `withBlockIds` took out of loading (`HD-05`). A
+ * the same problem `withBlockIds` took out of loading. A
  * ten-thousand-block paste spent most of a minute there.
  *
  * Two parts, both linear:
@@ -234,7 +234,7 @@ export const PastedBlockIds = /* @__PURE__ */ Extension.create({
 
 /**
  * Tiptap's `UniqueID`, with one default changed: it leaves paste and drop
- * transactions to `PastedBlockIds` (`HD-13`).
+ * transactions to `PastedBlockIds`.
  *
  * The default rather than a setting in `createExtensions`, so the documented
  * way to give a block type of your own an id —

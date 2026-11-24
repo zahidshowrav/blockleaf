@@ -88,7 +88,7 @@ export const UNKNOWN_INLINE_NODE = 'blockleafUnknownInline';
 export const UNKNOWN_MARK = 'blockleafUnknownMark';
 
 /**
- * The wrapper a captioned block lives in, and the caption itself (`F20`).
+ * The wrapper a captioned block lives in, and the caption itself.
  * The caption is beside the block, not inside it: `prosemirror-tables` reads
  * every child of a `table` as a row.
  */
@@ -96,46 +96,46 @@ export const FIGURE_NODE = 'figure';
 export const CAPTION_NODE = 'caption';
 
 /**
- * The group of blocks a `figure` may caption besides a table (`PA-20`,
- * `F28`): `image` in the core, and the media blocks `./media` adds. A group
+ * The group of blocks a `figure` may caption besides a table:
+ * `image` in the core, and the media blocks `./media` adds. A group
  * rather than a list of names, because a content expression that names a
  * node the editor did not load stops the schema being built at all.
  */
 export const CAPTIONABLE_GROUP = 'captionable';
 
 /**
- * The caption toolbar (`PA-21`), from `@blockleaf/editor/media`. Named so
+ * The caption toolbar, from `@blockleaf/editor/media`. Named so
  * `BlockleafEditor` can hand it the resolved labels.
  */
 export const CAPTION_MENU_EXTENSION_NAME = 'captionMenu';
 
 /**
- * The media blocks (`PA-12` to `PA-14`, `F29`): in the schema from version
+ * The media blocks: in the schema from version
  * 2, loaded from `@blockleaf/editor/media`. Each is captionable.
  */
 export const VIDEO_NODE = 'video';
 export const AUDIO_NODE = 'audio';
 export const ATTACHMENT_NODE = 'attachment';
 
-/** The toolbar for a selected video, audio clip or file (`PA-12` to `PA-14`). */
+/** The toolbar for a selected video, audio clip or file. */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
-/** Resizing and full width for images and videos (`PA-24`), from `./media`. */
+/** Resizing and full width for images and videos, from `./media`. */
 export const MEDIA_RESIZE_EXTENSION_NAME = 'mediaResize';
 
-/** A toggle block: its first child is the title, the rest open and close (`F23`). */
+/** A toggle block: its first child is the title, the rest open and close. */
 export const DETAILS_NODE = 'details';
 
 /**
- * A table of contents (`PA-08`, `F27`). It stores no entries: the editor and
+ * A table of contents. It stores no entries: the editor and
  * the renderer list the document's headings each time they draw it. In the
  * schema from version 2; the editor loads it from `@blockleaf/editor/toc`.
  */
 export const TABLE_OF_CONTENTS_NODE = 'tableOfContents';
 
 /**
- * An inline reference to a person, page or anything else a host can name
- * (`PA-02`). Stored as `{ id, label, kind }`; see `F24`. The node is in the
+ * An inline reference to a person, page or anything else a host can name.
+ * Stored as `{ id, label, kind }`. The node is in the
  * schema from version 2, but the editor only loads it from
  * `@blockleaf/editor/mentions`.
  */
@@ -147,15 +147,15 @@ export const MENTIONS_EXTENSION_NAME = 'blockleafMentions';
 /** What a mention shows before its label, in the editor and the renderer. */
 export const MENTION_PREFIX = '@';
 
-/** Subscript and superscript (`PA-07`): marks in the schema from version 2, loaded from `@blockleaf/editor/text-style`. */
+/** Subscript and superscript: marks in the schema from version 2, loaded from `@blockleaf/editor/text-style`. */
 export const SUBSCRIPT_MARK = 'subscript';
 export const SUPERSCRIPT_MARK = 'superscript';
 
 /**
- * Text alignment (`PA-06`, `F25`): an attribute on paragraphs and headings,
+ * Text alignment: an attribute on paragraphs and headings,
  * in the core schema so no editor drops it. `null` is the language's own
  * direction; these are the only other values a document stores. A caption
- * takes it too (`PA-20`), as its own alignment beside its block's.
+ * takes it too, as its own alignment beside its block's.
  */
 export const TEXT_ALIGNMENTS = ['left', 'center', 'right', 'justify'] as const;
 export const TEXT_ALIGN_ATTRIBUTE_EXTENSION_NAME = 'blockleafTextAlign';
@@ -163,11 +163,11 @@ export const TEXT_ALIGN_TYPES = ['paragraph', 'heading', 'caption'] as const;
 /** The commands and shortcuts for `textAlign`, from `@blockleaf/editor/text-style`. */
 export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
 
-/** The `:` picker that inserts an emoji as plain text (`PA-03`). */
+/** The `:` picker that inserts an emoji as plain text. */
 export const EMOJI_EXTENSION_NAME = 'blockleafEmoji';
 
 /**
- * Text colour (`PA-05`, `F18`, `F26`): a mark in the schema from version 2,
+ * Text colour: a mark in the schema from version 2,
  * loaded from `@blockleaf/editor/text-style`. It stores a token, never a CSS
  * value; these are the ones the stylesheet defines and the picker offers.
  */
@@ -185,7 +185,7 @@ export const TEXT_COLORS = [
 ] as const;
 
 /**
- * Font family (`PA-10`, `F26`): a token mark in the schema from version 2,
+ * Font family: a token mark in the schema from version 2,
  * loaded from `@blockleaf/editor/text-style`. These are the families the
  * stylesheet defines and the picker offers; a host may define more.
  */
@@ -193,7 +193,7 @@ export const FONT_FAMILY_MARK = 'fontFamily';
 export const FONT_FAMILIES = ['sans', 'serif', 'mono'] as const;
 
 /**
- * What a style token may look like (`F18`): lower case, a letter first, at
+ * What a style token may look like: lower case, a letter first, at
  * most 32 characters. Checked wherever one is read, because it ends up inside
  * a `style` attribute and nothing that could close the `var()` may get there.
  * Here rather than beside the marks so the validator can use it without
@@ -202,7 +202,7 @@ export const FONT_FAMILIES = ['sans', 'serif', 'mono'] as const;
 export const STYLE_TOKEN = /^[a-z][a-z0-9-]{0,31}$/;
 
 /**
- * Font size (`PA-11`, `F26`): a token mark in the schema from version 2,
+ * Font size: a token mark in the schema from version 2,
  * loaded from `@blockleaf/editor/text-style`. Steps around the body size;
  * the body size itself is no mark at all, and anything bigger than `xl` is
  * a heading's job.
@@ -211,7 +211,7 @@ export const FONT_SIZE_MARK = 'fontSize';
 export const FONT_SIZES = ['sm', 'lg', 'xl'] as const;
 
 /**
- * Background colour (`PA-22`): a token in the `highlight` mark's existing
+ * Background colour: a token in the `highlight` mark's existing
  * `color`, resolved through `--bl-highlight-<token>`. The same nine names as
  * text colour, each with a light and a dark tint.
  */

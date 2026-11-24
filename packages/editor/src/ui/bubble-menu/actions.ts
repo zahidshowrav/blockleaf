@@ -15,8 +15,7 @@ import { whenMarkExists } from '../schema-guard.js';
 
 /**
  * The default toolbar, in reading order. Every entry calls a command that
- * `EC` already ships and already tests — see the block split in
- * `docs/progress-tracker.md`.
+ * the editor already ships and already tests.
  */
 /** The default mark actions, built against a label set. */
 export const createBubbleActions = (

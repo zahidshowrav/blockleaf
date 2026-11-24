@@ -16,7 +16,7 @@ import {
 
 const ALIGNMENTS = new Set<string>(['left', 'center', 'right']);
 
-/** A style token (`F18`): lower case, a letter first, at most 32 characters. */
+/** A style token: lower case, a letter first, at most 32 characters. */
 const STYLE_TOKEN_PATTERN = /^[a-z][a-z0-9-]{0,31}$/;
 
 /**
@@ -68,7 +68,7 @@ export const codeLanguage = (node: RenderableNode): string | undefined => {
 };
 
 /**
- * A stored width (`PA-24`, `F21`): pixels, or `'full'` for the width of the
+ * A stored width: pixels, or `'full'` for the width of the
  * page. Anything else is no width at all.
  */
 const mediaWidth = (value: unknown): number | 'full' | undefined => {
@@ -147,7 +147,7 @@ export interface VideoAttributes {
 }
 
 /**
- * A video's attributes (`PA-12`), or `null` when its source does not
+ * A video's attributes, or `null` when its source does not
  * survive sanitisation and nothing should render. The poster is held to the
  * image rule and dropped if it fails it.
  */
@@ -175,7 +175,7 @@ export interface AudioAttributes {
 	title: string | undefined;
 }
 
-/** An audio clip's attributes (`PA-13`), or `null` for an unsafe source. */
+/** An audio clip's attributes, or `null` for an unsafe source. */
 export const audioAttributes = (
 	node: RenderableNode
 ): AudioAttributes | null => {
@@ -190,7 +190,7 @@ export interface AttachmentAttributes {
 	mime: string | undefined;
 }
 
-/** A file's attributes (`PA-14`), or `null` for an unsafe source. */
+/** A file's attributes, or `null` for an unsafe source. */
 export const attachmentAttributes = (
 	node: RenderableNode
 ): AttachmentAttributes | null => {
@@ -252,7 +252,7 @@ const LEGACY_HIGHLIGHT = /^(#[0-9a-f]{3,8}|(rgb|hsl)a?\(\s*[\d.%\s,/]+\))$/i;
 
 /**
  * A highlight's stored `color`, when it is one the renderers will draw: a
- * token (`PA-22`) or a colour written before tokens. Anything else — a value
+ * token or a colour written before tokens. Anything else — a value
  * with a `;` in it above all — is treated as no colour.
  */
 export const highlightColor = (mark: RenderableMark): string | undefined => {
@@ -265,7 +265,7 @@ export const highlightColor = (mark: RenderableMark): string | undefined => {
 };
 
 /**
- * The CSS background a highlight's colour resolves to (`PA-22`), as the
+ * The CSS background a highlight's colour resolves to, as the
  * editor writes it: a token through `--bl-highlight-<token>`, falling back to
  * the token itself so a colour name stored before tokens still shows; an
  * older hex or `rgb()` value as it is.
@@ -276,7 +276,7 @@ export const highlightBackground = (color: string): string =>
 		: color;
 
 /**
- * A token mark's token (`F26`), or nothing when it is not one. The token goes
+ * A token mark's token, or nothing when it is not one. The token goes
  * inside a `style`, so anything that could close the `var()` is refused
  * rather than escaped.
  */
@@ -290,15 +290,15 @@ const markToken = (
 		: undefined;
 };
 
-/** A `textColor` mark's token (`PA-05`). */
+/** A `textColor` mark's token. */
 export const textColorToken = (mark: RenderableMark): string | undefined =>
 	markToken(mark, 'color');
 
-/** A `fontFamily` mark's token (`PA-10`). */
+/** A `fontFamily` mark's token. */
 export const fontFamilyToken = (mark: RenderableMark): string | undefined =>
 	markToken(mark, 'family');
 
-/** A `fontSize` mark's token (`PA-11`). */
+/** A `fontSize` mark's token. */
 export const fontSizeToken = (mark: RenderableMark): string | undefined =>
 	markToken(mark, 'size');
 
@@ -374,7 +374,7 @@ export interface TableColumn {
  *
  * `colwidth` is an array per cell because a cell spanning three columns
  * carries all three widths. It is presentation stored in a document that
- * otherwise stores meaning — see PROJECT_PLAN §3.1 — but prosemirror-tables
+ * otherwise stores meaning, but prosemirror-tables
  * writes it, so the renderer honours it rather than dropping the author's
  * column sizing on the way out.
  */
@@ -430,7 +430,7 @@ const stringAttr = (node: RenderableNode, name: string): string => {
 };
 
 /**
- * A mention's attributes and the text it shows (`PA-02`), as the editor
+ * A mention's attributes and the text it shows, as the editor
  * writes them. `data-mention-id` rather than `data-id`, which is a block's.
  */
 export const mentionAttributes = (
@@ -463,9 +463,9 @@ const TEXT_ALIGNMENTS: ReadonlySet<string> = new Set<TextAlign>([
 ]);
 
 /**
- * A paragraph's or heading's alignment (`PA-06`), one of four tokens or
+ * A paragraph's or heading's alignment, one of four tokens or
  * nothing. Anything else in a stored document is ignored rather than
- * written into a `style` attribute (`F18`).
+ * written into a `style` attribute.
  */
 export const textAlign = (node: RenderableNode): TextAlign | undefined => {
 	const value = node.attrs?.textAlign;

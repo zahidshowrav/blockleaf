@@ -12,7 +12,7 @@ import { type EditorView } from '@tiptap/pm/view';
 import { MEDIA_RESIZE_EXTENSION_NAME, VIDEO_NODE } from './constants.js';
 import { FULL_WIDTH, readMediaWidth, type MediaWidth } from './media-width.js';
 
-/** The blocks a resize applies to (`F21`): pictures that have a shape. */
+/** The blocks a resize applies to: pictures that have a shape. */
 const RESIZABLE: ReadonlySet<string> = new Set(['image', VIDEO_NODE]);
 
 /** Narrower than this and a picture stops being one. */
@@ -26,7 +26,7 @@ declare module '@tiptap/core' {
 		mediaResize: {
 			/**
 			 * Sets the selected image's or video's width: pixels, `'full'`,
-			 * or `null` for the file's own size (`PA-24`). Pixels are kept
+			 * or `null` for the file's own size. Pixels are kept
 			 * to at least 64.
 			 */
 			setMediaWidth: (width: MediaWidth | null) => ReturnType;
@@ -63,7 +63,7 @@ const clamp = (width: number, max: number) =>
 
 /**
  * The handles drawn over a selected image or video: one on each side edge,
- * none on the top or bottom, because only the width may change (`F21`).
+ * none on the top or bottom, because only the width may change.
  *
  * An overlay rather than a node view, so the image keeps the exact markup
  * it has without this subpath, and with it every stylesheet and selector
@@ -211,7 +211,7 @@ class ResizeView implements PluginView {
 }
 
 /**
- * Resizing for images and videos (`PA-24`, `F21`), from
+ * Resizing for images and videos, from
  * `@blockleaf/editor/media`: a handle on each side of a selected one, the
  * width only, with the height following the picture's own shape. And full
  * width, a named value rather than a pixel count.
