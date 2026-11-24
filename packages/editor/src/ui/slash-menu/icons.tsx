@@ -295,6 +295,22 @@ export const ImageIcon = (props: IconProps) => (
 	</svg>
 );
 
+export const TableOfContentsIcon = (props: IconProps) => (
+	<svg
+		viewBox="0 0 24 24"
+		width="16"
+		height="16"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<path d="M4 6h16M8 12h12M8 18h12" />
+	</svg>
+);
+
 export const ToggleIcon = (props: IconProps) => (
 	<svg
 		viewBox="0 0 24 24"

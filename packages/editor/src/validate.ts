@@ -37,6 +37,7 @@ import type {
 	TableCellNode,
 	TableHeaderNode,
 	TableNode,
+	TableOfContentsNode,
 	TableRowNode,
 	TaskItemNode,
 	TaskListNode,
@@ -67,6 +68,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'image',
 	'table',
 	'figure',
+	'tableOfContents',
 	'caption',
 	'tableRow',
 	'tableHeader',
@@ -460,6 +462,16 @@ export const detailsNodeSchema: z.ZodType<DetailsNode> = z.object({
 		.optional()
 });
 
+export const tableOfContentsNodeSchema: z.ZodType<TableOfContentsNode> =
+	z.object({
+		type: z.literal('tableOfContents'),
+		attrs: z
+			.object({
+				id: z.string().optional()
+			})
+			.optional()
+	});
+
 /* -------------------------------------------------------------------------- */
 /* Table Nodes (Tables cannot be nested)                                      */
 /* -------------------------------------------------------------------------- */
@@ -478,7 +490,8 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				taskListNodeSchema,
 				calloutNodeSchema,
 				detailsNodeSchema,
-				imageNodeSchema
+				imageNodeSchema,
+				tableOfContentsNodeSchema
 			])
 		)
 	);
@@ -569,7 +582,8 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				captionNodeSchema,
 				tableRowNodeSchema,
 				tableHeaderNodeSchema,
-				tableCellNodeSchema
+				tableCellNodeSchema,
+				tableOfContentsNodeSchema
 			])
 		)
 );
@@ -597,6 +611,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				tableRowNodeSchema,
 				tableHeaderNodeSchema,
 				tableCellNodeSchema,
+				tableOfContentsNodeSchema,
 				textNodeSchema,
 				hardBreakNodeSchema,
 				mentionNodeSchema

@@ -15,6 +15,7 @@
 		"mentions",
 		"emoji",
 		"text-style",
+		"table-of-contents",
 		"rendering",
 		"performance",
 		"---Integration---",

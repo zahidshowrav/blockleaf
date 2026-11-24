@@ -20,6 +20,7 @@ import {
 	tableRows,
 	textAlign
 } from '../attrs.js';
+import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
 import { type NodeRender } from '../walk.js';
 
@@ -51,10 +52,14 @@ export const createHtmlNodes = (
 			children
 		),
 
-	heading: ({ node, children }) =>
+	heading: ({ node, root, children }) =>
 		element(
 			`h${headingLevel(node)}`,
-			{ 'data-id': blockId(node), style: alignStyle(node) },
+			{
+				id: headingAnchor(root, blockId(node)),
+				'data-id': blockId(node),
+				style: alignStyle(node)
+			},
 			children
 		),
 
@@ -130,6 +135,43 @@ export const createHtmlNodes = (
 			},
 			children
 		),
+
+	// A table of contents (PA-08, F27). The editor's `getHTML` writes the
+	// `nav` alone; the list is filled in here, from the document's headings.
+	tableOfContents: ({ node, root }) => {
+		const items = tableOfContents(root);
+		const list = items.length
+			? element(
+					'ul',
+					{},
+					items
+						.map((item) =>
+							element(
+								'li',
+								{ 'data-depth': String(item.depth) },
+								item.id
+									? element(
+											'a',
+											{ href: `#${item.id}` },
+											escapeText(item.text)
+										)
+									: escapeText(item.text)
+							)
+						)
+						.join('')
+				)
+			: '';
+		return element(
+			'nav',
+			{
+				'data-id': blockId(node),
+				'data-type': 'tableOfContents',
+				class: 'blockleaf-toc',
+				'aria-label': labels.tableOfContents
+			},
+			list
+		);
+	},
 
 	// A toggle (F23): the first block is its title, inside `<summary>`.
 	details: ({ node, renderNode, combine }) => {

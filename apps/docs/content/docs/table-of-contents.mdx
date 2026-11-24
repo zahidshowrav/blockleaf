@@ -1,0 +1,179 @@
+---
+title: Table of contents
+description: A block that lists the page's headings, each linking to its heading, plus the same list for a sidebar of your own.
+icon: ListTree
+---
+
+Type `/contents` and pick **Table of contents**, and the page gets a block
+that lists every heading in it, each one a link to its heading. Add, rename
+or delete a heading and the list follows straight away.
+
+It ships as an opt-in subpath, and the block is new in schema version 2.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withTableOfContents } from '@blockleaf/editor/toc';
+
+const extensions = withTableOfContents(presets.standard());
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+There are two ways to show the headings, and you can use both:
+
+- **The block**, which the writer places in the page, wherever they like.
+- **The list**, from `useTableOfContents`, for an outline you draw yourself
+  beside the page.
+
+## What is stored
+
+```json
+{ "type": "tableOfContents", "attrs": { "id": "8f0c…" } }
+```
+
+Nothing else. The entries are never stored: the editor and the renderer
+work them out from the headings each time they draw the block, so the list
+can never go stale. The reasoning is F27 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+
+## What it lists
+
+- **Every heading, in order**, including headings inside a callout, a toggle
+  or a table cell.
+- **Not empty headings.** A heading you have only just started is left out
+  until it has text.
+- **Indented by level.** The highest level the page uses sits at the left,
+  so a page whose headings start at Heading 2 does not open indented. Each
+  entry has a `data-depth` of 1, 2 or 3.
+
+Each entry links to `#` and the heading's block id. In the editor, a click
+puts the caret at the start of that heading and scrolls to it.
+
+While the page has no headings, the block says so in the editor. The
+renderer writes an empty `nav`.
+
+## A sidebar of your own
+
+`useTableOfContents` gives you the same list, kept up to date as the page
+is edited:
+
+```tsx
+import { useTableOfContents } from '@blockleaf/editor/toc';
+
+const Outline = ({ editor }: { editor: Editor | null }) => {
+	const headings = useTableOfContents(editor);
+	return (
+		<nav aria-label="On this page">
+			{headings.map((heading) => (
+				<button
+					key={heading.id}
+					style={{ paddingLeft: `${heading.depth - 1}em` }}
+					onClick={() =>
+						heading.id && editor?.commands.goToHeading(heading.id)
+					}
+				>
+					{heading.text}
+				</button>
+			))}
+		</nav>
+	);
+};
+```
+
+Each entry is `{ id, level, depth, text }`. `id` is the heading's block id,
+or `null` for a heading without one. The array stays the same object until
+the headings change, so typing in a paragraph does not redraw your outline.
+
+`getTableOfContents(doc)` gives the same list from stored JSON. This subpath
+loads Tiptap, though. On a server, use `tableOfContents` from
+`@blockleaf/renderer`, which needs nothing else.
+
+## Commands
+
+| Command                   | What it does                                                                      |
+| ------------------------- | --------------------------------------------------------------------------------- |
+| `insertTableOfContents()` | Inserts the block at the selection.                                               |
+| `goToHeading(id)`         | Puts the caret at the start of the heading with that block id, and scrolls to it. |
+
+Both exist only when the subpath is loaded.
+
+## Rendering
+
+`@blockleaf/renderer` fills the list in on both targets, with no extra
+import:
+
+```html
+<nav
+	data-id="t1"
+	data-type="tableOfContents"
+	class="blockleaf-toc"
+	aria-label="Table of contents"
+>
+	<ul>
+		<li data-depth="1"><a href="#a1">Setup</a></li>
+		<li data-depth="2"><a href="#b2">Install</a></li>
+	</ul>
+</nav>
+…
+<h2
+	id="a1"
+	data-id="a1"
+>
+	Setup
+</h2>
+```
+
+Two things differ from the rest of the renderer's output:
+
+- **Headings get an `id`**, so the links jump. Only in a document that has a
+  table of contents: everywhere else a heading keeps `data-id` alone, as it
+  always has.
+- **The editor's `getHTML` writes only the empty `nav`.** A node can only
+  write itself, and the list is made of other nodes. Use the renderer to
+  publish a page.
+
+For a sidebar on a published page, `tableOfContents(doc)` from
+`@blockleaf/renderer` returns the entries with `{ id, level, depth, text }`.
+
+## Styling
+
+| Property          | Default  | What it sets                    |
+| ----------------- | -------- | ------------------------------- |
+| `--bl-toc-indent` | `1.25em` | How far each level is indented. |
+
+Links use `--bl-color-muted`, and `--bl-color-fg` on hover and focus.
+
+## Without the subpath
+
+An editor that does not load `@blockleaf/editor/toc` still opens a document
+with a table of contents in it. The block shows as a placeholder and is
+saved back exactly as it came in. See
+[a block the editor does not know](./getting-started.mdx#a-block-the-editor-does-not-know).
+
+## Translating it
+
+The block's strings are under `tableOfContents` in `labels`, and the slash
+menu entry under `blockTypes` and `slashMenu.descriptions`:
+
+```tsx
+<BlockleafEditor
+	extensions={extensions}
+	labels={{
+		tableOfContents: {
+			label: 'Sommaire',
+			empty: 'Ajoutez un titre pour le voir ici.'
+		},
+		blockTypes: { 'table-of-contents': 'Sommaire' }
+	}}
+/>
+```
+
+The renderer's accessible name is `tableOfContents` in its own `labels`.
+
+## Cost
+
+Adds 0.63 kB on top of the editor, and nothing without the import. The
+slash menu entry, which hides itself without the block, is 0.19 kB of the
+main bundle.

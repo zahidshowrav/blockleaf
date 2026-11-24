@@ -8,11 +8,43 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26 · **Last reviewed:** 2026-11-23
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27 · **Last reviewed:** 2026-11-23
 
 ---
 
 ## Settled
+
+### F27 — what a table of contents stores · decided 2026-11-23
+
+`PA-08` adds a table of contents. It can be a block the writer places, or a
+list worked out from the headings and drawn outside the document.
+
+**Decisions:**
+
+- **Both.** A `tableOfContents` block, and the list it shows, exported for
+  a host's own sidebar: `useTableOfContents` and `getTableOfContents` in
+  `@blockleaf/editor/toc`, `tableOfContents` in `@blockleaf/renderer`.
+- **The block stores nothing but its id.** Entries are worked out from the
+  headings every time it is drawn, so it can never be stale, and renaming a
+  heading never changes a second node.
+- **Every heading with text, in order**, inside callouts, toggles and cells
+  too. Indented by `depth`, counted from the highest level the document
+  uses, so a page starting at Heading 2 does not open indented.
+- **Links are `#<block id>`.** The editor moves the caret on a click. The
+  renderer gives headings an `id` to jump to, but only in a document with a
+  table of contents block: block ids are `data-id` everywhere else, and
+  every existing document renders exactly as before.
+- **`getHTML` writes an empty `nav`.** A node's `renderHTML` sees only that
+  node, so the editor cannot list the headings there. The renderer fills it
+  in; that is the one difference from the editor, and its parity tests say
+  so.
+- **The renderer passes `root` to every node renderer**, the document being
+  rendered. Additive; the table of contents is its first user.
+- **Rejected: storing the entries.** A snapshot goes stale the moment a
+  heading is renamed, and every heading edit would rewrite a second block.
+- **Rejected: always writing heading `id`s.** Useful for deep links, but it
+  changes every rendered page, and two copies of a document on one page
+  would repeat the ids.
 
 ### F26 — one mark per text style · decided 2026-11-23
 

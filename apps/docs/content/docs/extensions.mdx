@@ -30,6 +30,11 @@ Mentions are already built: use [`@blockleaf/editor/mentions`](./mentions.mdx)
 rather than `@tiptap/extension-mention`. Both name their node `mention`, and
 Blockleaf's stores the shape its schema documents.
 
+The same goes for a table of contents: use
+[`@blockleaf/editor/toc`](./table-of-contents.mdx) rather than
+`@tiptap/extension-table-of-contents`. Blockleaf's is a block stored in the
+document, with a `tableOfContents` node its schema and renderer know.
+
 `presets.standard()` and `presets.minimal()` return a fresh array each call —
 Tiptap extensions carry per-editor state, so sharing one array between two
 editors is a bug waiting to happen. `createExtensions(preset)` is the same

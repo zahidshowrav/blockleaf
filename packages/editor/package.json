@@ -44,6 +44,10 @@
 			"types": "./dist/text-style.d.ts",
 			"import": "./dist/text-style.js"
 		},
+		"./toc": {
+			"types": "./dist/toc.d.ts",
+			"import": "./dist/toc.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"

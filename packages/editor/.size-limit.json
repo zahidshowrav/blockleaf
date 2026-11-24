@@ -40,5 +40,12 @@
 		"import": "{ withEmoji }",
 		"limit": "72 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "table of contents subpath, standalone (shares the runtime in practice)",
+		"path": "dist/toc.js",
+		"import": "{ withTableOfContents }",
+		"limit": "60 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

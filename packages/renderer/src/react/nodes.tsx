@@ -19,6 +19,7 @@ import {
 	tableRows,
 	textAlign
 } from '../attrs.js';
+import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
 
 /**
@@ -46,10 +47,11 @@ const Paragraph: NodeRenderer = ({ node, children }) => (
 	</p>
 );
 
-const Heading: NodeRenderer = ({ node, children }) => {
+const Heading: NodeRenderer = ({ node, root, children }) => {
 	const Tag = `h${headingLevel(node)}` as 'h1' | 'h2' | 'h3';
 	return (
 		<Tag
+			id={headingAnchor(root, blockId(node))}
 			data-id={blockId(node)}
 			style={alignStyle(node)}
 		>
@@ -322,6 +324,41 @@ const allHeaders = (row: RenderableNode | undefined): boolean =>
  */
 export const unhandledNode: NodeRenderer = () => null;
 
+/**
+ * A table of contents (`PA-08`, `F27`). The editor's `getHTML` writes the
+ * `nav` alone; the list is filled in here, from the document's headings.
+ */
+export const tableOfContentsRenderer =
+	(labels: RendererLabels = defaultRendererLabels): NodeRenderer =>
+	({ node, root }) => {
+		const items = tableOfContents(root);
+		return (
+			<nav
+				data-id={blockId(node)}
+				data-type="tableOfContents"
+				className="blockleaf-toc"
+				aria-label={labels.tableOfContents}
+			>
+				{items.length > 0 && (
+					<ul>
+						{items.map((item, index) => (
+							<li
+								key={item.id ?? index}
+								data-depth={item.depth}
+							>
+								{item.id ? (
+									<a href={`#${item.id}`}>{item.text}</a>
+								) : (
+									item.text
+								)}
+							</li>
+						))}
+					</ul>
+				)}
+			</nav>
+		);
+	};
+
 export const defaultNodes: Record<string, NodeRenderer> = {
 	doc: Doc,
 	paragraph: Paragraph,
@@ -338,6 +375,7 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	details: Details,
 	image: Image,
 	table: tableRenderer(),
+	tableOfContents: tableOfContentsRenderer(),
 	figure: Figure,
 	caption: Caption,
 	tableRow: TableRow,

@@ -180,6 +180,17 @@ export interface HorizontalRuleNode {
 	};
 }
 
+/**
+ * A table of contents (`PA-08`, version 2). It stores nothing but its id: the
+ * entries are the document's headings, listed whenever it is drawn (`F27`).
+ */
+export interface TableOfContentsNode {
+	type: 'tableOfContents';
+	attrs?: {
+		id?: string;
+	};
+}
+
 export interface BulletListNode {
 	type: 'bulletList';
 	attrs?: {
@@ -302,7 +313,8 @@ export type TableCellContentNode =
 	| TaskListNode
 	| CalloutNode
 	| DetailsNode
-	| ImageNode;
+	| ImageNode
+	| TableOfContentsNode;
 
 export interface TableHeaderNode {
 	type: 'tableHeader';
@@ -343,7 +355,8 @@ export type BlockNode =
 	| CaptionNode
 	| TableRowNode
 	| TableHeaderNode
-	| TableCellNode;
+	| TableCellNode
+	| TableOfContentsNode;
 
 /**
  * Discriminated union over the complete Blockleaf node set defined in apps/docs/content/docs/schema.mdx.

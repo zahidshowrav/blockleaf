@@ -60,6 +60,7 @@
 
 	/* rhythm */
 	--bl-space-block: 0.75em;
+	--bl-toc-indent: 1.25em;
 	--bl-radius: 6px;
 	--bl-content-padding: 0;
 
@@ -339,6 +340,54 @@
 	top: 0.85em;
 	font-size: 1.15em;
 	line-height: 1;
+}
+
+/* Table of contents (PA-08). One flat list, indented by how deep each
+   heading sits below the document's highest level. */
+.blockleaf-editor__content .blockleaf-toc {
+	margin: var(--bl-space-block) 0;
+}
+
+.blockleaf-editor__content .blockleaf-toc ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.blockleaf-editor__content .blockleaf-toc li {
+	margin: 0.2em 0;
+	padding-left: var(--bl-toc-indent);
+}
+
+.blockleaf-editor__content .blockleaf-toc li[data-depth='1'] {
+	padding-left: 0;
+}
+
+.blockleaf-editor__content .blockleaf-toc li[data-depth='3'] {
+	padding-left: calc(var(--bl-toc-indent) * 2);
+}
+
+.blockleaf-editor__content .blockleaf-toc a {
+	color: var(--bl-color-muted);
+	text-decoration: underline;
+	text-decoration-color: var(--bl-color-border);
+}
+
+.blockleaf-editor__content .blockleaf-toc a:hover,
+.blockleaf-editor__content .blockleaf-toc a:focus-visible {
+	color: var(--bl-color-fg);
+	text-decoration-color: currentColor;
+}
+
+.blockleaf-editor__content .blockleaf-toc__empty {
+	margin: 0;
+	color: var(--bl-color-muted);
+}
+
+.blockleaf-editor__content .blockleaf-toc.ProseMirror-selectednode {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: 2px;
+	border-radius: var(--bl-radius);
 }
 
 .blockleaf-editor__content table {
