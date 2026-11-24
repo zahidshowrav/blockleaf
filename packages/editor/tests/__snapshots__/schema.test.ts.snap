@@ -468,6 +468,16 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "file-1",
+        "mime": "application/pdf",
+        "name": "report.pdf",
+        "size": 1572864,
+        "src": "https://example.com/report.pdf",
+      },
+      "type": "attachment",
+    },
+    {
+      "attrs": {
         "id": "figure-image",
       },
       "content": [

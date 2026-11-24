@@ -165,6 +165,31 @@ export const audioAttributes = (
 	return src ? { src, title: optionalString(node.attrs?.title) } : null;
 };
 
+export interface AttachmentAttributes {
+	src: string;
+	name: string;
+	size: number | undefined;
+	mime: string | undefined;
+}
+
+/** A file's attributes (`PA-14`), or `null` for an unsafe source. */
+export const attachmentAttributes = (
+	node: RenderableNode
+): AttachmentAttributes | null => {
+	const src = mediaSrc(node);
+	if (!src) return null;
+	const size = node.attrs?.size;
+	return {
+		src,
+		name: optionalString(node.attrs?.name) ?? '',
+		size:
+			typeof size === 'number' && Number.isInteger(size) && size >= 0
+				? size
+				: undefined,
+		mime: optionalString(node.attrs?.mime)
+	};
+};
+
 export interface LinkAttributes {
 	href: string;
 	target: string | undefined;

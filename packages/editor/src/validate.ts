@@ -27,6 +27,7 @@ import type {
 	ImageNode,
 	VideoNode,
 	AudioNode,
+	AttachmentNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -70,6 +71,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'image',
 	'video',
 	'audio',
+	'attachment',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -348,6 +350,18 @@ export const audioNodeSchema: z.ZodType<AudioNode> = z.object({
 	})
 });
 
+/** Version 2 (`PA-14`). `size` is a whole number of bytes. */
+export const attachmentNodeSchema: z.ZodType<AttachmentNode> = z.object({
+	type: z.literal('attachment'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		name: z.string(),
+		size: z.number().int().nonnegative().nullable().optional(),
+		mime: z.string().nullable().optional()
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -524,6 +538,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				imageNodeSchema,
 				videoNodeSchema,
 				audioNodeSchema,
+				attachmentNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -589,14 +604,15 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 		})
 		.optional(),
 	// A table, or since version 2 an image (`PA-20`) or a media block
-	// (`PA-12`, `PA-13`), then its caption.
+	// (`PA-12` to `PA-14`), then its caption.
 	content: z
 		.tuple([
 			z.union([
 				tableNodeSchema,
 				imageNodeSchema,
 				videoNodeSchema,
-				audioNodeSchema
+				audioNodeSchema,
+				attachmentNodeSchema
 			]),
 			captionNodeSchema
 		])
@@ -626,6 +642,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				imageNodeSchema,
 				videoNodeSchema,
 				audioNodeSchema,
+				attachmentNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -656,6 +673,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				imageNodeSchema,
 				videoNodeSchema,
 				audioNodeSchema,
+				attachmentNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

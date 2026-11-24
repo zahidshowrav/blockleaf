@@ -435,7 +435,7 @@ describe('document schema', () => {
 						align: 'center' as const
 					}
 				},
-				// PA-12, PA-13: the media blocks, a video with its caption.
+				// PA-12 to PA-14: the media blocks, a video with its caption.
 				{
 					type: 'figure' as const,
 					attrs: { id: 'figure-video' },
@@ -462,6 +462,16 @@ describe('document schema', () => {
 						id: 'audio-1',
 						src: 'https://example.com/talk.mp3',
 						title: 'The talk'
+					}
+				},
+				{
+					type: 'attachment' as const,
+					attrs: {
+						id: 'file-1',
+						src: 'https://example.com/report.pdf',
+						name: 'report.pdf',
+						size: 1572864,
+						mime: 'application/pdf'
 					}
 				},
 				// PA-20: an image with a caption, aligned on its own.

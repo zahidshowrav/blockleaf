@@ -222,7 +222,7 @@ paste lands it at the caret.
 | `uploadMaxBytes` | `10485760` (10 MB) | Largest file accepted.                 |
 | `onUploadError`  | —                  | Called per rejected or failed file.    |
 
-Left unset, `uploadAccept` is images, plus video and audio
+Left unset, `uploadAccept` is images, plus video, audio and any other file
 once [`@blockleaf/editor/media`](./media.mdx) adds the blocks to hold them.
 Each file becomes the block for its type. Set it and only what you list is
 accepted, whatever is loaded.

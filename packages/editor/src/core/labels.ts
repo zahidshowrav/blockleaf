@@ -1,4 +1,5 @@
 import { HEADING_LEVELS } from './constants.js';
+import { formatFileSize } from './media-src.js';
 
 /**
  * Every string the editor and its default chrome put on screen.
@@ -30,6 +31,7 @@ export type BlockTypeId =
 	| 'image'
 	| 'video'
 	| 'audio'
+	| 'file'
 	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
@@ -155,7 +157,7 @@ export type CaptionLabels = {
 };
 
 export type MediaLabels = {
-	/** Accessible name of the toolbar for a selected video or audio clip. */
+	/** Accessible name of the toolbar for a selected video, audio clip or file. */
 	toolbar: string;
 	actions: Record<
 		| 'align-left'
@@ -165,10 +167,14 @@ export type MediaLabels = {
 		| 'delete',
 		string
 	>;
+	/** A file's size as shown on its block, from a byte count. */
+	fileSize: (bytes: number) => string;
 	/** Accessible name of an audio player with no title. */
 	audio: string;
 	/** Accessible name of a video player. */
 	video: string;
+	/** Accessible name of a file block: its name and size, if known. */
+	file: (name: string, size: string) => string;
 };
 
 export type LinkLabels = {
@@ -390,6 +396,7 @@ export const defaultLabels: ResolvedLabels = {
 		image: 'Image',
 		video: 'Video',
 		audio: 'Audio',
+		file: 'File',
 		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
@@ -417,6 +424,7 @@ export const defaultLabels: ResolvedLabels = {
 			image: 'Upload an image from your device.',
 			video: 'Upload a video from your device.',
 			audio: 'Upload a sound or voice recording.',
+			file: 'Attach a file to download.',
 			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
@@ -511,8 +519,10 @@ export const defaultLabels: ResolvedLabels = {
 			'toggle-caption': 'Toggle caption',
 			delete: 'Delete'
 		},
+		fileSize: formatFileSize,
 		audio: 'Audio',
-		video: 'Video'
+		video: 'Video',
+		file: (name, size) => (size ? `${name}, ${size}` : name)
 	},
 	link: {
 		address: 'Link address',

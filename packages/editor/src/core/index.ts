@@ -153,6 +153,7 @@ export {
 	type ImageNode,
 	type VideoNode,
 	type AudioNode,
+	type AttachmentNode,
 	type InlineNode,
 	type ItalicMark,
 	type LinkMark,

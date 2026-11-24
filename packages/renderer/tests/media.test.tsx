@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { docOf } from './fixtures.js';
 import { canonical, editorHTML, reactHTML, stringHTML } from './html.js';
+import { toPlainText } from '../src/text.js';
 import { type RenderableDocument, type RenderableNode } from '../src/types.js';
 
 const video: RenderableNode = {
@@ -20,15 +21,27 @@ const audio: RenderableNode = {
 	attrs: { id: 'a', src: '/media/talk.mp3', title: 'The talk' }
 };
 
+const attachment: RenderableNode = {
+	type: 'attachment',
+	attrs: {
+		id: 'f',
+		src: 'https://cdn.test/report.pdf',
+		name: 'report.pdf',
+		size: 1_572_864,
+		mime: 'application/pdf'
+	}
+};
+
 const both = (doc: RenderableDocument) => [
 	canonical(reactHTML(doc)),
 	canonical(stringHTML(doc))
 ];
 
-describe('media blocks (PA-12, PA-13)', () => {
+describe('media blocks (PA-12 to PA-14)', () => {
 	it.each([
 		['a video', video],
-		['an audio clip', audio]
+		['an audio clip', audio],
+		['a file', attachment]
 	])('renders %s exactly as the editor writes it', (_, node) => {
 		const doc = docOf(node);
 		const editor = canonical(editorHTML(doc));
@@ -63,8 +76,8 @@ describe('media blocks (PA-12, PA-13)', () => {
 		['data:video/mp4;base64,AAAA'],
 		['http://cdn.test/a.mp4']
 	])('renders nothing for an unsafe source: %s', (src) => {
-		for (const type of ['video', 'audio']) {
-			const doc = docOf({ type, attrs: { src } });
+		for (const type of ['video', 'audio', 'attachment']) {
+			const doc = docOf({ type, attrs: { src, name: 'x' } });
 			for (const html of both(doc)) {
 				expect(html).toBe('');
 			}
@@ -80,5 +93,21 @@ describe('media blocks (PA-12, PA-13)', () => {
 			expect(html).toContain('<video');
 			expect(html).not.toContain('poster');
 		}
+	});
+
+	it('escapes a file name', () => {
+		const doc = docOf({
+			type: 'attachment',
+			attrs: { src: '/a.pdf', name: '<img src=x onerror=alert(1)>.pdf' }
+		});
+		// The raw output: the canonical form decodes text again.
+		for (const html of [reactHTML(doc), stringHTML(doc)]) {
+			expect(html).not.toContain('<img');
+			expect(html).toContain('&lt;img');
+		}
+	});
+
+	it('counts a file as its name in plain text, and players as nothing', () => {
+		expect(toPlainText(docOf(video, attachment, audio))).toBe('report.pdf');
 	});
 });

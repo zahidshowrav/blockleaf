@@ -292,6 +292,21 @@ export interface AudioNode {
 	};
 }
 
+/**
+ * A file to download (`PA-14`, version 2): its address, its name, and the
+ * size in bytes and MIME type the upload had, when known.
+ */
+export interface AttachmentNode {
+	type: 'attachment';
+	attrs: {
+		id: string;
+		src: string;
+		name: string;
+		size?: number | null;
+		mime?: string | null;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -302,9 +317,10 @@ export interface TableNode {
 
 /**
  * The blocks a `figure` may caption (`F20`, `F28`): a table, and since
- * version 2 an image (`PA-20`) and the media blocks (`PA-12`, `PA-13`).
+ * version 2 an image (`PA-20`) and the media blocks (`PA-12` to `PA-14`).
  */
-export type CaptionedNode = TableNode | ImageNode | VideoNode | AudioNode;
+export type CaptionedNode =
+	TableNode | ImageNode | VideoNode | AudioNode | AttachmentNode;
 
 /**
  * A block with a caption: the block, then its `caption` (`F20`). The caption
@@ -353,6 +369,7 @@ export type TableCellContentNode =
 	| ImageNode
 	| VideoNode
 	| AudioNode
+	| AttachmentNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -391,6 +408,7 @@ export type BlockNode =
 	| ImageNode
 	| VideoNode
 	| AudioNode
+	| AttachmentNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

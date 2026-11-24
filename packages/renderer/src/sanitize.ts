@@ -71,9 +71,10 @@ export const sanitizeSrc = (src: string): string | null => {
 };
 
 /**
- * Allows `https:` and relative paths, for video and audio sources (`F29`).
- * The `src` rule without data URLs: a video or a sound never arrives as
- * one, and a `data:` link is how HTML is served from your own origin.
+ * Allows `https:` and relative paths, for video, audio and file sources
+ * (`F29`). The `src` rule without data URLs: a video or a file never
+ * arrives as one, and a `data:` link is how HTML is served from your own
+ * origin.
  */
 export const sanitizeMediaSrc = (src: string): string | null => {
 	const trimmed = src.trim();

@@ -10,6 +10,7 @@ import {
 	Heading2Icon,
 	Heading3Icon,
 	AudioIcon,
+	FileIcon,
 	ImageIcon,
 	VideoIcon,
 	OrderedListIcon,
@@ -22,6 +23,7 @@ import {
 } from './icons.js';
 import type { SlashCommand } from './types.js';
 import {
+	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	DETAILS_NODE,
 	TABLE_OF_CONTENTS_NODE,
@@ -45,7 +47,7 @@ const hasUpload = (editor: Editor) =>
  * upload adapter; the picker shows only that kind of file.
  */
 const media = (
-	id: 'video' | 'audio',
+	id: 'video' | 'audio' | 'file',
 	node: string,
 	accept: string[],
 	keywords: string[],
@@ -232,7 +234,7 @@ export const createSlashCommands = (
 				(extension) => extension.name === UPLOAD_EXTENSION_NAME
 			),
 		// Narrowed to images: with `@blockleaf/editor/media` the upload
-		// accepts video and audio too, each with its own item.
+		// accepts video, audio and any file too, each with its own item.
 		run: (editor) =>
 			editor.chain().focus().openUploadPicker(['image/*']).run()
 	},
@@ -251,6 +253,15 @@ export const createSlashCommands = (
 		['audio/*'],
 		['audio', 'sound', 'music', 'voice', 'podcast', 'upload', 'media'],
 		AudioIcon,
+		blockTypes,
+		labels
+	),
+	media(
+		'file',
+		ATTACHMENT_NODE,
+		['*/*'],
+		['file', 'attachment', 'pdf', 'document', 'download', 'upload'],
+		FileIcon,
 		blockTypes,
 		labels
 	),

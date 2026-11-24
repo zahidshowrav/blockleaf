@@ -9,11 +9,13 @@ import {
 } from '../src/core/upload-extension.js';
 import type { UploadAdapter } from '../src/core/upload.js';
 import {
+	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE,
 	createMedia,
 	defaultMediaActions,
+	formatFileSize,
 	mediaMenuShouldShow,
 	sanitizeMediaSrc,
 	withMedia
@@ -55,6 +57,16 @@ const audio: JSONContent = {
 	attrs: { src: 'https://cdn.test/a.mp3', title: 'Interview, part one' }
 };
 
+const attachment: JSONContent = {
+	type: ATTACHMENT_NODE,
+	attrs: {
+		src: 'https://cdn.test/report.pdf',
+		name: 'report.pdf',
+		size: 1_572_864,
+		mime: 'application/pdf'
+	}
+};
+
 const top = (editor: Editor) =>
 	((editor.getJSON() as JSONContent).content ?? []).map((node) => node.type);
 
@@ -87,6 +99,18 @@ describe('the media URL rule (F29)', () => {
 		''
 	])('refuses %s', (input) => {
 		expect(sanitizeMediaSrc(input)).toBeNull();
+	});
+});
+
+describe('file sizes', () => {
+	it.each([
+		[0, '0 B'],
+		[812, '812 B'],
+		[14_336, '14 KB'],
+		[1_572_864, '1.5 MB'],
+		[3_355_443_200, '3.1 GB']
+	])('writes %i bytes as %s', (bytes, expected) => {
+		expect(formatFileSize(bytes)).toBe(expected);
 	});
 });
 
@@ -169,6 +193,67 @@ describe('audio (PA-13)', () => {
 	});
 });
 
+describe('file (PA-14)', () => {
+	it('is a link to the file, with its name and size', () => {
+		const editor = open([attachment]);
+		const html = editor.getHTML();
+		expect(html).toContain('data-type="attachment"');
+		expect(html).toContain('href="https://cdn.test/report.pdf"');
+		expect(html).toContain('download="report.pdf"');
+		expect(html).toContain('aria-label="report.pdf, 1.5 MB"');
+		expect(html).toContain('>report.pdf</span>');
+		expect(html).toContain('>1.5 MB</span>');
+	});
+
+	it('round-trips through its own HTML', () => {
+		const editor = open([attachment]);
+		const again = open(editor.getHTML());
+		expect(again.getJSON().content?.[0]?.attrs).toMatchObject(
+			attachment.attrs ?? {}
+		);
+	});
+
+	it('refuses an unsafe source or a missing name', () => {
+		const editor = open([{ type: 'paragraph' }]);
+		expect(
+			editor.commands.setAttachment({
+				src: 'data:text/html,<script>',
+				name: 'x.html'
+			})
+		).toBe(false);
+		expect(
+			editor.commands.setAttachment({ src: '/a.pdf', name: '  ' })
+		).toBe(false);
+		expect(
+			editor.commands.setAttachment({ src: '/a.pdf', name: 'a.pdf' })
+		).toBe(true);
+	});
+
+	it('counts as its name in plain text', () => {
+		const editor = open([attachment]);
+		expect(editor.getText()).toContain('report.pdf');
+	});
+
+	it('does not navigate when clicked in the editor', () => {
+		const container = document.createElement('div');
+		document.body.append(container);
+		containers.push(container);
+		const editor = new Editor({
+			element: container,
+			extensions: [...createExtensions('standard'), ...blocks()],
+			content: { type: 'doc', content: [attachment] }
+		});
+		editors.push(editor);
+		const link = container.querySelector('a.blockleaf-attachment');
+		const click = new MouseEvent('click', {
+			bubbles: true,
+			cancelable: true
+		});
+		link?.dispatchEvent(click);
+		expect(click.defaultPrevented).toBe(true);
+	});
+});
+
 describe('uploads go to the block for their type', () => {
 	const adapter: UploadAdapter = {
 		upload: (file) =>
@@ -217,6 +302,21 @@ describe('uploads go to the block for their type', () => {
 		expect(node?.attrs?.title).toBe('voice memo');
 	});
 
+	it('anything else becomes a file, with its name, size and type', async () => {
+		const editor = await upload(
+			new File(['%PDF'], 'report.pdf', { type: 'application/pdf' })
+		);
+		const node = editor
+			.getJSON()
+			.content?.find((block) => block.type === ATTACHMENT_NODE);
+		expect(node?.attrs).toMatchObject({
+			src: '/uploads/report.pdf',
+			name: 'report.pdf',
+			size: 4,
+			mime: 'application/pdf'
+		});
+	});
+
 	it('an image is still an image', async () => {
 		const editor = await upload(
 			new File(['x'], 'a.png', { type: 'image/png' })
@@ -235,6 +335,17 @@ describe('uploads go to the block for their type', () => {
 		expect(top(editor)).not.toContain(VIDEO_NODE);
 		expect(failures[0]?.reason).toBe('type');
 	});
+
+	it('keeps a host’s own accept, even with the media blocks loaded', async () => {
+		const failures: UploadFailure[] = [];
+		await upload(
+			new File(['%PDF'], 'report.pdf', { type: 'application/pdf' }),
+			blocks(),
+			['image/*'],
+			(failure) => failures.push(failure)
+		);
+		expect(failures[0]?.reason).toBe('type');
+	});
 });
 
 describe('the media toolbar', () => {
@@ -244,10 +355,11 @@ describe('the media toolbar', () => {
 		return found;
 	};
 
-	it('shows for a selected video or audio clip, and not an image', () => {
+	it('shows for a selected video, audio clip or file, and not an image', () => {
 		const editor = open([
 			video,
 			audio,
+			attachment,
 			{ type: 'image', attrs: { src: 'https://cdn.test/a.png' } }
 		]);
 		const shows = () =>
@@ -259,7 +371,7 @@ describe('the media toolbar', () => {
 				from: editor.state.selection.from,
 				to: editor.state.selection.to
 			});
-		for (const type of [VIDEO_NODE, AUDIO_NODE]) {
+		for (const type of [VIDEO_NODE, AUDIO_NODE, ATTACHMENT_NODE]) {
 			selectFirst(editor, type);
 			expect(shows()).toBe(true);
 		}
@@ -267,7 +379,7 @@ describe('the media toolbar', () => {
 		expect(shows()).toBe(false);
 	});
 
-	it('aligns a video, and offers no alignment for audio', () => {
+	it('aligns a video, and offers no alignment for audio or a file', () => {
 		const editor = open([video, audio]);
 		selectFirst(editor, VIDEO_NODE);
 		expect(action('align-right').isAvailable?.(editor)).toBe(true);
@@ -278,6 +390,13 @@ describe('the media toolbar', () => {
 		expect(action('align-right').isAvailable?.(editor)).toBe(false);
 		expect(action('toggle-caption').isAvailable?.(editor)).toBe(true);
 	});
+
+	it('deletes the selected block', () => {
+		const editor = open([attachment, { type: 'paragraph' }]);
+		selectFirst(editor, ATTACHMENT_NODE);
+		action('delete').run(editor);
+		expect(top(editor)).not.toContain(ATTACHMENT_NODE);
+	});
 });
 
 describe('slash menu items', () => {
@@ -287,14 +406,14 @@ describe('slash menu items', () => {
 		return found;
 	};
 
-	it('offers video and audio only with the blocks and an adapter', () => {
+	it('offers video, audio and file only with the blocks and an adapter', () => {
 		const bare = open([{ type: 'paragraph' }], []);
 		const noAdapter = open([{ type: 'paragraph' }]);
 		const full = open(
 			[{ type: 'paragraph' }],
 			[...blocks(), createUploadExtension({ adapter: null })]
 		);
-		for (const id of ['video', 'audio']) {
+		for (const id of ['video', 'audio', 'file']) {
 			expect(item(id).isAvailable?.(bare)).toBe(false);
 			expect(item(id).isAvailable?.(noAdapter)).toBe(false);
 			expect(item(id).isAvailable?.(full)).toBe(true);
@@ -310,6 +429,7 @@ describe('withMedia', () => {
 		for (const name of [
 			VIDEO_NODE,
 			AUDIO_NODE,
+			ATTACHMENT_NODE,
 			MEDIA_MENU_EXTENSION_NAME
 		]) {
 			expect(names.filter((entry) => entry === name)).toHaveLength(1);
@@ -329,7 +449,7 @@ describe('validation (version 2)', () => {
 	});
 
 	it('accepts each block, alone and in a figure', () => {
-		for (const node of [video, audio]) {
+		for (const node of [video, audio, attachment]) {
 			expect(safeValidateDocument(doc(withId(node))).success).toBe(true);
 			expect(
 				safeValidateDocument(
@@ -340,5 +460,22 @@ describe('validation (version 2)', () => {
 				).success
 			).toBe(true);
 		}
+	});
+
+	it('refuses a file with a size that is not a whole number of bytes', () => {
+		const bad = withId({
+			...attachment,
+			attrs: { ...attachment.attrs, size: -1 }
+		});
+		expect(safeValidateDocument(doc(bad)).success).toBe(false);
+	});
+
+	it('refuses a file with no name', () => {
+		const { name: _name, ...rest } = attachment.attrs ?? {};
+		expect(
+			safeValidateDocument(
+				doc({ type: ATTACHMENT_NODE, attrs: { ...rest, id: 'b1' } })
+			).success
+		).toBe(false);
 	});
 });

@@ -3,9 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR, dropFile } from './helpers.js';
 
 /**
- * PA-12, PA-13. Video and audio arrive the way images do — dropped,
+ * PA-12 to PA-14. Video, audio and files arrive the way images do — dropped,
  * pasted or picked — and become their own blocks. Which block a file becomes,
- * and how a click on a player behaves inside the editor, is
+ * and how a click on a player or a link behaves inside the editor, is
  * browser behaviour jsdom cannot show.
  */
 
@@ -42,6 +42,31 @@ test.describe('media blocks', () => {
 		await expect(json(page)).toContainText('"type": "audio"');
 	});
 
+	test('any other file becomes a file block, and a click does not leave the page', async ({
+		page
+	}) => {
+		await open(page);
+		await dropFile(page, 'report.pdf', 'start', 'application/pdf');
+
+		const file = page.locator(`${EDITOR} a.blockleaf-attachment`);
+		await expect(file).toBeVisible({ timeout: 10000 });
+		await expect(file).toContainText('report.pdf');
+		await expect(file).toContainText('4 B');
+
+		const url = page.url();
+		await file.click();
+		expect(page.url()).toBe(url);
+		await expect(
+			page.locator(
+				`${EDITOR} a.blockleaf-attachment.ProseMirror-selectednode`
+			)
+		).toBeVisible();
+		await expect(
+			page.getByRole('toolbar', { name: 'Media' })
+		).toBeVisible();
+		await expect(json(page)).toContainText('"mime": "application/pdf"');
+	});
+
 	test('a selected video can be aligned and captioned from its toolbar', async ({
 		page
 	}) => {
@@ -72,21 +97,23 @@ test.describe('media blocks', () => {
 		);
 	});
 
-	test('the slash menu offers video and audio', async ({ page }) => {
+	test('the slash menu offers video, audio and file', async ({ page }) => {
 		await open(page);
 		await page.keyboard.type('/');
 		const menu = page.getByRole('listbox');
-		for (const name of ['Video', 'Audio']) {
+		for (const name of ['Video', 'Audio', 'File']) {
 			await expect(menu.getByRole('option', { name })).toBeVisible();
 		}
 	});
 
-	test('without the media subpath a video is refused and only images upload', async ({
+	test('without the media subpath a PDF is refused and only images upload', async ({
 		page
 	}) => {
 		await open(page, '/');
-		await dropFile(page, 'launch.mp4', 'start', 'video/mp4');
+		await dropFile(page, 'report.pdf', 'start', 'application/pdf');
 		await expect(page.locator('.sandbox__upload-error')).toBeVisible();
-		await expect(page.locator(`${EDITOR} video`)).toHaveCount(0);
+		await expect(
+			page.locator(`${EDITOR} .blockleaf-attachment`)
+		).toHaveCount(0);
 	});
 });

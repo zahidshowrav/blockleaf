@@ -1,11 +1,11 @@
 ---
 title: Media
-description: Video and audio blocks, and the caption toolbar, from the opt-in media subpath.
+description: Video, audio and file blocks, and the caption toolbar, from the opt-in media subpath.
 icon: Film
 ---
 
-`@blockleaf/editor/media` adds two blocks — **video** and **audio** — a
-toolbar for each, and the **caption toolbar**.
+`@blockleaf/editor/media` adds three blocks — **video**, **audio** and a
+**file** to download — a toolbar for each, and the **caption toolbar**.
 
 ```ts
 import { presets } from '@blockleaf/editor/extensions';
@@ -27,22 +27,23 @@ a stored one as a placeholder and saves it back unchanged.
 ## Getting a file in
 
 Media comes in the way images do: dropped, pasted, or picked from the slash
-menu's **Video** and **Audio** items. Both go through your
+menu's **Video**, **Audio** and **File** items. All three go through your
 [upload adapter](./uploads.mdx), and the slash items only show when you gave
 one.
 
 What a file becomes depends on its type:
 
-| File type | Becomes                                  |
-| --------- | ---------------------------------------- |
-| `image/*` | an image                                 |
-| `video/*` | a video                                  |
-| `audio/*` | an audio clip, titled from its file name |
+| File type | Becomes                                    |
+| --------- | ------------------------------------------ |
+| `image/*` | an image                                   |
+| `video/*` | a video                                    |
+| `audio/*` | an audio clip, titled from its file name   |
+| any other | a file block, with its name, size and type |
 
-With this subpath loaded, the upload accepts video and audio as well as
-images. Without it, only images, as before. If you pass your own `uploadAccept`, that is what is
-accepted, whatever is loaded. So `uploadAccept={['image/*', 'video/mp4']}`
-gives you images and MP4 video and nothing else.
+With this subpath loaded, the upload accepts all of them. Without it, only
+images, as before. If you pass your own `uploadAccept`, that is what is
+accepted, whatever is loaded. So `uploadAccept={['image/*', 'application/pdf']}`
+gives you images and PDFs and nothing else.
 
 Raise `uploadMaxBytes` for video. The default, 10 MB, suits a photo, not a
 film.
@@ -52,6 +53,12 @@ Each block also has a command, for host code or your own chrome:
 ```ts
 editor.commands.setVideo({ src: '/media/launch.mp4', width: 640 });
 editor.commands.setAudio({ src: '/media/talk.mp3', title: 'The talk' });
+editor.commands.setAttachment({
+	src: '/files/report.pdf',
+	name: 'report.pdf',
+	size: 1572864,
+	mime: 'application/pdf'
+});
 ```
 
 ## What is stored
@@ -59,12 +66,15 @@ editor.commands.setAudio({ src: '/media/talk.mp3', title: 'The talk' });
 ```json
 { "type": "video", "attrs": { "id": "…", "src": "https://cdn.test/launch.mp4", "poster": null, "width": 640, "align": "center" } }
 { "type": "audio", "attrs": { "id": "…", "src": "https://cdn.test/talk.mp3", "title": "The talk" } }
+{ "type": "attachment", "attrs": { "id": "…", "src": "https://cdn.test/report.pdf", "name": "report.pdf", "size": 1572864, "mime": "application/pdf" } }
 ```
 
 - **Video** is stored like an image: a source, a width, an alignment, plus
   an optional `poster`, the still shown before it plays.
 - **Audio** stores a `title`. It is the player's accessible name, so a page
   with three players does not announce "audio" three times.
+- **A file** stores its `name`, its `size` in bytes and its `mime` type, so
+  the block can say what it is before anyone downloads it.
 
 The reasoning is F29 in
 [`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
@@ -74,11 +84,11 @@ The reasoning is F29 in
 `src` follows the image rule — `https:` or a relative path, never
 `javascript:`, `http:`, `blob:` or a protocol-relative URL — with one
 difference: **no `data:` URLs at all.** An image can come off the clipboard
-as one. A video never does, and a document holding megabytes of
+as one. A video or a PDF never does, and a document holding megabytes of
 base64 is one every host pays to store and send. A `data:` link is also how
 a page serves HTML from your own origin.
 
-A pasted `<video>` or `<audio>` with an unsafe source is dropped.
+A pasted `<video>`, `<audio>` or file link with an unsafe source is dropped.
 The commands refuse the same sources. A video's `poster` follows the image
 rule, data URLs included, and an unsafe one is dropped while the video stays.
 
@@ -87,15 +97,20 @@ rule, data URLs included, and an unsafe one is dropped while the video stays.
 Video and audio play in the browser's own players. A video lines up left,
 centre or right like an image; audio fills the line.
 
-Select either and a toolbar appears:
+A file is a card with its name and size. **A click selects it; it does not
+open the file.** The editor is for writing, and a stray click must not leave
+the page. Published through [the renderer](./rendering.mdx), it is an
+ordinary link with `download`.
 
-| Button         | For             |
-| -------------- | --------------- |
-| Align left     | video           |
-| Align centre   | video           |
-| Align right    | video           |
-| Toggle caption | video and audio |
-| Delete         | video and audio |
+Select any of the three and a toolbar appears:
+
+| Button         | For                    |
+| -------------- | ---------------------- |
+| Align left     | video                  |
+| Align centre   | video                  |
+| Align right    | video                  |
+| Toggle caption | video, audio and files |
+| Delete         | video, audio and files |
 
 To select a video, click near its top, away from its controls; or arrow onto
 it from the line above, as for an image.
@@ -155,16 +170,17 @@ withMedia(presets.standard(), {
 
 `mediaMenu: false` or `captionMenu: false` leaves that toolbar out. The
 blocks are always added. Their strings are under `labels.media` and
-`labels.caption`; see
+`labels.caption`, including how a file size is written; see
 [i18n](./i18n.mdx).
 
 ## Rendering
 
-[`@blockleaf/renderer`](./rendering.mdx) renders both, on both targets,
-with no setup: `<video controls>` and `<audio controls>`. Its `labels` name
-the players.
+[`@blockleaf/renderer`](./rendering.mdx) renders all three, on both targets,
+with no setup: `<video controls>`, `<audio controls>`, and an `<a download>`
+holding the name and size. Its `labels` name the players and write the file
+size.
 
 ## What it costs
 
-The subpath adds about 1 kB on top of the editor. The editor's own bundle
+The subpath adds about 1.2 kB on top of the editor. The editor's own bundle
 does not carry the blocks unless you import it.

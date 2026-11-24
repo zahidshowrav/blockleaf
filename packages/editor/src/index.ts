@@ -67,6 +67,7 @@ export {
 	type ImageNode,
 	type VideoNode,
 	type AudioNode,
+	type AttachmentNode,
 	type IncompatibleDocumentReason,
 	type InlineNode,
 	type ItalicMark,

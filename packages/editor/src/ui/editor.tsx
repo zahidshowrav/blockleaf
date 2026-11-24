@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 
 import {
+	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	CAPTION_MENU_EXTENSION_NAME,
 	DETAILS_NODE,
@@ -157,7 +158,8 @@ const LABELLED: ReadonlySet<string> = new Set([
 	CAPTION_MENU_EXTENSION_NAME,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE,
-	AUDIO_NODE
+	AUDIO_NODE,
+	ATTACHMENT_NODE
 ]);
 
 export const BlockleafEditor = ({

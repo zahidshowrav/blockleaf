@@ -8,6 +8,7 @@ import {
 	colspan,
 	headerRowCount,
 	headingLevel,
+	attachmentAttributes,
 	audioAttributes,
 	imageAttributes,
 	isChecked,
@@ -367,12 +368,12 @@ export const tableOfContentsRenderer =
 	};
 
 /**
- * Video and audio (`PA-12`, `PA-13`), as the editor writes them.
+ * Video, audio and a file (`PA-12` to `PA-14`), as the editor writes them.
  * A factory, because each puts a translatable name in its output.
  */
 export const mediaRenderers = (
 	labels: RendererLabels = defaultRendererLabels
-): Record<'video' | 'audio', NodeRenderer> => ({
+): Record<'video' | 'audio' | 'attachment', NodeRenderer> => ({
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
 		if (!attrs) return null;
@@ -403,6 +404,27 @@ export const mediaRenderers = (
 				preload="metadata"
 				aria-label={attrs.title ?? labels.audio}
 			/>
+		);
+	},
+	attachment: ({ node }) => {
+		const attrs = attachmentAttributes(node);
+		if (!attrs) return null;
+		const size =
+			attrs.size === undefined ? '' : labels.fileSize(attrs.size);
+		return (
+			<a
+				data-id={blockId(node)}
+				data-type="attachment"
+				className="blockleaf-attachment"
+				href={attrs.src}
+				download={attrs.name}
+				data-size={attrs.size}
+				data-mime={attrs.mime}
+				aria-label={labels.file(attrs.name, size)}
+			>
+				<span className="blockleaf-attachment__name">{attrs.name}</span>
+				<span className="blockleaf-attachment__size">{size}</span>
+			</a>
 		);
 	}
 });

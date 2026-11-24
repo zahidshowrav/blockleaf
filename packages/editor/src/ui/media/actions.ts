@@ -43,14 +43,14 @@ const align = (
 			? current === null || current === 'left'
 			: current === value;
 	},
-	// Only a video lines up like an image; audio fills the line.
+	// Only a video lines up like an image; audio and files fill the line.
 	isAvailable: isVideo,
 	run: (editor) => editor.chain().focus().updateVideo({ align: value }).run()
 });
 
 /**
- * The toolbar for a selected video or audio clip (`PA-12`, `PA-13`).
- * Alignment shows for video only.
+ * The toolbar for a selected video, audio clip or file (`PA-12` to
+ * `PA-14`). Alignment shows for video only.
  */
 export const createMediaActions = (
 	labels: MediaLabels = defaultLabels.media

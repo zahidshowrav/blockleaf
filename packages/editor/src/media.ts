@@ -1,7 +1,7 @@
 /**
- * Media, as an opt-in subpath (`PA-12`, `PA-13`, `PA-21`).
+ * Media, as an opt-in subpath (`PA-12` to `PA-14`, `PA-21`).
  *
- * Two blocks — video and audio — each uploaded through
+ * Three blocks — video, audio and a file to download — each uploaded through
  * the host's adapter and each captionable, with a toolbar for a selected one.
  * And the caption toolbar: while the caret is in a caption, it offers the
  * caption's own alignment and a button to remove it. Captions themselves are
@@ -20,11 +20,13 @@
 import { type Extensions } from '@tiptap/core';
 
 import {
+	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	CAPTION_MENU_EXTENSION_NAME,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE
 } from './core/constants.js';
+import { Attachment } from './core/nodes/attachment.js';
 import { Audio } from './core/nodes/audio.js';
 import { Video } from './core/nodes/video.js';
 import {
@@ -34,12 +36,18 @@ import {
 import { createMediaMenu, type MediaMenuOptions } from './ui/media/index.js';
 
 export {
+	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	CAPTION_MENU_EXTENSION_NAME,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE
 } from './core/constants.js';
-export { sanitizeMediaSrc } from './core/media-src.js';
+export { formatFileSize, sanitizeMediaSrc } from './core/media-src.js';
+export {
+	Attachment,
+	type AttachmentAttributes,
+	type AttachmentOptions
+} from './core/nodes/attachment.js';
 export {
 	Audio,
 	type AudioAttributes,
@@ -73,7 +81,7 @@ export {
 } from './ui/caption/index.js';
 
 export type MediaOptions = {
-	/** The toolbar for a selected video or audio clip, or `false`. */
+	/** The toolbar for a selected video, audio clip or file, or `false`. */
 	mediaMenu?: Partial<MediaMenuOptions> | false;
 	/** The caption toolbar's options, or `false` to leave it out. */
 	captionMenu?: Partial<CaptionMenuOptions> | false;
@@ -82,6 +90,7 @@ export type MediaOptions = {
 const NAMES: ReadonlySet<string> = new Set([
 	VIDEO_NODE,
 	AUDIO_NODE,
+	ATTACHMENT_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	CAPTION_MENU_EXTENSION_NAME
 ]);
@@ -90,6 +99,7 @@ const NAMES: ReadonlySet<string> = new Set([
 export const createMedia = (options: MediaOptions = {}): Extensions => [
 	Video,
 	Audio,
+	Attachment,
 	...(options.mediaMenu === false
 		? []
 		: [createMediaMenu(options.mediaMenu)]),
@@ -101,7 +111,7 @@ export const createMedia = (options: MediaOptions = {}): Extensions => [
 /**
  * Adds the media blocks and their chrome to an extension list, replacing
  * any already there. An upload adapter, if the list has one, then accepts
- * video and audio as well as images.
+ * video, audio and any other file as well as images.
  */
 export const withMedia = (
 	extensions: Extensions,

@@ -9,6 +9,7 @@ import {
 	columnStyle,
 	headerRowCount,
 	headingLevel,
+	attachmentAttributes,
 	audioAttributes,
 	imageAttributes,
 	isChecked,
@@ -200,7 +201,7 @@ export const createHtmlNodes = (
 		});
 	},
 
-	// Video and audio (`PA-12`, `PA-13`), as the editor writes
+	// Video, audio and a file (`PA-12` to `PA-14`), as the editor writes
 	// them. An unsafe source renders nothing, as an image's does.
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
@@ -237,6 +238,36 @@ export const createHtmlNodes = (
 				'aria-label': attrs.title ?? labels.audio
 			},
 			''
+		);
+	},
+
+	attachment: ({ node }) => {
+		const attrs = attachmentAttributes(node);
+		if (!attrs) return '';
+		const size =
+			attrs.size === undefined ? '' : labels.fileSize(attrs.size);
+		return element(
+			'a',
+			{
+				'data-id': blockId(node),
+				'data-type': 'attachment',
+				class: 'blockleaf-attachment',
+				href: attrs.src,
+				download: attrs.name,
+				'data-size': attrs.size,
+				'data-mime': attrs.mime,
+				'aria-label': labels.file(attrs.name, size)
+			},
+			element(
+				'span',
+				{ class: 'blockleaf-attachment__name' },
+				escapeText(attrs.name)
+			) +
+				element(
+					'span',
+					{ class: 'blockleaf-attachment__size' },
+					escapeText(size)
+				)
 		);
 	},
 
