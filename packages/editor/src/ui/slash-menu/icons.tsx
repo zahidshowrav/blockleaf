@@ -351,3 +351,8 @@ const mediaIcon = (path: string) => {
 export const VideoIcon = /* @__PURE__ */ mediaIcon(
 	'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM10 9v6l5-3z'
 );
+
+/** A note. */
+export const AudioIcon = /* @__PURE__ */ mediaIcon(
+	'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
+);

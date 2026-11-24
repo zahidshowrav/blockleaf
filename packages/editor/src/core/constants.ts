@@ -59,7 +59,8 @@ export const BLOCK_NODE_TYPES = [
 	'table',
 	'figure',
 	'tableOfContents',
-	'video'
+	'video',
+	'audio'
 ] as const;
 
 /**
@@ -108,12 +109,13 @@ export const CAPTIONABLE_GROUP = 'captionable';
 export const CAPTION_MENU_EXTENSION_NAME = 'captionMenu';
 
 /**
- * The media blocks (`PA-12`, `F29`): in the schema from version
+ * The media blocks (`PA-12`, `PA-13`, `F29`): in the schema from version
  * 2, loaded from `@blockleaf/editor/media`. Each is captionable.
  */
 export const VIDEO_NODE = 'video';
+export const AUDIO_NODE = 'audio';
 
-/** The toolbar for a selected video (`PA-12`). */
+/** The toolbar for a selected video or audio clip (`PA-12`, `PA-13`). */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */

@@ -152,6 +152,7 @@ export {
 	type HorizontalRuleNode,
 	type ImageNode,
 	type VideoNode,
+	type AudioNode,
 	type InlineNode,
 	type ItalicMark,
 	type LinkMark,

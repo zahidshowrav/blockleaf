@@ -3,7 +3,7 @@ import { type Schema } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-import { UPLOAD_EXTENSION_NAME, VIDEO_NODE } from './constants.js';
+import { AUDIO_NODE, UPLOAD_EXTENSION_NAME, VIDEO_NODE } from './constants.js';
 import {
 	defaultLabels,
 	type ResolvedLabels,
@@ -25,16 +25,18 @@ export const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 /**
  * What an upload accepts when the host does not say: images, and since
- * `PA-12` video too, once `@blockleaf/editor/media` adds the block to hold
- * it. Left as this array, `accept` is worked out from the schema; a host's
- * own array, even an equal one, is used as given.
+ * `PA-12` whatever else the loaded blocks can hold — video and audio with
+ * `@blockleaf/editor/media`. Left
+ * as this array, `accept` is worked out from the schema; a host's own array,
+ * even an equal one, is used as given.
  */
 export const DEFAULT_UPLOAD_ACCEPT = ['image/*'];
 
 /** What a file of each kind becomes, in the order it is checked (`F29`). */
 const MEDIA_ACCEPT: ReadonlyArray<readonly [string, string]> = [
 	['image/*', 'image'],
-	['video/*', VIDEO_NODE]
+	['video/*', VIDEO_NODE],
+	['audio/*', AUDIO_NODE]
 ];
 
 /** The `accept` the blocks in this schema can hold. */
@@ -64,6 +66,14 @@ const uploadedContent = (
 			return {
 				type: node,
 				attrs: { src: result.src, width: result.width ?? null }
+			};
+		case AUDIO_NODE:
+			return {
+				type: node,
+				attrs: {
+					src: result.src,
+					title: result.alt ?? altFromFileName(file.name)
+				}
 			};
 		default:
 			return {

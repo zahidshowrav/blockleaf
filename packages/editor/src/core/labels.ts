@@ -29,6 +29,7 @@ export type BlockTypeId =
 	| 'table'
 	| 'image'
 	| 'video'
+	| 'audio'
 	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
@@ -154,7 +155,7 @@ export type CaptionLabels = {
 };
 
 export type MediaLabels = {
-	/** Accessible name of the toolbar for a selected video. */
+	/** Accessible name of the toolbar for a selected video or audio clip. */
 	toolbar: string;
 	actions: Record<
 		| 'align-left'
@@ -164,6 +165,8 @@ export type MediaLabels = {
 		| 'delete',
 		string
 	>;
+	/** Accessible name of an audio player with no title. */
+	audio: string;
 	/** Accessible name of a video player. */
 	video: string;
 };
@@ -386,6 +389,7 @@ export const defaultLabels: ResolvedLabels = {
 		table: 'Table',
 		image: 'Image',
 		video: 'Video',
+		audio: 'Audio',
 		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
@@ -412,6 +416,7 @@ export const defaultLabels: ResolvedLabels = {
 			table: 'Pick a size, with a header row.',
 			image: 'Upload an image from your device.',
 			video: 'Upload a video from your device.',
+			audio: 'Upload a sound or voice recording.',
 			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
@@ -506,6 +511,7 @@ export const defaultLabels: ResolvedLabels = {
 			'toggle-caption': 'Toggle caption',
 			delete: 'Delete'
 		},
+		audio: 'Audio',
 		video: 'Video'
 	},
 	link: {

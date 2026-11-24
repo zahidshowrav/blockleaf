@@ -9,6 +9,7 @@ import {
 	columnStyle,
 	headerRowCount,
 	headingLevel,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -199,7 +200,7 @@ export const createHtmlNodes = (
 		});
 	},
 
-	// Video (`PA-12`), as the editor writes
+	// Video and audio (`PA-12`, `PA-13`), as the editor writes
 	// them. An unsafe source renders nothing, as an image's does.
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
@@ -216,6 +217,24 @@ export const createHtmlNodes = (
 				controls: '',
 				preload: 'metadata',
 				'aria-label': labels.video
+			},
+			''
+		);
+	},
+
+	audio: ({ node }) => {
+		const attrs = audioAttributes(node);
+		if (!attrs) return '';
+		return element(
+			'audio',
+			{
+				'data-id': blockId(node),
+				src: attrs.src,
+				title: attrs.title,
+				class: 'blockleaf-audio',
+				controls: '',
+				preload: 'metadata',
+				'aria-label': attrs.title ?? labels.audio
 			},
 			''
 		);

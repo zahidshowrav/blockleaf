@@ -152,6 +152,19 @@ export const videoAttributes = (
 	};
 };
 
+export interface AudioAttributes {
+	src: string;
+	title: string | undefined;
+}
+
+/** An audio clip's attributes (`PA-13`), or `null` for an unsafe source. */
+export const audioAttributes = (
+	node: RenderableNode
+): AudioAttributes | null => {
+	const src = mediaSrc(node);
+	return src ? { src, title: optionalString(node.attrs?.title) } : null;
+};
+
 export interface LinkAttributes {
 	href: string;
 	target: string | undefined;

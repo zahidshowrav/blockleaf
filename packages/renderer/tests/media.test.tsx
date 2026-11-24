@@ -15,20 +15,25 @@ const video: RenderableNode = {
 	}
 };
 
+const audio: RenderableNode = {
+	type: 'audio',
+	attrs: { id: 'a', src: '/media/talk.mp3', title: 'The talk' }
+};
+
 const both = (doc: RenderableDocument) => [
 	canonical(reactHTML(doc)),
 	canonical(stringHTML(doc))
 ];
 
-describe('media blocks (PA-12)', () => {
-	it.each([['a video', video]])(
-		'renders %s exactly as the editor writes it',
-		(_, node) => {
-			const doc = docOf(node);
-			const editor = canonical(editorHTML(doc));
-			for (const html of both(doc)) expect(html).toBe(editor);
-		}
-	);
+describe('media blocks (PA-12, PA-13)', () => {
+	it.each([
+		['a video', video],
+		['an audio clip', audio]
+	])('renders %s exactly as the editor writes it', (_, node) => {
+		const doc = docOf(node);
+		const editor = canonical(editorHTML(doc));
+		for (const html of both(doc)) expect(html).toBe(editor);
+	});
 
 	it('renders a captioned video as the editor does', () => {
 		const doc = docOf({
@@ -43,12 +48,22 @@ describe('media blocks (PA-12)', () => {
 		for (const html of both(doc)) expect(html).toBe(editor);
 	});
 
+	it('names an audio player with no title from the labels', () => {
+		const doc = docOf({ type: 'audio', attrs: { src: '/a.mp3' } });
+		expect(
+			canonical(stringHTML(doc, { labels: { audio: 'Son' } }))
+		).toContain('aria-label="Son"');
+		expect(
+			canonical(reactHTML(doc, { labels: { audio: 'Son' } }))
+		).toContain('aria-label="Son"');
+	});
+
 	it.each([
 		['javascript:alert(1)'],
 		['data:video/mp4;base64,AAAA'],
 		['http://cdn.test/a.mp4']
 	])('renders nothing for an unsafe source: %s', (src) => {
-		for (const type of ['video']) {
+		for (const type of ['video', 'audio']) {
 			const doc = docOf({ type, attrs: { src } });
 			for (const html of both(doc)) {
 				expect(html).toBe('');

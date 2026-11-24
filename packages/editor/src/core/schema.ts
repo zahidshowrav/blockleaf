@@ -282,6 +282,16 @@ export interface VideoNode {
 	};
 }
 
+/** An audio clip (`PA-13`, version 2). `title` is the player's name. */
+export interface AudioNode {
+	type: 'audio';
+	attrs: {
+		id: string;
+		src: string;
+		title?: string | null;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -292,9 +302,9 @@ export interface TableNode {
 
 /**
  * The blocks a `figure` may caption (`F20`, `F28`): a table, and since
- * version 2 an image (`PA-20`) and a video (`PA-12`).
+ * version 2 an image (`PA-20`) and the media blocks (`PA-12`, `PA-13`).
  */
-export type CaptionedNode = TableNode | ImageNode | VideoNode;
+export type CaptionedNode = TableNode | ImageNode | VideoNode | AudioNode;
 
 /**
  * A block with a caption: the block, then its `caption` (`F20`). The caption
@@ -342,6 +352,7 @@ export type TableCellContentNode =
 	| DetailsNode
 	| ImageNode
 	| VideoNode
+	| AudioNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -379,6 +390,7 @@ export type BlockNode =
 	| DetailsNode
 	| ImageNode
 	| VideoNode
+	| AudioNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

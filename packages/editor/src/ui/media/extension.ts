@@ -1,7 +1,11 @@
 import { Extension } from '@tiptap/core';
 
 import { createMediaActions, selectedMediaType } from './actions.js';
-import { MEDIA_MENU_EXTENSION_NAME, VIDEO_NODE } from '../../core/constants.js';
+import {
+	AUDIO_NODE,
+	MEDIA_MENU_EXTENSION_NAME,
+	VIDEO_NODE
+} from '../../core/constants.js';
 import { defaultLabels, type ResolvedLabels } from '../../core/labels.js';
 import {
 	createBubbleMenuExtension,
@@ -12,9 +16,9 @@ import {
 
 export const MEDIA_MENU_PLUGIN_KEY = 'blockleafMediaMenu';
 
-const MEDIA_TYPES: ReadonlySet<string> = new Set([VIDEO_NODE]);
+const MEDIA_TYPES: ReadonlySet<string> = new Set([VIDEO_NODE, AUDIO_NODE]);
 
-/** Shown for a selected video. */
+/** Shown for a selected video or audio clip. */
 export const mediaMenuShouldShow: BubbleMenuShouldShow = ({ editor }) =>
 	editor.isEditable && MEDIA_TYPES.has(selectedMediaType(editor) ?? '');
 

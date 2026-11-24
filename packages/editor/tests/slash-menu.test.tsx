@@ -19,11 +19,11 @@ import {
 } from '../src/ui/index.js';
 
 describe('Slash menu command registry (CH-01)', () => {
-	it('initializes with all 16 default commands', () => {
+	it('initializes with all 17 default commands', () => {
 		const registry = createCommandRegistry();
 		const commands = registry.getAll();
 
-		expect(commands).toHaveLength(16);
+		expect(commands).toHaveLength(17);
 		const ids = commands.map((c) => c.id);
 		expect(ids).toEqual([
 			'paragraph',
@@ -41,6 +41,7 @@ describe('Slash menu command registry (CH-01)', () => {
 			'table',
 			'image',
 			'video',
+			'audio',
 			'table-of-contents'
 		]);
 	});
@@ -81,7 +82,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		registry.remove('divider');
 		expect(registry.get('divider')).toBeUndefined();
-		expect(registry.getAll()).toHaveLength(15);
+		expect(registry.getAll()).toHaveLength(16);
 	});
 
 	it('reorders commands given an array of ids', () => {
@@ -90,15 +91,15 @@ describe('Slash menu command registry (CH-01)', () => {
 		const ids = registry.getAll().map((c) => c.id);
 		expect(ids[0]).toBe('table');
 		expect(ids[1]).toBe('task-list');
-		expect(ids).toHaveLength(16);
+		expect(ids).toHaveLength(17);
 	});
 
 	it('filters commands by query across titles, aliases, keywords, and descriptions', () => {
 		const registry = createCommandRegistry();
 
 		// Empty query returns all commands
-		expect(registry.filter('')).toHaveLength(16);
-		expect(registry.filter('   ')).toHaveLength(16);
+		expect(registry.filter('')).toHaveLength(17);
+		expect(registry.filter('   ')).toHaveLength(17);
 
 		// Exact title matches rank highest
 		const textResults = registry.filter('text');
@@ -300,7 +301,7 @@ describe('<SlashMenu /> UI Component', () => {
 
 			// Options
 			const options = screen.getAllByRole('option');
-			expect(options).toHaveLength(16);
+			expect(options).toHaveLength(17);
 			expect(options[0]?.getAttribute('aria-selected')).toBe('true');
 			expect(options[1]?.getAttribute('aria-selected')).toBe('false');
 		} finally {

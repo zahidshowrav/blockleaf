@@ -267,7 +267,9 @@
 	outline-offset: 2px;
 }
 
-/* Video (PA-12): the browser's own player, lined up like an image. */
+/* Video and audio (PA-12, PA-13): the browser's own players. A video lines
+   up like an image; an audio player fills the line, since its controls are
+   the whole of it. */
 .blockleaf-editor__content .blockleaf-video {
 	display: block;
 	max-width: 100%;
@@ -285,8 +287,14 @@
 	margin-inline: auto 0;
 }
 
+.blockleaf-editor__content .blockleaf-audio {
+	display: block;
+	width: 100%;
+}
+
 /* A selected media block needs an outline of its own, as an image does. */
-.blockleaf-editor__content .blockleaf-video.ProseMirror-selectednode {
+.blockleaf-editor__content .blockleaf-video.ProseMirror-selectednode,
+.blockleaf-editor__content .blockleaf-audio.ProseMirror-selectednode {
 	outline: 2px solid var(--bl-color-accent);
 	outline-offset: 2px;
 }

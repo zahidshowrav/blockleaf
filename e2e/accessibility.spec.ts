@@ -339,14 +339,16 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
-	test('a video and the media toolbar have no violations', async ({
+	test('video, audio and the media toolbar have no violations', async ({
 		page
 	}) => {
 		await page.goto('/?media');
 		await page.locator(EDITOR).click();
+		await dropFile(page, 'voice_memo.m4a', 'start', 'audio/mp4');
 		await dropFile(page, 'launch.mp4', 'start', 'video/mp4');
 		const video = page.locator(`${EDITOR} video`);
 		await expect(video).toBeVisible({ timeout: 10000 });
+		await expect(page.locator(`${EDITOR} audio`)).toBeAttached();
 
 		expect(await violations(page, EDITOR)).toEqual([]);
 

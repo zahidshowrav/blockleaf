@@ -460,6 +460,14 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "audio-1",
+        "src": "https://example.com/talk.mp3",
+        "title": "The talk",
+      },
+      "type": "audio",
+    },
+    {
+      "attrs": {
         "id": "figure-image",
       },
       "content": [

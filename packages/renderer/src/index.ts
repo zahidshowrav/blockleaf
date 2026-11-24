@@ -6,11 +6,13 @@ export {
 	headingLevel,
 	highlightBackground,
 	highlightColor,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	linkAttributes,
 	listStart,
 	videoAttributes,
+	type AudioAttributes,
 	type ImageAttributes,
 	type VideoAttributes,
 	type LinkAttributes

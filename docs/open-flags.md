@@ -14,19 +14,19 @@ it; the reasoning is worth more later than the tidiness is now.
 
 ## Settled
 
-### F29 — what a video stores · decided 2026-11-24
+### F29 — what video and audio store · decided 2026-11-24
 
-`PA-12` adds a video block to the `./media` subpath, the first of the media
-blocks. It is a new node type in version 2, an atom, and in the
-`captionable` group (`F28`).
+`PA-12` and `PA-13` add two blocks to the `./media` subpath. Each is a new
+node type in version 2, an atom, and in the `captionable` group (`F28`).
 
 **Decisions:**
 
 - **`video { id, src, poster, width, align }`.** The image's shape, so the same toolbar and, in `PA-24`, the same resize apply. `poster` is a still, held to the image rule.
+- **`audio { id, src, title }`.** The title is the player's accessible name; without one, a page of players is "audio, audio, audio". An upload titles it from the file name, as an image's `alt` is.
 - **Sources: `https:` or relative, and no `data:` URL of any kind.** The image rule allows raster data URLs because a clipboard image arrives as one. A video never does; megabytes of base64 in a document cost every host; and a `data:` link is a way to serve HTML from the host's origin. The renderer carries the same rule (`F15`), and its tests run both copies over one table.
-- **Uploads go to the block for the file's type**: `image/*`, then `video/*` if the video block is loaded. Left at its default, the upload's `accept` follows what is loaded; a host's own `accept` is used as given.
-- **The renderer renders it, built in.** That took `renderToHTML` past 3 kB, so both renderer budgets are now 3.5 kB (decided 2026-11-24). An opt-in renderer subpath was the alternative and was turned down: a renderer that silently drops a stored video from a published page is worse than the weight.
-- **Why:** the block stores what it needs to be drawn without a fetch, and nothing that a screen or a session would make wrong.
+- **Uploads go to the block for the file's type**: `image/*`, `video/*`, `audio/*`, each only if its block is loaded. Left at its default, the upload's `accept` follows what is loaded; a host's own `accept` is used as given.
+- **The renderer renders them, built in.** That took both renderer entries past 3 kB, so both budgets are now 3.5 kB (decided 2026-11-24). An opt-in renderer subpath was the alternative and was turned down: a renderer that silently drops a stored video from a published page is worse than the weight.
+- **Why:** each block stores what it needs to be drawn without a fetch, and nothing that a screen or a session would make wrong.
 
 ### F28 — which blocks a figure may caption · decided 2026-11-24
 

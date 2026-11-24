@@ -14,12 +14,15 @@ export interface RendererLabels {
 	tableOfContents: string;
 	/** Accessible name of a video player. */
 	video: string;
+	/** Accessible name of an audio player with no title. */
+	audio: string;
 }
 
 export const defaultRendererLabels: RendererLabels = {
 	tableScrollRegion: 'Table, scrollable',
 	tableOfContents: 'Table of contents',
-	video: 'Video'
+	video: 'Video',
+	audio: 'Audio'
 };
 
 export const resolveRendererLabels = (

@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 import { EDITOR, dropFile } from './helpers.js';
 
 /**
- * PA-12. Video arrives the way images do — dropped,
- * pasted or picked — and becomes its own block. Which block a file becomes,
+ * PA-12, PA-13. Video and audio arrive the way images do — dropped,
+ * pasted or picked — and become their own blocks. Which block a file becomes,
  * and how a click on a player behaves inside the editor, is
  * browser behaviour jsdom cannot show.
  */
@@ -28,6 +28,18 @@ test.describe('media blocks', () => {
 		await expect(video).toHaveAttribute('controls', '');
 		await expect(video).toHaveAttribute('src', '/media/launch.mp4');
 		await expect(json(page)).toContainText('"type": "video"');
+	});
+
+	test('a dropped sound becomes audio, named after the file', async ({
+		page
+	}) => {
+		await open(page);
+		await dropFile(page, 'voice_memo.m4a', 'start', 'audio/mp4');
+
+		const audio = page.locator(`${EDITOR} audio.blockleaf-audio`);
+		await expect(audio).toBeAttached({ timeout: 10000 });
+		await expect(audio).toHaveAttribute('aria-label', 'voice memo');
+		await expect(json(page)).toContainText('"type": "audio"');
 	});
 
 	test('a selected video can be aligned and captioned from its toolbar', async ({
@@ -60,11 +72,11 @@ test.describe('media blocks', () => {
 		);
 	});
 
-	test('the slash menu offers video', async ({ page }) => {
+	test('the slash menu offers video and audio', async ({ page }) => {
 		await open(page);
 		await page.keyboard.type('/');
 		const menu = page.getByRole('listbox');
-		for (const name of ['Video']) {
+		for (const name of ['Video', 'Audio']) {
 			await expect(menu.getByRole('option', { name })).toBeVisible();
 		}
 	});

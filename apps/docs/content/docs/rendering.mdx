@@ -180,7 +180,8 @@ can be translated:
 ```
 
 `renderToHTML` takes the same `labels` option. The other strings it can
-hold are `tableOfContents` and `video`, the player's name. The class is styled by
+hold are `tableOfContents`, and `video` and `audio`, a player's name (for
+audio, when the clip has no title). The class is styled by
 `@blockleaf/editor/styles.css` and, unlike the prose rules, is **not** scoped
 to `.blockleaf-editor__content` — rendered output lands in whatever markup you
 wrote, and a table that only behaves when somebody remembered a wrapper class
@@ -461,27 +462,28 @@ Minified and brotlied, with all dependencies.
 
 Every node in [the schema](./schema.mdx) renders:
 
-| Node                         | Element                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| `paragraph`                  | `<p>`, with `style="text-align: …"` when aligned                               |
-| `heading`                    | `<h1>`–`<h3>`, clamped into range                                              |
-| `blockquote`                 | `<blockquote>`                                                                 |
-| `codeBlock`                  | `<pre><code class="language-…">`                                               |
-| `horizontalRule`             | `<hr>`                                                                         |
-| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                                          |
-| `listItem`                   | `<li>`                                                                         |
-| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                           |
-| `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                          |
-| `details`                    | `<details open>`, its first block inside `<summary>`                           |
-| `image`                      | `<img class="blockleaf-image">`                                                |
-| `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                  |
-| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                           |
-| `tableRow`                   | `<tr>`                                                                         |
-| `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">` |
-| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                          |
-| `text` / `hardBreak`         | text / `<br>`                                                                  |
-| `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                |
-| `tableOfContents`            | `<nav class="blockleaf-toc">` with a link to each heading                      |
+| Node                         | Element                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------- |
+| `paragraph`                  | `<p>`, with `style="text-align: …"` when aligned                                  |
+| `heading`                    | `<h1>`–`<h3>`, clamped into range                                                 |
+| `blockquote`                 | `<blockquote>`                                                                    |
+| `codeBlock`                  | `<pre><code class="language-…">`                                                  |
+| `horizontalRule`             | `<hr>`                                                                            |
+| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                                             |
+| `listItem`                   | `<li>`                                                                            |
+| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                              |
+| `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                             |
+| `details`                    | `<details open>`, its first block inside `<summary>`                              |
+| `image`                      | `<img class="blockleaf-image">`                                                   |
+| `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                     |
+| `audio`                      | `<audio class="blockleaf-audio" controls preload="metadata">`, named by its title |
+| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                              |
+| `tableRow`                   | `<tr>`                                                                            |
+| `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">`    |
+| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                             |
+| `text` / `hardBreak`         | text / `<br>`                                                                     |
+| `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                   |
+| `tableOfContents`            | `<nav class="blockleaf-toc">` with a link to each heading                         |
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to

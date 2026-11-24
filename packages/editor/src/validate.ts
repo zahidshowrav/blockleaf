@@ -26,6 +26,7 @@ import type {
 	HorizontalRuleNode,
 	ImageNode,
 	VideoNode,
+	AudioNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -68,6 +69,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'details',
 	'image',
 	'video',
+	'audio',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -336,6 +338,16 @@ export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
 	})
 });
 
+/** Version 2 (`PA-13`). */
+export const audioNodeSchema: z.ZodType<AudioNode> = z.object({
+	type: z.literal('audio'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		title: z.string().nullable().optional()
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -511,6 +523,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				detailsNodeSchema,
 				imageNodeSchema,
 				videoNodeSchema,
+				audioNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -575,11 +588,16 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 			id: z.string().optional()
 		})
 		.optional(),
-	// A table, or since version 2 an image (`PA-20`) or a video (`PA-12`),
-	// then its caption.
+	// A table, or since version 2 an image (`PA-20`) or a media block
+	// (`PA-12`, `PA-13`), then its caption.
 	content: z
 		.tuple([
-			z.union([tableNodeSchema, imageNodeSchema, videoNodeSchema]),
+			z.union([
+				tableNodeSchema,
+				imageNodeSchema,
+				videoNodeSchema,
+				audioNodeSchema
+			]),
 			captionNodeSchema
 		])
 		.optional()
@@ -607,6 +625,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				detailsNodeSchema,
 				imageNodeSchema,
 				videoNodeSchema,
+				audioNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -636,6 +655,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				detailsNodeSchema,
 				imageNodeSchema,
 				videoNodeSchema,
+				audioNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

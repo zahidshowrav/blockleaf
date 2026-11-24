@@ -103,9 +103,10 @@ isAvailable?: (editor: Editor) => boolean;
 ```
 
 **Toggle** uses one too: it is hidden when the editor's extensions have no
-`details` node, as with the `minimal` preset. **Video** needs both:
-the block from [`@blockleaf/editor/media`](./media.mdx)
-and an upload adapter. It opens the picker showing only video files.
+`details` node, as with the `minimal` preset. **Video** and **Audio**
+need both: the blocks from [`@blockleaf/editor/media`](./media.mdx)
+and an upload adapter. Each opens the picker showing only its own kind of
+file.
 
 It is evaluated every time the menu opens, not once at startup, so a host that
 swaps its adapter at runtime gets the right list. A command without the

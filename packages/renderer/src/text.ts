@@ -29,6 +29,7 @@ const BLOCKS = new Set([
 	'details',
 	'image',
 	'video',
+	'audio',
 	'table',
 	'figure',
 	'caption',

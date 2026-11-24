@@ -8,6 +8,7 @@ import {
 	colspan,
 	headerRowCount,
 	headingLevel,
+	audioAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -366,12 +367,12 @@ export const tableOfContentsRenderer =
 	};
 
 /**
- * Video (`PA-12`), as the editor writes it. A factory, because it puts a
- * translatable name in its output.
+ * Video and audio (`PA-12`, `PA-13`), as the editor writes them.
+ * A factory, because each puts a translatable name in its output.
  */
 export const mediaRenderers = (
 	labels: RendererLabels = defaultRendererLabels
-): Record<'video', NodeRenderer> => ({
+): Record<'video' | 'audio', NodeRenderer> => ({
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
 		if (!attrs) return null;
@@ -386,6 +387,21 @@ export const mediaRenderers = (
 				controls
 				preload="metadata"
 				aria-label={labels.video}
+			/>
+		);
+	},
+	audio: ({ node }) => {
+		const attrs = audioAttributes(node);
+		if (!attrs) return null;
+		return (
+			<audio
+				data-id={blockId(node)}
+				src={attrs.src}
+				title={attrs.title}
+				className="blockleaf-audio"
+				controls
+				preload="metadata"
+				aria-label={attrs.title ?? labels.audio}
 			/>
 		);
 	}

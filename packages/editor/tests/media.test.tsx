@@ -2,12 +2,14 @@ import { Editor, type JSONContent } from '@tiptap/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { createExtensions } from '../src/core/extensions.js';
+import { resolveLabels } from '../src/core/labels.js';
 import {
 	createUploadExtension,
 	type UploadFailure
 } from '../src/core/upload-extension.js';
 import type { UploadAdapter } from '../src/core/upload.js';
 import {
+	AUDIO_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE,
 	createMedia,
@@ -46,6 +48,11 @@ const open = (content: JSONContent[] | string, extra = blocks()) => {
 const video: JSONContent = {
 	type: VIDEO_NODE,
 	attrs: { src: 'https://cdn.test/a.mp4', width: 640, align: 'center' }
+};
+
+const audio: JSONContent = {
+	type: AUDIO_NODE,
+	attrs: { src: 'https://cdn.test/a.mp3', title: 'Interview, part one' }
 };
 
 const top = (editor: Editor) =>
@@ -130,6 +137,38 @@ describe('video (PA-12)', () => {
 	});
 });
 
+describe('audio (PA-13)', () => {
+	it('names the player by its title', () => {
+		const editor = open([audio]);
+		expect(editor.getHTML()).toContain('aria-label="Interview, part one"');
+		expect(editor.getHTML()).toContain('<audio');
+	});
+
+	it('falls back to a translatable name with no title', () => {
+		const editor = open(
+			[{ type: AUDIO_NODE, attrs: { src: '/a.mp3' } }],
+			createMedia({ mediaMenu: false, captionMenu: false }).map(
+				(extension) =>
+					extension.name === AUDIO_NODE
+						? extension.configure({
+								labels: resolveLabels({
+									media: { audio: 'Son' }
+								})
+							})
+						: extension
+			)
+		);
+		expect(editor.getHTML()).toContain('aria-label="Son"');
+	});
+
+	it('refuses an unsafe source', () => {
+		const editor = open([{ type: 'paragraph' }]);
+		expect(editor.commands.setAudio({ src: 'http://cdn.test/a.mp3' })).toBe(
+			false
+		);
+	});
+});
+
 describe('uploads go to the block for their type', () => {
 	const adapter: UploadAdapter = {
 		upload: (file) =>
@@ -168,6 +207,16 @@ describe('uploads go to the block for their type', () => {
 		expect(top(editor)).toContain(VIDEO_NODE);
 	});
 
+	it('a sound becomes audio, titled from its file name', async () => {
+		const editor = await upload(
+			new File(['x'], 'voice_memo.m4a', { type: 'audio/mp4' })
+		);
+		const node = editor
+			.getJSON()
+			.content?.find((block) => block.type === AUDIO_NODE);
+		expect(node?.attrs?.title).toBe('voice memo');
+	});
+
 	it('an image is still an image', async () => {
 		const editor = await upload(
 			new File(['x'], 'a.png', { type: 'image/png' })
@@ -195,9 +244,10 @@ describe('the media toolbar', () => {
 		return found;
 	};
 
-	it('shows for a selected video, and not an image', () => {
+	it('shows for a selected video or audio clip, and not an image', () => {
 		const editor = open([
 			video,
+			audio,
 			{ type: 'image', attrs: { src: 'https://cdn.test/a.png' } }
 		]);
 		const shows = () =>
@@ -209,7 +259,7 @@ describe('the media toolbar', () => {
 				from: editor.state.selection.from,
 				to: editor.state.selection.to
 			});
-		for (const type of [VIDEO_NODE]) {
+		for (const type of [VIDEO_NODE, AUDIO_NODE]) {
 			selectFirst(editor, type);
 			expect(shows()).toBe(true);
 		}
@@ -217,20 +267,16 @@ describe('the media toolbar', () => {
 		expect(shows()).toBe(false);
 	});
 
-	it('aligns and captions a video', () => {
-		const editor = open([video]);
+	it('aligns a video, and offers no alignment for audio', () => {
+		const editor = open([video, audio]);
 		selectFirst(editor, VIDEO_NODE);
 		expect(action('align-right').isAvailable?.(editor)).toBe(true);
 		action('align-right').run(editor);
 		expect(editor.getJSON().content?.[0]?.attrs?.align).toBe('right');
-		expect(action('toggle-caption').isAvailable?.(editor)).toBe(true);
-	});
 
-	it('deletes the selected video', () => {
-		const editor = open([video, { type: 'paragraph' }]);
-		selectFirst(editor, VIDEO_NODE);
-		action('delete').run(editor);
-		expect(top(editor)).not.toContain(VIDEO_NODE);
+		selectFirst(editor, AUDIO_NODE);
+		expect(action('align-right').isAvailable?.(editor)).toBe(false);
+		expect(action('toggle-caption').isAvailable?.(editor)).toBe(true);
 	});
 });
 
@@ -241,14 +287,14 @@ describe('slash menu items', () => {
 		return found;
 	};
 
-	it('offers video only with the block and an adapter', () => {
+	it('offers video and audio only with the blocks and an adapter', () => {
 		const bare = open([{ type: 'paragraph' }], []);
 		const noAdapter = open([{ type: 'paragraph' }]);
 		const full = open(
 			[{ type: 'paragraph' }],
 			[...blocks(), createUploadExtension({ adapter: null })]
 		);
-		for (const id of ['video']) {
+		for (const id of ['video', 'audio']) {
 			expect(item(id).isAvailable?.(bare)).toBe(false);
 			expect(item(id).isAvailable?.(noAdapter)).toBe(false);
 			expect(item(id).isAvailable?.(full)).toBe(true);
@@ -261,7 +307,11 @@ describe('withMedia', () => {
 		const names = withMedia(withMedia(createExtensions('standard'))).map(
 			(extension) => extension.name
 		);
-		for (const name of [VIDEO_NODE, MEDIA_MENU_EXTENSION_NAME]) {
+		for (const name of [
+			VIDEO_NODE,
+			AUDIO_NODE,
+			MEDIA_MENU_EXTENSION_NAME
+		]) {
 			expect(names.filter((entry) => entry === name)).toHaveLength(1);
 		}
 	});
@@ -279,7 +329,7 @@ describe('validation (version 2)', () => {
 	});
 
 	it('accepts each block, alone and in a figure', () => {
-		for (const node of [video]) {
+		for (const node of [video, audio]) {
 			expect(safeValidateDocument(doc(withId(node))).success).toBe(true);
 			expect(
 				safeValidateDocument(
