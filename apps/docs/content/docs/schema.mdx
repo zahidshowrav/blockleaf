@@ -58,23 +58,24 @@ Shipped in `SC` (via Tiptap's StarterKit): `doc`, `paragraph`, `text`, `hardBrea
 
 Planned for `EC`–`MC`:
 
-| Node                                      | Attributes                    | Notes                                                                                                                                                               |
-| ----------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `paragraph`                               | `textAlign`                   | Version 2, optional: `left`, `center`, `right` or `justify`; absent means the language's own direction. See [text styles](./text-style.mdx#text-alignment).         |
-| `heading`                                 | `level: 1 \| 2 \| 3`          | Capped at three. Deeper levels are a document-structure smell and a renderer problem. Takes `textAlign`, as `paragraph` does.                                       |
-| `bulletList` / `orderedList` / `listItem` | —                             | Nesting capped at 3 levels.                                                                                                                                         |
-| `taskList` / `taskItem`                   | `checked: boolean`            | The single most-expected Notion feature.                                                                                                                            |
-| `codeBlock`                               | `language: string \| null`    | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                                                   |
-| `image`                                   | `id, src, alt, width, align`  | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference.                               |
-| `callout`                                 | `emoji: string, tone: string` | Cheap to build, instantly reads as "Notion".                                                                                                                        |
-| `details`                                 | `open: boolean`               | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                                                     |
-| `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                                                 |
-| `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                                             |
-| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.                                   |
-| `figure`                                  | —                             | A captioned block: a `table` or an `image`, then its `caption`, nothing else. See [Captions](#captions).                                                            |
-| `caption`                                 | `textAlign`                   | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`. `textAlign` is version 2; absent follows the block.      |
-| `mention`                                 | `id, label, kind`             | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                             |
-| `tableOfContents`                         | —                             | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx). |
+| Node                                      | Attributes                      | Notes                                                                                                                                                               |
+| ----------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `paragraph`                               | `textAlign`                     | Version 2, optional: `left`, `center`, `right` or `justify`; absent means the language's own direction. See [text styles](./text-style.mdx#text-alignment).         |
+| `heading`                                 | `level: 1 \| 2 \| 3`            | Capped at three. Deeper levels are a document-structure smell and a renderer problem. Takes `textAlign`, as `paragraph` does.                                       |
+| `bulletList` / `orderedList` / `listItem` | —                               | Nesting capped at 3 levels.                                                                                                                                         |
+| `taskList` / `taskItem`                   | `checked: boolean`              | The single most-expected Notion feature.                                                                                                                            |
+| `codeBlock`                               | `language: string \| null`      | Highlighting via `lowlight`; the language is stored, not inferred at render time.                                                                                   |
+| `image`                                   | `id, src, alt, width, align`    | `id` is the upload adapter's handle, so a host can re-resolve or re-sign `src` later. Never store a signed URL as the only reference.                               |
+| `callout`                                 | `emoji: string, tone: string`   | Cheap to build, instantly reads as "Notion".                                                                                                                        |
+| `details`                                 | `open: boolean`                 | A toggle. Its first block is the title and the blocks after it are the body that `open` shows or hides (`F23`).                                                     |
+| `table`                                   | —                               | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                                                 |
+| `tableRow`                                | —                               | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                                             |
+| `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`    | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.                                   |
+| `video`                                   | `id, src, poster, width, align` | Version 2. `src` is `https:` or relative, never a `data:` URL. See [media](./media.mdx).                                                                            |
+| `figure`                                  | —                               | A captioned block: a `table`, an `image` or a `video`, then its `caption`, nothing else. See [Captions](#captions).                                                 |
+| `caption`                                 | `textAlign`                     | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`. `textAlign` is version 2; absent follows the block.      |
+| `mention`                                 | `id, label, kind`               | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                             |
+| `tableOfContents`                         | —                               | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx). |
 
 ## Mark set
 
@@ -96,7 +97,7 @@ A table is a grid of rich-text cells with an optional header row. Nested tables 
 
 ### Captions
 
-A captioned block is stored inside a `figure`, with the caption beside it. The block is a table, or since version 2 an image:
+A captioned block is stored inside a `figure`, with the caption beside it. The block is a table, or since version 2 an image or a video:
 
 ```json
 {
@@ -122,7 +123,7 @@ A captioned block is stored inside a `figure`, with the caption beside it. The b
 
 - **The block inside is stored exactly as it is without a caption.** Adding a caption wraps it; removing one unwraps it. Nothing about the table or image changes.
 - **Beside, not inside.** ProseMirror's table implementation reads every child of a `table` as a row, so a caption inside the table would read as a broken row. Beside also leaves an image the single, uneditable block it always was.
-- **One mechanism for every caption.** Video, audio, file and embed captions on the [roadmap](./roadmap.mdx) use the same `figure` and `caption`. The blocks a figure may hold besides a table are a node group, `captionable`, so a block from a subpath joins it without the core naming it.
+- **One mechanism for every caption.** Images and video use the same `figure` and `caption`, and so will embeds on the [roadmap](./roadmap.mdx). The blocks a figure may hold besides a table are a node group, `captionable`, so a block from a subpath joins it without the core naming it.
 - **The caption's own alignment.** `textAlign` on the caption, the same four values as a paragraph's. Absent, it follows its block: under a centred image it is centred.
 - **A caption is not alt text.** See [caption or alt text](/docs/uploads#caption-or-alt-text).
 - **Tables needed no `SCHEMA_VERSION` bump.** `figure` and `caption` were new node types when tables gained them, and no existing node changed. An editor older than this one keeps a captioned table as a placeholder and saves it back intact. An older `@blockleaf/renderer` renders nothing for it — the whole table, not only the caption — so upgrade the renderer before the editor. A captioned image is version 2; see below.
@@ -137,6 +138,7 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`fontFamily`** (`PA-10`) and **`fontSize`** (`PA-11`) — marks with `{ family }` and `{ size }`, tokens like `textColor`'s.
 - **`tableOfContents`** (`PA-08`) — a block with no attributes beyond its id. It never stores its entries, so it cannot go stale; see F27.
 - **`textAlign`** on `paragraph` and `heading` (`PA-06`) — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it; see F25.
+- **`video`** (`PA-12`) — a media block, captionable. Its source is `https:` or relative, never `data:`. See F29 and [media](./media.mdx).
 - **An image in a `figure`** (`PA-20`) — a figure may hold an `image` as well as a `table`, and its `caption` takes `textAlign`, absent to follow the image. An editor that only knows version 1 would refuse an image inside a figure, which is why this is in the bump and not beside it like the table caption was. See F28.
 - The rest of the batch, such as maths and media, joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
 

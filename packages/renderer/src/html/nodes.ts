@@ -18,7 +18,8 @@ import {
 	tableColumns,
 	tableMinWidth,
 	tableRows,
-	textAlign
+	textAlign,
+	videoAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -196,6 +197,28 @@ export const createHtmlNodes = (
 			'data-align': attrs.align,
 			class: 'blockleaf-image'
 		});
+	},
+
+	// Video (`PA-12`), as the editor writes
+	// them. An unsafe source renders nothing, as an image's does.
+	video: ({ node }) => {
+		const attrs = videoAttributes(node);
+		if (!attrs) return '';
+		return element(
+			'video',
+			{
+				'data-id': blockId(node),
+				src: attrs.src,
+				poster: attrs.poster,
+				width: attrs.width,
+				'data-align': attrs.align,
+				class: 'blockleaf-video',
+				controls: '',
+				preload: 'metadata',
+				'aria-label': labels.video
+			},
+			''
+		);
 	},
 
 	// A real table with a real `<thead>`, the renderer's one deliberate

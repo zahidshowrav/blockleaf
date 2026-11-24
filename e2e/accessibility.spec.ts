@@ -339,6 +339,26 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
+	test('a video and the media toolbar have no violations', async ({
+		page
+	}) => {
+		await page.goto('/?media');
+		await page.locator(EDITOR).click();
+		await dropFile(page, 'launch.mp4', 'start', 'video/mp4');
+		const video = page.locator(`${EDITOR} video`);
+		await expect(video).toBeVisible({ timeout: 10000 });
+
+		expect(await violations(page, EDITOR)).toEqual([]);
+
+		await video.click({ position: { x: 150, y: 16 } });
+		await expect(
+			page.getByRole('toolbar', { name: 'Media' })
+		).toBeVisible();
+		expect(
+			await violations(page, '[role="toolbar"][aria-label="Media"]')
+		).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

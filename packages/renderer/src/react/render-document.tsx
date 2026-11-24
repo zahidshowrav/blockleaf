@@ -4,6 +4,7 @@ import { resolveRendererLabels, type RendererLabels } from '../labels.js';
 import { defaultMarks, unhandledMark } from './marks.js';
 import {
 	defaultNodes,
+	mediaRenderers,
 	tableOfContentsRenderer,
 	tableRenderer,
 	unhandledNode
@@ -80,7 +81,8 @@ export const RenderDocument = ({
 		? {
 				...defaultNodes,
 				table: tableRenderer(resolved),
-				tableOfContents: tableOfContentsRenderer(resolved)
+				tableOfContents: tableOfContentsRenderer(resolved),
+				...mediaRenderers(resolved)
 			}
 		: defaultNodes;
 

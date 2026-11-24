@@ -69,3 +69,19 @@ export const sanitizeSrc = (src: string): string | null => {
 		return trimmed;
 	}
 };
+
+/**
+ * Allows `https:` and relative paths, for video sources (`F29`). The `src`
+ * rule without data URLs: a video never arrives as one, and a `data:` link is how HTML is served from your own
+ * origin.
+ */
+export const sanitizeMediaSrc = (src: string): string | null => {
+	const trimmed = src.trim();
+	if (!trimmed || trimmed.startsWith('//')) return null;
+	if (trimmed.startsWith('/')) return trimmed;
+	try {
+		return new URL(trimmed).protocol === 'https:' ? trimmed : null;
+	} catch {
+		return HAS_SCHEME.test(trimmed) ? null : trimmed;
+	}
+};

@@ -1,3 +1,5 @@
+import type { Editor } from '@tiptap/core';
+
 import { GridPicker } from './grid-picker.js';
 import {
 	BulletListIcon,
@@ -8,6 +10,7 @@ import {
 	Heading2Icon,
 	Heading3Icon,
 	ImageIcon,
+	VideoIcon,
 	OrderedListIcon,
 	QuoteIcon,
 	TableIcon,
@@ -20,13 +23,45 @@ import type { SlashCommand } from './types.js';
 import {
 	DETAILS_NODE,
 	TABLE_OF_CONTENTS_NODE,
-	UPLOAD_EXTENSION_NAME
+	UPLOAD_EXTENSION_NAME,
+	VIDEO_NODE
 } from '../../core/constants.js';
 import {
 	defaultLabels,
 	type BlockTypeLabels,
 	type SlashMenuLabels
 } from '../../core/labels.js';
+
+const hasUpload = (editor: Editor) =>
+	editor.extensionManager.extensions.some(
+		(extension) => extension.name === UPLOAD_EXTENSION_NAME
+	);
+
+/**
+ * An item that uploads into one media block (`PA-12` to `PA-14`). Only
+ * where `@blockleaf/editor/media` added the block and the host gave an
+ * upload adapter; the picker shows only that kind of file.
+ */
+const media = (
+	id: 'video',
+	node: string,
+	accept: string[],
+	keywords: string[],
+	icon: SlashCommand['icon'],
+	blockTypes: BlockTypeLabels,
+	labels: SlashMenuLabels
+): SlashCommand => ({
+	id,
+	title: blockTypes[id],
+	description: labels.descriptions[id],
+	aliases: [id],
+	group: labels.groups.advanced,
+	icon,
+	keywords,
+	isAvailable: (editor) =>
+		editor.schema.nodes[node] !== undefined && hasUpload(editor),
+	run: (editor) => editor.chain().focus().openUploadPicker(accept).run()
+});
 
 /**
  * The default command list, built against a label set.
@@ -194,8 +229,20 @@ export const createSlashCommands = (
 			editor.extensionManager.extensions.some(
 				(extension) => extension.name === UPLOAD_EXTENSION_NAME
 			),
-		run: (editor) => editor.chain().focus().openUploadPicker().run()
+		// Narrowed to images: with `@blockleaf/editor/media` the upload
+		// accepts video too, which has its own item.
+		run: (editor) =>
+			editor.chain().focus().openUploadPicker(['image/*']).run()
 	},
+	media(
+		'video',
+		VIDEO_NODE,
+		['video/*'],
+		['video', 'movie', 'clip', 'film', 'upload', 'media'],
+		VideoIcon,
+		blockTypes,
+		labels
+	),
 	{
 		id: 'table-of-contents',
 		title: blockTypes['table-of-contents'],

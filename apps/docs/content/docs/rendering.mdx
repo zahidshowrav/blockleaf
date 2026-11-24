@@ -179,7 +179,8 @@ can be translated:
 />
 ```
 
-`renderToHTML` takes the same `labels` option. The class is styled by
+`renderToHTML` takes the same `labels` option. The other strings it can
+hold are `tableOfContents` and `video`, the player's name. The class is styled by
 `@blockleaf/editor/styles.css` and, unlike the prose rules, is **not** scoped
 to `.blockleaf-editor__content` — rendered output lands in whatever markup you
 wrote, and a table that only behaves when somebody remembered a wrapper class
@@ -449,9 +450,9 @@ root entry and installs nothing else.
 
 | Entry                             |    Size |
 | --------------------------------- | ------: |
-| `RenderDocument`                  | 2.82 kB |
-| `renderToHTML`                    | 2.90 kB |
-| `toPlainText` + `extractHeadings` |   565 B |
+| `RenderDocument`                  | 3.26 kB |
+| `renderToHTML`                    | 3.33 kB |
+| `toPlainText` + `extractHeadings` |   592 B |
 | `sanitizeHref` + `sanitizeSrc`    |   217 B |
 
 Minified and brotlied, with all dependencies.
@@ -473,6 +474,7 @@ Every node in [the schema](./schema.mdx) renders:
 | `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                          |
 | `details`                    | `<details open>`, its first block inside `<summary>`                           |
 | `image`                      | `<img class="blockleaf-image">`                                                |
+| `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                  |
 | `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                           |
 | `tableRow`                   | `<tr>`                                                                         |
 | `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">` |

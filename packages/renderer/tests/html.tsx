@@ -2,6 +2,7 @@ import { Editor } from '@tiptap/core';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { createExtensions } from '@blockleaf/editor/extensions';
+import { createMedia } from '@blockleaf/editor/media';
 import { withMentions } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
 import { withTableOfContents } from '@blockleaf/editor/toc';
@@ -19,11 +20,17 @@ import { type RenderableDocument } from '../src/types.js';
  */
 export const editorHTML = (doc: RenderableDocument): string => {
 	const editor = new Editor({
-		extensions: withTableOfContents(
-			withTextStyle(
-				withMentions(createExtensions('standard'), { items: () => [] })
-			)
-		),
+		extensions: [
+			...withTableOfContents(
+				withTextStyle(
+					withMentions(createExtensions('standard'), {
+						items: () => []
+					})
+				)
+			),
+			// The blocks only: the toolbars need a mounted editor.
+			...createMedia({ mediaMenu: false, captionMenu: false })
+		],
 		content: doc
 	});
 	const html = editor.getHTML();

@@ -267,6 +267,21 @@ export interface ImageNode {
 	};
 }
 
+/**
+ * A video (`PA-12`, version 2). `src` is `https:` or a relative path, never
+ * a `data:` URL; `poster` follows the image rule (`F29`).
+ */
+export interface VideoNode {
+	type: 'video';
+	attrs: {
+		id: string;
+		src: string;
+		poster?: string | null;
+		width?: number | null;
+		align?: 'left' | 'center' | 'right' | null;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -277,9 +292,9 @@ export interface TableNode {
 
 /**
  * The blocks a `figure` may caption (`F20`, `F28`): a table, and since
- * version 2 an image (`PA-20`).
+ * version 2 an image (`PA-20`) and a video (`PA-12`).
  */
-export type CaptionedNode = TableNode | ImageNode;
+export type CaptionedNode = TableNode | ImageNode | VideoNode;
 
 /**
  * A block with a caption: the block, then its `caption` (`F20`). The caption
@@ -326,6 +341,7 @@ export type TableCellContentNode =
 	| CalloutNode
 	| DetailsNode
 	| ImageNode
+	| VideoNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -362,6 +378,7 @@ export type BlockNode =
 	| CalloutNode
 	| DetailsNode
 	| ImageNode
+	| VideoNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

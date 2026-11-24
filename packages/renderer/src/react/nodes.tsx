@@ -17,7 +17,8 @@ import {
 	tableColumns,
 	tableMinWidth,
 	tableRows,
-	textAlign
+	textAlign,
+	videoAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -364,6 +365,32 @@ export const tableOfContentsRenderer =
 		);
 	};
 
+/**
+ * Video (`PA-12`), as the editor writes it. A factory, because it puts a
+ * translatable name in its output.
+ */
+export const mediaRenderers = (
+	labels: RendererLabels = defaultRendererLabels
+): Record<'video', NodeRenderer> => ({
+	video: ({ node }) => {
+		const attrs = videoAttributes(node);
+		if (!attrs) return null;
+		return (
+			<video
+				data-id={blockId(node)}
+				src={attrs.src}
+				poster={attrs.poster}
+				width={attrs.width}
+				data-align={attrs.align}
+				className="blockleaf-video"
+				controls
+				preload="metadata"
+				aria-label={labels.video}
+			/>
+		);
+	}
+});
+
 export const defaultNodes: Record<string, NodeRenderer> = {
 	doc: Doc,
 	paragraph: Paragraph,
@@ -381,6 +408,7 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	image: Image,
 	table: tableRenderer(),
 	tableOfContents: tableOfContentsRenderer(),
+	...mediaRenderers(),
 	figure: Figure,
 	caption: Caption,
 	tableRow: TableRow,

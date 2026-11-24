@@ -435,6 +435,27 @@ describe('document schema', () => {
 						align: 'center' as const
 					}
 				},
+				// PA-12: a video, with its caption.
+				{
+					type: 'figure' as const,
+					attrs: { id: 'figure-video' },
+					content: [
+						{
+							type: 'video' as const,
+							attrs: {
+								id: 'video-1',
+								src: 'https://example.com/clip.mp4',
+								poster: 'https://example.com/clip.png',
+								width: 640,
+								align: 'center' as const
+							}
+						},
+						{
+							type: 'caption' as const,
+							content: [{ type: 'text' as const, text: 'Launch' }]
+						}
+					]
+				},
 				// PA-20: an image with a caption, aligned on its own.
 				{
 					type: 'figure' as const,

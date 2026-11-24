@@ -1,4 +1,4 @@
-import { sanitizeHref, sanitizeSrc } from './sanitize.js';
+import { sanitizeHref, sanitizeMediaSrc, sanitizeSrc } from './sanitize.js';
 import {
 	type HeadingLevel,
 	type ImageAlign,
@@ -99,6 +99,48 @@ export const imageAttributes = (
 	return {
 		src,
 		alt: typeof alt === 'string' ? alt : '',
+		width:
+			typeof width === 'number' && Number.isFinite(width)
+				? width
+				: undefined,
+		align:
+			typeof align === 'string' && ALIGNMENTS.has(align)
+				? (align as ImageAlign)
+				: undefined
+	};
+};
+
+const mediaSrc = (node: RenderableNode): string | null => {
+	const src = node.attrs?.src;
+	return typeof src === 'string' ? sanitizeMediaSrc(src) : null;
+};
+
+const optionalString = (value: unknown): string | undefined =>
+	typeof value === 'string' && value ? value : undefined;
+
+export interface VideoAttributes {
+	src: string;
+	poster: string | undefined;
+	width: number | undefined;
+	align: ImageAlign | undefined;
+}
+
+/**
+ * A video's attributes (`PA-12`), or `null` when its source does not
+ * survive sanitisation and nothing should render. The poster is held to the
+ * image rule and dropped if it fails it.
+ */
+export const videoAttributes = (
+	node: RenderableNode
+): VideoAttributes | null => {
+	const src = mediaSrc(node);
+	if (!src) return null;
+	const poster = optionalString(node.attrs?.poster);
+	const width = node.attrs?.width;
+	const align = node.attrs?.align;
+	return {
+		src,
+		poster: poster ? (sanitizeSrc(poster) ?? undefined) : undefined,
 		width:
 			typeof width === 'number' && Number.isFinite(width)
 				? width

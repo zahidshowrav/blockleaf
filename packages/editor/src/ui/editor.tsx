@@ -7,8 +7,10 @@ import {
 	MENTIONS_EXTENSION_NAME,
 	TABLE_A11Y_EXTENSION_NAME,
 	TABLE_OF_CONTENTS_NODE,
+	MEDIA_MENU_EXTENSION_NAME,
 	UNKNOWN_CONTENT_EXTENSION_NAME,
-	UPLOAD_EXTENSION_NAME
+	UPLOAD_EXTENSION_NAME,
+	VIDEO_NODE
 } from '../core/constants.js';
 import {
 	createExtensions,
@@ -139,6 +141,23 @@ export type BlockleafEditorProps = Omit<
 	children?: ReactNode;
 };
 
+/**
+ * Extensions that render strings but are built outside this component, so
+ * they are handed the resolved labels here when nobody gave them their own.
+ */
+const LABELLED: ReadonlySet<string> = new Set([
+	UPLOAD_EXTENSION_NAME,
+	TABLE_A11Y_EXTENSION_NAME,
+	UNKNOWN_CONTENT_EXTENSION_NAME,
+	DETAILS_NODE,
+	MENTIONS_EXTENSION_NAME,
+	EMOJI_EXTENSION_NAME,
+	TABLE_OF_CONTENTS_NODE,
+	CAPTION_MENU_EXTENSION_NAME,
+	MEDIA_MENU_EXTENSION_NAME,
+	VIDEO_NODE
+]);
+
 export const BlockleafEditor = ({
 	extensions,
 	preset = 'standard',
@@ -165,21 +184,14 @@ export const BlockleafEditor = ({
 	const resolvedExtensions = useMemo(() => {
 		const resolved = resolveLabels(labels);
 		const base = extensions ?? createExtensions(preset);
-		// Eight extensions render strings but are not assembled here: the
+		// These extensions render strings but are not assembled here: the
 		// upload one is built by the host because it needs their adapter, and
 		// the table accessibility, unknown-content and toggle ones come with
 		// `createExtensions`, and the mention and emoji pickers, the table
-		// of contents and the caption toolbar with their subpaths; none knows anything about labels. Each, if nobody gave it labels
+		// of contents and the media blocks and toolbars with their subpaths; none knows anything about labels. Each, if nobody gave it labels
 		// of its own, gets these rather than staying English.
 		const chrome = base.map((extension) =>
-			(extension.name === UPLOAD_EXTENSION_NAME ||
-				extension.name === TABLE_A11Y_EXTENSION_NAME ||
-				extension.name === UNKNOWN_CONTENT_EXTENSION_NAME ||
-				extension.name === DETAILS_NODE ||
-				extension.name === MENTIONS_EXTENSION_NAME ||
-				extension.name === EMOJI_EXTENSION_NAME ||
-				extension.name === TABLE_OF_CONTENTS_NODE ||
-				extension.name === CAPTION_MENU_EXTENSION_NAME) &&
+			LABELLED.has(extension.name) &&
 			(extension.options as { labels?: unknown }).labels === defaultLabels
 				? extension.configure({ labels: resolved })
 				: extension

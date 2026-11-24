@@ -28,6 +28,7 @@ export type BlockTypeId =
 	| 'divider'
 	| 'table'
 	| 'image'
+	| 'video'
 	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
@@ -150,6 +151,21 @@ export type CaptionLabels = {
 		'align-left' | 'align-center' | 'align-right' | 'remove-caption',
 		string
 	>;
+};
+
+export type MediaLabels = {
+	/** Accessible name of the toolbar for a selected video. */
+	toolbar: string;
+	actions: Record<
+		| 'align-left'
+		| 'align-center'
+		| 'align-right'
+		| 'toggle-caption'
+		| 'delete',
+		string
+	>;
+	/** Accessible name of a video player. */
+	video: string;
 };
 
 export type LinkLabels = {
@@ -283,6 +299,7 @@ export type ResolvedLabels = {
 	table: TableLabels;
 	image: ImageLabels;
 	caption: CaptionLabels;
+	media: MediaLabels;
 	link: LinkLabels;
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
@@ -319,6 +336,9 @@ export type BlockleafLabels = {
 	};
 	caption?: Partial<Omit<CaptionLabels, 'actions'>> & {
 		actions?: Partial<CaptionLabels['actions']>;
+	};
+	media?: Partial<Omit<MediaLabels, 'actions'>> & {
+		actions?: Partial<MediaLabels['actions']>;
 	};
 	link?: Partial<LinkLabels>;
 	upload?: Partial<UploadLabels>;
@@ -365,6 +385,7 @@ export const defaultLabels: ResolvedLabels = {
 		divider: 'Divider',
 		table: 'Table',
 		image: 'Image',
+		video: 'Video',
 		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
@@ -390,6 +411,7 @@ export const defaultLabels: ResolvedLabels = {
 			divider: 'Visually separate sections with a line.',
 			table: 'Pick a size, with a header row.',
 			image: 'Upload an image from your device.',
+			video: 'Upload a video from your device.',
 			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
@@ -474,6 +496,17 @@ export const defaultLabels: ResolvedLabels = {
 			'align-right': 'Align caption right',
 			'remove-caption': 'Remove caption'
 		}
+	},
+	media: {
+		toolbar: 'Media',
+		actions: {
+			'align-left': 'Align left',
+			'align-center': 'Align centre',
+			'align-right': 'Align right',
+			'toggle-caption': 'Toggle caption',
+			delete: 'Delete'
+		},
+		video: 'Video'
 	},
 	link: {
 		address: 'Link address',
@@ -601,6 +634,11 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 		...defaultLabels.image,
 		...labels?.image,
 		actions: { ...defaultLabels.image.actions, ...labels?.image?.actions }
+	},
+	media: {
+		...defaultLabels.media,
+		...labels?.media,
+		actions: { ...defaultLabels.media.actions, ...labels?.media?.actions }
 	},
 	caption: {
 		...defaultLabels.caption,

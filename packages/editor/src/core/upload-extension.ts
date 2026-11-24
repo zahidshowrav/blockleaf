@@ -1,14 +1,20 @@
-import { Extension, type Editor } from '@tiptap/core';
+import { Extension, type Editor, type JSONContent } from '@tiptap/core';
+import { type Schema } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-import { UPLOAD_EXTENSION_NAME } from './constants.js';
+import { UPLOAD_EXTENSION_NAME, VIDEO_NODE } from './constants.js';
 import {
 	defaultLabels,
 	type ResolvedLabels,
 	type UploadLabels
 } from './labels.js';
-import { isAbortError, isUploadResult, type UploadAdapter } from './upload.js';
+import {
+	isAbortError,
+	isUploadResult,
+	type UploadAdapter,
+	type UploadResult
+} from './upload.js';
 
 export const UPLOAD_PLUGIN_KEY = /* @__PURE__ */ new PluginKey<UploadState>(
 	'blockleafUpload'
@@ -17,8 +23,62 @@ export const UPLOAD_PLUGIN_KEY = /* @__PURE__ */ new PluginKey<UploadState>(
 /** 10 MB. Large enough for a phone photo, small enough to catch a mistake. */
 export const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
-/** Only images for now; MC is scoped to media the editor can render. */
+/**
+ * What an upload accepts when the host does not say: images, and since
+ * `PA-12` video too, once `@blockleaf/editor/media` adds the block to hold
+ * it. Left as this array, `accept` is worked out from the schema; a host's
+ * own array, even an equal one, is used as given.
+ */
 export const DEFAULT_UPLOAD_ACCEPT = ['image/*'];
+
+/** What a file of each kind becomes, in the order it is checked (`F29`). */
+const MEDIA_ACCEPT: ReadonlyArray<readonly [string, string]> = [
+	['image/*', 'image'],
+	['video/*', VIDEO_NODE]
+];
+
+/** The `accept` the blocks in this schema can hold. */
+const acceptOf = (schema: Schema, accept: string[]): string[] =>
+	accept !== DEFAULT_UPLOAD_ACCEPT
+		? accept
+		: MEDIA_ACCEPT.filter(([, node]) => schema.nodes[node]).map(
+				([pattern]) => pattern
+			);
+
+/**
+ * The block an uploaded file becomes: the first loaded block whose kind
+ * matches the file's type, an image if nothing does.
+ */
+const uploadedContent = (
+	schema: Schema,
+	file: File,
+	result: UploadResult
+): JSONContent => {
+	const node =
+		MEDIA_ACCEPT.find(
+			([pattern, name]) =>
+				schema.nodes[name] && matchesAccept(file.type, pattern)
+		)?.[1] ?? 'image';
+	switch (node) {
+		case VIDEO_NODE:
+			return {
+				type: node,
+				attrs: { src: result.src, width: result.width ?? null }
+			};
+		default:
+			return {
+				type: 'image',
+				attrs: {
+					src: result.src,
+					// `height` is not a node attribute: `width` alone plus the
+					// stylesheet's `height: auto` reserves the right box
+					// without storing a number that a re-encode can falsify.
+					width: result.width ?? null,
+					alt: result.alt ?? altFromFileName(file.name)
+				}
+			};
+	}
+};
 
 export type UploadFailureReason =
 	/** No adapter was given, so there is nothing to upload to. */
@@ -150,8 +210,12 @@ declare module '@tiptap/core' {
 		blockleafUpload: {
 			/** Screens, uploads and inserts. `at` defaults to the selection. */
 			uploadFiles: (files: File[] | FileList, at?: number) => ReturnType;
-			/** Opens the system file picker, then `uploadFiles`. */
-			openUploadPicker: () => ReturnType;
+			/**
+			 * Opens the system file picker, then `uploadFiles`. `accept`
+			 * narrows the picker — `['video/*']` from the slash menu's Video
+			 * item — and never widens what the extension accepts.
+			 */
+			openUploadPicker: (accept?: string[]) => ReturnType;
 			/** Aborts an in-flight upload. */
 			cancelUpload: (id: string) => ReturnType;
 			/** Runs a failed upload again, at the position it still holds. */
@@ -369,7 +433,7 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 			}
 
 			const { accepted, rejected } = screenFiles(files, {
-				accept,
+				accept: acceptOf(editor.schema, accept),
 				maxBytes
 			});
 			rejected.forEach(report);
@@ -456,14 +520,16 @@ export const UploadExtension = /* @__PURE__ */ Extension.create<
 				},
 
 			openUploadPicker:
-				() =>
+				(accept) =>
 				({ editor }) => {
 					if (typeof document === 'undefined') return false;
 
 					const input = document.createElement('input');
 					input.type = 'file';
 					input.multiple = true;
-					input.accept = this.options.accept.join(',');
+					input.accept = (
+						accept ?? acceptOf(editor.schema, this.options.accept)
+					).join(',');
 					// Off-screen rather than display:none — a hidden input is
 					// not clickable in every browser.
 					input.style.position = 'fixed';
@@ -724,17 +790,10 @@ const uploadOne = async (
 
 		editor
 			.chain()
-			.insertContentAt(position, {
-				type: 'image',
-				attrs: {
-					src: result.src,
-					// `height` is not a node attribute: `width` alone plus the
-					// stylesheet's `height: auto` reserves the right box
-					// without storing a number that a re-encode can falsify.
-					width: result.width ?? null,
-					alt: result.alt ?? altFromFileName(file.name)
-				}
-			})
+			.insertContentAt(
+				position,
+				uploadedContent(editor.schema, file, result)
+			)
 			.run();
 	} catch (error) {
 		controllers.delete(id);

@@ -208,7 +208,7 @@ Three ways in, all of them the same pipeline:
 | ---------- | ----------------------------------------------------- |
 | **Drop**   | Files dropped anywhere on the editor.                 |
 | **Paste**  | Files on the clipboard — a screenshot, a copied file. |
-| **Picker** | `editor.commands.openUploadPicker()`.                 |
+| **Picker** | `editor.commands.openUploadPicker(accept?)`.          |
 
 A drop lands the image where the pointer was, not where the caret was. A
 paste lands it at the caret.
@@ -218,9 +218,14 @@ paste lands it at the caret.
 | Option           | Default            | What it does                           |
 | ---------------- | ------------------ | -------------------------------------- |
 | `upload`         | —                  | The adapter. Without it, nothing runs. |
-| `uploadAccept`   | `['image/*']`      | MIME patterns accepted.                |
+| `uploadAccept`   | what is loaded     | MIME patterns accepted.                |
 | `uploadMaxBytes` | `10485760` (10 MB) | Largest file accepted.                 |
 | `onUploadError`  | —                  | Called per rejected or failed file.    |
+
+Left unset, `uploadAccept` is images, plus video
+once [`@blockleaf/editor/media`](./media.mdx) adds the block to hold it.
+Each file becomes the block for its type. Set it and only what you list is
+accepted, whatever is loaded.
 
 `uploadAccept` takes the two forms an `<input accept>` takes: an exact type
 (`image/png`) and a wildcard subtype (`image/*`). Extension entries (`.png`)

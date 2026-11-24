@@ -12,11 +12,14 @@ export interface RendererLabels {
 	tableScrollRegion: string;
 	/** Accessible name of a table of contents (`PA-08`). */
 	tableOfContents: string;
+	/** Accessible name of a video player. */
+	video: string;
 }
 
 export const defaultRendererLabels: RendererLabels = {
 	tableScrollRegion: 'Table, scrollable',
-	tableOfContents: 'Table of contents'
+	tableOfContents: 'Table of contents',
+	video: 'Video'
 };
 
 export const resolveRendererLabels = (

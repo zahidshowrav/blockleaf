@@ -25,6 +25,7 @@ import type {
 	FontSizeMark,
 	HorizontalRuleNode,
 	ImageNode,
+	VideoNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -66,6 +67,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'callout',
 	'details',
 	'image',
+	'video',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -317,6 +319,23 @@ export const imageNodeSchema: z.ZodType<ImageNode> = z.object({
 	})
 });
 
+const mediaAlignSchema = z
+	.enum(['left', 'center', 'right'])
+	.nullable()
+	.optional();
+
+/** Version 2 (`PA-12`). */
+export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
+	type: z.literal('video'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string(),
+		poster: z.string().nullable().optional(),
+		width: z.number().nullable().optional(),
+		align: mediaAlignSchema
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -491,6 +510,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -555,9 +575,13 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 			id: z.string().optional()
 		})
 		.optional(),
-	// A table, or since version 2 an image (`PA-20`), then its caption.
+	// A table, or since version 2 an image (`PA-20`) or a video (`PA-12`),
+	// then its caption.
 	content: z
-		.tuple([z.union([tableNodeSchema, imageNodeSchema]), captionNodeSchema])
+		.tuple([
+			z.union([tableNodeSchema, imageNodeSchema, videoNodeSchema]),
+			captionNodeSchema
+		])
 		.optional()
 });
 
@@ -582,6 +606,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -610,6 +635,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				calloutNodeSchema,
 				detailsNodeSchema,
 				imageNodeSchema,
+				videoNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
