@@ -20,7 +20,8 @@ import {
 	tableMinWidth,
 	tableRows,
 	textAlign,
-	videoAttributes
+	videoAttributes,
+	widthAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -173,7 +174,7 @@ const Image: NodeRenderer = ({ node }) => {
 			data-id={blockId(node)}
 			src={attrs.src}
 			alt={attrs.alt}
-			width={attrs.width}
+			{...widthAttributes(attrs.width)}
 			data-align={attrs.align}
 			className="blockleaf-image"
 		/>
@@ -382,7 +383,7 @@ export const mediaRenderers = (
 				data-id={blockId(node)}
 				src={attrs.src}
 				poster={attrs.poster}
-				width={attrs.width}
+				{...widthAttributes(attrs.width)}
 				data-align={attrs.align}
 				className="blockleaf-video"
 				controls

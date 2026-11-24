@@ -21,7 +21,8 @@ import {
 	tableMinWidth,
 	tableRows,
 	textAlign,
-	videoAttributes
+	videoAttributes,
+	widthAttributes
 } from '../attrs.js';
 import { headingAnchor, tableOfContents } from '../toc.js';
 import { type RenderableNode } from '../types.js';
@@ -195,7 +196,7 @@ export const createHtmlNodes = (
 			'data-id': blockId(node),
 			src: attrs.src,
 			alt: attrs.alt,
-			width: attrs.width,
+			...widthAttributes(attrs.width),
 			'data-align': attrs.align,
 			class: 'blockleaf-image'
 		});
@@ -212,7 +213,7 @@ export const createHtmlNodes = (
 				'data-id': blockId(node),
 				src: attrs.src,
 				poster: attrs.poster,
-				width: attrs.width,
+				...widthAttributes(attrs.width),
 				'data-align': attrs.align,
 				class: 'blockleaf-video',
 				controls: '',

@@ -262,7 +262,8 @@ export interface ImageNode {
 		id: string;
 		src: string;
 		alt?: string | null;
-		width?: number | null;
+		/** Pixels, or `'full'` since version 2 (`PA-24`, `F21`). */
+		width?: number | 'full' | null;
 		align?: 'left' | 'center' | 'right' | null;
 	};
 }
@@ -277,7 +278,8 @@ export interface VideoNode {
 		id: string;
 		src: string;
 		poster?: string | null;
-		width?: number | null;
+		/** Pixels, or `'full'` since version 2 (`PA-24`, `F21`). */
+		width?: number | 'full' | null;
 		align?: 'left' | 'center' | 'right' | null;
 	};
 }

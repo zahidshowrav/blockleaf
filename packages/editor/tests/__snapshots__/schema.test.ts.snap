@@ -486,6 +486,7 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
             "alt": "A captioned picture",
             "id": "img-captioned",
             "src": "https://example.com/captioned.png",
+            "width": "full",
           },
           "type": "image",
         },

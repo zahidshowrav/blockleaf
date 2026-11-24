@@ -484,7 +484,9 @@ describe('document schema', () => {
 							attrs: {
 								id: 'img-captioned',
 								src: 'https://example.com/captioned.png',
-								alt: 'A captioned picture'
+								alt: 'A captioned picture',
+								// PA-24: full width is a name, not pixels.
+								width: 'full' as const
 							}
 						},
 						{

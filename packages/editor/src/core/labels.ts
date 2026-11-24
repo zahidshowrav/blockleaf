@@ -129,6 +129,7 @@ export type ImageLabels = {
 		| 'align-left'
 		| 'align-center'
 		| 'align-right'
+		| 'full-width'
 		| 'toggle-caption'
 		| 'delete-image',
 		string
@@ -163,6 +164,7 @@ export type MediaLabels = {
 		| 'align-left'
 		| 'align-center'
 		| 'align-right'
+		| 'full-width'
 		| 'toggle-caption'
 		| 'delete',
 		string
@@ -491,6 +493,7 @@ export const defaultLabels: ResolvedLabels = {
 			'align-left': 'Align left',
 			'align-center': 'Align centre',
 			'align-right': 'Align right',
+			'full-width': 'Full width',
 			'toggle-caption': 'Toggle caption',
 			'delete-image': 'Delete image'
 		},
@@ -516,6 +519,7 @@ export const defaultLabels: ResolvedLabels = {
 			'align-left': 'Align left',
 			'align-center': 'Align centre',
 			'align-right': 'Align right',
+			'full-width': 'Full width',
 			'toggle-caption': 'Toggle caption',
 			delete: 'Delete'
 		},

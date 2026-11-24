@@ -111,3 +111,34 @@ describe('media blocks (PA-12 to PA-14)', () => {
 		expect(toPlainText(docOf(video, attachment, audio))).toBe('report.pdf');
 	});
 });
+
+describe('full width (PA-24)', () => {
+	it.each([
+		[
+			'an image',
+			{
+				type: 'image',
+				attrs: { id: 'i', src: '/a.png', alt: 'A', width: 'full' }
+			}
+		],
+		[
+			'a video',
+			{ type: 'video', attrs: { id: 'v', src: '/a.mp4', width: 'full' } }
+		]
+	])('renders %s at full width exactly as the editor does', (_, node) => {
+		const doc = docOf(node as RenderableNode);
+		const editor = canonical(editorHTML(doc));
+		expect(editor).toContain('data-width="full"');
+		for (const html of both(doc)) expect(html).toBe(editor);
+	});
+
+	it('writes no width for a word it does not know', () => {
+		const doc = docOf({
+			type: 'image',
+			attrs: { src: '/a.png', width: 'wide' }
+		});
+		for (const html of both(doc)) {
+			expect(html).not.toContain('width');
+		}
+	});
+});

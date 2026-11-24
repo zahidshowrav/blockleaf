@@ -1,11 +1,12 @@
 ---
 title: Media
-description: Video, audio and file blocks, and the caption toolbar, from the opt-in media subpath.
+description: Video, audio and file blocks, resizing, and the caption toolbar, from the opt-in media subpath.
 icon: Film
 ---
 
 `@blockleaf/editor/media` adds three blocks — **video**, **audio** and a
-**file** to download — a toolbar for each, and the **caption toolbar**.
+**file** to download — a toolbar for each, **resizing** for images and
+videos, and the **caption toolbar**.
 
 ```ts
 import { presets } from '@blockleaf/editor/extensions';
@@ -64,13 +65,14 @@ editor.commands.setAttachment({
 ## What is stored
 
 ```json
-{ "type": "video", "attrs": { "id": "…", "src": "https://cdn.test/launch.mp4", "poster": null, "width": 640, "align": "center" } }
+{ "type": "video", "attrs": { "id": "…", "src": "https://cdn.test/launch.mp4", "poster": null, "width": "full", "align": "center" } }
 { "type": "audio", "attrs": { "id": "…", "src": "https://cdn.test/talk.mp3", "title": "The talk" } }
 { "type": "attachment", "attrs": { "id": "…", "src": "https://cdn.test/report.pdf", "name": "report.pdf", "size": 1572864, "mime": "application/pdf" } }
 ```
 
-- **Video** is stored like an image: a source, a width, an alignment, plus
-  an optional `poster`, the still shown before it plays.
+- **Video** is stored like an image: a source, a width (pixels, or `"full"`;
+  see [resizing](#resizing)), an alignment, plus an optional `poster`, the
+  still shown before it plays.
 - **Audio** stores a `title`. It is the player's accessible name, so a page
   with three players does not announce "audio" three times.
 - **A file** stores its `name`, its `size` in bytes and its `mime` type, so
@@ -109,11 +111,47 @@ Select any of the three and a toolbar appears:
 | Align left     | video                  |
 | Align centre   | video                  |
 | Align right    | video                  |
+| Full width     | video                  |
 | Toggle caption | video, audio and files |
 | Delete         | video, audio and files |
 
 To select a video, click near its top, away from its controls; or arrow onto
 it from the line above, as for an image.
+
+## Resizing
+
+Select an image or a video and a handle appears on each side. Drag one to
+make it narrower or wider. **Only the width changes**: the height follows
+the picture's own shape, so nothing is ever stretched or squashed, and there
+is no handle on the top or bottom edge. A centred picture grows on both
+sides at once, so the handle stays under your pointer.
+
+The width is stored when you let go, as a number of pixels in `width`. One
+drag is one undo step. A width is never drawn wider than the page, so a
+picture sized on a wide screen still fits on a phone, and never narrower
+than 64 pixels.
+
+**Full width** in the image or video toolbar makes it as wide as the page.
+It is stored as `"width": "full"`, a name rather than a number: a width
+measured on your screen would be wrong on everyone else's. Press it again
+to go back to the file's own size.
+
+With the keyboard, select the picture and press `Alt`+`Shift`+`←` or `→`
+to narrow or widen it by a tenth of the page. The handles themselves are
+for a pointer and are hidden from screen readers; the shortcuts and the
+Full width button do the same job.
+
+```ts
+editor.commands.setMediaWidth(480); // pixels
+editor.commands.setMediaWidth('full'); // the width of the page
+editor.commands.setMediaWidth(null); // the file's own size
+editor.commands.toggleMediaFullWidth();
+```
+
+`withMedia(extensions, { resize: false })` leaves resizing out. A stored
+width still shows; it just cannot be changed by dragging. The reasoning is
+F21 in
+[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
 
 ## Captions
 
@@ -168,7 +206,8 @@ withMedia(presets.standard(), {
 });
 ```
 
-`mediaMenu: false` or `captionMenu: false` leaves that toolbar out. The
+`mediaMenu: false` or `captionMenu: false` leaves that toolbar out, and
+`resize: false` leaves out resizing. The
 blocks are always added. Their strings are under `labels.media` and
 `labels.caption`, including how a file size is written; see
 [i18n](./i18n.mdx).
@@ -182,5 +221,5 @@ size.
 
 ## What it costs
 
-The subpath adds about 1.2 kB on top of the editor. The editor's own bundle
+The subpath adds about 1.8 kB on top of the editor. The editor's own bundle
 does not carry the blocks unless you import it.

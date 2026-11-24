@@ -120,6 +120,9 @@ export const ATTACHMENT_NODE = 'attachment';
 /** The toolbar for a selected video, audio clip or file (`PA-12` to `PA-14`). */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
+/** Resizing and full width for images and videos (`PA-24`), from `./media`. */
+export const MEDIA_RESIZE_EXTENSION_NAME = 'mediaResize';
+
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';
 

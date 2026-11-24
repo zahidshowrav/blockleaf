@@ -67,10 +67,34 @@ export const codeLanguage = (node: RenderableNode): string | undefined => {
 	return typeof language === 'string' && language ? language : undefined;
 };
 
+/**
+ * A stored width (`PA-24`, `F21`): pixels, or `'full'` for the width of the
+ * page. Anything else is no width at all.
+ */
+const mediaWidth = (value: unknown): number | 'full' | undefined => {
+	if (value === 'full') return 'full';
+	return typeof value === 'number' && Number.isFinite(value) && value > 0
+		? Math.round(value)
+		: undefined;
+};
+
+/**
+ * The HTML attributes for a width, as the editor writes them: `width` for
+ * pixels, `data-width="full"` for full width.
+ */
+export const widthAttributes = (
+	width: number | 'full' | undefined
+): { width?: number; 'data-width'?: 'full' } =>
+	width === 'full'
+		? { 'data-width': 'full' }
+		: width === undefined
+			? {}
+			: { width };
+
 export interface ImageAttributes {
 	src: string;
 	alt: string;
-	width: number | undefined;
+	width: number | 'full' | undefined;
 	align: ImageAlign | undefined;
 }
 
@@ -99,10 +123,7 @@ export const imageAttributes = (
 	return {
 		src,
 		alt: typeof alt === 'string' ? alt : '',
-		width:
-			typeof width === 'number' && Number.isFinite(width)
-				? width
-				: undefined,
+		width: mediaWidth(width),
 		align:
 			typeof align === 'string' && ALIGNMENTS.has(align)
 				? (align as ImageAlign)
@@ -121,7 +142,7 @@ const optionalString = (value: unknown): string | undefined =>
 export interface VideoAttributes {
 	src: string;
 	poster: string | undefined;
-	width: number | undefined;
+	width: number | 'full' | undefined;
 	align: ImageAlign | undefined;
 }
 
@@ -141,10 +162,7 @@ export const videoAttributes = (
 	return {
 		src,
 		poster: poster ? (sanitizeSrc(poster) ?? undefined) : undefined,
-		width:
-			typeof width === 'number' && Number.isFinite(width)
-				? width
-				: undefined,
+		width: mediaWidth(width),
 		align:
 			typeof align === 'string' && ALIGNMENTS.has(align)
 				? (align as ImageAlign)

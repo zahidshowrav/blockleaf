@@ -452,8 +452,8 @@ root entry and installs nothing else.
 
 | Entry                             |    Size |
 | --------------------------------- | ------: |
-| `RenderDocument`                  | 3.26 kB |
-| `renderToHTML`                    | 3.33 kB |
+| `RenderDocument`                  | 3.29 kB |
+| `renderToHTML`                    | 3.37 kB |
 | `toPlainText` + `extractHeadings` |   592 B |
 | `sanitizeHref` + `sanitizeSrc`    |   217 B |
 
@@ -475,7 +475,7 @@ Every node in [the schema](./schema.mdx) renders:
 | `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                              |
 | `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                             |
 | `details`                    | `<details open>`, its first block inside `<summary>`                              |
-| `image`                      | `<img class="blockleaf-image">`                                                   |
+| `image`                      | `<img class="blockleaf-image">`, `data-width=\"full\"` at full width              |
 | `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                     |
 | `audio`                      | `<audio class="blockleaf-audio" controls preload="metadata">`, named by its title |
 | `attachment`                 | `<a class="blockleaf-attachment" download>` with the file's name and size         |

@@ -312,13 +312,19 @@ export const codeBlockNodeSchema: z.ZodType<CodeBlockNode> = z.object({
 	content: z.array(textNodeSchema).optional()
 });
 
+/** Pixels, or since version 2 `'full'` (`PA-24`, `F21`). */
+const mediaWidthSchema = z
+	.union([z.number(), z.literal('full')])
+	.nullable()
+	.optional();
+
 export const imageNodeSchema: z.ZodType<ImageNode> = z.object({
 	type: z.literal('image'),
 	attrs: z.object({
 		id: z.string(),
 		src: z.string(),
 		alt: z.string().nullable().optional(),
-		width: z.number().nullable().optional(),
+		width: mediaWidthSchema,
 		align: z.enum(['left', 'center', 'right']).nullable().optional()
 	})
 });
@@ -335,7 +341,7 @@ export const videoNodeSchema: z.ZodType<VideoNode> = z.object({
 		id: z.string(),
 		src: z.string(),
 		poster: z.string().nullable().optional(),
-		width: z.number().nullable().optional(),
+		width: mediaWidthSchema,
 		align: mediaAlignSchema
 	})
 });

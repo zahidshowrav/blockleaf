@@ -225,6 +225,14 @@ Resizing media blocks (images, videos, YouTube/Vimeo embeds, iframes) resizes
 - Full width is a named state/class rather than a raw pixel width, ensuring responsive rendering on mobile and varied screen sizes.
 - Image cropping, if desired in the future, will be introduced as its own dedicated crop tool rather than a side-effect of resize handles.
 
+**Built (`PA-24`, 2026-11-24):**
+
+- **Stored as `width: number | "full" | null`** on `image` and `video`. Full width is the one named value, in the attribute that already held pixels, rather than a second attribute that could disagree with the first. `null` is the file's own size. Version 1 images keep the pixels or `null` they had.
+- **A pixel width is drawn no wider than the page**, and never narrower than 64 pixels. On release, not while dragging: one drag is one undo step and one `onChange`.
+- **The handles are an overlay, not a node view**, so the image keeps its markup and every selector on it. They are pointer-only and hidden from assistive technology; the keyboard has `Alt-Shift-Arrow` and the toolbar's Full width button.
+- **A centred picture grows on both sides**, so the handle stays under the pointer.
+- **In `./media`, not the core.** The core reads and draws `"full"`, so an editor without the subpath keeps and shows a stored width; it only cannot change one.
+
 ### F20 — is a caption plain text or rich text · decided 2026-11-07
 
 Captions (under images, video, embeds, audio, and tables) are structured as **rich text**

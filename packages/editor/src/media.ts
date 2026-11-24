@@ -1,11 +1,13 @@
 /**
- * Media, as an opt-in subpath (`PA-12` to `PA-14`, `PA-21`).
+ * Media, as an opt-in subpath (`PA-12` to `PA-14`, `PA-21`, `PA-24`).
  *
  * Three blocks — video, audio and a file to download — each uploaded through
  * the host's adapter and each captionable, with a toolbar for a selected one.
  * And the caption toolbar: while the caret is in a caption, it offers the
  * caption's own alignment and a button to remove it. Captions themselves are
  * in the core — any image or table takes one.
+ *
+ * Images and videos get resize handles and a full width (`PA-24`).
  *
  * The blocks are in the stored schema from version 2. An editor without this
  * subpath keeps a stored one as a placeholder and saves it back unchanged.
@@ -24,8 +26,10 @@ import {
 	AUDIO_NODE,
 	CAPTION_MENU_EXTENSION_NAME,
 	MEDIA_MENU_EXTENSION_NAME,
+	MEDIA_RESIZE_EXTENSION_NAME,
 	VIDEO_NODE
 } from './core/constants.js';
+import { MediaResize } from './core/media-resize.js';
 import { Attachment } from './core/nodes/attachment.js';
 import { Audio } from './core/nodes/audio.js';
 import { Video } from './core/nodes/video.js';
@@ -40,9 +44,16 @@ export {
 	AUDIO_NODE,
 	CAPTION_MENU_EXTENSION_NAME,
 	MEDIA_MENU_EXTENSION_NAME,
+	MEDIA_RESIZE_EXTENSION_NAME,
 	VIDEO_NODE
 } from './core/constants.js';
 export { formatFileSize, sanitizeMediaSrc } from './core/media-src.js';
+export { MIN_MEDIA_WIDTH, MediaResize } from './core/media-resize.js';
+export {
+	FULL_WIDTH,
+	readMediaWidth,
+	type MediaWidth
+} from './core/media-width.js';
 export {
 	Attachment,
 	type AttachmentAttributes,
@@ -81,6 +92,8 @@ export {
 } from './ui/caption/index.js';
 
 export type MediaOptions = {
+	/** Resize handles and full width for images and videos; `false` leaves them out. */
+	resize?: false;
 	/** The toolbar for a selected video, audio clip or file, or `false`. */
 	mediaMenu?: Partial<MediaMenuOptions> | false;
 	/** The caption toolbar's options, or `false` to leave it out. */
@@ -92,6 +105,7 @@ const NAMES: ReadonlySet<string> = new Set([
 	AUDIO_NODE,
 	ATTACHMENT_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
+	MEDIA_RESIZE_EXTENSION_NAME,
 	CAPTION_MENU_EXTENSION_NAME
 ]);
 
@@ -100,6 +114,7 @@ export const createMedia = (options: MediaOptions = {}): Extensions => [
 	Video,
 	Audio,
 	Attachment,
+	...(options.resize === false ? [] : [MediaResize]),
 	...(options.mediaMenu === false
 		? []
 		: [createMediaMenu(options.mediaMenu)]),
