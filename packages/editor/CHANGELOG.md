@@ -4,422 +4,166 @@
 
 ### Minor Changes
 
-- 2299442: A print stylesheet (`PA-19`), so a browser's Save as PDF gives a readable document with nothing else installed. It applies to the editor and to `@blockleaf/renderer` output. When printing, the chrome is hidden, blocks such as code, quotes, callouts, images and table rows stay whole where they fit, code wraps, and a link prints its address after its text.
-  
-  It prints light. The system dark theme now applies on screen only (`@media screen and (prefers-color-scheme: dark)`), and a forced `data-theme="dark"` prints with the light palette, because browsers drop backgrounds when printing. A palette of your own on `.blockleaf-editor` is not touched.
-- c6149b6: A toggle block (`PA-01`). **Toggle** in the slash menu wraps the current block in a toggle. That block becomes its title, and the blocks after it are the body. A button beside the title opens and closes it, and so does `Mod+Enter` anywhere inside it. Enter at the end of a closed title starts a block after the toggle, and Backspace at the start of the title turns the toggle back into its blocks.
-  
-  It is stored as the `details` node the schema has documented since `0.1.0`: `open`, plus its blocks, with the first block as the title (`F23`). `SCHEMA_VERSION` stays `1` and nothing migrates. New exports: `Details`, `DETAILS_NODE` and the `DetailsLabels` type. New labels: `blockTypes.toggle`, `slashMenu.descriptions.toggle` and `details.toggle`. `ToggleIcon` is exported with the other slash menu icons.
+- 2299442: A print stylesheet, so Save as PDF gives a clean document. Dark theme now applies on screen only.
+- c6149b6: A toggle block, from **Toggle** in the slash menu, stored as the existing `details` node. `SCHEMA_VERSION` stays `1`; new exports `Details`, `DETAILS_NODE` and `DetailsLabels`.
 
 ## 0.9.0
 
 ### Minor Changes
 
-- f3b8165: Pasting a long document is fast (`HD-13`). Pasting five thousand blocks took 20 seconds and now takes under two.
-  
-  Pasted blocks now get their ids in one pass, before they reach the document. The new `PastedBlockIds` extension does this, and both presets include it. The `UniqueID` exported from `@blockleaf/editor/extensions` is now Blockleaf's own copy of Tiptap's: it leaves pastes and drops to `PastedBlockIds` by default, and `UniqueID.configure({ types })` keeps that. `isPasteTransaction` is exported for anyone who gives `UniqueID` a `filterTransaction` of their own. Pasting Markdown text now runs the same paste hooks as pasting HTML. Stored documents do not change.
+- f3b8165: Pasting a long document is much faster: five thousand blocks now take under two seconds, down from 20. New `PastedBlockIds` extension and `isPasteTransaction` export; stored documents do not change.
 
 ## 0.8.0
 
 ### Minor Changes
 
-- 80bd590: A table can have a caption (`HD-10`).
-  
-  **Toggle caption** in the row and column menus puts a caption under the table and the caret in it, or takes it away. The caption is rich text, so a credit can carry its link. In the caption, Enter moves to a new paragraph below, and Backspace in an empty caption removes it. Deleting the table deletes its caption too.
-  
-  A captioned table is stored as a new `figure` node holding the table and then a new `caption` node. The table itself is stored exactly as it is without a caption. Both are new node types, so `SCHEMA_VERSION` stays `1` and nothing migrates. The validator accepts them, `Figure` and `Caption` are exported from `@blockleaf/editor/extensions`, and the command is `toggleTableCaption()`. New labels: `table.actions['toggle-caption']` and `placeholder.caption`.
+- 80bd590: A table can have a caption, with `toggleTableCaption()`. Stored as new `figure` and `caption` nodes; `SCHEMA_VERSION` stays `1`.
 
 ## 0.7.0
 
 ### Minor Changes
 
-- f55edd9: Add `migrate()`, which brings a stored document up to the current `SCHEMA_VERSION` (`HD-09`).
-  
-  It walks a document saved at an older `schemaVersion` forward one version at a time and never changes its input. A document already at the current version comes back as the same object, a newer one comes back untouched, and anything that is not a Blockleaf document comes back untouched. The editor now runs it on `defaultValue` by itself; call it yourself before `setContent()`, before validating on the server, and before rendering with `@blockleaf/renderer`.
-  
-  `SCHEMA_VERSION` is still `1`, so nothing migrates yet. This is the machinery the first bump needs. The stored shape does not change.
+- f55edd9: New `migrate()` brings a stored document up to the current `SCHEMA_VERSION`. Call it before `setContent()`, server-side validation and rendering; the stored shape does not change.
 
 ## 0.6.0
 
 ### Minor Changes
 
-- 4344313: A document a newer editor wrote is locked too, and `incompatibleDocument` can throw (`FC-02`).
-  
-  A `defaultValue` whose `attrs.schemaVersion` is higher than this editor's `SCHEMA_VERSION` now triggers the same policy as an unreadable one. It opens showing its content, read-only, with `onChange` and `onChangeImmediate` silent, because saving it from here would stamp it with an older version than it has. `onContentError` fires once as the editor is created, with an `IncompatibleDocumentError` whose `reason` is `'newer-version'`.
-  
-  `incompatibleDocument` takes a third value, `'throw'`: the hook throws an `IncompatibleDocumentError` during render, for an error boundary to catch, and nothing is mounted. `IncompatibleDocumentError` is exported, with `reason`, `documentVersion` and `editorVersion`.
-- b332a3c: An editor that refuses a document it cannot read (`FC-01`).
-  
-  Stored content the editor cannot read — a block from a preset or subpath this instance did not load, a node from a host extension that is not installed here, or JSON a migration got wrong — used to open as an empty document behind a console warning, and the next save wrote that empty document over the stored one. The editor now opens read-only instead, whatever `editable` says, and `onChange` and `onChangeImmediate` stay silent, so the empty document can never reach a save path. `onContentError` reports why, so the host can show a message.
-  
-  `incompatibleDocument` is the override: `'readonly'`, the default, or `'discard'`, which opens the empty document editable and accepts the loss. It is live, so a "start over" button can flip it.
-  
-  Behind this sits Tiptap's content check, now on by default. `insertContent` of unreadable content reports and returns `false`; `setContent` throws rather than reporting, so wrap that call. `enableContentCheck={false}` restores Tiptap's own behaviour. Keeping an unknown block intact rather than refusing it is the next step.
-- cc7933e: An unknown block, inline node or mark is kept, not refused (`FC-03`).
-  
-  A stored document with a node or mark this editor does not know — a block from a preset or subpath it did not load, or a node from an extension not installed here — used to fail the content check and open locked. Each one now opens as a placeholder that names its type, the rest of the document stays editable, and `onChange` hands back the original JSON exactly as it came in. A placeholder can be selected, dragged and deleted; it is never rebuilt from pasted HTML.
-  
-  The placeholders ship as `UnknownContent` in both presets, and the editor adds it to a host's own `extensions` array. `wrapUnknownContent` and `unwrapUnknownContent` do the swap for hosts that call `setContent` or `getJSON` directly. The placeholder text is `labels.unknown`.
-  
-  A document whose structure the schema refuses, or whose `schemaVersion` is newer, is still locked by `incompatibleDocument`.
-- f46ac4a: The validator accepts node and mark types it does not define (`FC-04`).
-  
-  `validateDocument`, `safeValidateDocument` and `blockleafDocumentSchema` from `@blockleaf/editor/validate` used to refuse a whole document over one node of an unknown type. A node or mark with a string `type` the schema does not define now passes anywhere a node or mark may go, unread, and comes back exactly as it was. Every known type is still checked in full, and a node with no string `type` is still refused.
-  
-  `UnrecognisedNode` and `UnrecognisedMark` are exported as types, and `unrecognisedNodeSchema` and `unrecognisedMarkSchema` from `./validate`. They are not members of `BlockNode`, `InlineNode` or `BlockleafMark`, so `type` still narrows; a walker needs a `default` branch. The contract is written down in the schema page.
+- 4344313: A document written by a newer editor now opens read-only too. `incompatibleDocument` accepts `'throw'`, and `IncompatibleDocumentError` is exported.
+- b332a3c: A document the editor cannot read now opens read-only instead of empty, so a save cannot overwrite it; `incompatibleDocument: 'discard'` opts out. Tiptap's content check is now on by default, so `setContent` can throw.
+- cc7933e: An unknown node or mark now opens as a placeholder and is kept exactly as stored, instead of locking the document. New `UnknownContent`, `wrapUnknownContent` and `unwrapUnknownContent`.
+- f46ac4a: The validator now accepts node and mark types it does not define, and returns them unchanged. New `UnrecognisedNode` and `UnrecognisedMark` types; a walker needs a `default` branch.
 
 ### Patch Changes
 
 - 729dae6: Autofocus no longer throws on Android, iOS and desktop Safari.
-  
-  Tiptap's `focus` command focuses the DOM synchronously on those platforms, its own focus plugin dispatches a transaction in response, and the command's transaction then throws `RangeError: Applying a mismatched transaction`. The throw happens inside Tiptap's mount timer ahead of the `create` event, so the editor never emitted it and the paragraph added after a trailing table never appeared. The editor now does its own autofocus after `create`, focusing the DOM before running the command.
 
 ## 0.5.1
 
 ### Patch Changes
 
-- 1c8c989: Style the box `@blockleaf/renderer` puts a published table in.
-  
-  `.blockleaf-table-scroll` joins `.tableWrapper` on the containment and overflow rules. Deliberately unscoped, unlike every prose rule: rendered output lands in whatever markup the host wrote, and a table that only behaves when somebody remembered to add `.blockleaf-editor__content` is a table that does not behave.
+- 1c8c989: Styles the scrollable table box that `@blockleaf/renderer` outputs (`.blockleaf-table-scroll`).
 
 ## 0.5.0
 
 ### Minor Changes
 
-- e5df470: Open a long document in seconds rather than minutes.
-  
-  A document that has never been through this editor — an import, a migration, anything carrying no block ids — took **137 seconds** to open at ten thousand blocks. It now takes about two. `@tiptap/extension-unique-id` assigns missing ids inside ProseMirror, one `setNodeMarkup` step per block on a single transaction, with every step applied to the document the step before it produced; that is quadratic. The editor now stamps them in one linear pass over plain JSON before the document reaches ProseMirror, so the extension finds nothing to do on load and keeps the incremental job it is good at.
-  
-  | Blocks | Before | Now  |
-  | ------ | ------ | ---- |
-  | 1,000  | 2.1s   | 0.5s |
-  | 5,000  | 34.2s  | 1.3s |
-  | 10,000 | 137.2s | 2.3s |
-  
-  `withBlockIds` is exported, so a bulk migration can do the same work once at rest.
-  
-  `onChange` no longer serialises the whole document on every keystroke. It was serialising first and debouncing only the delivery, which is exactly what the debounce exists to avoid; the document is now serialised inside the timer. `onChangeImmediate` still gets it every time, because that is what it is for.
-  
-  `BLOCK_NODE_TYPES` moved from `extensions` to `constants`. It is exported from the same places, so nothing an importer can see has changed.
+- e5df470: A long document with no block ids opens much faster: ten thousand blocks in about two seconds, down from 137. New `withBlockIds` export, and `onChange` no longer serialises the document on every keystroke.
 
 ## 0.4.0
 
 ### Minor Changes
 
-- 38dc0d1: Make a table readable by a screen reader, and survivable on a narrow screen.
-  
-  Header cells now carry `scope`, decided from the document's shape the same way `@blockleaf/renderer` decides it — a header among nothing but headers heads its column, one sitting among data cells heads its row. Until now the editor emitted a bare `<th>`, so the same document announced one way while it was edited and another once it was published. A header nobody has typed in yet is named rather than announcing as nothing at all.
-  
-  The caret's position is announced as it moves between cells, through a polite live region: "Row 2 of 4, column 3 of 3". Counted with `TableMap`, so a merged cell reports the first column it actually occupies rather than a number that would be false.
-  
-  A table too wide for the screen scrolls inside a focusable, labelled region instead of pushing the page sideways. `overflow-x` alone did not hold: a grid or flex item defaults to `min-width: auto`, so a 780px table pushed the host's own layout wider than the screen and the wrapper inherited that width with nothing left to scroll. The wrapper uses `contain: inline-size`, which keeps the table's width out of the host's layout — no `min-width: 0` required of consumers.
-  
-  None of this is stored. No `SCHEMA_VERSION` moved and nothing in anyone's database has to change.
-  
-  New labels under `table`: `cellPosition`, `scrollRegion` and `emptyHeader`.
+- 38dc0d1: Tables work better with screen readers and narrow screens: header cells get `scope`, the caret's cell is announced, and a wide table scrolls in its own region. Nothing stored changes; new labels under `table`.
 
 ## 0.3.0
 
 ### Minor Changes
 
-- 27fffcc: Translate the chrome through a single `labels` prop.
-  
-  Every string the editor and its default menus render now comes from one typed label set, grouped by surface — `blockTypes`, `slashMenu`, `bubbleMenu`, `blockMenu`, `table`, `image`, `link`, `upload`, `codeBlock` and `placeholder`. Anything a host leaves out keeps its English default at every level, so a partial translation is a valid one, and a misspelled key is a compile error rather than a silently English menu item.
-  
-  `blockTypes` names each block once: the slash menu's items and the block menu's "Turn into" group both read from it, so the two cannot drift apart.
-  
-  Each default registry is now a function of a label set — `createSlashCommands`, `createBubbleActions`, `createBlockActions`, `createTableActions`, `createCellActions`, `createImageActions` — and the `default*` arrays are those functions called with the English defaults, unchanged. `resolveBubbleActions`, `resolveBlockActions` and `resolveTableActions` take an optional second argument for the defaults an override builds on.
-  
-  `PlaceholderLabels` and `defaultPlaceholderLabels` now live in `src/core` with the rest; they are still exported from the same places.
-- 1605175: Make the block menu reachable on a phone.
-  
-  A touch device never fires `mousemove`, so a drag handle that appears on hover never appears at all — and every block action went with it. On a coarse pointer the handle now follows the caret instead of the pointer: tap into a block and it is beside that block, tap its grip and the menu opens. The pointer is watched rather than read once, so a laptop with a touchscreen behaves as whichever the reader last used, and a mouse is unaffected.
-  
-  A touch press on the handle no longer blurs the editor. It used to take the caret away before the click landed, which unmounted the handle under the finger and sent the tap to the page behind it. Mouse presses are untouched, because preventing their default would also stop `dragstart`.
-  
-  Under `@media (pointer: coarse)` the handle, the bubble menu's buttons and the slash, block and table menu rows grow to 44px. WCAG 2.5.8's 24px was already met; 24px is a floor, not a thumb.
+- 27fffcc: Translate every string the editor shows through a single `labels` prop. The default registries are now functions of a label set, such as `createSlashCommands`.
+- 1605175: The block menu now works on touch screens, and touch targets grow to 44px on a coarse pointer.
 
 ## 0.2.0
 
 ### Minor Changes
 
-- e2a4dd6: Never insert an uploaded image without alt text.
-  
-  An image with no `alt` is the one critical accessibility failure an editor can hand a screen reader, which falls back to announcing the URL. `UploadResult` now takes an optional `alt`, and an upload that does not supply one gets the file's own name with the extension dropped and `-`/`_` turned into spaces — `red-balloon_02.png` becomes `red balloon 02`. An empty string is kept as given, because that marks the image decorative and is a different statement from having no description.
+- e2a4dd6: An uploaded image always gets alt text: `UploadResult` takes `alt`, and falls back to the file name. An empty string is kept, marking the image decorative.
 
 ### Patch Changes
 
-- da5329e: Put the block menu in the tab order.
-  
-  The menu is a scroll container that was only focusable in script, so a keyboard user could reach its items through the menu's own arrow handling but had no way to scroll to the ones below the fold. It is now tabbable; `aria-activedescendant` still drives what is announced.
+- da5329e: The block menu is now in the tab order, so a keyboard user can scroll it.
 
 ## 0.1.2
 
 ### Patch Changes
 
-- c9c8638: Align a task item's text with its own checkbox.
-  
-  The item's content lives in a `div` the node view owns, which sits outside the `> * + *` rule that spaces top-level blocks, so its paragraph kept the browser's default `1em` margin and dropped the first line about 18px below the checkbox beside it. The first and last child of that wrapper now have their outer margins removed; spacing between paragraphs inside one item is untouched.
+- c9c8638: A task item's text now lines up with its checkbox.
 
 ## 0.1.1
 
 ### Patch Changes
 
-- 9faaa12: Keep the upload placeholder's element across progress ticks instead of rebuilding it.
-  
-  The widget decoration was keyed on the progress value, so every tick — up to one every 60ms — destroyed the placeholder's DOM and built a new one, Cancel button included. A click already on its way to that button lost its target. The key now carries only the placeholder's shape, uploading or failed, and a tick moves the existing bar in place.
+- 9faaa12: The upload placeholder no longer rebuilds on every progress tick, so a click on Cancel is not lost.
 
 ## 0.1.0
 
 ### Minor Changes
 
-- c8a31a2: Add an Image item to the slash menu, and an `isAvailable` predicate to `SlashCommand`.
-  
-  `/image` opens the file picker and runs the upload adapter, so uploading no longer requires a drop or a paste. The item hides itself when no `upload` adapter is configured, because the command it calls does not exist without one.
+- c8a31a2: An Image item in the slash menu, shown only when an `upload` adapter is set. `SlashCommand` gains `isAvailable`.
 
 ## 0.0.9
 
 ### Patch Changes
 
-- cc50bbd: Stop the block menu being clipped by the container the editor is in.
-  
-  It rendered inside the handle, so an ancestor with `overflow: auto` — which is
-  how most hosts give an editor a fixed height — cut it off, and because an
-  absolutely positioned descendant still counts towards a scroll container's
-  `scrollHeight`, opening it lengthened the scrollbar and shifted the content
-  underneath.
-  
-  The menu now renders in a portal on `document.body`, positioned `fixed`
-  against the handle's viewport rect. It flips above the handle when there is no
-  room below, follows the handle on scroll and resize, and closes when a press
-  lands outside it — which also stops it sitting open behind the slash menu.
-  
-  Two things change for anyone styling it. It is no longer a descendant of the
-  editor wrapper, so target `.blockleaf-block-menu` directly; and like the slash
-  menu it carries `data-theme` across but cannot inherit `--bl-*` properties set
-  on the wrapper.
+- cc50bbd: The block menu is no longer clipped by a scrolling container. It now renders on `document.body`, so style `.blockleaf-block-menu` directly.
 
 ## 0.0.8
 
 ### Patch Changes
 
-- 7dc27ac: Fix the slash menu's arrow keys selecting a different row than the one they
-  move to.
-  
-  The list renders grouped by `group`, but `ArrowDown` and `ArrowUp` stepped
-  through the flat `items` array. The default registry declares commands
-  interleaved across groups, so the two orders disagreed and the highlight
-  jumped: from Text it went to Heading 1, ran down to To-do list, then back up
-  to Quote, Code, Callout and Divider before reaching Table. `Enter` then ran
-  whichever command that index happened to hit.
-  
-  Selection now indexes the same order the rows are rendered in, so `↑` and `↓`
-  move to the row above and below, and wrapping goes from the last row to the
-  first.
+- 7dc27ac: The slash menu's arrow keys now move to the row above or below.
 
 ## 0.0.7
 
 ### Patch Changes
 
-- 7c1bbcb: Fix the drag handle never appearing beside the block it belongs to.
-  
-  The plugin computed the right offset and wrote it to the wrong element. It set
-  `top` and `left` on the wrapper `ReactRenderer` creates, which is
-  `position: static`, so both were inert — while the handle inside it was
-  `position: absolute` with no offsets of its own and therefore fell back to its
-  static position at the end of the content flow. Every block produced the same
-  place: the bottom of the editor.
-  
-  A CSS `transform: translateX(calc(-100% - 4px))` then shifted it into the
-  gutter, except `--bl-content-padding` is `0` by default, so there is usually no
-  gutter and the handle landed outside the editor box — where any ancestor with
-  `overflow: auto` clipped it. In the documentation site's demo, 33 of its 45
-  pixels were cut off.
-  
-  The stylesheet now makes the wrapper the positioned box, and the plugin places
-  it with the handle's own width accounted for and clamped to the editor's left
-  edge. With room it sits in the gutter; without room it overlaps the text rather
-  than vanishing.
-  
-  `--bl-handle-gap` is gone, since the offset is no longer a CSS transform.
+- 7c1bbcb: The drag handle now appears beside its block. `--bl-handle-gap` is removed.
 
 ## 0.0.6
 
 ### Patch Changes
 
-- dfbc49d: Stop the chrome throwing when an extension it offers is not loaded.
-  
-  `isAvailable` asked `editor.can().toggleHighlight()`, but `editor.can()` only
-  carries the commands the configured extensions registered. With
-  `preset="minimal"` — no highlight, no tables — selecting text threw
-  `editor.can(...).toggleHighlight is not a function` while the toolbar was
-  rendering, and the cell menu threw the same way on `mergeCells`, so the whole
-  editor failed to mount. The same held for any host passing its own
-  `extensions` array without one of those types.
-  
-  Every default action now checks its mark or node is in the schema before
-  asking whether the command applies, through a shared `whenMarkExists` /
-  `whenNodeExists` guard. A type the editor does not have reads as unavailable
-  and the button is hidden, which is what `isAvailable` was for.
-- f254f17: Fix task list items rendering stacked instead of inline, and list markers
-  disappearing under a CSS reset.
-  
-  The task item rules were keyed to `li[data-type='taskItem']`, an attribute
-  that only exists in serialised output. Tiptap builds the live item in
-  `addNodeView` from the node's own attributes — `data-checked`, `data-id` — and
-  never applies the `data-type` that `renderHTML` merges in. So the selector
-  styled every rendered page and no actual editor, and the checkbox sat above
-  its label rather than beside it for as long as task lists have existed. The
-  rules now match through the parent list, `ul[data-type='taskList'] > li`,
-  which is present in both.
-  
-  `list-style` is now stated rather than inherited from the user agent. Every
-  common reset strips list markers, so bullets and numbers vanished in any app
-  using Tailwind's preflight or normalize — and "works without a CSS framework"
-  should not mean "breaks with one".
-  
-  Both were found by putting a task list and a bullet list in the documentation
-  site's live demo.
+- dfbc49d: The chrome no longer throws when an extension it offers, such as highlight or tables, is not loaded.
+- f254f17: Task list items render inline, and list markers survive a CSS reset.
 
 ## 0.0.5
 
 ### Patch Changes
 
-- b6f7882: Add the upload adapter interface (MC-01). Hosts implement `UploadAdapter` and
-  the editor drives it; no storage provider is baked in. The second argument is a
-  context object rather than a bare `AbortSignal` so adapters can report
-  determinate progress, and `isUploadResult` validates what an adapter resolves
-  with before it can reach the document.
-- 05657cb: Add drop, paste and picker entry points for uploads (MC-02). Dropping files on
-  the editor, pasting them from the clipboard, or calling `openUploadPicker`
-  screens each file for type and size **before** it leaves the browser, then
-  hands it to the adapter and inserts an image where it landed.
-  
-  The in-flight placeholder is a widget decoration rather than a node, so
-  ProseMirror maps its position through every edit made while the upload runs —
-  an image dropped at the end of a paragraph still lands there after typing
-  above it — and nothing has to be stripped out of the document before saving.
-  
-  `upload`, `uploadAccept`, `uploadMaxBytes` and `onUploadError` are new options
-  on `useBlockleafEditor` and `<BlockleafEditor>`. Without an adapter the
-  extension is not added at all, so files fall through to the browser rather
-  than being swallowed.
-- 5fa4e4c: Add upload progress, cancel and retry (MC-03). The in-flight placeholder now
-  shows a progress bar driven by the adapter's `onProgress`, with a Cancel
-  button that aborts the request through the signal.
-  
-  Progress is indeterminate until an adapter reports a fraction — `fetch` cannot
-  measure upload progress, so a bar claiming a percentage it does not have would
-  be a lie. An indeterminate `progressbar` omits `aria-valuenow` rather than
-  reporting zero.
-  
-  A failed upload no longer disappears. Its placeholder stays, holding the
-  position it has been mapping all along, and offers Retry and Dismiss — so a
-  retry puts the image where the user dropped it, even after editing above it.
-  A cancelled upload is not reported as a failure.
-- a114e5d: Add the image block with alt text and alignment (MC-04). The node is
-  hand-rolled rather than taken from `@tiptap/extension-image`, and `src` is
-  sanitised in the schema: `https:`, relative paths and raster data URLs are
-  allowed, while `javascript:`, `blob:`, `http:` and SVG data URLs are rejected.
-  An unsafe `<img>` arriving through a paste is dropped rather than stored with
-  a null source.
-  
-  Selecting an image opens a toolbar for alignment, alt text and delete. An
-  empty alt is kept rather than discarded, since that is how an image is marked
-  decorative.
-  
-  The bubble menu's link editor is now one of a general panel slot, so the
-  toolbar's keyboard handling lives in one place. Three CSS classes were
-  renamed to match: `blockleaf-bubble-menu__link-editor`, `__link-input` and
-  `__link-error` are now `__panel`, `__panel-input` and `__panel-error`.
-  Closing a panel now returns focus to the button that opened it, which the
-  link editor had never managed.
-- c004dfe: Add the syntax-highlighted code block with a language picker (MC-05), as the
-  new opt-in subpath `@blockleaf/editor/code-block`.
-  
-  ```ts
-  import { createExtensions } from '@blockleaf/editor/extensions';
-  import { withCodeBlock } from '@blockleaf/editor/code-block';
-  
-  const extensions = withCodeBlock(createExtensions('standard'));
-  ```
-  
-  It is a subpath rather than part of the default build because `lowlight` and
-  its grammars cost 16.53 kB and the default bundle had 15.37 kB left — shipping
-  it by default put the editor at 161.16 kB, over the ceiling. Importing nothing
-  costs nothing, and the main entry is unchanged at 144.63 kB. See F14.
-  
-  Seven grammars ship by default — bash, css, javascript, json, python,
-  typescript and xml — and hosts register more through `additionalLanguages`.
-  `StarterKit`'s plain code block is untouched for anyone who does not import
-  the subpath, and the stored shape is identical either way.
-  
-  A code block whose language this host has not registered now renders
-  unhighlighted instead of throwing during editor construction, and keeps its
-  `language` attribute rather than having it stripped on the next save.
+- b6f7882: Add the upload adapter interface: hosts implement `UploadAdapter`, and `isUploadResult` checks what it returns.
+- 05657cb: Upload files by drop, paste or `openUploadPicker`, checked for type and size first. New options: `upload`, `uploadAccept`, `uploadMaxBytes` and `onUploadError`.
+- 5fa4e4c: Uploads show progress and a Cancel button, and a failed upload offers Retry and Dismiss.
+- a114e5d: Image block with alt text and alignment; `src` is sanitised in the schema. Renamed CSS classes: `blockleaf-bubble-menu__link-editor`, `__link-input` and `__link-error` are now `__panel`, `__panel-input` and `__panel-error`.
+- c004dfe: Syntax-highlighted code block with a language picker, from the opt-in `@blockleaf/editor/code-block` subpath (`withCodeBlock`). Stored documents do not change.
 
 ## 0.0.4
 
 ### Patch Changes
 
-- d4ee34a: Implement slash command menu backed by command registry with full keyboard and accessibility support (CH-01)
-- e44eabb: Add the selection bubble menu with a link editor (CH-02). Six mark toggles with
-  ARIA toolbar keyboard navigation, and an href field that mirrors the schema's
-  sanitisation so a rejected link says why.
-- 7f1cbc8: Add the drag handle and block menu (CH-03). Hand-rolled rather than using
-  `@tiptap/extension-drag-handle`, which imports yjs at module scope and costs
-  32.87 kB; this costs 1.83 kB and no new dependency.
-- 5f8e57e: Add the placeholder and configure the trailing node (CH-04). The placeholder is
-  a hand-rolled decoration plugin — `@tiptap/extensions` declares no
-  `sideEffects`, which pushed the schema-only entry from 136 B to 60.77 kB.
-  StarterKit's `trailingNode` no longer appends an empty paragraph after a
-  heading, and a saved document that needs a trailing paragraph gets one on load
-  without reporting it as a user edit.
-- 5efe7d3: Make the chrome keyboard-complete and axe-clean (CH-05). Adds a `label` prop
-  giving the editing surface an accessible name, `Shift+F10` and `Mod+Alt+M` for
-  the block menu, `Mod+Alt+R` / `Mod+Alt+C` for the table menus, and fixes a
-  colour-contrast failure on selected menu rows. The link editor now wins focus
-  reliably, including when `Mod+K` is pressed before the toolbar has appeared.
-- 67a6702: Add the table grid-size picker to the slash menu (CH-06). Choosing Table now
-  opens an 8 × 8 grid driven by pointer or arrow key, calling the `insertTable`
-  command from EC-13. Slash commands can carry a `picker` for any command that
-  needs an argument.
-- b40815c: Add in-table row and column handles (CH-07). Each opens a menu of structure
-  operations calling the EC-14 and EC-15 commands, and asks those commands
-  whether they can run rather than re-deriving availability.
-- d1f6727: Add the in-table cell bubble menu (CH-08). A second bubble menu instance with
-  its own plugin key and `shouldShow`, offering merge, split and structure
-  operations for a selection spanning cells. The text bubble menu stands down
-  for a cell selection so the two never compete.
-- 23952c5: Fix `pnpm dev` leaving the sandbox unable to resolve `@blockleaf/editor`. The
-  stylesheet is now copied by the bundler rather than the `build` script, so
-  watch mode emits it too, and `clean` no longer wipes `dist/` when the watcher
-  starts. The published `./styles.css` subpath is unchanged.
+- d4ee34a: Slash command menu with full keyboard and accessibility support.
+- e44eabb: Selection bubble menu with mark toggles and a link editor.
+- 7f1cbc8: Drag handle and block menu.
+- 5f8e57e: Placeholder text, and no empty paragraph appended after a heading.
+- 5efe7d3: Keyboard-complete, axe-clean chrome. New `label` prop names the editing surface, and new shortcuts open the block and table menus.
+- 67a6702: Choosing Table in the slash menu opens a grid-size picker. Slash commands can carry a `picker`.
+- b40815c: Row and column handles in tables, each with a menu of structure actions.
+- d1f6727: A cell bubble menu for merge, split and structure actions on a cell selection.
+- 23952c5: Fix `pnpm dev` leaving the sandbox unable to resolve `@blockleaf/editor`.
 
 ## 0.0.3
 
 ### Patch Changes
 
-- 8e6a8c8: Export discriminated union `BlockleafNode` and `BlockleafMark` types corresponding to the v0.1 schema.
-- 32d55f2: Add callout, task list, highlight, underline, and sanitised link extensions to minimal and standard presets.
-- c15f81e: Add UniqueID extension across block nodes for stable block IDs (EC-05).
-- 00b273e: Add markdown input rules for headings, lists, blockquotes, callouts (`:::`), marks, and sanitised markdown links (EC-06).
-- 1243e38: Add complete keyboard shortcuts across every node and mark in the editing core (EC-07).
-- f42a550: Add paste normalisation for HTML sanitisation and markdown plain-text paste handling (EC-08).
-- c8bb06d: Add canonical schema snapshot fixture and tests to prevent accidental shape changes (EC-10).
-- e19816e: Export strict non-nestable TableCellContentNode type for table cells and headers in schema (EC-11).
-- e0d61c8: Integrate TableKit from @tiptap/extension-table with non-resizable schema in standard preset (EC-12).
-- 8e6559d: Add insertTable command and keyboard insertion path via Mod-Alt-t shortcut and ||| input rule (EC-13)
-- 880c0a9: Verify and test table structure commands (addRowBefore, addRowAfter, deleteRow, addColumnBefore, addColumnAfter, deleteColumn, toggleHeaderRow, deleteTable) (EC-14)
-- d350b3b: Verify and test table cell merge, split, and mergeOrSplit commands (EC-15)
-- 550813e: Verify and coordinate table cell navigation (Tab, Shift-Tab, arrows) and list indentation keymaps (EC-16)
-- f05eaf2: Normalise pasted tables from HTML, Google Docs, Word, and markdown plain-text, flattening nested tables (EC-17)
-- 011304d: Add table document round-trip test and schema snapshot fixture (EC-18)
-- d9d74ec: Export deep document schema validation from @blockleaf/editor/validate subpath with optional zod peer dependency (EC-19)
-- efbd920: Configure Playwright browser test harness and e2e smoke spec against sandbox (EC-20)
+- 8e6a8c8: Export `BlockleafNode` and `BlockleafMark` union types for the schema.
+- 32d55f2: Add callout, task list, highlight, underline and sanitised link extensions to the minimal and standard presets.
+- c15f81e: Add stable block ids through the UniqueID extension.
+- 00b273e: Add Markdown input rules for headings, lists, blockquotes, callouts (`:::`), marks and sanitised links.
+- 1243e38: Add keyboard shortcuts for every node and mark.
+- f42a550: Sanitise pasted HTML and handle pasted Markdown text.
+- c8bb06d: Add a schema snapshot test to catch accidental shape changes.
+- e19816e: Export the `TableCellContentNode` type for table cells and headers.
+- e0d61c8: Add tables to the standard preset.
+- 8e6559d: Add the `insertTable` command, the `Mod-Alt-t` shortcut and the `|||` input rule.
+- 880c0a9: Test the table row, column and header commands.
+- d350b3b: Test the table cell merge and split commands.
+- 550813e: Table cell navigation and list indentation keys work together.
+- f05eaf2: Normalise pasted tables from HTML, Google Docs, Word and Markdown, flattening nested tables.
+- 011304d: Add a table round-trip test and schema snapshot.
+- d9d74ec: Document validation from `@blockleaf/editor/validate`, with zod as an optional peer dependency.
+- efbd920: Add a Playwright browser test setup.
 
 ## 0.0.2
 
 ### Patch Changes
 
-- 46f8c2d: Raise the bundle ceiling from 130 kB to 160 kB. Measured, not guessed: tables cost 11.74 kB and `lowlight` costs 16.69 kB curated or 39.27 kB with the `common` grammar set. The schema-only budget is unchanged at 2 kB.
+- 46f8c2d: Raise the bundle size ceiling from 130 kB to 160 kB. The schema-only budget stays at 2 kB.
