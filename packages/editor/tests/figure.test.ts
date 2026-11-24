@@ -223,12 +223,168 @@ describe('table caption (HD-10)', () => {
 		expect(figure?.content?.[1]?.content?.[0]?.text).toBe('Pasted');
 	});
 
-	it('does not force a pasted image figure into a table', () => {
+	it('does not invent a caption for a pasted figure without one', () => {
 		const instance = open([{ type: 'paragraph' }]);
 		instance.commands.setContent(
-			'<figure><img src="https://example.com/a.png"><figcaption>Photo</figcaption></figure>'
+			'<figure><img src="https://example.com/a.png"></figure>'
+		);
+		expect(types(instance)[0]).toBe('image');
+		expect(types(instance)).not.toContain('figure');
+	});
+});
+
+const image: JSONContent = {
+	type: 'image',
+	attrs: { src: 'https://example.com/a.png', alt: 'A cat' }
+};
+
+const captionedImage = (
+	text?: string,
+	attrs?: Record<string, unknown>
+): JSONContent => ({
+	type: 'figure',
+	content: [
+		image,
+		{
+			type: 'caption',
+			...(attrs ? { attrs } : {}),
+			...(text ? { content: [{ type: 'text', text }] } : {})
+		}
+	]
+});
+
+/** Selects the first image, as a click on it does. */
+const selectImage = (instance: Editor) => {
+	let target = -1;
+	instance.state.doc.descendants((node, pos) => {
+		if (target === -1 && node.type.name === 'image') target = pos;
+	});
+	instance.commands.setNodeSelection(target);
+};
+
+const first = (instance: Editor) =>
+	((instance.getJSON() as JSONContent).content ?? [])[0];
+
+describe('image caption (PA-20)', () => {
+	it('stores a captioned image as a figure, the image exactly as it was', () => {
+		const instance = open([captionedImage('Photo: Ada')]);
+		const figure = first(instance);
+		expect(figure?.type).toBe('figure');
+		expect(figure?.content?.[0]).toMatchObject(image);
+		expect(figure?.content?.[1]?.content?.[0]?.text).toBe('Photo: Ada');
+	});
+
+	it('adds a caption to a selected image and puts the caret in it', () => {
+		const instance = open([image, { type: 'paragraph' }]);
+		selectImage(instance);
+		expect(instance.commands.toggleCaption()).toBe(true);
+		expect(types(instance)).toEqual(['figure', 'paragraph']);
+		expect(instance.state.selection.$from.parent.type.name).toBe('caption');
+		instance.commands.insertContent('Credit');
+		expect(first(instance)?.content?.[1]?.content).toEqual([
+			{ type: 'text', text: 'Credit' }
+		]);
+	});
+
+	it('removes the caption and selects the image again', () => {
+		const instance = open([captionedImage('gone'), { type: 'paragraph' }]);
+		selectImage(instance);
+		expect(instance.commands.toggleCaption()).toBe(true);
+		expect(types(instance)).toEqual(['image', 'paragraph']);
+		expect(instance.state.selection.from).toBe(0);
+		expect(
+			instance.state.doc.nodeAt(instance.state.selection.from)?.type.name
+		).toBe('image');
+	});
+
+	it('removes the caption from a selected figure too', () => {
+		const instance = open([captionedImage('gone'), { type: 'paragraph' }]);
+		instance.commands.setNodeSelection(0);
+		expect(instance.commands.toggleCaption()).toBe(true);
+		expect(types(instance)[0]).toBe('image');
+	});
+
+	it('removes an empty caption on Backspace and selects the image', () => {
+		const instance = open([captionedImage(), { type: 'paragraph' }]);
+		intoCaption(instance);
+		press(instance, 'Backspace');
+		expect(types(instance)[0]).toBe('image');
+		expect(
+			instance.state.doc.nodeAt(instance.state.selection.from)?.type.name
+		).toBe('image');
+	});
+
+	it('deletes the caption with the image', () => {
+		const instance = open([
+			captionedImage('orphan?'),
+			{ type: 'paragraph' }
+		]);
+		selectImage(instance);
+		instance.commands.deleteSelection();
+		expect(types(instance)).not.toContain('figure');
+		expect(JSON.stringify(instance.getJSON() as JSONContent)).not.toContain(
+			'orphan?'
+		);
+	});
+
+	it('leaves the caption for a paragraph below on Enter', () => {
+		const instance = open([captionedImage('Caption')]);
+		intoCaption(instance);
+		press(instance, 'Enter');
+		expect(types(instance)).toEqual(['figure', 'paragraph']);
+	});
+
+	it('cannot caption a paragraph, and toggleTableCaption ignores images', () => {
+		const instance = open([{ type: 'paragraph' }, image]);
+		expect(instance.can().toggleCaption()).toBe(false);
+		selectImage(instance);
+		expect(instance.can().toggleTableCaption()).toBe(false);
+		expect(instance.can().toggleCaption()).toBe(true);
+	});
+
+	it('aligns the caption on its own, and null goes back to following the image', () => {
+		const instance = open([captionedImage('Credit')]);
+		intoCaption(instance);
+		expect(instance.commands.setCaptionAlign('center')).toBe(true);
+		expect(first(instance)?.content?.[1]?.attrs).toMatchObject({
+			textAlign: 'center'
+		});
+		expect(instance.getHTML()).toMatch(
+			/<figcaption style="text-align: center;?" class="blockleaf-caption">/
+		);
+		instance.commands.setCaptionAlign(null);
+		expect(first(instance)?.content?.[1]?.attrs?.textAlign).toBeUndefined();
+	});
+
+	it('aligns the caption from the selected image as well', () => {
+		const instance = open([captionedImage('Credit')]);
+		selectImage(instance);
+		expect(instance.commands.setCaptionAlign('right')).toBe(true);
+		expect(first(instance)?.content?.[1]?.attrs?.textAlign).toBe('right');
+	});
+
+	it('refuses to align a caption outside a figure', () => {
+		const instance = open([{ type: 'paragraph' }]);
+		expect(instance.can().setCaptionAlign('center')).toBe(false);
+	});
+
+	it('reads a pasted <figure> holding an image and a <figcaption>', () => {
+		const instance = open([{ type: 'paragraph' }]);
+		instance.commands.setContent(
+			'<figure><img src="https://example.com/a.png" alt="A cat"><figcaption>Pasted</figcaption></figure>'
+		);
+		const figure = first(instance);
+		expect(figure?.type).toBe('figure');
+		expect(figure?.content?.[0]?.type).toBe('image');
+		expect(figure?.content?.[1]?.content?.[0]?.text).toBe('Pasted');
+	});
+
+	it('drops a pasted figure whose image has an unsafe src', () => {
+		const instance = open([{ type: 'paragraph' }]);
+		instance.commands.setContent(
+			'<figure><img src="javascript:alert(1)"><figcaption>Bad</figcaption></figure><p>after</p>'
 		);
 		expect(types(instance)).not.toContain('figure');
-		expect(types(instance)).not.toContain('table');
+		expect(types(instance)).not.toContain('image');
 	});
 });

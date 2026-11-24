@@ -385,7 +385,7 @@ text editing, which the row and column handles already cover.
 ## Image menu
 
 Select an image and a toolbar appears above it: align left, centre, right,
-alt text, delete.
+toggle caption, alt text, delete.
 
 | Prop           | Default | What it does                                     |
 | -------------- | ------- | ------------------------------------------------ |
@@ -421,6 +421,19 @@ the attribute.
 
 Alignment is an attribute on the image node rather than a wrapper element, so
 the stored document stays one node and the HTML round-trips.
+
+### Caption
+
+**Toggle caption** puts a caption under the image and the caret in it, or
+takes it away. It works like a table's: Enter moves to a new paragraph below,
+Backspace in an empty caption removes it and selects the image again, and
+deleting the image deletes its caption too.
+
+A caption with no alignment of its own follows the image, so a centred
+image gets a centred caption. `editor.commands.setCaptionAlign('right')` gives
+it one; `null` goes back to following. See [Captions](/docs/schema#captions)
+for how it is stored, and [the image block](/docs/uploads#caption-or-alt-text)
+for what a caption is for that alt text is not.
 
 ---
 

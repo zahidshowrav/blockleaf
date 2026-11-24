@@ -122,7 +122,11 @@ export type TableLabels = {
 
 export type ImageLabels = {
 	actions: Record<
-		'align-left' | 'align-center' | 'align-right' | 'delete-image',
+		| 'align-left'
+		| 'align-center'
+		| 'align-right'
+		| 'toggle-caption'
+		| 'delete-image',
 		string
 	>;
 	/** Accessible name of the alt text field. */
@@ -169,7 +173,7 @@ export type PlaceholderLabels = {
 	paragraph?: string;
 	/** Shown in an empty heading, by level. */
 	heading?: (level: number) => string;
-	/** Shown in an empty table caption. */
+	/** Shown in an empty caption, under a table or an image. */
 	caption?: string;
 	/** Shown in any other empty block that has no label of its own. */
 	fallback?: string;
@@ -439,6 +443,7 @@ export const defaultLabels: ResolvedLabels = {
 			'align-left': 'Align left',
 			'align-center': 'Align centre',
 			'align-right': 'Align right',
+			'toggle-caption': 'Toggle caption',
 			'delete-image': 'Delete image'
 		},
 		altText: 'Alt text',

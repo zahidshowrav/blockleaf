@@ -366,3 +366,22 @@ sources, so host code calling the commands directly is held to the rule too.
 
 The editor's alt field writes the second when submitted empty, so marking an
 image decorative is something a user can actually do.
+
+### Caption or alt text
+
+An image can have both, and they do different jobs:
+
+- **Alt text describes the image** for someone who cannot see it. It is read
+  in place of the picture, and nobody else ever sees it.
+- **A caption adds context for everyone**: a credit, a source link, what the
+  picture shows that the picture cannot say. It is shown under the image and
+  read by a screen reader too.
+
+So do not paste one into the other. A screen reader reads both, and the same
+sentence twice is noise. A photo of a bridge might have the alt text "A
+suspension bridge in fog" and the caption "The Golden Gate at 6 a.m. Photo:
+Ada Lovelace", with the name linked.
+
+A captioned image is stored as a `figure` holding the image and a `caption`,
+and the image inside is stored exactly as it was without one. See
+[Captions](/docs/schema#captions).

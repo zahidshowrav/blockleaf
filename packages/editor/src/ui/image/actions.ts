@@ -1,9 +1,11 @@
 import type { Editor } from '@tiptap/core';
 
 import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon } from './icons.js';
+import { FIGURE_NODE } from '../../core/constants.js';
 import { defaultLabels, type ImageLabels } from '../../core/labels.js';
 import type { BubbleAction } from '../bubble-menu/types.js';
 import { TrashIcon } from '../drag-handle/icons.js';
+import { CaptionIcon } from '../table-controls/icons.js';
 
 const alignOf = (editor: Editor): string | null => {
 	const align = editor.getAttributes('image').align;
@@ -43,6 +45,19 @@ export const createImageActions = (
 		icon: AlignRightIcon,
 		isActive: (editor) => alignOf(editor) === 'right',
 		run: (editor) => editor.chain().focus().setImageAlign('right').run()
+	},
+	{
+		id: 'toggle-caption',
+		title: labels.actions['toggle-caption'],
+		icon: CaptionIcon,
+		// Pressed while the image sits in a figure, which is what having a
+		// caption is (`PA-20`).
+		isActive: (editor) =>
+			editor.state.selection.$from.parent.type.name === FIGURE_NODE,
+		// A host's own extension list may have no figure at all.
+		isAvailable: (editor) =>
+			'toggleCaption' in editor.commands && editor.can().toggleCaption(),
+		run: (editor) => editor.chain().focus().toggleCaption().run()
 	},
 	{
 		id: 'delete-image',

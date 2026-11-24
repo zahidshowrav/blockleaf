@@ -46,6 +46,7 @@ export {
 	type BulletListNode,
 	type CalloutNode,
 	type CaptionNode,
+	type CaptionedNode,
 	type CodeBlockNode,
 	type CodeMark,
 	type DetailsNode,

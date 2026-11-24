@@ -8,11 +8,28 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27 · **Last reviewed:** 2026-11-23
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28 · **Last reviewed:** 2026-11-24
 
 ---
 
 ## Settled
+
+### F28 — which blocks a figure may caption · decided 2026-11-24
+
+`HD-10` gave tables a caption as `figure > table caption` (`F20`). `PA-20`
+gives images one, and `PA-12` to `PA-15` will add video, audio, files and
+embeds, which ship in subpaths. The figure lives in the core, so its content
+expression cannot name `video`: ProseMirror refuses to build a schema whose
+expression names a node the editor did not load.
+
+**Decisions:**
+
+- **A node group, `captionable`.** The figure's content is `(table | captionable) caption`. `image` is in the group in the core; each media block joins it from its subpath. The core never names them.
+- **`table` stays named.** It belongs to the table kit, whose group the core does not set, and it was the first captioned block.
+- **The caption's own alignment is `textAlign`**, the attribute every preset already carries for paragraphs (`F25`), not a new one. Absent, the stylesheet makes it follow its block's alignment, so a centred image does not get a left-hand caption.
+- **In version 2.** An editor that only knows version 1 refuses an image inside a figure (it is a known node with content it does not allow, not an unknown one it could keep as a placeholder). Version 2 is unreleased, so this joins it; no new bump.
+- **Deleting the block deletes the caption.** As for tables: a figure left with only a caption is removed.
+- **Why:** one caption mechanism, open to blocks the core does not ship, with no change to how a table caption is stored.
 
 ### F27 — what a table of contents stores · decided 2026-11-23
 

@@ -32,7 +32,7 @@ import { type RenderableNode } from '../types.js';
 
 const Doc: NodeRenderer = ({ children }) => <>{children}</>;
 
-/** A paragraph's or heading's alignment, as the editor writes it. */
+/** A paragraph's, heading's or caption's alignment, as the editor writes it. */
 const alignStyle = (node: RenderableNode) => {
 	const align = textAlign(node);
 	return align ? { textAlign: align } : undefined;
@@ -261,7 +261,7 @@ export const tableRenderer =
 		);
 	};
 
-/** A captioned table (F20): the table, then its caption. */
+/** A captioned table or image (F20, PA-20): the block, then its caption. */
 const Figure: NodeRenderer = ({ node, children }) => (
 	<figure
 		data-id={blockId(node)}
@@ -271,8 +271,13 @@ const Figure: NodeRenderer = ({ node, children }) => (
 	</figure>
 );
 
-const Caption: NodeRenderer = ({ children }) => (
-	<figcaption className="blockleaf-caption">{children}</figcaption>
+const Caption: NodeRenderer = ({ node, children }) => (
+	<figcaption
+		className="blockleaf-caption"
+		style={alignStyle(node)}
+	>
+		{children}
+	</figcaption>
 );
 
 const TableRow: NodeRenderer = ({ children }) => <tr>{children}</tr>;

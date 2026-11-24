@@ -435,6 +435,26 @@ describe('document schema', () => {
 						align: 'center' as const
 					}
 				},
+				// PA-20: an image with a caption, aligned on its own.
+				{
+					type: 'figure' as const,
+					attrs: { id: 'figure-image' },
+					content: [
+						{
+							type: 'image' as const,
+							attrs: {
+								id: 'img-captioned',
+								src: 'https://example.com/captioned.png',
+								alt: 'A captioned picture'
+							}
+						},
+						{
+							type: 'caption' as const,
+							attrs: { textAlign: 'right' as const },
+							content: [{ type: 'text' as const, text: 'Credit' }]
+						}
+					]
+				},
 				{
 					type: 'table' as const,
 					attrs: { id: 'tbl-1' },

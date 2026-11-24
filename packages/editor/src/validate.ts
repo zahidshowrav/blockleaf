@@ -543,6 +543,8 @@ export const tableNodeSchema: z.ZodType<TableNode> = z.object({
 
 export const captionNodeSchema: z.ZodType<CaptionNode> = z.object({
 	type: z.literal('caption'),
+	// Version 2 (`PA-20`): the caption's own alignment. Absent follows its block.
+	attrs: z.object({ textAlign: textAlignSchema }).optional(),
 	content: z.array(inlineNodeSchema).optional()
 });
 
@@ -553,7 +555,10 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 			id: z.string().optional()
 		})
 		.optional(),
-	content: z.tuple([tableNodeSchema, captionNodeSchema]).optional()
+	// A table, or since version 2 an image (`PA-20`), then its caption.
+	content: z
+		.tuple([z.union([tableNodeSchema, imageNodeSchema]), captionNodeSchema])
+		.optional()
 });
 
 /* -------------------------------------------------------------------------- */

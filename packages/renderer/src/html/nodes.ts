@@ -254,8 +254,8 @@ export const createHtmlNodes = (
 		);
 	},
 
-	// A captioned table (F20): the table, then its caption, as the editor
-	// writes them.
+	// A captioned table or image (F20, PA-20): the block, then its caption,
+	// as the editor writes them.
 	figure: ({ node, children }) =>
 		element(
 			'figure',
@@ -263,8 +263,12 @@ export const createHtmlNodes = (
 			children
 		),
 
-	caption: ({ children }) =>
-		element('figcaption', { class: 'blockleaf-caption' }, children),
+	caption: ({ node, children }) =>
+		element(
+			'figcaption',
+			{ class: 'blockleaf-caption', style: alignStyle(node) },
+			children
+		),
 
 	tableRow: ({ children }) => element('tr', {}, children),
 
@@ -299,7 +303,7 @@ export const createHtmlNodes = (
 	}
 });
 
-/** The `style` a paragraph or heading carries for its alignment, if any. */
+/** The `style` a paragraph, heading or caption carries for its alignment, if any. */
 const alignStyle = (node: RenderableNode): string | undefined => {
 	const align = textAlign(node);
 	return align ? `text-align: ${align}` : undefined;
