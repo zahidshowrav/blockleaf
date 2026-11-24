@@ -395,4 +395,41 @@ describe('a captioned table (HD-10)', () => {
 			safeValidateDocument(doc({ type: 'figure', content })).success
 		).toBe(false);
 	});
+
+	const image = {
+		type: 'image',
+		attrs: { id: 'i1', src: 'https://cdn.test/a.png', alt: 'A cat' }
+	};
+
+	it('accepts an image with a caption aligned on its own (PA-20)', () => {
+		expect(
+			safeValidateDocument(
+				doc({
+					type: 'figure',
+					content: [
+						image,
+						{
+							type: 'caption',
+							attrs: { textAlign: 'center' },
+							content: [{ type: 'text', text: 'Credit' }]
+						}
+					]
+				})
+			).success
+		).toBe(true);
+	});
+
+	it('refuses a caption alignment that is not one of the four', () => {
+		expect(
+			safeValidateDocument(
+				doc({
+					type: 'figure',
+					content: [
+						image,
+						{ type: 'caption', attrs: { textAlign: 'middle' } }
+					]
+				})
+			).success
+		).toBe(false);
+	});
 });

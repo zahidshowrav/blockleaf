@@ -1,5 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
+import { CAPTIONABLE_GROUP } from '../constants.js';
+
 /**
  * Raster data URLs, which a clipboard paste can legitimately produce.
  *
@@ -83,7 +85,8 @@ const parseAlign = (value: string | null): ImageAlign | null =>
 
 export const Image = Node.create<ImageOptions>({
 	name: 'image',
-	group: 'block',
+	// `captionable`: a `figure` may hold it with a caption (`PA-20`).
+	group: `block ${CAPTIONABLE_GROUP}`,
 	atom: true,
 	draggable: true,
 

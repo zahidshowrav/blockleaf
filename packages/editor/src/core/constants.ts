@@ -92,6 +92,14 @@ export const UNKNOWN_MARK = 'blockleafUnknownMark';
 export const FIGURE_NODE = 'figure';
 export const CAPTION_NODE = 'caption';
 
+/**
+ * The group of blocks a `figure` may caption besides a table (`PA-20`,
+ * `F28`): `image` in the core, and the media blocks `./media` adds. A group
+ * rather than a list of names, because a content expression that names a
+ * node the editor did not load stops the schema being built at all.
+ */
+export const CAPTIONABLE_GROUP = 'captionable';
+
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';
 
@@ -123,11 +131,12 @@ export const SUPERSCRIPT_MARK = 'superscript';
 /**
  * Text alignment (`PA-06`, `F25`): an attribute on paragraphs and headings,
  * in the core schema so no editor drops it. `null` is the language's own
- * direction; these are the only other values a document stores.
+ * direction; these are the only other values a document stores. A caption
+ * takes it too (`PA-20`), as its own alignment beside its block's.
  */
 export const TEXT_ALIGNMENTS = ['left', 'center', 'right', 'justify'] as const;
 export const TEXT_ALIGN_ATTRIBUTE_EXTENSION_NAME = 'blockleafTextAlign';
-export const TEXT_ALIGN_TYPES = ['paragraph', 'heading'] as const;
+export const TEXT_ALIGN_TYPES = ['paragraph', 'heading', 'caption'] as const;
 /** The commands and shortcuts for `textAlign`, from `@blockleaf/editor/text-style`. */
 export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
 

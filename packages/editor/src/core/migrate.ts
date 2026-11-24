@@ -26,7 +26,7 @@ export type DocumentMigration = (doc: StoredDocument) => StoredDocument;
  */
 export const migrations: Readonly<Record<number, DocumentMigration>> = {
 	// Version 2 adds node types (`mention`, `PA-02`, and the rest of the
-	// `PA-02` to `PA-11` batch) and changes none, so every version 1
+	// `PA` and `TB` batch) and changes none, so every version 1
 	// document is already a valid version 2 one. The bump is what tells an
 	// older editor that a document may hold them.
 	1: (doc) => doc

@@ -433,6 +433,34 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "figure-image",
+      },
+      "content": [
+        {
+          "attrs": {
+            "alt": "A captioned picture",
+            "id": "img-captioned",
+            "src": "https://example.com/captioned.png",
+          },
+          "type": "image",
+        },
+        {
+          "attrs": {
+            "textAlign": "right",
+          },
+          "content": [
+            {
+              "text": "Credit",
+              "type": "text",
+            },
+          ],
+          "type": "caption",
+        },
+      ],
+      "type": "figure",
+    },
+    {
+      "attrs": {
         "id": "tbl-1",
       },
       "content": [

@@ -71,8 +71,8 @@ Planned for `EC`–`MC`:
 | `table`                                   | —                             | Contains `tableRow` and nothing else. Not nestable: a cell may not contain a table.                                                                                 |
 | `tableRow`                                | —                             | Contains `tableHeader` or `tableCell`. A header row is a row of `tableHeader`, not a flag on the table.                                                             |
 | `tableHeader` / `tableCell`               | `colspan, rowspan, colwidth`  | Cells hold block content, so a cell can contain paragraphs and lists. `colwidth` is `number[] \| null` — pixel widths; see below.                                   |
-| `figure`                                  | —                             | A captioned block: the block, then its `caption`, nothing else. Only a `table` takes a caption today. See [Captions](#captions).                                    |
-| `caption`                                 | —                             | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`.                                                          |
+| `figure`                                  | —                             | A captioned block: a `table` or an `image`, then its `caption`, nothing else. See [Captions](#captions).                                                            |
+| `caption`                                 | `textAlign`                   | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`. `textAlign` is version 2; absent follows the block.      |
 | `mention`                                 | `id, label, kind`             | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                             |
 | `tableOfContents`                         | —                             | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx). |
 
@@ -96,23 +96,36 @@ A table is a grid of rich-text cells with an optional header row. Nested tables 
 
 ### Captions
 
-A table with a caption is stored inside a `figure`, with the caption beside it:
+A captioned block is stored inside a `figure`, with the caption beside it. The block is a table, or since version 2 an image:
 
 ```json
 {
 	"type": "figure",
 	"attrs": { "id": "…" },
 	"content": [
-		{ "type": "table", "content": [ … ] },
-		{ "type": "caption", "content": [{ "type": "text", "text": "Sales by quarter" }] }
+		{
+			"type": "image",
+			"attrs": {
+				"id": "…",
+				"src": "https://cdn.test/bridge.png",
+				"alt": "A suspension bridge in fog"
+			}
+		},
+		{
+			"type": "caption",
+			"attrs": { "textAlign": "center" },
+			"content": [{ "type": "text", "text": "The Golden Gate at 6 a.m." }]
+		}
 	]
 }
 ```
 
-- **The table inside is stored exactly as it is without a caption.** Adding a caption wraps it; removing one unwraps it. Nothing about the table changes.
-- **Beside, not inside.** ProseMirror's table implementation reads every child of a `table` as a row, so a caption inside the table would read as a broken row.
-- **One mechanism for every caption.** Image, video and embed captions on the [roadmap](./roadmap.mdx) use the same `figure` and `caption`.
-- **No `SCHEMA_VERSION` bump.** `figure` and `caption` are new node types, and no existing node changed, so a version 1 document stays a version 1 document. An editor older than this one keeps a captioned table as a placeholder and saves it back intact. An older `@blockleaf/renderer` renders nothing for it — the whole table, not only the caption — so upgrade the renderer before the editor.
+- **The block inside is stored exactly as it is without a caption.** Adding a caption wraps it; removing one unwraps it. Nothing about the table or image changes.
+- **Beside, not inside.** ProseMirror's table implementation reads every child of a `table` as a row, so a caption inside the table would read as a broken row. Beside also leaves an image the single, uneditable block it always was.
+- **One mechanism for every caption.** Video, audio, file and embed captions on the [roadmap](./roadmap.mdx) use the same `figure` and `caption`. The blocks a figure may hold besides a table are a node group, `captionable`, so a block from a subpath joins it without the core naming it.
+- **The caption's own alignment.** `textAlign` on the caption, the same four values as a paragraph's. Absent, it follows its block: under a centred image it is centred.
+- **A caption is not alt text.** See [caption or alt text](/docs/uploads#caption-or-alt-text).
+- **Tables needed no `SCHEMA_VERSION` bump.** `figure` and `caption` were new node types when tables gained them, and no existing node changed. An editor older than this one keeps a captioned table as a placeholder and saves it back intact. An older `@blockleaf/renderer` renders nothing for it — the whole table, not only the caption — so upgrade the renderer before the editor. A captioned image is version 2; see below.
 
 ## Version 2
 
@@ -124,6 +137,7 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`fontFamily`** (`PA-10`) and **`fontSize`** (`PA-11`) — marks with `{ family }` and `{ size }`, tokens like `textColor`'s.
 - **`tableOfContents`** (`PA-08`) — a block with no attributes beyond its id. It never stores its entries, so it cannot go stale; see F27.
 - **`textAlign`** on `paragraph` and `heading` (`PA-06`) — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it; see F25.
+- **An image in a `figure`** (`PA-20`) — a figure may hold an `image` as well as a `table`, and its `caption` takes `textAlign`, absent to follow the image. An editor that only knows version 1 would refuse an image inside a figure, which is why this is in the bump and not beside it like the table caption was. See F28.
 - The rest of the batch, such as maths and media, joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
 
 The migration from `1` changes nothing: every version 1 document is already a valid version 2 one, so `migrate()` only stamps the new number. The bump is there for the other direction. An editor that only knows version 1 opens a version 2 document read-only rather than editing around nodes it cannot show.
@@ -163,7 +177,7 @@ strips it and the editor drops it. That is why adding an attribute to an
 existing node always needs a `SCHEMA_VERSION` bump and a migration: an
 older editor would lose it. A new node type survives an older editor as a
 placeholder, so new types are batched into one planned bump — version 2
-carries the whole `PA-02` to `PA-11` batch — rather than bumping for each.
+carries the whole `PA` and `TB` batch — rather than bumping for each.
 
 ## Explicitly out of v0.1
 

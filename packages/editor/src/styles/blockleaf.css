@@ -453,6 +453,22 @@
 	font-size: 0.875em;
 }
 
+/* A captioned image (PA-20). The image keeps its own alignment inside the
+   figure, and a caption with no alignment of its own follows it, so a
+   centred picture does not get a caption stuck to the left edge. A caption
+   that was aligned carries an inline `text-align`, which wins. */
+.blockleaf-editor__content
+	.blockleaf-figure:has(> [data-align='center'])
+	> .blockleaf-caption {
+	text-align: center;
+}
+
+.blockleaf-editor__content
+	.blockleaf-figure:has(> [data-align='right'])
+	> .blockleaf-caption {
+	text-align: right;
+}
+
 /* A toggle (PA-01, F23): its first block is the title, the rest is the body.
    In the editor a button beside the title opens and closes it, and a closed
    toggle hides everything after the title. */

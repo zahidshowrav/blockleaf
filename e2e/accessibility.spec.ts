@@ -297,6 +297,25 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} figure`)).toEqual([]);
 	});
 
+	test('a captioned image has no violations', async ({ page }) => {
+		await openEditor(page);
+		await dropFile(page, 'red-balloon.png');
+		const image = page.locator(`${EDITOR} img`);
+		await expect(image).toBeVisible();
+		await image.click();
+		await page
+			.getByRole('toolbar', { name: 'Image' })
+			.getByRole('button', { name: 'Toggle caption' })
+			.click();
+		await expect(page.locator(EDITOR)).toBeFocused();
+		await page.keyboard.type('A red balloon over the river');
+		await expect(page.locator(`${EDITOR} figcaption`)).toHaveText(
+			'A red balloon over the river'
+		);
+
+		expect(await violations(page, `${EDITOR} figure`)).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

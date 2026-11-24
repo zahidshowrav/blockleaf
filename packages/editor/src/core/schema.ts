@@ -276,21 +276,33 @@ export interface TableNode {
 }
 
 /**
+ * The blocks a `figure` may caption (`F20`, `F28`): a table, and since
+ * version 2 an image (`PA-20`).
+ */
+export type CaptionedNode = TableNode | ImageNode;
+
+/**
  * A block with a caption: the block, then its `caption` (`F20`). The caption
  * sits beside the block rather than inside it, so the block is stored exactly
- * as it would be without one. Only a table takes a caption today.
+ * as it would be without one.
  */
 export interface FigureNode {
 	type: 'figure';
 	attrs?: {
 		id?: string;
 	};
-	content?: [TableNode, CaptionNode];
+	content?: [CaptionedNode, CaptionNode];
 }
 
-/** A figure's caption. Rich text, so a credit can carry its link. */
+/**
+ * A figure's caption. Rich text, so a credit can carry its link. Version 2
+ * (`PA-20`) gives it `textAlign`; absent, it follows its block's alignment.
+ */
 export interface CaptionNode {
 	type: 'caption';
+	attrs?: {
+		textAlign?: TextAlign | null;
+	};
 	content?: InlineNode[];
 }
 

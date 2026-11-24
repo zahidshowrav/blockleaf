@@ -109,11 +109,12 @@ describe('image menu visibility (MC-04)', () => {
 });
 
 describe('image menu actions (MC-04)', () => {
-	it('offers alignment and delete', () => {
+	it('offers alignment, a caption and delete', () => {
 		expect(defaultImageActions.map((action) => action.id)).toEqual([
 			'align-left',
 			'align-center',
 			'align-right',
+			'toggle-caption',
 			'delete-image'
 		]);
 	});
@@ -144,6 +145,24 @@ describe('image menu actions (MC-04)', () => {
 		expect(imageAttrs(editor)?.align).toBeNull();
 		expect(left?.isActive(editor)).toBe(true);
 		expect(centre?.isActive(editor)).toBe(false);
+	});
+
+	it('adds a caption, and shows it pressed once the image is in a figure (PA-20)', () => {
+		const editor = createImageEditor();
+		selectImage(editor);
+		const caption = defaultImageActions.find(
+			(entry) => entry.id === 'toggle-caption'
+		);
+		expect(caption?.isAvailable?.(editor)).toBe(true);
+		expect(caption?.isActive(editor)).toBe(false);
+
+		caption?.run(editor);
+		expect(editor.state.doc.firstChild?.type.name).toBe('figure');
+
+		selectImage(editor);
+		expect(caption?.isActive(editor)).toBe(true);
+		caption?.run(editor);
+		expect(editor.state.doc.firstChild?.type.name).toBe('image');
 	});
 
 	it('deletes the selected image', () => {

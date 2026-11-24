@@ -7,42 +7,72 @@ import {
 } from '@tiptap/core';
 import { type Node as ProseMirrorNode } from '@tiptap/pm/model';
 import {
+	NodeSelection,
 	Plugin,
 	PluginKey,
 	TextSelection,
 	type EditorState,
+	type Selection,
 	type Transaction
 } from '@tiptap/pm/state';
 
-import { CAPTION_NODE, FIGURE_NODE } from '../constants.js';
+import { CAPTION_NODE, CAPTIONABLE_GROUP, FIGURE_NODE } from '../constants.js';
+import { readTextAlign, type TextAlignment } from '../text-align.js';
 
 declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		figure: {
 			/**
-			 * Gives the table around the selection a caption, or takes its
-			 * caption away. Adding one puts the caret in the new caption.
+			 * Gives the selected block a caption, or takes its caption away
+			 * (`PA-20`). The block is the table around the caret, or a
+			 * selected image or other captionable block. Adding one puts the
+			 * caret in the new caption.
+			 */
+			toggleCaption: () => ReturnType;
+			/**
+			 * `toggleCaption`, for a table only: false anywhere else. Kept
+			 * from `HD-10`, which captioned tables before anything else.
 			 */
 			toggleTableCaption: () => ReturnType;
+			/**
+			 * Aligns the caption of the figure around the selection; `null`
+			 * goes back to following its block (`PA-20`).
+			 */
+			setCaptionAlign: (alignment: TextAlignment | null) => ReturnType;
 		};
 	}
 }
 
+const isCaptionable = (node: ProseMirrorNode): boolean =>
+	node.type.isInGroup(CAPTIONABLE_GROUP);
+
 /**
- * The figure's table, if it still has one worth keeping. Deleting the table
+ * The figure's block, if it still has one worth keeping. Deleting the block
  * inside a figure does not empty the figure: ProseMirror fills the gap with
- * a made-up table holding one row and no cells, so a table without a single
- * cell counts as gone too.
+ * a made-up one — a table holding one row and no cells, or an image with no
+ * `src` — so those count as gone too.
  */
-const tableOf = (figure: ProseMirrorNode): ProseMirrorNode | null => {
+const blockOf = (figure: ProseMirrorNode): ProseMirrorNode | null => {
 	const first = figure.firstChild;
-	if (first?.type.name !== 'table') return null;
-	let cells = 0;
-	first.forEach((row) => {
-		cells += row.childCount;
-	});
-	return cells > 0 ? first : null;
+	if (!first) return null;
+	if (first.type.name === 'table') {
+		let cells = 0;
+		first.forEach((row) => {
+			cells += row.childCount;
+		});
+		return cells > 0 ? first : null;
+	}
+	if (!isCaptionable(first)) return null;
+	const src: unknown = first.attrs.src;
+	return typeof src === 'string' && src.length > 0 ? first : null;
 };
+
+/** The selected node, when the selection is a node selection. */
+const selectedNode = (selection: Selection): ProseMirrorNode | null =>
+	selection instanceof NodeSelection ? selection.node : null;
+
+const parentFigure = (selection: Selection) =>
+	findParentNode((node) => node.type.name === FIGURE_NODE)(selection);
 
 /**
  * Removes a figure that lost its table — `deleteTable` deletes the table node
@@ -59,7 +89,7 @@ const dropOrphanedFigures = (
 	const transform = combineTransactionSteps(oldState.doc, [...transactions]);
 	const orphans = new Map<number, number>();
 	const check = (node: ProseMirrorNode, pos: number) => {
-		if (node.type.name === FIGURE_NODE && !tableOf(node)) {
+		if (node.type.name === FIGURE_NODE && !blockOf(node)) {
 			orphans.set(pos, pos + node.nodeSize);
 		}
 	};
@@ -83,6 +113,10 @@ const dropOrphanedFigures = (
 /**
  * The text under a captioned block. Rich text, so a credit can carry its
  * link (`F20`). It only exists as the last child of a `figure`.
+ *
+ * Its alignment is the `textAlign` attribute every preset carries (`F25`):
+ * unset, it follows its block's, so a centred image has a centred caption
+ * without anyone asking for one.
  */
 export const Caption = /* @__PURE__ */ Node.create({
 	name: CAPTION_NODE,
@@ -132,7 +166,7 @@ export const Caption = /* @__PURE__ */ Node.create({
 
 		// Backspace at the start of an empty caption removes it; at the start
 		// of a written one it does nothing, rather than pulling the text into
-		// the last cell.
+		// the last cell or deleting the image above.
 		const backspace = () => {
 			if (!inCaption()) return false;
 			const { selection } = this.editor.state;
@@ -140,7 +174,7 @@ export const Caption = /* @__PURE__ */ Node.create({
 				return false;
 			}
 			if (selection.$from.parent.content.size > 0) return true;
-			return this.editor.commands.toggleTableCaption();
+			return this.editor.commands.toggleCaption();
 		};
 
 		return {
@@ -155,8 +189,9 @@ export const Caption = /* @__PURE__ */ Node.create({
  * Wraps a block that has a caption: the block first, its `caption` last.
  *
  * The caption is beside the block rather than inside it because
- * `prosemirror-tables` reads every child of a `table` as a row (`F20`).
- * Only tables take one for now; `PA-20` widens the content to images.
+ * `prosemirror-tables` reads every child of a `table` as a row (`F20`), and
+ * because it leaves an image the atom it always was (`PA-20`). The block is
+ * a table, or any node in the `captionable` group (`F28`).
  */
 export const Figure = /* @__PURE__ */ Node.create({
 	name: FIGURE_NODE,
@@ -165,7 +200,7 @@ export const Figure = /* @__PURE__ */ Node.create({
 	// leaves behind — which it does again on every pass, forever.
 	priority: 110,
 	group: 'block',
-	content: `table ${CAPTION_NODE}`,
+	content: `(table | ${CAPTIONABLE_GROUP}) ${CAPTION_NODE}`,
 	isolating: true,
 	defining: true,
 
@@ -173,12 +208,15 @@ export const Figure = /* @__PURE__ */ Node.create({
 		return [
 			{
 				tag: 'figure',
-				// Only a figure this schema can hold. Any other is left to the
-				// rules for its content, so a pasted image figure keeps its
-				// image instead of being forced into a table.
+				// Only a figure this schema can hold: a table or an image, and
+				// a caption. Any other is left to the rules for its content,
+				// so a figure with no caption keeps its block instead of
+				// gaining an empty caption, and one holding something this
+				// schema cannot caption is not forced into a table.
 				getAttrs: (element) =>
+					element.querySelector(':scope > figcaption') &&
 					element.querySelector(
-						':scope > table, :scope > div > table'
+						':scope > table, :scope > div > table, :scope > img'
 					)
 						? null
 						: false
@@ -195,59 +233,136 @@ export const Figure = /* @__PURE__ */ Node.create({
 	},
 
 	addCommands() {
+		/**
+		 * Wraps `node` at `pos` in a figure with an empty caption and puts the
+		 * caret in it, or returns false if a figure cannot go there.
+		 */
+		const wrap = (
+			state: EditorState,
+			tr: Transaction,
+			dispatch: unknown,
+			pos: number,
+			node: ProseMirrorNode
+		): boolean => {
+			const figureType = state.schema.nodes[FIGURE_NODE];
+			const captionType = state.schema.nodes[CAPTION_NODE];
+			if (!figureType || !captionType) return false;
+			const $pos = state.doc.resolve(pos);
+			if (
+				!$pos.parent.canReplaceWith(
+					$pos.index(),
+					$pos.index() + 1,
+					figureType
+				)
+			) {
+				return false;
+			}
+			if (dispatch) {
+				tr.replaceWith(
+					pos,
+					pos + node.nodeSize,
+					figureType.create(null, [node, captionType.create()])
+				);
+				// Into the figure (+1), past the block, into the caption (+1).
+				const caption = pos + 1 + node.nodeSize + 1;
+				tr.setSelection(TextSelection.create(tr.doc, caption));
+			}
+			return true;
+		};
+
+		/**
+		 * Replaces the figure around the selection with its block. A table
+		 * gets the caret at the end of its last cell; anything else is
+		 * selected, as it was before it had a caption.
+		 */
+		const unwrap = (
+			tr: Transaction,
+			dispatch: unknown,
+			figure: { pos: number; node: ProseMirrorNode },
+			block: ProseMirrorNode
+		): boolean => {
+			if (dispatch) {
+				tr.replaceWith(
+					figure.pos,
+					figure.pos + figure.node.nodeSize,
+					block
+				);
+				if (block.type.name === 'table') {
+					const end = figure.pos + block.nodeSize - 1;
+					tr.setSelection(
+						TextSelection.near(tr.doc.resolve(end), -1)
+					);
+				} else {
+					tr.setSelection(NodeSelection.create(tr.doc, figure.pos));
+				}
+			}
+			return true;
+		};
+
+		const tableAround = (selection: Selection) =>
+			findParentNode((node) => node.type.name === 'table')(selection);
+
 		return {
-			toggleTableCaption:
+			toggleCaption:
 				() =>
 				({ state, tr, dispatch }) => {
-					const figure = findParentNode(
-						(node) => node.type.name === FIGURE_NODE
-					)(state.selection);
-					const captioned = figure ? tableOf(figure.node) : null;
-					if (figure && captioned) {
-						if (dispatch) {
-							tr.replaceWith(
-								figure.pos,
-								figure.pos + figure.node.nodeSize,
-								captioned
-							);
-							// The caret goes to the end of the last cell.
-							const end = figure.pos + captioned.nodeSize - 1;
-							tr.setSelection(
-								TextSelection.near(tr.doc.resolve(end), -1)
-							);
-						}
-						return true;
+					const selected = selectedNode(state.selection);
+					// A selected figure — the block menu selects one — counts
+					// as being inside it.
+					const figure =
+						selected?.type.name === FIGURE_NODE
+							? { pos: state.selection.from, node: selected }
+							: parentFigure(state.selection);
+					const block = figure ? blockOf(figure.node) : null;
+					if (figure && block) {
+						return unwrap(tr, dispatch, figure, block);
 					}
 
-					const table = findParentNode(
-						(node) => node.type.name === 'table'
-					)(state.selection);
-					const figureType = state.schema.nodes[FIGURE_NODE];
-					const captionType = state.schema.nodes[CAPTION_NODE];
-					if (!table || !figureType || !captionType) return false;
-					const $table = state.doc.resolve(table.pos);
-					if (
-						!$table.parent.canReplaceWith(
-							$table.index(),
-							$table.index() + 1,
-							figureType
-						)
-					) {
+					if (selected && isCaptionable(selected)) {
+						return wrap(
+							state,
+							tr,
+							dispatch,
+							state.selection.from,
+							selected
+						);
+					}
+
+					const table = tableAround(state.selection);
+					if (!table) return false;
+					return wrap(state, tr, dispatch, table.pos, table.node);
+				},
+
+			toggleTableCaption:
+				() =>
+				({ state, commands }) => {
+					const figure = parentFigure(state.selection);
+					const inTable = figure
+						? figure.node.firstChild?.type.name === 'table'
+						: tableAround(state.selection) !== undefined;
+					return inTable && commands.toggleCaption();
+				},
+
+			setCaptionAlign:
+				(alignment) =>
+				({ state, tr, dispatch }) => {
+					const figure = parentFigure(state.selection);
+					const caption = figure?.node.lastChild;
+					if (!figure || caption?.type.name !== CAPTION_NODE) {
 						return false;
 					}
+					const value =
+						alignment === null
+							? undefined
+							: readTextAlign(alignment);
+					if (alignment !== null && value === undefined) return false;
 					if (dispatch) {
-						tr.replaceWith(
-							table.pos,
-							table.pos + table.node.nodeSize,
-							figureType.create(null, [
-								table.node,
-								captionType.create()
-							])
-						);
-						// Into the figure (+1), past the table, into the
-						// caption (+1).
-						const caption = table.pos + 1 + table.node.nodeSize + 1;
-						tr.setSelection(TextSelection.create(tr.doc, caption));
+						const pos =
+							figure.pos +
+							figure.node.nodeSize -
+							caption.nodeSize -
+							1;
+						tr.setNodeAttribute(pos, 'textAlign', value);
 					}
 					return true;
 				}

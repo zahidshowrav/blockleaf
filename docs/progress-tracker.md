@@ -27,8 +27,8 @@ site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA
 **Next:** the media stack, `PA-20` → `PA-21` → `PA-12`/`PA-13`/`PA-14` → `PA-24`. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
-changes nothing; `PA-03` to `PA-11` join version 2 without bumping again.
-Every other `PA` and `TB` task waits for the v2 release.
+changes nothing. Every other `PA` and `TB` task joins version 2 without
+bumping again, and version 2 is released once that batch is in.
 `PA-08` and `PA-09` share the `./toc` subpath; the table of contents stores
 nothing but its id (`F27`). `PA-18` comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
 waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
@@ -475,8 +475,8 @@ own `size-limit` entry declaring `import`. Five of the marks share
 `./text-style` and two share `./toc`, because a subpath per feature is
 release overhead with nothing to show for it.
 
-The additive schema changes land in **planned batches** — `PA-02` to `PA-11`
-in one bump, `PA-12` to `PA-17` in another. Six bumps for six node types is
+The additive schema changes land in **one planned bump** — every `PA` and
+`TB` change joins version 2 (decided 2026-11-24). Six bumps for six node types is
 churn every host pays to follow, and the migration for a purely additive
 change is the same work whether it runs once or six times.
 
