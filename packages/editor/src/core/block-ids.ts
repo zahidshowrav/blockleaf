@@ -17,6 +17,7 @@ import {
 	PluginKey,
 	type Transaction
 } from '@tiptap/pm/state';
+import { CellSelection } from '@tiptap/pm/tables';
 
 import { UNIQUE_ID_EXTENSION_NAME } from './constants.js';
 
@@ -104,6 +105,10 @@ const stampNode = (
  * Gives every block in a pasted slice its id before the slice reaches the
  * document. `UniqueID`'s `transformPasted` has already cleared the copied
  * ids, which is right: a copy must not share an id with its original.
+ *
+ * The blocks are built with `create`, which does not check their content.
+ * A step used to, so a slice that another plugin left invalid now lands
+ * instead of failing the paste. Blockleaf's own plugins never build one.
  */
 export const stampPastedSlice = (
 	slice: Slice,
@@ -223,7 +228,13 @@ export const PastedBlockIds = /* @__PURE__ */ Extension.create({
 			new Plugin({
 				key: new PluginKey('pastedBlockIds'),
 				props: {
-					transformPasted: (slice) => stampPastedSlice(slice, options)
+					// Pasting into selected table cells repeats the pasted cells
+					// to fill the selection, ids included. Left without ids, the
+					// slice gets them in `appendTransaction`, one per copy.
+					transformPasted: (slice, view) =>
+						view.state.selection instanceof CellSelection
+							? slice
+							: stampPastedSlice(slice, options)
 				},
 				appendTransaction: (transactions, oldState, newState) =>
 					settlePastedIds(transactions, oldState, newState, options)

@@ -1,6 +1,7 @@
 import { Editor, type JSONContent } from '@tiptap/core';
 import { Slice } from '@tiptap/pm/model';
 import { TextSelection, type Transaction } from '@tiptap/pm/state';
+import { CellSelection } from '@tiptap/pm/tables';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { UniqueID } from '../src/core/block-ids.js';
@@ -170,6 +171,35 @@ describe('ids for pasted blocks (HD-13)', () => {
 
 	// `UniqueID` is told to skip pastes, and nothing else: typing still goes
 	// through it.
+	it('gives each copy its own ids when pasting into selected cells', () => {
+		const row = (text: string) =>
+			`<tr><td><p>${text}1</p></td><td><p>${text}2</p></td></tr>`;
+		const target = open(
+			`<table><tbody>${row('a')}${row('b')}${row('c')}</tbody></table>`
+		);
+		const cells: number[] = [];
+		target.state.doc.descendants((node, pos) => {
+			if (node.type.name === 'tableCell') cells.push(pos);
+		});
+		target.view.dispatch(
+			target.state.tr.setSelection(
+				CellSelection.create(target.state.doc, cells[0]!, cells.at(-1)!)
+			)
+		);
+
+		// One copied row; the table fills all three selected rows with it.
+		paste(
+			target,
+			'<table><tbody><tr><td><p>x1</p></td><td><p>x2</p></td></tr></tbody></table>'
+		);
+
+		const ids = blockIds(target);
+		expect(target.getText()).toContain('x1');
+		expect(target.getText()).not.toContain('a1');
+		expect(ids.every((id) => typeof id === 'string')).toBe(true);
+		expect(new Set(ids).size).toBe(ids.length);
+	});
+
 	it('still gives a block made by typing its id', () => {
 		const target = open('<p>Hello</p>');
 		target.commands.setTextSelection(target.state.doc.content.size - 1);
