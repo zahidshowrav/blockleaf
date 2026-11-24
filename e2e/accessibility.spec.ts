@@ -316,6 +316,29 @@ test.describe('Chrome accessibility in a real browser', () => {
 		expect(await violations(page, `${EDITOR} figure`)).toEqual([]);
 	});
 
+	test('the caption toolbar has no violations, contrast included', async ({
+		page
+	}) => {
+		await page.goto('/?media');
+		await page.locator(EDITOR).click();
+		await dropFile(page, 'red-balloon.png');
+		const image = page.locator(`${EDITOR} img`);
+		await expect(image).toBeVisible();
+		await image.click();
+		await page
+			.getByRole('toolbar', { name: 'Image' })
+			.getByRole('button', { name: 'Toggle caption' })
+			.click();
+		await expect(page.locator(EDITOR)).toBeFocused();
+		await page.keyboard.type('Balloon');
+		const toolbar = page.getByRole('toolbar', { name: 'Caption' });
+		await expect(toolbar).toBeVisible();
+
+		expect(
+			await violations(page, '[role="toolbar"][aria-label="Caption"]')
+		).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

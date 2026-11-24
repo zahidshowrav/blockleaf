@@ -100,6 +100,12 @@ export const CAPTION_NODE = 'caption';
  */
 export const CAPTIONABLE_GROUP = 'captionable';
 
+/**
+ * The caption toolbar (`PA-21`), from `@blockleaf/editor/media`. Named so
+ * `BlockleafEditor` can hand it the resolved labels.
+ */
+export const CAPTION_MENU_EXTENSION_NAME = 'captionMenu';
+
 /** A toggle block: its first child is the title, the rest open and close (`F23`). */
 export const DETAILS_NODE = 'details';
 

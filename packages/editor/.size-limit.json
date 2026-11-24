@@ -47,5 +47,12 @@
 		"import": "{ withTableOfContents }",
 		"limit": "60 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "media subpath, standalone (counts the bubble menu the editor already ships; 0.23 kB on top of it)",
+		"path": "dist/media.js",
+		"import": "{ withMedia }",
+		"limit": "90 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

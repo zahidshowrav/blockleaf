@@ -143,6 +143,15 @@ export type ImageLabels = {
 	editAlt: string;
 };
 
+export type CaptionLabels = {
+	/** Accessible name of the caption toolbar (`PA-21`). */
+	toolbar: string;
+	actions: Record<
+		'align-left' | 'align-center' | 'align-right' | 'remove-caption',
+		string
+	>;
+};
+
 export type LinkLabels = {
 	/** Accessible name of the address field. */
 	address: string;
@@ -273,6 +282,7 @@ export type ResolvedLabels = {
 	blockMenu: BlockMenuLabels;
 	table: TableLabels;
 	image: ImageLabels;
+	caption: CaptionLabels;
 	link: LinkLabels;
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
@@ -306,6 +316,9 @@ export type BlockleafLabels = {
 	};
 	image?: Partial<Omit<ImageLabels, 'actions'>> & {
 		actions?: Partial<ImageLabels['actions']>;
+	};
+	caption?: Partial<Omit<CaptionLabels, 'actions'>> & {
+		actions?: Partial<CaptionLabels['actions']>;
 	};
 	link?: Partial<LinkLabels>;
 	upload?: Partial<UploadLabels>;
@@ -453,6 +466,15 @@ export const defaultLabels: ResolvedLabels = {
 		addAlt: 'Add alt text',
 		editAlt: 'Edit alt text'
 	},
+	caption: {
+		toolbar: 'Caption',
+		actions: {
+			'align-left': 'Align caption left',
+			'align-center': 'Centre caption',
+			'align-right': 'Align caption right',
+			'remove-caption': 'Remove caption'
+		}
+	},
 	link: {
 		address: 'Link address',
 		placeholder: 'Paste or type a link',
@@ -579,6 +601,14 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 		...defaultLabels.image,
 		...labels?.image,
 		actions: { ...defaultLabels.image.actions, ...labels?.image?.actions }
+	},
+	caption: {
+		...defaultLabels.caption,
+		...labels?.caption,
+		actions: {
+			...defaultLabels.caption.actions,
+			...labels?.caption?.actions
+		}
 	},
 	link: { ...defaultLabels.link, ...labels?.link },
 	upload: { ...defaultLabels.upload, ...labels?.upload },

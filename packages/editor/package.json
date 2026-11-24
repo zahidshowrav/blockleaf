@@ -48,6 +48,10 @@
 			"types": "./dist/toc.d.ts",
 			"import": "./dist/toc.js"
 		},
+		"./media": {
+			"types": "./dist/media.d.ts",
+			"import": "./dist/media.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"

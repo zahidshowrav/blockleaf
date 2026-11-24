@@ -108,6 +108,7 @@ export {
 	type TextCountLabels,
 	type FontLabels,
 	type ImageLabels,
+	type CaptionLabels,
 	type LinkLabels,
 	type MentionLabels,
 	type ResolvedLabels,

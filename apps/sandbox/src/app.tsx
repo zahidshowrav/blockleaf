@@ -12,6 +12,7 @@ import type {
 } from '@blockleaf/editor';
 import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
+import { withMedia } from '@blockleaf/editor/media';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
 import { TextCount, withTableOfContents } from '@blockleaf/editor/toc';
@@ -72,17 +73,18 @@ const withSandboxMentions = (base: Extensions): Extensions =>
 
 /**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
- * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`. With none, the editor is
+ * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`. With none, the editor is
  * the default preset, as a host that installs nothing gets it.
  */
 const extensions = (() => {
-	const flags = ['mentions', 'textstyle', 'emoji', 'toc'];
+	const flags = ['mentions', 'textstyle', 'emoji', 'toc', 'media'];
 	if (!flags.some((flag) => params.has(flag))) return undefined;
 	let base = presets.standard();
 	if (params.has('mentions')) base = withSandboxMentions(base);
 	if (params.has('textstyle')) base = withTextStyle(base);
 	if (params.has('emoji')) base = withEmoji(base);
 	if (params.has('toc')) base = withTableOfContents(base);
+	if (params.has('media')) base = withMedia(base);
 	return base;
 })();
 

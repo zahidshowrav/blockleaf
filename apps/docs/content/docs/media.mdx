@@ -1,0 +1,82 @@
+---
+title: Media
+description: The caption toolbar, from the opt-in media subpath.
+icon: Film
+---
+
+`@blockleaf/editor/media` is the opt-in subpath for media. Today it adds the
+**caption toolbar**.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withMedia } from '@blockleaf/editor/media';
+
+const extensions = withMedia(presets.standard());
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+## Captions
+
+An image or a table can have a caption without this subpath. The core adds
+one from the image toolbar or the table's row menu, and stores it as a
+`figure` holding the block and a `caption`. See
+[Captions](/docs/schema#captions), and
+[caption or alt text](/docs/uploads#caption-or-alt-text) for what a caption
+is for.
+
+## The caption toolbar
+
+Put the caret in a caption and a toolbar appears above it:
+
+| Button              | Does                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| Align caption left  | Gives the caption its own alignment.                         |
+| Centre caption      | The same, centred.                                           |
+| Align caption right | The same, on the right.                                      |
+| Remove caption      | Takes the caption away. The image or table stays, as it was. |
+
+**A caption follows its block until you align it.** Under a centred image, a
+caption with no alignment of its own is centred too, and the toolbar shows
+**Centre caption** pressed. Press a different alignment and the caption keeps
+it. Press the caption's own alignment again and it goes back to following
+the block.
+
+The toolbar only shows for a caret, not for a selection. Select some of the
+caption and the ordinary text toolbar takes over, so you can bold it or add
+a link, for a photo credit say.
+
+With the keyboard, `Tab` from the caption moves to the toolbar, like every
+other toolbar in the editor. `Escape` goes back to the caption. With
+[`@blockleaf/editor/text-style`](./text-style.mdx) loaded, its alignment
+shortcuts work in a caption too.
+
+### Without the toolbar
+
+Everything the toolbar does is a command, so your own chrome can do it:
+
+```ts
+editor.commands.setCaptionAlign('center'); // its own alignment
+editor.commands.setCaptionAlign(null); // follow the block again
+editor.commands.toggleCaption(); // add or remove
+```
+
+### Options
+
+```ts
+withMedia(presets.standard(), {
+	captionMenu: {
+		actions: (defaults) => defaults.filter((a) => a.id !== 'remove-caption')
+	}
+});
+```
+
+`captionMenu: false` leaves the toolbar out. Its strings are under
+`labels.caption`; see [i18n](./i18n.mdx).
+
+## What it costs
+
+The subpath adds about 0.2 kB on top of the editor, because the toolbar is the editor's own bubble menu. The editor's own bundle
+does not change unless you import it.
