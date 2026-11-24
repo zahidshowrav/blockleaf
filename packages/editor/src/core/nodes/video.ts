@@ -3,13 +3,19 @@ import { Node, mergeAttributes } from '@tiptap/core';
 import { CAPTIONABLE_GROUP, VIDEO_NODE } from '../constants.js';
 import { defaultLabels, type ResolvedLabels } from '../labels.js';
 import { sanitizeMediaSrc } from '../media-src.js';
+import {
+	parseMediaWidth,
+	renderMediaWidth,
+	type MediaWidth
+} from '../media-width.js';
 import { sanitizeSrc, type ImageAlign } from './image.js';
 
 export interface VideoAttributes {
 	src: string;
 	/** A still shown before it plays. Held to the image rule. */
 	poster?: string | null;
-	width?: number | null;
+	/** Pixels, or `'full'` for the width of the page (`PA-24`). */
+	width?: MediaWidth | null;
 	align?: ImageAlign | null;
 }
 
@@ -28,12 +34,6 @@ declare module '@tiptap/core' {
 		};
 	}
 }
-
-const parseWidth = (value: string | null): number | null => {
-	if (value === null) return null;
-	const parsed = Number.parseInt(value, 10);
-	return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-};
 
 const parseAlign = (value: string | null): ImageAlign | null =>
 	value === 'left' || value === 'center' || value === 'right' ? value : null;
@@ -89,14 +89,11 @@ export const Video = /* @__PURE__ */ Node.create<VideoOptions>({
 					return poster ? { poster } : {};
 				}
 			},
+			// Pixels, or `'full'` (`PA-24`, `F21`).
 			width: {
 				default: null,
-				parseHTML: (element) =>
-					parseWidth(element.getAttribute('width')),
-				renderHTML: (attributes) =>
-					typeof attributes.width === 'number'
-						? { width: String(attributes.width) }
-						: {}
+				parseHTML: parseMediaWidth,
+				renderHTML: (attributes) => renderMediaWidth(attributes.width)
 			},
 			align: {
 				default: null,

@@ -5,6 +5,7 @@ import { defaultLabels, type MediaLabels } from '../../core/labels.js';
 import type { BubbleAction } from '../bubble-menu/types.js';
 import { createToggleCaptionAction } from '../caption/actions.js';
 import { TrashIcon } from '../drag-handle/icons.js';
+import { createFullWidthAction } from '../image/actions.js';
 import {
 	AlignCenterIcon,
 	AlignLeftIcon,
@@ -58,6 +59,7 @@ export const createMediaActions = (
 	align('left', labels.actions['align-left'], AlignLeftIcon),
 	align('center', labels.actions['align-center'], AlignCenterIcon),
 	align('right', labels.actions['align-right'], AlignRightIcon),
+	createFullWidthAction(labels.actions['full-width'], isVideo),
 	createToggleCaptionAction(labels.actions['toggle-caption']),
 	{
 		id: 'delete',

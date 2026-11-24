@@ -109,11 +109,12 @@ describe('image menu visibility (MC-04)', () => {
 });
 
 describe('image menu actions (MC-04)', () => {
-	it('offers alignment, a caption and delete', () => {
+	it('offers alignment, full width, a caption and delete', () => {
 		expect(defaultImageActions.map((action) => action.id)).toEqual([
 			'align-left',
 			'align-center',
 			'align-right',
+			'full-width',
 			'toggle-caption',
 			'delete-image'
 		]);

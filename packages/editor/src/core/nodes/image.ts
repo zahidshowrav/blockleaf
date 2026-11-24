@@ -1,6 +1,11 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
 import { CAPTIONABLE_GROUP } from '../constants.js';
+import {
+	parseMediaWidth,
+	renderMediaWidth,
+	type MediaWidth
+} from '../media-width.js';
 
 /**
  * Raster data URLs, which a clipboard paste can legitimately produce.
@@ -53,7 +58,8 @@ export type ImageAlign = 'left' | 'center' | 'right';
 export interface ImageAttributes {
 	src: string;
 	alt?: string | null;
-	width?: number | null;
+	/** Pixels, or `'full'` for the width of the page (`PA-24`). */
+	width?: MediaWidth | null;
 	align?: ImageAlign | null;
 }
 
@@ -73,12 +79,6 @@ declare module '@tiptap/core' {
 		};
 	}
 }
-
-const parseDimension = (value: string | null): number | null => {
-	if (value === null) return null;
-	const parsed = Number.parseInt(value, 10);
-	return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-};
 
 const parseAlign = (value: string | null): ImageAlign | null =>
 	value === 'left' || value === 'center' || value === 'right' ? value : null;
@@ -122,14 +122,11 @@ export const Image = Node.create<ImageOptions>({
 						? { alt: attributes.alt }
 						: {}
 			},
+			// Pixels, or `'full'` (`PA-24`, `F21`).
 			width: {
 				default: null,
-				parseHTML: (element) =>
-					parseDimension(element.getAttribute('width')),
-				renderHTML: (attributes) =>
-					typeof attributes.width === 'number'
-						? { width: String(attributes.width) }
-						: {}
+				parseHTML: parseMediaWidth,
+				renderHTML: (attributes) => renderMediaWidth(attributes.width)
 			},
 			align: {
 				default: null,

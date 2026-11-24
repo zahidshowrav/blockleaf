@@ -46,3 +46,13 @@ export const AltTextIcon = (props: IconProps) => (
 		<path d="M4 20V8l4 8 4-8v12M15 20V4M15 12h4a4 4 0 0 1 0 8h-4" />
 	</svg>
 );
+
+/** Two arrows pointing out to the sides (`PA-24`). */
+export const FullWidthIcon = (props: IconProps) => (
+	<svg
+		{...strokeProps}
+		{...props}
+	>
+		<path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />
+	</svg>
+);

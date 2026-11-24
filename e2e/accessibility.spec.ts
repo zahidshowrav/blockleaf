@@ -365,6 +365,20 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
+	test('a selected image with its resize handles has no violations', async ({
+		page
+	}) => {
+		await page.goto('/?media');
+		await page.locator(EDITOR).click();
+		await dropFile(page, 'red-balloon.png');
+		const image = page.locator(`${EDITOR} img`);
+		await expect(image).toBeVisible();
+		await image.click();
+		await expect(page.locator('.blockleaf-resize')).toBeVisible();
+
+		expect(await violations(page, '.blockleaf-editor')).toEqual([]);
+	});
+
 	test('the callout has no violations', async ({ page }) => {
 		await openEditor(page);
 		await page.keyboard.type('/callout');

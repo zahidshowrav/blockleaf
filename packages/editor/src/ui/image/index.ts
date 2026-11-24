@@ -4,7 +4,8 @@ export {
 	AlignCenterIcon,
 	AlignLeftIcon,
 	AlignRightIcon,
-	AltTextIcon
+	AltTextIcon,
+	FullWidthIcon
 } from './icons.js';
 export {
 	IMAGE_MENU_PLUGIN_KEY,

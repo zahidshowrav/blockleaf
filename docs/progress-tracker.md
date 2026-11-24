@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-11`, `PA-19` and `PA-22` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-14`, `PA-19` to `PA-22` and `PA-24` are done.
 
-**Next:** the media stack, `PA-20` → `PA-21` → `PA-12`/`PA-13`/`PA-14` → `PA-24`. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** embeds, `PA-15` → `PA-16`, which reuse the media stack's caption toolbar and resize. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
@@ -532,6 +532,20 @@ fallback, and a hex or `rgb()` stored before still renders. The colour panel
 became "Color", with Text and Background groups; the font panel has Typeface
 and Size. Each panel's groups are separate tab stops.
 
+The media stack (2026-11-24): `PA-20` → `PA-21` → `PA-12` to `PA-14` →
+`PA-24`, all in version 2 with no new bump (decided 2026-11-24: every `PA`
+and `TB` change joins version 2). A figure now holds `(table | captionable)
+caption`; `captionable` is a node group, so `./media` adds blocks to it
+without the core naming them (`F28`), and the caption's own alignment is the
+`textAlign` attribute every preset already carries. `./media` holds the
+caption toolbar, the `video`, `audio` and `attachment` blocks (`F29`), a
+toolbar for them, and resizing. Media sources are `https:` or relative and
+never `data:`. Uploads go to the block for the file's type, and the default
+`accept` follows what is loaded. The renderer draws all of it built in,
+which took both its entries past 3 kB; both budgets are now 3.5 kB (`F29`).
+Full width is `width: "full"` on `image` and `video`, and the handles are an
+overlay, so an image keeps its markup (`F21`). The core is at 154.20 kB.
+
 | Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
@@ -545,19 +559,19 @@ and Size. Each panel's groups are separate tab stops.
 | PA-09 | Character and word count                                          | `./toc`                        | Done        | `280a25f` | 2026-11-23 |
 | PA-10 | Font family, stored as a token                                    | `./text-style`                 | Done        | `b810f8e` | 2026-11-23 |
 | PA-11 | Font size, stored as a token                                      | `./text-style`                 | Done        | `8ac43bd` | 2026-11-23 |
-| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
-| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Not started | —         | —          |
-| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Not started | —         | —          |
+| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Done        | `5a05f62` | 2026-11-24 |
+| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Done        | `591902f` | 2026-11-24 |
+| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Done        | `2b04a32` | 2026-11-24 |
 | PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —         | —          |
 | PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —         | —          |
 | PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
 | PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —         | —          |
 | PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
-| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Not started | —         | —          |
-| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Not started | —         | —          |
+| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Done        | `0f5095c` | 2026-11-24 |
+| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Done        | `6167d57` | 2026-11-24 |
 | PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Done        | `bcea22e` | 2026-11-23 |
 | PA-23 | Block background colour                                           | core                           | Not started | —         | —          |
-| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Not started | —         | —          |
+| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Done        | `a173335` | 2026-11-24 |
 
 `PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
 `--bl-font-size-lg` — not a CSS value. A `14px` written into a document is

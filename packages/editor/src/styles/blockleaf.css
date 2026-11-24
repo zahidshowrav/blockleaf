@@ -341,6 +341,69 @@
 	outline-offset: 2px;
 }
 
+/* Full width (PA-24, F21): a name, not a pixel count, so it is the width of
+   whatever page the document is shown on. The height follows the picture. */
+.blockleaf-editor__content .blockleaf-image[data-width='full'],
+.blockleaf-editor__content .blockleaf-video[data-width='full'] {
+	width: 100%;
+}
+
+/* The resize handles over a selected image or video (PA-24). One on each
+   side edge and none on the top or bottom: only the width changes. */
+.blockleaf-resize {
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.blockleaf-resize[hidden] {
+	display: none;
+}
+
+.blockleaf-resize__handle {
+	position: absolute;
+	top: 50%;
+	width: 8px;
+	height: max(2rem, 25%);
+	max-height: 4rem;
+	border: 1px solid var(--bl-color-bg);
+	border-radius: 4px;
+	background: var(--bl-color-accent);
+	transform: translateY(-50%);
+	cursor: ew-resize;
+	pointer-events: auto;
+	touch-action: none;
+}
+
+.blockleaf-resize__handle[data-side='left'] {
+	left: -4px;
+}
+
+.blockleaf-resize__handle[data-side='right'] {
+	right: -4px;
+}
+
+/* A finger needs more than eight pixels to land on. */
+@media (pointer: coarse) {
+	.blockleaf-resize__handle {
+		width: 14px;
+	}
+
+	.blockleaf-resize__handle[data-side='left'] {
+		left: -7px;
+	}
+
+	.blockleaf-resize__handle[data-side='right'] {
+		right: -7px;
+	}
+}
+
+@media print {
+	.blockleaf-resize {
+		display: none;
+	}
+}
+
 /* A broken or still-loading src must not collapse the block to nothing, or
    the caret has no block to land beside. */
 .blockleaf-editor__content .blockleaf-image:not([src]) {
