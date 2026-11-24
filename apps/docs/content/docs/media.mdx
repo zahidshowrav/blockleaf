@@ -78,9 +78,6 @@ editor.commands.setAttachment({
 - **A file** stores its `name`, its `size` in bytes and its `mime` type, so
   the block can say what it is before anyone downloads it.
 
-The reasoning is F29 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
-
 ### Sources are sanitised by the schema
 
 `src` follows the image rule — `https:` or a relative path, never
@@ -149,9 +146,7 @@ editor.commands.toggleMediaFullWidth();
 ```
 
 `withMedia(extensions, { resize: false })` leaves resizing out. A stored
-width still shows; it just cannot be changed by dragging. The reasoning is
-F21 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+width still shows; it just cannot be changed by dragging.
 
 ## Captions
 

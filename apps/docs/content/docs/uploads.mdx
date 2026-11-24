@@ -49,8 +49,7 @@ interface UploadAdapter {
 }
 ```
 
-`PROJECT_PLAN.md` §4 sketches `upload(file, signal)`. The second argument is an
-object instead, because progress needs somewhere to live and adding a third
+The second argument is an object rather than a bare `signal`, because progress needs somewhere to live and adding a third
 positional argument later would be a breaking change.
 
 ### `width` and `height` are worth returning

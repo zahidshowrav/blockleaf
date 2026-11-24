@@ -489,8 +489,7 @@ Every node in [the schema](./schema.mdx) renders:
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to
-any stylesheet with a descendant selector in it. See F15 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md) for why that sentence needed writing down.
+any stylesheet with a descendant selector in it.
 
 `codeBlock` renders a `language-…` class and no highlighting. Highlighting a
 block on the server means shipping a highlighter; pick your own and point it

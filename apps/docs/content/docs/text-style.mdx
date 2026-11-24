@@ -102,9 +102,9 @@ the schema has had since `0.1.0`, with a token in its `color`:
 | `pink`   | `#fce4f1` | `#47162f` |
 | `red`    | `#fde0e0` | `#4b1818` |
 
-Why colour and font are marks of their own rather than parts of a shared
-`textStyle` mark is F26 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+Colour, font and size are marks of their own rather than attributes of one
+shared `textStyle` mark. An editor keeps a mark it does not know but drops an
+attribute it does not know, so separate marks are never lost on save.
 
 ## Font family
 
@@ -209,8 +209,7 @@ preset. An editor keeps a mark it does not know, but it drops an attribute
 it does not know — so if the attribute lived here, opening an aligned
 document in an editor without the subpath and saving it would remove the
 alignment, silently. With the attribute in the core, every editor shows and
-keeps it; only setting it needs the subpath. The reasoning is F25 in
-[`open-flags.md`](https://github.com/zahidshowrav/blockleaf/blob/main/docs/open-flags.md).
+keeps it; only setting it needs the subpath.
 
 ## Without the subpath
 
