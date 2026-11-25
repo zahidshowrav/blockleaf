@@ -10,7 +10,7 @@ import type {
 	BlockleafLabels,
 	UploadFailure
 } from '@blockleaf/editor';
-import { withEmbeds } from '@blockleaf/editor/embeds';
+import { withEmbeds, type FetchLinkPreview } from '@blockleaf/editor/embeds';
 import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
 import { withMedia } from '@blockleaf/editor/media';
@@ -73,6 +73,23 @@ const withSandboxMentions = (base: Extensions): Extensions =>
 	});
 
 /**
+ * A stand-in for the server a host would ask for a page's title and picture:
+ * it answers from the address alone, after a short wait, so the card can be
+ * seen filling in.
+ */
+const sandboxLinkPreview: FetchLinkPreview = (url) =>
+	new Promise((resolve) => {
+		setTimeout(() => {
+			const { hostname, pathname } = new URL(url);
+			resolve({
+				title: `A page at ${pathname}`,
+				description: 'Filled in by the sandbox, as a host would.',
+				siteName: hostname
+			});
+		}, 150);
+	});
+
+/**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
  * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`, `?embeds`. With none, the editor is
  * the default preset, as a host that installs nothing gets it.
@@ -86,7 +103,9 @@ const extensions = (() => {
 	if (params.has('emoji')) base = withEmoji(base);
 	if (params.has('toc')) base = withTableOfContents(base);
 	if (params.has('media')) base = withMedia(base);
-	if (params.has('embeds')) base = withEmbeds(base);
+	if (params.has('embeds')) {
+		base = withEmbeds(base, { fetchLinkPreview: sandboxLinkPreview });
+	}
 	return base;
 })();
 

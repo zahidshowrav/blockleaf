@@ -12,6 +12,7 @@ import {
 	attachmentAttributes,
 	audioAttributes,
 	embedAttributes,
+	linkPreviewAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -294,6 +295,48 @@ export const createHtmlNodes = (
 					{ class: 'blockleaf-attachment__size' },
 					escapeText(size)
 				)
+		);
+	},
+
+	// A link as a card. A part with nothing stored shows the host name and
+	// says so, as the editor writes it.
+	linkPreview: ({ node }) => {
+		const attrs = linkPreviewAttributes(node);
+		if (!attrs) return '';
+		const part = (name: string, value: string | undefined) =>
+			element(
+				'span',
+				{
+					class: `blockleaf-link-preview__${name}`,
+					'data-fallback': value ? undefined : ''
+				},
+				escapeText(value ?? attrs.host)
+			);
+		return element(
+			'a',
+			{
+				'data-id': blockId(node),
+				'data-type': 'linkPreview',
+				class: 'blockleaf-link-preview',
+				href: attrs.url
+			},
+			part('title', attrs.title) +
+				(attrs.description
+					? element(
+							'span',
+							{ class: 'blockleaf-link-preview__description' },
+							escapeText(attrs.description)
+						)
+					: '') +
+				part('site', attrs.siteName) +
+				(attrs.image
+					? voidElement('img', {
+							class: 'blockleaf-link-preview__image',
+							src: attrs.image,
+							alt: '',
+							loading: 'lazy'
+						})
+					: '')
 		);
 	},
 

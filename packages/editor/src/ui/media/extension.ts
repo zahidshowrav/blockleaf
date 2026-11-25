@@ -5,6 +5,7 @@ import {
 	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	EMBED_NODE,
+	LINK_PREVIEW_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE
 } from '../../core/constants.js';
@@ -22,10 +23,11 @@ const MEDIA_TYPES: ReadonlySet<string> = new Set([
 	VIDEO_NODE,
 	AUDIO_NODE,
 	ATTACHMENT_NODE,
-	EMBED_NODE
+	EMBED_NODE,
+	LINK_PREVIEW_NODE
 ]);
 
-/** Shown for a selected video, audio clip, file or embed. */
+/** Shown for a selected video, audio clip, file, embed or link card. */
 export const mediaMenuShouldShow: BubbleMenuShouldShow = ({ editor }) =>
 	editor.isEditable && MEDIA_TYPES.has(selectedMediaType(editor) ?? '');
 

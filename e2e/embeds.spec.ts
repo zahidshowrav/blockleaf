@@ -123,4 +123,36 @@ test.describe('embeds', () => {
 			.poll(() => page.evaluate(() => document.activeElement?.tagName))
 			.toBe('IFRAME');
 	});
+
+	test('a link preview asks for an address, shows its host, then what the host fetched', async ({
+		page
+	}) => {
+		await open(page);
+		await page.keyboard.type('/preview');
+		await page.keyboard.press('Enter');
+		const field = page.getByRole('textbox', {
+			name: 'Link preview address'
+		});
+		await expect(field).toBeFocused();
+		await field.fill('http://example.com/a');
+		await field.press('Enter');
+		await expect(page.getByRole('alert')).toContainText('https://');
+
+		await field.fill('https://example.com/notes');
+		await field.press('Enter');
+		const card = page.locator(`${EDITOR} a.blockleaf-link-preview`);
+		await expect(card).toHaveAttribute('href', 'https://example.com/notes');
+		await expect(card).toContainText('A page at /notes');
+		await expect(json(page)).toContainText('"title": "A page at /notes"');
+
+		// A click selects the card; it does not follow the link.
+		const url = page.url();
+		await page.keyboard.press('ArrowDown');
+		await card.click();
+		expect(page.url()).toBe(url);
+		await expect(card).toHaveClass(/ProseMirror-selectednode/);
+		await expect(
+			page.getByRole('toolbar', { name: 'Media' })
+		).toBeVisible();
+	});
 });

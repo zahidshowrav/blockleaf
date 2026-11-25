@@ -496,6 +496,18 @@ describe('document schema', () => {
 						}
 					]
 				},
+				// A link card: the text it shows is stored on it.
+				{
+					type: 'linkPreview' as const,
+					attrs: {
+						id: 'card-1',
+						url: 'https://example.com/article',
+						title: 'An article',
+						description: 'What it is about.',
+						image: 'https://example.com/cover.png',
+						siteName: 'Example'
+					}
+				},
 				// PA-20: an image with a caption, aligned on its own.
 				{
 					type: 'figure' as const,

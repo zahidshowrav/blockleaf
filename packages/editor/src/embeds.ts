@@ -9,8 +9,12 @@
  * menu and paste it there. An embed is captionable, resizes like a video,
  * and gets the media toolbar.
  *
- * The block is in the stored schema from version 2. An editor without this
- * subpath keeps a stored one as a placeholder and saves it back unchanged.
+ * And a link preview: any `https:` link as a card with the page's title,
+ * description, site name and picture, which the host fetches.
+ *
+ * The blocks are in the stored schema from version 2. An editor without
+ * this subpath keeps a stored one as a placeholder and saves it back
+ * unchanged.
  *
  * ```ts
  * import { presets } from '@blockleaf/editor/extensions';
@@ -24,11 +28,16 @@ import { type Extensions } from '@tiptap/core';
 import {
 	CAPTION_MENU_EXTENSION_NAME,
 	EMBED_NODE,
+	LINK_PREVIEW_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	MEDIA_RESIZE_EXTENSION_NAME
 } from './core/constants.js';
 import { MediaResize } from './core/media-resize.js';
 import { Embed } from './core/nodes/embed.js';
+import {
+	LinkPreview,
+	type FetchLinkPreview
+} from './core/nodes/link-preview.js';
 import {
 	createCaptionMenu,
 	type CaptionMenuOptions
@@ -37,6 +46,7 @@ import { createMediaMenu, type MediaMenuOptions } from './ui/media/index.js';
 
 export {
 	EMBED_NODE,
+	LINK_PREVIEW_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	MEDIA_RESIZE_EXTENSION_NAME
 } from './core/constants.js';
@@ -52,6 +62,14 @@ export {
 	type EmbedAttributes,
 	type EmbedOptions
 } from './core/nodes/embed.js';
+export {
+	LinkPreview,
+	sanitizeLinkPreviewUrl,
+	type FetchLinkPreview,
+	type LinkPreviewAttributes,
+	type LinkPreviewData,
+	type LinkPreviewOptions
+} from './core/nodes/link-preview.js';
 
 export type EmbedsOptions = {
 	/**
@@ -59,6 +77,11 @@ export type EmbedsOptions = {
 	 * leaves it a link; the slash menu still embeds.
 	 */
 	pasteToEmbed?: boolean;
+	/**
+	 * Fetches the title, description, site name and picture for a link
+	 * card added without them. Without it, a card shows its address.
+	 */
+	fetchLinkPreview?: FetchLinkPreview;
 	/** Resize handles and full width; `false` leaves them out. */
 	resize?: false;
 	/** The toolbar for a selected embed, or `false`. */
@@ -69,19 +92,24 @@ export type EmbedsOptions = {
 
 const NAMES: ReadonlySet<string> = new Set([
 	EMBED_NODE,
+	LINK_PREVIEW_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	MEDIA_RESIZE_EXTENSION_NAME,
 	CAPTION_MENU_EXTENSION_NAME
 ]);
 
 /**
- * The embed block and its chrome: the media toolbar, the caption toolbar
- * and resizing, the same ones `@blockleaf/editor/media` adds.
+ * The embed and link preview blocks and their chrome: the media toolbar,
+ * the caption toolbar and resizing, the same ones `@blockleaf/editor/media`
+ * adds.
  */
 export const createEmbeds = (options: EmbedsOptions = {}): Extensions => [
 	options.pasteToEmbed === false
 		? Embed.configure({ pasteToEmbed: false })
 		: Embed,
+	options.fetchLinkPreview
+		? LinkPreview.configure({ fetchLinkPreview: options.fetchLinkPreview })
+		: LinkPreview,
 	...(options.resize === false ? [] : [MediaResize]),
 	...(options.mediaMenu === false
 		? []

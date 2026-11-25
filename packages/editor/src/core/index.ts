@@ -156,6 +156,7 @@ export {
 	type AudioNode,
 	type AttachmentNode,
 	type EmbedNode,
+	type LinkPreviewNode,
 	type InlineNode,
 	type ItalicMark,
 	type LinkMark,

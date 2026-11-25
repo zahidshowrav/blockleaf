@@ -1,11 +1,12 @@
 ---
 title: Embeds
-description: YouTube, Vimeo, Loom, Spotify and CodePen in a frame, from the opt-in embeds subpath.
+description: YouTube, Vimeo, Loom, Spotify and CodePen in a frame, and link preview cards, from the opt-in embeds subpath.
 icon: SquarePlay
 ---
 
-`@blockleaf/editor/embeds` adds an **embed** block: a video, a song or a
-pen from another site, shown in a frame.
+`@blockleaf/editor/embeds` adds two blocks: an **embed**, a video, a song
+or a pen from another site shown in a frame, and a **link preview**, any
+link shown as a card with the page's title and picture.
 
 ```ts
 import { presets } from '@blockleaf/editor/extensions';
@@ -14,8 +15,8 @@ import { withEmbeds } from '@blockleaf/editor/embeds';
 const extensions = withEmbeds(presets.standard());
 ```
 
-The block is new in schema version 2. An editor without this subpath keeps
-a stored one as a placeholder and saves it back unchanged.
+Both blocks are new in schema version 2. An editor without this subpath
+keeps a stored one as a placeholder and saves it back unchanged.
 
 ## Which sites
 
@@ -116,14 +117,93 @@ adds. With both subpaths loaded they are shared, and each is in the editor
 once.
 
 Strings are under `labels.embeds`: each provider's name for its frame, and
-the slash menu's address field. See [i18n](./i18n.mdx).
+the slash menu's two address fields. See [i18n](./i18n.mdx).
 
 ## Rendering
 
-[`@blockleaf/renderer`](./rendering.mdx) renders an embed on both targets,
-with no setup, as the same `<iframe>` the editor writes. It checks the
-stored address against its own copy of the list and renders nothing for
-anything else. `labels.embed` names each frame from its provider.
+[`@blockleaf/renderer`](./rendering.mdx) renders both blocks on both
+targets, with no setup, as the same markup the editor writes. For an embed,
+it checks the stored address against its own copy of the list and renders
+nothing for anything else; `labels.embed` names each frame from its
+provider. A link card is an `<a>` holding its text and picture, and renders
+nothing unless its address is `https:`.
+
+## Link previews
+
+A link preview is a card for any `https:` link: the page's title, a line of
+description, the site's name, and a picture on the right.
+
+Type `/preview` (or `/bookmark`) and paste the link. The card appears
+straight away with the site's address, then fills in when your
+`fetchLinkPreview` answers:
+
+```ts
+withEmbeds(presets.standard(), {
+	fetchLinkPreview: async (url, { signal }) => {
+		const response = await fetch(
+			`/api/preview?url=${encodeURIComponent(url)}`,
+			{ signal }
+		);
+		return response.ok ? response.json() : null;
+	}
+});
+```
+
+**The fetch is yours.** A browser cannot read another site's page, so the
+editor cannot fetch the title itself. Your server reads the page's
+`og:title`, `og:description`, `og:image` and `og:site_name` tags and returns
+them as `{ title, description, image, siteName }`. Any of them may be
+missing. Without `fetchLinkPreview`, a card shows its address and host name.
+
+It is called once for each card added without a title, with a `signal` that
+aborts when the editor goes. Filling in a card is not an undo step: undo
+removes the card, not its title. A failed fetch leaves the card as it was.
+
+Or with a command, from host code that already has the details:
+
+```ts
+editor.commands.setLinkPreview({
+	url: 'https://example.com/article',
+	title: 'An article',
+	description: 'What it is about.',
+	image: 'https://example.com/cover.png',
+	siteName: 'Example'
+});
+```
+
+It returns `false` for a link that is not `https:`.
+
+### What is stored
+
+```json
+{
+	"type": "linkPreview",
+	"attrs": {
+		"id": "…",
+		"url": "https://example.com/article",
+		"title": "An article",
+		"description": "What it is about.",
+		"image": "https://example.com/cover.png",
+		"siteName": "Example"
+	}
+}
+```
+
+The text is stored, so a card is drawn without a fetch, in the editor and
+in the renderer. Whitespace is collapsed and long text is cut: a title to
+300 characters, a description to 500, a site name to 100. `url` must be
+`https:`; `image` follows the image rule, and an unsafe one is dropped.
+
+In the editor, a click selects the card; it does not follow the link.
+Select it for the media toolbar, with **Toggle caption** and **Delete**.
+Published, it is an ordinary link.
+
+## What it costs
+
+The subpath adds about 3.5 kB on top of the editor, or 1.9 kB when
+[`@blockleaf/editor/media`](./media.mdx) is loaded too, because the two
+share their toolbars and resizing. The editor's own bundle does not carry
+either block unless you import it.
 
 ## Content Security Policy
 

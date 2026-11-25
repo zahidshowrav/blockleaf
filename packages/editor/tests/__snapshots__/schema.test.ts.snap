@@ -504,6 +504,17 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "description": "What it is about.",
+        "id": "card-1",
+        "image": "https://example.com/cover.png",
+        "siteName": "Example",
+        "title": "An article",
+        "url": "https://example.com/article",
+      },
+      "type": "linkPreview",
+    },
+    {
+      "attrs": {
         "id": "figure-image",
       },
       "content": [

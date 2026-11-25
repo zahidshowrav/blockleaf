@@ -7,6 +7,7 @@ import {
 	CodeIcon,
 	DividerIcon,
 	EmbedIcon,
+	LinkPreviewIcon,
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
@@ -29,6 +30,7 @@ import {
 	AUDIO_NODE,
 	DETAILS_NODE,
 	EMBED_NODE,
+	LINK_PREVIEW_NODE,
 	TABLE_OF_CONTENTS_NODE,
 	UPLOAD_EXTENSION_NAME,
 	VIDEO_NODE
@@ -51,6 +53,20 @@ const EmbedPicker = /* @__PURE__ */ createUrlPicker({
 	canInsert: (editor, url) => editor.can().setEmbed({ src: url }),
 	insert: (editor, url) => {
 		editor.chain().focus().setEmbed({ src: url }).run();
+	}
+});
+
+/** The address field for a link preview card. */
+const LinkPreviewPicker = /* @__PURE__ */ createUrlPicker({
+	strings: (labels) => ({
+		address: labels.embeds.previewAddress,
+		placeholder: labels.embeds.previewPlaceholder,
+		insert: labels.embeds.previewInsert,
+		invalid: labels.embeds.previewInvalid
+	}),
+	canInsert: (editor, url) => editor.can().setLinkPreview({ url }),
+	insert: (editor, url) => {
+		editor.chain().focus().setLinkPreview({ url }).run();
 	}
 });
 
@@ -305,6 +321,22 @@ export const createSlashCommands = (
 		picker: EmbedPicker,
 		// Without the picker there is no address to embed; pasting one on
 		// an empty line embeds it.
+		run: (editor) => {
+			editor.commands.focus();
+		}
+	},
+	{
+		id: 'link-preview',
+		title: blockTypes['link-preview'],
+		description: labels.descriptions['link-preview'],
+		aliases: ['bookmark', 'card'],
+		group: labels.groups.advanced,
+		icon: LinkPreviewIcon,
+		keywords: ['link', 'preview', 'bookmark', 'card', 'url', 'web'],
+		// Only where `@blockleaf/editor/embeds` added the block.
+		isAvailable: (editor) =>
+			editor.schema.nodes[LINK_PREVIEW_NODE] !== undefined,
+		picker: LinkPreviewPicker,
 		run: (editor) => {
 			editor.commands.focus();
 		}

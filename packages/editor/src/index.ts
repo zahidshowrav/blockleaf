@@ -69,6 +69,7 @@ export {
 	type AudioNode,
 	type AttachmentNode,
 	type EmbedNode,
+	type LinkPreviewNode,
 	type IncompatibleDocumentReason,
 	type InlineNode,
 	type ItalicMark,
