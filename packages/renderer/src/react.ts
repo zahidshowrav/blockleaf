@@ -34,7 +34,12 @@ export {
 	resolveRendererLabels,
 	type RendererLabels
 } from './labels.js';
-export { sanitizeHref, sanitizeMediaSrc, sanitizeSrc } from './sanitize.js';
+export {
+	embedProviderOf,
+	sanitizeHref,
+	sanitizeMediaSrc,
+	sanitizeSrc
+} from './sanitize.js';
 export {
 	extractHeadings,
 	toPlainText,

@@ -10,6 +10,7 @@ import type {
 	BlockleafLabels,
 	UploadFailure
 } from '@blockleaf/editor';
+import { withEmbeds } from '@blockleaf/editor/embeds';
 import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
 import { withMedia } from '@blockleaf/editor/media';
@@ -73,11 +74,11 @@ const withSandboxMentions = (base: Extensions): Extensions =>
 
 /**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
- * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`. With none, the editor is
+ * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`, `?embeds`. With none, the editor is
  * the default preset, as a host that installs nothing gets it.
  */
 const extensions = (() => {
-	const flags = ['mentions', 'textstyle', 'emoji', 'toc', 'media'];
+	const flags = ['mentions', 'textstyle', 'emoji', 'toc', 'media', 'embeds'];
 	if (!flags.some((flag) => params.has(flag))) return undefined;
 	let base = presets.standard();
 	if (params.has('mentions')) base = withSandboxMentions(base);
@@ -85,6 +86,7 @@ const extensions = (() => {
 	if (params.has('emoji')) base = withEmoji(base);
 	if (params.has('toc')) base = withTableOfContents(base);
 	if (params.has('media')) base = withMedia(base);
+	if (params.has('embeds')) base = withEmbeds(base);
 	return base;
 })();
 

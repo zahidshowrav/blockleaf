@@ -10,7 +10,8 @@ export default defineConfig({
 		'src/text-style.ts',
 		'src/emoji.ts',
 		'src/toc.ts',
-		'src/media.ts'
+		'src/media.ts',
+		'src/embeds.ts'
 	],
 	format: ['esm'],
 	dts: true,

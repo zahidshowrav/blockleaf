@@ -9,11 +9,19 @@ import {
 } from '@tiptap/pm/state';
 import { type EditorView } from '@tiptap/pm/view';
 
-import { MEDIA_RESIZE_EXTENSION_NAME, VIDEO_NODE } from './constants.js';
+import {
+	EMBED_NODE,
+	MEDIA_RESIZE_EXTENSION_NAME,
+	VIDEO_NODE
+} from './constants.js';
 import { FULL_WIDTH, readMediaWidth, type MediaWidth } from './media-width.js';
 
 /** The blocks a resize applies to: pictures that have a shape. */
-const RESIZABLE: ReadonlySet<string> = new Set(['image', VIDEO_NODE]);
+const RESIZABLE: ReadonlySet<string> = new Set([
+	'image',
+	VIDEO_NODE,
+	EMBED_NODE
+]);
 
 /** Narrower than this and a picture stops being one. */
 export const MIN_MEDIA_WIDTH = 64;
@@ -211,7 +219,7 @@ class ResizeView implements PluginView {
 }
 
 /**
- * Resizing for images and videos, from
+ * Resizing for images, videos and embeds, from
  * `@blockleaf/editor/media`: a handle on each side of a selected one, the
  * width only, with the height following the picture's own shape. And full
  * width, a named value rather than a pixel count.

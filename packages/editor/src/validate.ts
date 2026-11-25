@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { STYLE_TOKEN } from './core/constants.js';
+import { embedProviderOf } from './core/embed-providers.js';
 import type {
 	BlockleafDocument,
 	BlockleafMark,
@@ -28,6 +29,7 @@ import type {
 	VideoNode,
 	AudioNode,
 	AttachmentNode,
+	EmbedNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -72,6 +74,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'video',
 	'audio',
 	'attachment',
+	'embed',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -368,6 +371,22 @@ export const attachmentNodeSchema: z.ZodType<AttachmentNode> = z.object({
 	})
 });
 
+/**
+ * Version 2. `src` must be a player address on the provider list: the
+ * check a frame needs, made here as well as in the editor and the renderer.
+ */
+export const embedNodeSchema: z.ZodType<EmbedNode> = z.object({
+	type: z.literal('embed'),
+	attrs: z.object({
+		id: z.string(),
+		src: z.string().refine((src) => embedProviderOf(src) !== null, {
+			message: 'Not a player address from a supported provider'
+		}),
+		width: mediaWidthSchema,
+		align: mediaAlignSchema
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -545,6 +564,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				videoNodeSchema,
 				audioNodeSchema,
 				attachmentNodeSchema,
+				embedNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -618,7 +638,8 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 				imageNodeSchema,
 				videoNodeSchema,
 				audioNodeSchema,
-				attachmentNodeSchema
+				attachmentNodeSchema,
+				embedNodeSchema
 			]),
 			captionNodeSchema
 		])
@@ -649,6 +670,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				videoNodeSchema,
 				audioNodeSchema,
 				attachmentNodeSchema,
+				embedNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -680,6 +702,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				videoNodeSchema,
 				audioNodeSchema,
 				attachmentNodeSchema,
+				embedNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

@@ -474,6 +474,28 @@ describe('document schema', () => {
 						mime: 'application/pdf'
 					}
 				},
+				// An embed, captioned, at a width: the player address is stored.
+				{
+					type: 'figure' as const,
+					attrs: { id: 'figure-embed' },
+					content: [
+						{
+							type: 'embed' as const,
+							attrs: {
+								id: 'embed-1',
+								src: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+								width: 560,
+								align: 'center' as const
+							}
+						},
+						{
+							type: 'caption' as const,
+							content: [
+								{ type: 'text' as const, text: 'The talk' }
+							]
+						}
+					]
+				},
 				// PA-20: an image with a caption, aligned on its own.
 				{
 					type: 'figure' as const,

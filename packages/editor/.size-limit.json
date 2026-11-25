@@ -54,5 +54,12 @@
 		"import": "{ withMedia }",
 		"limit": "90 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "embeds subpath, standalone (shares the runtime and the media toolbars in practice)",
+		"path": "dist/embeds.js",
+		"import": "{ withEmbeds }",
+		"limit": "90 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

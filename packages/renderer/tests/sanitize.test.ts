@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+	EMBED_PROVIDERS,
+	embedProviderOf as editorEmbedProvider
+} from '@blockleaf/editor/embeds';
+import {
 	sanitizeHref as editorHref,
 	sanitizeSrc as editorSrc
 } from '@blockleaf/editor/extensions';
 import { sanitizeMediaSrc as editorMediaSrc } from '@blockleaf/editor/media';
 
 import {
+	embedProviderOf,
 	sanitizeHref,
 	sanitizeMediaSrc,
 	sanitizeSrc
@@ -109,5 +114,48 @@ describe('sanitizeMediaSrc agrees with the editor (F29)', () => {
 		expect(
 			sanitizeMediaSrc('data:image/png;base64,iVBORw0KGgo=')
 		).toBeNull();
+	});
+});
+
+describe('embedProviderOf agrees with the editor', () => {
+	it.each([
+		'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+		'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=90',
+		'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1',
+		'https://www.youtube.com/embed/dQw4w9WgXcQ',
+		'http://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+		'https://www.youtube-nocookie.com.evil.test/embed/dQw4w9WgXcQ',
+		'https://player.vimeo.com/video/76979871',
+		'https://player.vimeo.com/video/76979871?h=af1d2c3b4e',
+		'https://player.vimeo.com/video/abc',
+		'https://www.loom.com/embed/0123456789abcdef0123456789abcdef',
+		'https://www.loom.com/share/0123456789abcdef0123456789abcdef',
+		'https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC',
+		'https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC',
+		'https://codepen.io/someone/embed/abcDEF1',
+		'https://codepen.io/someone/pen/abcDEF1',
+		'javascript:alert(1)',
+		'https://evil.test',
+		''
+	])('%j', (src) => {
+		expect(embedProviderOf(src)).toBe(editorEmbedProvider(src));
+	});
+
+	it('knows the same providers', () => {
+		expect(
+			Object.keys(EMBED_PROVIDERS).map((provider) =>
+				embedProviderOf(
+					{
+						youtube:
+							'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+						vimeo: 'https://player.vimeo.com/video/1',
+						loom: 'https://www.loom.com/embed/0123456789abcdef0123456789abcdef',
+						spotify:
+							'https://open.spotify.com/embed/show/4uLU6hMCjMI75M1A2tKUQC',
+						codepen: 'https://codepen.io/a/embed/b'
+					}[provider] ?? ''
+				)
+			)
+		).toEqual(Object.keys(EMBED_PROVIDERS));
 	});
 });

@@ -1,6 +1,6 @@
 import type { Editor } from '@tiptap/core';
 
-import { VIDEO_NODE } from '../../core/constants.js';
+import { EMBED_NODE, VIDEO_NODE } from '../../core/constants.js';
 import { defaultLabels, type MediaLabels } from '../../core/labels.js';
 import type { BubbleAction } from '../bubble-menu/types.js';
 import { createToggleCaptionAction } from '../caption/actions.js';
@@ -22,10 +22,15 @@ export const selectedMediaType = (editor: Editor): string | null => {
 	return node?.type.name ?? null;
 };
 
-const isVideo = (editor: Editor) => selectedMediaType(editor) === VIDEO_NODE;
+/** The blocks that line up like an image: a video and an embed. */
+const ALIGNABLE: ReadonlySet<string> = new Set([VIDEO_NODE, EMBED_NODE]);
+
+const isAlignable = (editor: Editor) =>
+	ALIGNABLE.has(selectedMediaType(editor) ?? '');
 
 const alignOf = (editor: Editor): string | null => {
-	const align: unknown = editor.getAttributes(VIDEO_NODE).align;
+	const type = selectedMediaType(editor);
+	const align: unknown = type ? editor.getAttributes(type).align : null;
 	return typeof align === 'string' ? align : null;
 };
 
@@ -44,14 +49,23 @@ const align = (
 			? current === null || current === 'left'
 			: current === value;
 	},
-	// Only a video lines up like an image; audio and files fill the line.
-	isAvailable: isVideo,
-	run: (editor) => editor.chain().focus().updateVideo({ align: value }).run()
+	// Audio and files fill the line.
+	isAvailable: isAlignable,
+	run: (editor) => {
+		const type = selectedMediaType(editor);
+		return type
+			? editor
+					.chain()
+					.focus()
+					.updateAttributes(type, { align: value })
+					.run()
+			: false;
+	}
 });
 
 /**
- * The toolbar for a selected video, audio clip or file.
- * Alignment shows for video only.
+ * The toolbar for a selected video, audio clip, file or embed.
+ * Alignment and full width show for a video and an embed.
  */
 export const createMediaActions = (
 	labels: MediaLabels = defaultLabels.media
@@ -59,7 +73,7 @@ export const createMediaActions = (
 	align('left', labels.actions['align-left'], AlignLeftIcon),
 	align('center', labels.actions['align-center'], AlignCenterIcon),
 	align('right', labels.actions['align-right'], AlignRightIcon),
-	createFullWidthAction(labels.actions['full-width'], isVideo),
+	createFullWidthAction(labels.actions['full-width'], isAlignable),
 	createToggleCaptionAction(labels.actions['toggle-caption']),
 	{
 		id: 'delete',

@@ -365,6 +365,42 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
+	test('an embed and the slash menu address field have no violations', async ({
+		page
+	}) => {
+		// A stand-in for the provider's page: axe looks inside frames, and
+		// the real player is not this library's markup to check.
+		await page.route(/youtube-nocookie\.com/, (route) =>
+			route.fulfill({
+				contentType: 'text/html',
+				body: '<!doctype html><html lang="en"><title>Player</title><main><h1>Player</h1></main></html>'
+			})
+		);
+		await page.goto('/?embeds');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('/embed');
+		await page.keyboard.press('Enter');
+		const field = page.getByRole('textbox', { name: 'Embed address' });
+		await field.fill('https://example.com');
+		await field.press('Enter');
+		await expect(page.getByRole('alert')).toBeVisible();
+		expect(await violations(page, '.blockleaf-slash-menu')).toEqual([]);
+
+		await field.fill('https://youtu.be/dQw4w9WgXcQ');
+		await field.press('Enter');
+		const frame = page.locator(`${EDITOR} iframe`);
+		await expect(frame).toBeVisible();
+		expect(await violations(page, EDITOR)).toEqual([]);
+
+		// A new embed is selected, so its toolbar is already showing.
+		await expect(
+			page.getByRole('toolbar', { name: 'Media' })
+		).toBeVisible();
+		expect(
+			await violations(page, '[role="toolbar"][aria-label="Media"]')
+		).toEqual([]);
+	});
+
 	test('a selected image with its resize handles has no violations', async ({
 		page
 	}) => {

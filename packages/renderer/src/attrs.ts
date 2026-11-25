@@ -1,4 +1,9 @@
-import { sanitizeHref, sanitizeMediaSrc, sanitizeSrc } from './sanitize.js';
+import {
+	embedProviderOf,
+	sanitizeHref,
+	sanitizeMediaSrc,
+	sanitizeSrc
+} from './sanitize.js';
 import {
 	type HeadingLevel,
 	type ImageAlign,
@@ -67,6 +72,12 @@ export const codeLanguage = (node: RenderableNode): string | undefined => {
 	return typeof language === 'string' && language ? language : undefined;
 };
 
+/** A stored alignment, or none. */
+const mediaAlign = (align: unknown): ImageAlign | undefined =>
+	typeof align === 'string' && ALIGNMENTS.has(align)
+		? (align as ImageAlign)
+		: undefined;
+
 /**
  * A stored width: pixels, or `'full'` for the width of the
  * page. Anything else is no width at all.
@@ -124,10 +135,7 @@ export const imageAttributes = (
 		src,
 		alt: typeof alt === 'string' ? alt : '',
 		width: mediaWidth(width),
-		align:
-			typeof align === 'string' && ALIGNMENTS.has(align)
-				? (align as ImageAlign)
-				: undefined
+		align: mediaAlign(align)
 	};
 };
 
@@ -163,10 +171,7 @@ export const videoAttributes = (
 		src,
 		poster: poster ? (sanitizeSrc(poster) ?? undefined) : undefined,
 		width: mediaWidth(width),
-		align:
-			typeof align === 'string' && ALIGNMENTS.has(align)
-				? (align as ImageAlign)
-				: undefined
+		align: mediaAlign(align)
 	};
 };
 
@@ -472,4 +477,30 @@ export const textAlign = (node: RenderableNode): TextAlign | undefined => {
 	return typeof value === 'string' && TEXT_ALIGNMENTS.has(value)
 		? (value as TextAlign)
 		: undefined;
+};
+
+export interface EmbedAttributes {
+	src: string;
+	provider: string;
+	width: number | 'full' | undefined;
+	align: ImageAlign | undefined;
+}
+
+/**
+ * An embed's attributes, or `null` when its source is not a player address
+ * on the provider list and nothing should render.
+ */
+export const embedAttributes = (
+	node: RenderableNode
+): EmbedAttributes | null => {
+	const src = node.attrs?.src;
+	const provider = typeof src === 'string' ? embedProviderOf(src) : null;
+	if (!provider) return null;
+	const align = node.attrs?.align;
+	return {
+		src: src as string,
+		provider,
+		width: mediaWidth(node.attrs?.width),
+		align: mediaAlign(align)
+	};
 };

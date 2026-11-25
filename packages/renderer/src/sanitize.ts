@@ -86,3 +86,26 @@ export const sanitizeMediaSrc = (src: string): string | null => {
 		return HAS_SCHEME.test(trimmed) ? null : trimmed;
 	}
 };
+
+/**
+ * The embed providers and the only player addresses their frames may load,
+ * copied from `@blockleaf/editor`'s schema. A frame runs another site's page
+ * inside yours, so a stored `src` that is not on this list renders nothing.
+ */
+const EMBEDS: [string, RegExp][] = [
+	[
+		'youtube',
+		/^https:\/\/www\.youtube-nocookie\.com\/embed\/[\w-]{11}(\?start=\d+)?$/
+	],
+	['vimeo', /^https:\/\/player\.vimeo\.com\/video\/\d+(\?h=[\da-f]+)?$/],
+	['loom', /^https:\/\/www\.loom\.com\/embed\/[\da-f]{32}$/],
+	[
+		'spotify',
+		/^https:\/\/open\.spotify\.com\/embed\/(track|album|playlist|episode|show)\/[A-Za-z\d]{22}$/
+	],
+	['codepen', /^https:\/\/codepen\.io\/[\w-]+\/embed\/[A-Za-z\d]+$/]
+];
+
+/** The provider a player address belongs to, or `null` when it is not on the list. */
+export const embedProviderOf = (src: string): string | null =>
+	EMBEDS.find(([, pattern]) => pattern.test(src))?.[0] ?? null;

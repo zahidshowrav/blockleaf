@@ -1,9 +1,9 @@
 /**
  * The strings the renderer puts into its output.
  *
- * There are two. The first exists because a table wider than its column has
- * to scroll inside a box somebody can reach from a keyboard, and an unnamed
- * `region` is announced by nothing; the second names a table of contents. The editor has a full
+ * They name what a screen reader would otherwise announce as nothing: the
+ * box a wide table scrolls inside, a table of contents, the players and
+ * frames. The editor has a full
  * label set; a renderer that hard-coded English while the editor
  * did not would be the odd one out.
  */
@@ -20,7 +20,17 @@ export interface RendererLabels {
 	fileSize: (bytes: number) => string;
 	/** Accessible name of a file block: its name and size, if known. */
 	file: (name: string, size: string) => string;
+	/** Accessible name of an embed's frame, from its provider. */
+	embed: (provider: string) => string;
 }
+
+const EMBED_NAMES: Record<string, string> = {
+	youtube: 'YouTube video',
+	vimeo: 'Vimeo video',
+	loom: 'Loom video',
+	spotify: 'Spotify player',
+	codepen: 'CodePen pen'
+};
 
 /**
  * A file size as people read it: `812 B`, `14 KB`, `1.5 MB`. The editor's
@@ -43,7 +53,8 @@ export const defaultRendererLabels: RendererLabels = {
 	video: 'Video',
 	audio: 'Audio',
 	fileSize,
-	file: (name, size) => (size ? `${name}, ${size}` : name)
+	file: (name, size) => (size ? `${name}, ${size}` : name),
+	embed: (provider) => EMBED_NAMES[provider] ?? provider
 };
 
 export const resolveRendererLabels = (

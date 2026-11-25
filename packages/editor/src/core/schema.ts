@@ -309,6 +309,22 @@ export interface AttachmentNode {
 	};
 }
 
+/**
+ * An embedded page (version 2). `src` is a player address from the
+ * provider list — YouTube, Vimeo, Loom, Spotify or CodePen — and nothing
+ * else; see `EMBED_PROVIDERS`.
+ */
+export interface EmbedNode {
+	type: 'embed';
+	attrs: {
+		id: string;
+		src: string;
+		/** Pixels, or `'full'`. */
+		width?: number | 'full' | null;
+		align?: 'left' | 'center' | 'right' | null;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -319,10 +335,10 @@ export interface TableNode {
 
 /**
  * The blocks a `figure` may caption: a table, and since
- * version 2 an image and the media blocks.
+ * version 2 an image, the media blocks and an embed.
  */
 export type CaptionedNode =
-	TableNode | ImageNode | VideoNode | AudioNode | AttachmentNode;
+	TableNode | ImageNode | VideoNode | AudioNode | AttachmentNode | EmbedNode;
 
 /**
  * A block with a caption: the block, then its `caption`. The caption
@@ -372,6 +388,7 @@ export type TableCellContentNode =
 	| VideoNode
 	| AudioNode
 	| AttachmentNode
+	| EmbedNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -411,6 +428,7 @@ export type BlockNode =
 	| VideoNode
 	| AudioNode
 	| AttachmentNode
+	| EmbedNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

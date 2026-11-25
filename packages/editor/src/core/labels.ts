@@ -1,4 +1,5 @@
 import { HEADING_LEVELS } from './constants.js';
+import { type EmbedProvider } from './embed-providers.js';
 import { formatFileSize } from './media-src.js';
 
 /**
@@ -32,6 +33,7 @@ export type BlockTypeId =
 	| 'video'
 	| 'audio'
 	| 'file'
+	| 'embed'
 	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
@@ -179,6 +181,19 @@ export type MediaLabels = {
 	file: (name: string, size: string) => string;
 };
 
+export type EmbedLabels = {
+	/** Each provider's frame, by its accessible name. */
+	frame: Record<EmbedProvider, string>;
+	/** Accessible name of the address field in the slash menu's picker. */
+	address: string;
+	/** Shown in that field while it is empty. */
+	placeholder: string;
+	/** The button that embeds the address. */
+	insert: string;
+	/** Shown when no provider on the list serves the address. */
+	unsupported: string;
+};
+
 export type LinkLabels = {
 	/** Accessible name of the address field. */
 	address: string;
@@ -311,6 +326,7 @@ export type ResolvedLabels = {
 	image: ImageLabels;
 	caption: CaptionLabels;
 	media: MediaLabels;
+	embeds: EmbedLabels;
 	link: LinkLabels;
 	upload: UploadLabels;
 	codeBlock: CodeBlockLabels;
@@ -350,6 +366,9 @@ export type BlockleafLabels = {
 	};
 	media?: Partial<Omit<MediaLabels, 'actions'>> & {
 		actions?: Partial<MediaLabels['actions']>;
+	};
+	embeds?: Partial<Omit<EmbedLabels, 'frame'>> & {
+		frame?: Partial<EmbedLabels['frame']>;
 	};
 	link?: Partial<LinkLabels>;
 	upload?: Partial<UploadLabels>;
@@ -399,6 +418,7 @@ export const defaultLabels: ResolvedLabels = {
 		video: 'Video',
 		audio: 'Audio',
 		file: 'File',
+		embed: 'Embed',
 		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
@@ -427,6 +447,7 @@ export const defaultLabels: ResolvedLabels = {
 			video: 'Upload a video from your device.',
 			audio: 'Upload a sound or voice recording.',
 			file: 'Attach a file to download.',
+			embed: 'Show a video, song or pen from a link.',
 			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
@@ -527,6 +548,20 @@ export const defaultLabels: ResolvedLabels = {
 		audio: 'Audio',
 		video: 'Video',
 		file: (name, size) => (size ? `${name}, ${size}` : name)
+	},
+	embeds: {
+		frame: {
+			youtube: 'YouTube video',
+			vimeo: 'Vimeo video',
+			loom: 'Loom video',
+			spotify: 'Spotify player',
+			codepen: 'CodePen pen'
+		},
+		address: 'Embed address',
+		placeholder: 'Paste a YouTube, Vimeo, Loom, Spotify or CodePen link',
+		insert: 'Embed',
+		unsupported:
+			'This link cannot be embedded. Use a YouTube, Vimeo, Loom, Spotify or CodePen link.'
 	},
 	link: {
 		address: 'Link address',
@@ -667,6 +702,11 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 			...defaultLabels.caption.actions,
 			...labels?.caption?.actions
 		}
+	},
+	embeds: {
+		...defaultLabels.embeds,
+		...labels?.embeds,
+		frame: { ...defaultLabels.embeds.frame, ...labels?.embeds?.frame }
 	},
 	link: { ...defaultLabels.link, ...labels?.link },
 	upload: { ...defaultLabels.upload, ...labels?.upload },
