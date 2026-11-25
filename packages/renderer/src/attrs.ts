@@ -504,3 +504,38 @@ export const embedAttributes = (
 		align: mediaAlign(align)
 	};
 };
+
+export interface LinkPreviewAttributes {
+	url: string;
+	/** The host name, shown where the card has no title or site name. */
+	host: string;
+	title: string | undefined;
+	description: string | undefined;
+	image: string | undefined;
+	siteName: string | undefined;
+}
+
+/**
+ * A link card's attributes, or `null` when its address is not an `https:`
+ * link and nothing should render. The picture is held to the image rule and
+ * dropped if it fails it.
+ */
+export const linkPreviewAttributes = (
+	node: RenderableNode
+): LinkPreviewAttributes | null => {
+	const raw = node.attrs?.url;
+	const url =
+		typeof raw === 'string' && /^https:\/\//i.test(raw.trim())
+			? sanitizeHref(raw.trim())
+			: null;
+	if (!url) return null;
+	const image = optionalString(node.attrs?.image);
+	return {
+		url,
+		host: new URL(url).hostname.replace(/^www\./, ''),
+		title: optionalString(node.attrs?.title),
+		description: optionalString(node.attrs?.description),
+		image: image ? (sanitizeSrc(image) ?? undefined) : undefined,
+		siteName: optionalString(node.attrs?.siteName)
+	};
+};

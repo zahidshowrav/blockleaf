@@ -62,7 +62,8 @@ export const BLOCK_NODE_TYPES = [
 	'video',
 	'audio',
 	'attachment',
-	'embed'
+	'embed',
+	'linkPreview'
 ] as const;
 
 /**
@@ -124,7 +125,14 @@ export const ATTACHMENT_NODE = 'attachment';
  */
 export const EMBED_NODE = 'embed';
 
-/** The toolbar for a selected video, audio clip, file or embed. */
+/**
+ * A link shown as a card, with the page's title, description, site name and
+ * picture stored on it: in the schema from version 2, loaded from
+ * `@blockleaf/editor/embeds`. Captionable.
+ */
+export const LINK_PREVIEW_NODE = 'linkPreview';
+
+/** The toolbar for a selected video, audio clip, file, embed or link card. */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
 /** Resizing and full width for images, videos and embeds. */

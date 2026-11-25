@@ -362,6 +362,11 @@ export const EmbedIcon = /* @__PURE__ */ mediaIcon(
 	'M3 5h18v14H3zM3 9h18M10 12.5v4l3.5-2z'
 );
 
+/** A card with a picture beside two lines of text. */
+export const LinkPreviewIcon = /* @__PURE__ */ mediaIcon(
+	'M3 6h18v12H3zM14 6v12M6 10h5M6 14h3'
+);
+
 /** A page with a folded corner. */
 export const FileIcon = /* @__PURE__ */ mediaIcon(
 	'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5'

@@ -30,6 +30,7 @@ import type {
 	AudioNode,
 	AttachmentNode,
 	EmbedNode,
+	LinkPreviewNode,
 	InlineNode,
 	ItalicMark,
 	LinkMark,
@@ -75,6 +76,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'audio',
 	'attachment',
 	'embed',
+	'linkPreview',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -387,6 +389,21 @@ export const embedNodeSchema: z.ZodType<EmbedNode> = z.object({
 	})
 });
 
+/** Version 2. `url` is `https:`. */
+export const linkPreviewNodeSchema: z.ZodType<LinkPreviewNode> = z.object({
+	type: z.literal('linkPreview'),
+	attrs: z.object({
+		id: z.string(),
+		url: z
+			.string()
+			.regex(/^https:\/\//i, 'A card links to an https: address'),
+		title: z.string().nullable().optional(),
+		description: z.string().nullable().optional(),
+		image: z.string().nullable().optional(),
+		siteName: z.string().nullable().optional()
+	})
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -565,6 +582,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				audioNodeSchema,
 				attachmentNodeSchema,
 				embedNodeSchema,
+				linkPreviewNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -639,7 +657,8 @@ export const figureNodeSchema: z.ZodType<FigureNode> = z.object({
 				videoNodeSchema,
 				audioNodeSchema,
 				attachmentNodeSchema,
-				embedNodeSchema
+				embedNodeSchema,
+				linkPreviewNodeSchema
 			]),
 			captionNodeSchema
 		])
@@ -671,6 +690,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				audioNodeSchema,
 				attachmentNodeSchema,
 				embedNodeSchema,
+				linkPreviewNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -703,6 +723,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				audioNodeSchema,
 				attachmentNodeSchema,
 				embedNodeSchema,
+				linkPreviewNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

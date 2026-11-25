@@ -325,6 +325,22 @@ export interface EmbedNode {
 	};
 }
 
+/**
+ * A link shown as a card (version 2). `url` is `https:`; `image` follows the
+ * image rule. The text is stored, so the card is drawn without a fetch.
+ */
+export interface LinkPreviewNode {
+	type: 'linkPreview';
+	attrs: {
+		id: string;
+		url: string;
+		title?: string | null;
+		description?: string | null;
+		image?: string | null;
+		siteName?: string | null;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -335,10 +351,16 @@ export interface TableNode {
 
 /**
  * The blocks a `figure` may caption: a table, and since
- * version 2 an image, the media blocks and an embed.
+ * version 2 an image, the media blocks, an embed and a link card.
  */
 export type CaptionedNode =
-	TableNode | ImageNode | VideoNode | AudioNode | AttachmentNode | EmbedNode;
+	| TableNode
+	| ImageNode
+	| VideoNode
+	| AudioNode
+	| AttachmentNode
+	| EmbedNode
+	| LinkPreviewNode;
 
 /**
  * A block with a caption: the block, then its `caption`. The caption
@@ -389,6 +411,7 @@ export type TableCellContentNode =
 	| AudioNode
 	| AttachmentNode
 	| EmbedNode
+	| LinkPreviewNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -429,6 +452,7 @@ export type BlockNode =
 	| AudioNode
 	| AttachmentNode
 	| EmbedNode
+	| LinkPreviewNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

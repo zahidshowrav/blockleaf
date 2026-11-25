@@ -56,10 +56,10 @@
 		"ignore": ["react", "react-dom"]
 	},
 	{
-		"name": "embeds subpath, standalone (shares the runtime and the media toolbars in practice)",
+		"name": "embeds subpath, standalone (counts the toolbars the editor ships; 3.5 kB on top of the editor, 1.9 kB on top of media)",
 		"path": "dist/embeds.js",
 		"import": "{ withEmbeds }",
-		"limit": "90 kB",
+		"limit": "92 kB",
 		"ignore": ["react", "react-dom"]
 	}
 ]

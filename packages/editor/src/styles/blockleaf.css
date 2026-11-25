@@ -331,6 +331,69 @@
 	pointer-events: none;
 }
 
+/* A link shown as a card: its text, then its picture on the right. */
+/* The text runs down the left; the picture, if any, fills the right. */
+.blockleaf-editor__content .blockleaf-link-preview {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	min-height: 96px;
+	padding-right: min(33%, 200px);
+	overflow: hidden;
+	border: 1px solid var(--bl-color-border);
+	border-radius: var(--bl-radius);
+	color: inherit;
+	text-decoration: none;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview:hover {
+	border-color: var(--bl-color-muted);
+}
+
+.blockleaf-editor__content .blockleaf-link-preview__title,
+.blockleaf-editor__content .blockleaf-link-preview__description,
+.blockleaf-editor__content .blockleaf-link-preview__site {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview__title {
+	padding: 12px 14px 0;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview__description {
+	display: -webkit-box;
+	padding: 4px 14px 0;
+	color: var(--bl-color-muted);
+	font-size: 0.875em;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview__site {
+	margin-top: auto;
+	padding: 8px 14px 12px;
+	color: var(--bl-color-muted);
+	font-size: 0.8125em;
+	white-space: nowrap;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview:not(:has(img)) {
+	padding-right: 0;
+}
+
+.blockleaf-editor__content .blockleaf-link-preview__image {
+	position: absolute;
+	inset: 0 0 0 auto;
+	width: min(33%, 200px);
+	height: 100%;
+	object-fit: cover;
+	border-left: 1px solid var(--bl-color-border);
+}
+
 .blockleaf-editor__content .blockleaf-audio {
 	display: block;
 	width: 100%;
@@ -381,7 +444,8 @@
 .blockleaf-editor__content .blockleaf-video.ProseMirror-selectednode,
 .blockleaf-editor__content .blockleaf-audio.ProseMirror-selectednode,
 .blockleaf-editor__content .blockleaf-attachment.ProseMirror-selectednode,
-.blockleaf-editor__content .blockleaf-embed.ProseMirror-selectednode {
+.blockleaf-editor__content .blockleaf-embed.ProseMirror-selectednode,
+.blockleaf-editor__content .blockleaf-link-preview.ProseMirror-selectednode {
 	outline: 2px solid var(--bl-color-accent);
 	outline-offset: 2px;
 }

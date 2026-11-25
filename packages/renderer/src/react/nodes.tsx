@@ -11,6 +11,7 @@ import {
 	attachmentAttributes,
 	audioAttributes,
 	embedAttributes,
+	linkPreviewAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -383,7 +384,10 @@ const FRAME = {
  */
 export const mediaRenderers = (
 	labels: RendererLabels = defaultRendererLabels
-): Record<'video' | 'audio' | 'attachment' | 'embed', NodeRenderer> => ({
+): Record<
+	'video' | 'audio' | 'attachment' | 'embed' | 'linkPreview',
+	NodeRenderer
+> => ({
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
 		if (!attrs) return null;
@@ -431,6 +435,42 @@ export const mediaRenderers = (
 				preload="metadata"
 				aria-label={attrs.title ?? labels.audio}
 			/>
+		);
+	},
+	linkPreview: ({ node }) => {
+		const attrs = linkPreviewAttributes(node);
+		if (!attrs) return null;
+		const part = (name: string, value: string | undefined) => (
+			<span
+				className={`blockleaf-link-preview__${name}`}
+				data-fallback={value ? undefined : ''}
+			>
+				{value ?? attrs.host}
+			</span>
+		);
+		return (
+			<a
+				data-id={blockId(node)}
+				data-type="linkPreview"
+				className="blockleaf-link-preview"
+				href={attrs.url}
+			>
+				{part('title', attrs.title)}
+				{attrs.description ? (
+					<span className="blockleaf-link-preview__description">
+						{attrs.description}
+					</span>
+				) : null}
+				{part('site', attrs.siteName)}
+				{attrs.image ? (
+					<img
+						className="blockleaf-link-preview__image"
+						src={attrs.image}
+						alt=""
+						loading="lazy"
+					/>
+				) : null}
+			</a>
 		);
 	},
 	attachment: ({ node }) => {

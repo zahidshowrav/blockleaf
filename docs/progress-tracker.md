@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-14`, `PA-19` to `PA-22` and `PA-24` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-16`, `PA-19` to `PA-22` and `PA-24` are done.
 
-**Next:** embeds, `PA-15` → `PA-16`, which reuse the media stack's caption toolbar and resize. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** what is left in `PA` — `PA-04`, `PA-18` and `PA-23` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
@@ -546,6 +546,16 @@ which took both its entries past 3 kB; both budgets are now 3.5 kB (`F29`).
 Full width is `width: "full"` on `image` and `video`, and the handles are an
 overlay, so an image keeps its markup (`F21`). The core is at 154.20 kB.
 
+The embeds stack (2026-11-25): `PA-15` → `PA-16`, in version 2. `./embeds`
+holds the `embed` block, a frame for YouTube, Vimeo, Loom, Spotify or
+CodePen whose `src` must be a player address on a fixed list in the schema
+(`F30`), and the `linkPreview` card, whose text is stored and which the host
+fills in through `fetchLinkPreview` (`F31`). Both share the media toolbar,
+the caption toolbar and resizing with `./media`. The slash menu gained an
+address picker for both. The renderer draws both built in; both its budgets
+are now 4.25 kB (decided 2026-11-25). The core is at 154.71 kB, and the
+subpath adds 3.5 kB on top of it.
+
 | Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
 | ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
@@ -562,8 +572,8 @@ overlay, so an image keeps its markup (`F21`). The core is at 154.20 kB.
 | PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Done        | `5a05f62` | 2026-11-24 |
 | PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Done        | `591902f` | 2026-11-24 |
 | PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Done        | `2b04a32` | 2026-11-24 |
-| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Not started | —         | —          |
-| PA-16 | Link preview card, caption included                               | `./embeds`                     | Not started | —         | —          |
+| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Done        | `0ad1a1d` | 2026-11-25 |
+| PA-16 | Link preview card, caption included                               | `./embeds`                     | Done        | `f413487` | 2026-11-25 |
 | PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
 | PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —         | —          |
 | PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |

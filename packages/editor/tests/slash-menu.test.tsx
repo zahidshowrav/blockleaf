@@ -23,7 +23,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		const commands = registry.getAll();
 
-		expect(commands).toHaveLength(19);
+		expect(commands).toHaveLength(20);
 		const ids = commands.map((c) => c.id);
 		expect(ids).toEqual([
 			'paragraph',
@@ -44,6 +44,7 @@ describe('Slash menu command registry (CH-01)', () => {
 			'audio',
 			'file',
 			'embed',
+			'link-preview',
 			'table-of-contents'
 		]);
 	});
@@ -84,7 +85,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		registry.remove('divider');
 		expect(registry.get('divider')).toBeUndefined();
-		expect(registry.getAll()).toHaveLength(18);
+		expect(registry.getAll()).toHaveLength(19);
 	});
 
 	it('reorders commands given an array of ids', () => {
@@ -93,15 +94,15 @@ describe('Slash menu command registry (CH-01)', () => {
 		const ids = registry.getAll().map((c) => c.id);
 		expect(ids[0]).toBe('table');
 		expect(ids[1]).toBe('task-list');
-		expect(ids).toHaveLength(19);
+		expect(ids).toHaveLength(20);
 	});
 
 	it('filters commands by query across titles, aliases, keywords, and descriptions', () => {
 		const registry = createCommandRegistry();
 
 		// Empty query returns all commands
-		expect(registry.filter('')).toHaveLength(19);
-		expect(registry.filter('   ')).toHaveLength(19);
+		expect(registry.filter('')).toHaveLength(20);
+		expect(registry.filter('   ')).toHaveLength(20);
 
 		// Exact title matches rank highest
 		const textResults = registry.filter('text');
@@ -303,7 +304,7 @@ describe('<SlashMenu /> UI Component', () => {
 
 			// Options
 			const options = screen.getAllByRole('option');
-			expect(options).toHaveLength(19);
+			expect(options).toHaveLength(20);
 			expect(options[0]?.getAttribute('aria-selected')).toBe('true');
 			expect(options[1]?.getAttribute('aria-selected')).toBe('false');
 		} finally {

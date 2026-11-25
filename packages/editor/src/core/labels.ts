@@ -34,6 +34,7 @@ export type BlockTypeId =
 	| 'audio'
 	| 'file'
 	| 'embed'
+	| 'link-preview'
 	| 'table-of-contents';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
@@ -192,6 +193,12 @@ export type EmbedLabels = {
 	insert: string;
 	/** Shown when no provider on the list serves the address. */
 	unsupported: string;
+	/** The link preview's address field: its name, placeholder and button. */
+	previewAddress: string;
+	previewPlaceholder: string;
+	previewInsert: string;
+	/** Shown when the address is not an `https:` link. */
+	previewInvalid: string;
 };
 
 export type LinkLabels = {
@@ -419,6 +426,7 @@ export const defaultLabels: ResolvedLabels = {
 		audio: 'Audio',
 		file: 'File',
 		embed: 'Embed',
+		'link-preview': 'Link preview',
 		'table-of-contents': 'Table of contents'
 	},
 	slashMenu: {
@@ -448,6 +456,8 @@ export const defaultLabels: ResolvedLabels = {
 			audio: 'Upload a sound or voice recording.',
 			file: 'Attach a file to download.',
 			embed: 'Show a video, song or pen from a link.',
+			'link-preview':
+				'Show a link as a card, with its title and picture.',
 			'table-of-contents': 'List the headings, with a link to each.'
 		},
 		tableSize: 'Table size',
@@ -561,7 +571,11 @@ export const defaultLabels: ResolvedLabels = {
 		placeholder: 'Paste a YouTube, Vimeo, Loom, Spotify or CodePen link',
 		insert: 'Embed',
 		unsupported:
-			'This link cannot be embedded. Use a YouTube, Vimeo, Loom, Spotify or CodePen link.'
+			'This link cannot be embedded. Use a YouTube, Vimeo, Loom, Spotify or CodePen link.',
+		previewAddress: 'Link preview address',
+		previewPlaceholder: 'Paste a link',
+		previewInsert: 'Add preview',
+		previewInvalid: 'Use a link that starts with https://.'
 	},
 	link: {
 		address: 'Link address',

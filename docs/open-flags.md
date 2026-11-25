@@ -8,11 +8,26 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30 · **Last reviewed:** 2026-11-25
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31 · **Last reviewed:** 2026-11-25
 
 ---
 
 ## Settled
+
+### F31 — what a link preview card stores, and who fetches it · decided 2026-11-25
+
+`PA-16` adds `linkPreview` to `./embeds`: any link shown as a card with the
+page's title, description, site name and picture.
+
+**Decisions:**
+
+- **`linkPreview { id, url, title, description, image, siteName }`, with the text stored.** A card is drawn from the document alone, by the editor and by the renderer, so a published page never waits on, or breaks with, someone else's site. The cost is that a card goes stale if the page changes; a host that cares can fetch again and update it.
+- **`url` is `https:` only**, on top of the link rule. A card is a promise that there is a web page behind it; `mailto:` and relative links stay ordinary links. `image` follows the image rule.
+- **The host fetches, through `fetchLinkPreview(url, { signal })`.** A browser cannot read another origin's page, and a library that shipped a fetching proxy would be shipping a server. It is called once per card added without a title, by the card's id; the result is cleaned (whitespace collapsed; title 300, description 500, site name 100 characters) and is not an undo step.
+- **Where nothing is stored, the card shows the host name**, marked `data-fallback` so reading the HTML back stores nothing rather than the host name.
+- **Only from the slash menu.** A pasted link stays a link; turning every pasted link into a card would surprise more people than it helps. Pasting a provider link on its own line still embeds it (`F30`).
+- **Shares the media chrome**: captionable, with the media toolbar's caption and delete buttons. A figure counts a card with a `url` as a block worth keeping, as it does a picture with a `src`.
+- **Renderer**: built in, inside the 4.25 kB set in `F30`.
 
 ### F30 — what an embed stores, and which sites it may show · decided 2026-11-25
 

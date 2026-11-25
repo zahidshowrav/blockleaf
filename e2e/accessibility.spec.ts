@@ -401,6 +401,22 @@ test.describe('Chrome accessibility in a real browser', () => {
 		).toEqual([]);
 	});
 
+	test('a link preview card has no violations', async ({ page }) => {
+		await page.goto('/?embeds');
+		await page.locator(EDITOR).click();
+		await page.keyboard.type('/preview');
+		await page.keyboard.press('Enter');
+		const field = page.getByRole('textbox', {
+			name: 'Link preview address'
+		});
+		await field.fill('https://example.com/notes');
+		await field.press('Enter');
+		const card = page.locator(`${EDITOR} .blockleaf-link-preview`);
+		await expect(card).toContainText('A page at /notes');
+
+		expect(await violations(page, EDITOR)).toEqual([]);
+	});
+
 	test('a selected image with its resize handles has no violations', async ({
 		page
 	}) => {

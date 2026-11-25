@@ -50,7 +50,7 @@ const isCaptionable = (node: ProseMirrorNode): boolean =>
  * The figure's block, if it still has one worth keeping. Deleting the block
  * inside a figure does not empty the figure: ProseMirror fills the gap with
  * a made-up one — a table holding one row and no cells, or an image with no
- * `src` — so those count as gone too.
+ * `src` or a card with no `url` — so those count as gone too.
  */
 const blockOf = (figure: ProseMirrorNode): ProseMirrorNode | null => {
 	const first = figure.firstChild;
@@ -63,7 +63,8 @@ const blockOf = (figure: ProseMirrorNode): ProseMirrorNode | null => {
 		return cells > 0 ? first : null;
 	}
 	if (!isCaptionable(first)) return null;
-	const src: unknown = first.attrs.src;
+	// A media block points at its file with `src`, a link card with `url`.
+	const src: unknown = first.attrs.src ?? first.attrs.url;
 	return typeof src === 'string' && src.length > 0 ? first : null;
 };
 

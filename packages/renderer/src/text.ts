@@ -32,6 +32,7 @@ const BLOCKS = new Set([
 	'audio',
 	'attachment',
 	'embed',
+	'linkPreview',
 	'table',
 	'figure',
 	'caption',
@@ -87,6 +88,13 @@ export const toPlainText = (
 		if (node.type === 'attachment') {
 			const name = node.attrs?.name;
 			if (typeof name === 'string') parts.push(name);
+			return;
+		}
+
+		// A link card is its title, or its address, as in the editor.
+		if (node.type === 'linkPreview') {
+			const text = node.attrs?.title || node.attrs?.url;
+			if (typeof text === 'string') parts.push(text);
 			return;
 		}
 

@@ -199,3 +199,81 @@ describe('embeds', () => {
 		expect(toPlainText(docOf(embed))).toBe('');
 	});
 });
+
+const card: RenderableNode = {
+	type: 'linkPreview',
+	attrs: {
+		id: 'c',
+		url: 'https://www.example.com/article',
+		title: 'An article',
+		description: 'What it is about.',
+		image: 'https://cdn.test/cover.png',
+		siteName: 'Example'
+	}
+};
+
+describe('link preview cards', () => {
+	it.each([
+		['a full card', card],
+		[
+			'a card with only its address',
+			{
+				type: 'linkPreview',
+				attrs: { id: 'b', url: 'https://example.com/a' }
+			}
+		],
+		[
+			'a captioned card',
+			{
+				type: 'figure',
+				attrs: { id: 'fig' },
+				content: [
+					card,
+					{
+						type: 'caption',
+						content: [{ type: 'text', text: 'Read this' }]
+					}
+				]
+			}
+		]
+	])('renders %s exactly as the editor writes it', (_, node) => {
+		const doc = docOf(node as RenderableNode);
+		const editor = canonical(editorHTML(doc));
+		for (const html of both(doc)) expect(html).toBe(editor);
+	});
+
+	it.each([['javascript:alert(1)'], ['http://example.com'], ['/relative']])(
+		'renders nothing for an unsafe address: %s',
+		(url) => {
+			const doc = docOf({ type: 'linkPreview', attrs: { url } });
+			for (const html of both(doc)) expect(html).toBe('');
+		}
+	);
+
+	it('drops an unsafe picture and escapes its text', () => {
+		const doc = docOf({
+			type: 'linkPreview',
+			attrs: {
+				url: 'https://example.com',
+				title: '<script>alert(1)</script>',
+				image: 'javascript:alert(1)'
+			}
+		});
+		for (const html of [reactHTML(doc), stringHTML(doc)]) {
+			expect(html).not.toContain('<img');
+			expect(html).not.toContain('<script>');
+		}
+	});
+
+	it('is its title, or its address, in plain text', () => {
+		expect(toPlainText(docOf(card))).toBe('An article');
+		expect(
+			toPlainText(
+				docOf({
+					type: 'linkPreview',
+					attrs: { url: 'https://example.com/a' }
+				})
+			)
+		).toBe('https://example.com/a');
+	});
+});
