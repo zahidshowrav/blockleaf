@@ -181,8 +181,9 @@ can be translated:
 
 `renderToHTML` takes the same `labels` option. The other strings it can
 hold are `tableOfContents`, `video` and `audio` (a player's name, when an
-audio clip has no title), `fileSize`, which writes a byte count, and `file`,
-which names a file block from its name and size. The class is styled by
+audio clip has no title), `fileSize`, which writes a byte count, `file`,
+which names a file block from its name and size, and `embed`, which names
+an embed's frame from its provider. The class is styled by
 `@blockleaf/editor/styles.css` and, unlike the prose rules, is **not** scoped
 to `.blockleaf-editor__content` — rendered output lands in whatever markup you
 wrote, and a table that only behaves when somebody remembered a wrapper class
@@ -479,6 +480,7 @@ Every node in [the schema](./schema.mdx) renders:
 | `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                     |
 | `audio`                      | `<audio class="blockleaf-audio" controls preload="metadata">`, named by its title |
 | `attachment`                 | `<a class="blockleaf-attachment" download>` with the file's name and size         |
+| `embed`                      | `<iframe class="blockleaf-embed">`, only for a player address on the list         |
 | `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                              |
 | `tableRow`                   | `<tr>`                                                                            |
 | `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">`    |

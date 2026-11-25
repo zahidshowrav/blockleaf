@@ -1,6 +1,7 @@
 import { Editor } from '@tiptap/core';
 import { renderToStaticMarkup } from 'react-dom/server';
 
+import { createEmbeds } from '@blockleaf/editor/embeds';
 import { createExtensions } from '@blockleaf/editor/extensions';
 import { createMedia } from '@blockleaf/editor/media';
 import { withMentions } from '@blockleaf/editor/mentions';
@@ -29,7 +30,8 @@ export const editorHTML = (doc: RenderableDocument): string => {
 				)
 			),
 			// The blocks only: the toolbars need a mounted editor.
-			...createMedia({ mediaMenu: false, captionMenu: false })
+			...createMedia({ mediaMenu: false, captionMenu: false }),
+			...createEmbeds({ mediaMenu: false, captionMenu: false })
 		],
 		content: doc
 	});

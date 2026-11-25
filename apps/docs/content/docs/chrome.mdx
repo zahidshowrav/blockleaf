@@ -40,10 +40,13 @@ keywords and descriptions; `↑`/`↓` move, `Enter` runs, `Escape` dismisses.
 | `slashItems`    | —       | An array of commands, or `(defaults) => commands`. |
 | `slashRegistry` | —       | A `CommandRegistry` instance, for full control.    |
 
-The fifteen defaults are Text, Heading 1–3, Bullet list, Numbered list,
-To-do list, Quote, Code, Callout, Toggle, Divider, Table, Image and Table of
-contents. Image needs an upload adapter, and Table of contents needs
-[`@blockleaf/editor/toc`](./table-of-contents.mdx); each hides itself
+The nineteen defaults are Text, Heading 1–3, Bullet list, Numbered list,
+To-do list, Quote, Code, Callout, Toggle, Divider, Table, Image, Video,
+Audio, File, Embed and Table of contents. Some need more than the editor:
+Image needs an upload adapter; Video, Audio and File need one and
+[`@blockleaf/editor/media`](./media.mdx); Embed needs
+[`@blockleaf/editor/embeds`](./embeds.mdx); Table of contents needs
+[`@blockleaf/editor/toc`](./table-of-contents.mdx). Each hides itself
 without.
 
 They are displayed grouped by their `group` — Basic blocks, Headings, Lists,

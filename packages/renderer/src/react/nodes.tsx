@@ -10,6 +10,7 @@ import {
 	headingLevel,
 	attachmentAttributes,
 	audioAttributes,
+	embedAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -368,13 +369,21 @@ export const tableOfContentsRenderer =
 		);
 	};
 
+/** The frame an embed loads its player in, as the editor writes it. */
+const FRAME = {
+	loading: 'lazy',
+	allow: 'encrypted-media; fullscreen; picture-in-picture',
+	referrerPolicy: 'strict-origin-when-cross-origin',
+	sandbox: 'allow-scripts allow-same-origin allow-popups allow-presentation'
+} as const;
+
 /**
- * Video, audio and a file, as the editor writes them.
+ * Video, audio, a file and an embed, as the editor writes them.
  * A factory, because each puts a translatable name in its output.
  */
 export const mediaRenderers = (
 	labels: RendererLabels = defaultRendererLabels
-): Record<'video' | 'audio' | 'attachment', NodeRenderer> => ({
+): Record<'video' | 'audio' | 'attachment' | 'embed', NodeRenderer> => ({
 	video: ({ node }) => {
 		const attrs = videoAttributes(node);
 		if (!attrs) return null;
@@ -389,6 +398,23 @@ export const mediaRenderers = (
 				controls
 				preload="metadata"
 				aria-label={labels.video}
+			/>
+		);
+	},
+	embed: ({ node }) => {
+		const attrs = embedAttributes(node);
+		if (!attrs) return null;
+		return (
+			<iframe
+				data-id={blockId(node)}
+				src={attrs.src}
+				{...widthAttributes(attrs.width)}
+				data-align={attrs.align}
+				className="blockleaf-embed"
+				data-provider={attrs.provider}
+				title={labels.embed(attrs.provider)}
+				allowFullScreen
+				{...FRAME}
 			/>
 		);
 	},

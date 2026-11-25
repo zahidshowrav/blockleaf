@@ -37,11 +37,26 @@ const both = (doc: RenderableDocument) => [
 	canonical(stringHTML(doc))
 ];
 
+const embed: RenderableNode = {
+	type: 'embed',
+	attrs: {
+		id: 'e',
+		src: 'https://player.vimeo.com/video/76979871',
+		width: 480,
+		align: 'right'
+	}
+};
+
 describe('media blocks (PA-12 to PA-14)', () => {
 	it.each([
 		['a video', video],
 		['an audio clip', audio],
-		['a file', attachment]
+		['a file', attachment],
+		['an embed', embed],
+		[
+			'a full width embed',
+			{ ...embed, attrs: { ...embed.attrs, width: 'full', align: null } }
+		]
 	])('renders %s exactly as the editor writes it', (_, node) => {
 		const doc = docOf(node);
 		const editor = canonical(editorHTML(doc));
@@ -140,5 +155,47 @@ describe('full width (PA-24)', () => {
 		for (const html of both(doc)) {
 			expect(html).not.toContain('width');
 		}
+	});
+});
+
+describe('embeds', () => {
+	it('renders a captioned embed as the editor does', () => {
+		const doc = docOf({
+			type: 'figure',
+			attrs: { id: 'fig' },
+			content: [
+				embed,
+				{
+					type: 'caption',
+					content: [{ type: 'text', text: 'The talk' }]
+				}
+			]
+		});
+		const editor = canonical(editorHTML(doc));
+		for (const html of both(doc)) expect(html).toBe(editor);
+	});
+
+	it.each([
+		['a page rather than a player', 'https://vimeo.com/76979871'],
+		['another site', 'https://evil.test/embed'],
+		['a script', 'javascript:alert(1)']
+	])('renders nothing for %s', (_, src) => {
+		const doc = docOf({ type: 'embed', attrs: { src } });
+		for (const html of both(doc)) expect(html).toBe('');
+	});
+
+	it('names the frame from the labels', () => {
+		const doc = docOf(embed);
+		const labels = { embed: (provider: string) => `Lecteur ${provider}` };
+		expect(canonical(stringHTML(doc, { labels }))).toContain(
+			'title="Lecteur vimeo"'
+		);
+		expect(canonical(reactHTML(doc, { labels }))).toContain(
+			'title="Lecteur vimeo"'
+		);
+	});
+
+	it('counts as nothing in plain text', () => {
+		expect(toPlainText(docOf(embed))).toBe('');
 	});
 });

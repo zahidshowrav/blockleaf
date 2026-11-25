@@ -357,6 +357,11 @@ export const AudioIcon = /* @__PURE__ */ mediaIcon(
 	'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'
 );
 
+/** A frame around a play button: another site's player. */
+export const EmbedIcon = /* @__PURE__ */ mediaIcon(
+	'M3 5h18v14H3zM3 9h18M10 12.5v4l3.5-2z'
+);
+
 /** A page with a folded corner. */
 export const FileIcon = /* @__PURE__ */ mediaIcon(
 	'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5'

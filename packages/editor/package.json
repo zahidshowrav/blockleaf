@@ -52,6 +52,10 @@
 			"types": "./dist/media.d.ts",
 			"import": "./dist/media.js"
 		},
+		"./embeds": {
+			"types": "./dist/embeds.d.ts",
+			"import": "./dist/embeds.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"

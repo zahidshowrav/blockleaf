@@ -6,6 +6,7 @@ import {
 	CalloutIcon,
 	CodeIcon,
 	DividerIcon,
+	EmbedIcon,
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
@@ -22,10 +23,12 @@ import {
 	ToggleIcon
 } from './icons.js';
 import type { SlashCommand } from './types.js';
+import { createUrlPicker } from './url-picker.js';
 import {
 	ATTACHMENT_NODE,
 	AUDIO_NODE,
 	DETAILS_NODE,
+	EMBED_NODE,
 	TABLE_OF_CONTENTS_NODE,
 	UPLOAD_EXTENSION_NAME,
 	VIDEO_NODE
@@ -35,6 +38,21 @@ import {
 	type BlockTypeLabels,
 	type SlashMenuLabels
 } from '../../core/labels.js';
+
+/**
+ * The address field for an embed. It asks the command whether it can embed
+ * the address, so the provider list stays out of this bundle.
+ */
+const EmbedPicker = /* @__PURE__ */ createUrlPicker({
+	strings: (labels) => ({
+		...labels.embeds,
+		invalid: labels.embeds.unsupported
+	}),
+	canInsert: (editor, url) => editor.can().setEmbed({ src: url }),
+	insert: (editor, url) => {
+		editor.chain().focus().setEmbed({ src: url }).run();
+	}
+});
 
 const hasUpload = (editor: Editor) =>
 	editor.extensionManager.extensions.some(
@@ -265,6 +283,32 @@ export const createSlashCommands = (
 		blockTypes,
 		labels
 	),
+	{
+		id: 'embed',
+		title: blockTypes.embed,
+		description: labels.descriptions.embed,
+		aliases: ['embed', 'iframe'],
+		group: labels.groups.advanced,
+		icon: EmbedIcon,
+		keywords: [
+			'embed',
+			'youtube',
+			'vimeo',
+			'loom',
+			'spotify',
+			'codepen',
+			'video',
+			'music'
+		],
+		// Only where `@blockleaf/editor/embeds` added the block.
+		isAvailable: (editor) => editor.schema.nodes[EMBED_NODE] !== undefined,
+		picker: EmbedPicker,
+		// Without the picker there is no address to embed; pasting one on
+		// an empty line embeds it.
+		run: (editor) => {
+			editor.commands.focus();
+		}
+	},
 	{
 		id: 'table-of-contents',
 		title: blockTypes['table-of-contents'],

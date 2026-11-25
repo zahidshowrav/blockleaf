@@ -24,7 +24,12 @@ export {
 	resolveRendererLabels,
 	type RendererLabels
 } from './labels.js';
-export { sanitizeHref, sanitizeMediaSrc, sanitizeSrc } from './sanitize.js';
+export {
+	embedProviderOf,
+	sanitizeHref,
+	sanitizeMediaSrc,
+	sanitizeSrc
+} from './sanitize.js';
 export { tableOfContents, type TableOfContentsItem } from './toc.js';
 export {
 	extractHeadings,

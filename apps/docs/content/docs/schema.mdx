@@ -74,7 +74,8 @@ Added on top of it:
 | `video`                                   | `id, src, poster, width, align` | Version 2. `src` is `https:` or relative, never a `data:` URL. See [media](./media.mdx).                                                                                                |
 | `audio`                                   | `id, src, title`                | Version 2. `title` is the player's accessible name. See [media](./media.mdx).                                                                                                           |
 | `attachment`                              | `id, src, name, size, mime`     | Version 2. A file to download; `size` in bytes. See [media](./media.mdx).                                                                                                               |
-| `figure`                                  | —                               | A captioned block: a `table`, an `image`, a `video`, an `audio` or an `attachment`, then its `caption`, nothing else. See [Captions](#captions).                                        |
+| `embed`                                   | `id, src, width, align`         | Version 2. `src` is a player address from the provider list, nothing else. See [embeds](./embeds.mdx).                                                                                  |
+| `figure`                                  | —                               | A captioned block: a `table`, an `image`, a `video`, an `audio`, an `attachment` or an `embed`, then its `caption`, nothing else. See [Captions](#captions).                            |
 | `caption`                                 | `textAlign`                     | Rich text — inline content with marks, so a credit keeps its link. Only ever the last child of a `figure`. `textAlign` is version 2; absent follows the block.                          |
 | `mention`                                 | `id, label, kind`               | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                                                 |
 | `tableOfContents`                         | —                               | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx).                     |
@@ -99,7 +100,7 @@ A table is a grid of rich-text cells with an optional header row. Nested tables 
 
 ### Captions
 
-A captioned block is stored inside a `figure`, with the caption beside it. The block is a table, or since version 2 an image, a video, an audio clip or a file:
+A captioned block is stored inside a `figure`, with the caption beside it. The block is a table, or since version 2 an image, a video, an audio clip, a file or an embed:
 
 ```json
 {
@@ -141,7 +142,8 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`tableOfContents`** — a block with no attributes beyond its id. It never stores its entries, so it cannot go stale.
 - **`textAlign`** on `paragraph` and `heading` — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it, so an editor without them still keeps it on save.
 - **`video`**, **`audio`** and **`attachment`** — media blocks, each captionable. Their sources are `https:` or relative, never `data:`. See [media](./media.mdx).
-- **`width: "full"`** on `image` and `video` — the width of the page, as a name. An image's `width` was pixels or `null` in version 1, and still is unless someone presses Full width. See [resizing](./media.mdx#resizing).
+- **`embed`** — a frame showing a YouTube, Vimeo, Loom, Spotify or CodePen player. Its `src` must be a player address on the provider list. See [embeds](./embeds.mdx).
+- **`width: "full"`** on `image`, `video` and `embed` — the width of the page, as a name. An image's `width` was pixels or `null` in version 1, and still is unless someone presses Full width. See [resizing](./media.mdx#resizing).
 - **An image in a `figure`** — a figure may hold an `image` as well as a `table`, and its `caption` takes `textAlign`, absent to follow the image. An editor that only knows version 1 would refuse an image inside a figure, which is why this is in the bump and not beside it like the table caption was.
 - The rest of the batch, such as maths and media, joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.
 

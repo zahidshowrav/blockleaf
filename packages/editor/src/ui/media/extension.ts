@@ -4,6 +4,7 @@ import { createMediaActions, selectedMediaType } from './actions.js';
 import {
 	ATTACHMENT_NODE,
 	AUDIO_NODE,
+	EMBED_NODE,
 	MEDIA_MENU_EXTENSION_NAME,
 	VIDEO_NODE
 } from '../../core/constants.js';
@@ -20,10 +21,11 @@ export const MEDIA_MENU_PLUGIN_KEY = 'blockleafMediaMenu';
 const MEDIA_TYPES: ReadonlySet<string> = new Set([
 	VIDEO_NODE,
 	AUDIO_NODE,
-	ATTACHMENT_NODE
+	ATTACHMENT_NODE,
+	EMBED_NODE
 ]);
 
-/** Shown for a selected video, audio clip or file. */
+/** Shown for a selected video, audio clip, file or embed. */
 export const mediaMenuShouldShow: BubbleMenuShouldShow = ({ editor }) =>
 	editor.isEditable && MEDIA_TYPES.has(selectedMediaType(editor) ?? '');
 

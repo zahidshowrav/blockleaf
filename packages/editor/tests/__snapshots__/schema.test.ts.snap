@@ -478,6 +478,32 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "id": "figure-embed",
+      },
+      "content": [
+        {
+          "attrs": {
+            "align": "center",
+            "id": "embed-1",
+            "src": "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+            "width": 560,
+          },
+          "type": "embed",
+        },
+        {
+          "content": [
+            {
+              "text": "The talk",
+              "type": "text",
+            },
+          ],
+          "type": "caption",
+        },
+      ],
+      "type": "figure",
+    },
+    {
+      "attrs": {
         "id": "figure-image",
       },
       "content": [

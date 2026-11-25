@@ -61,7 +61,8 @@ export const BLOCK_NODE_TYPES = [
 	'tableOfContents',
 	'video',
 	'audio',
-	'attachment'
+	'attachment',
+	'embed'
 ] as const;
 
 /**
@@ -117,10 +118,16 @@ export const VIDEO_NODE = 'video';
 export const AUDIO_NODE = 'audio';
 export const ATTACHMENT_NODE = 'attachment';
 
-/** The toolbar for a selected video, audio clip or file. */
+/**
+ * An embedded page from a fixed list of providers: in the schema
+ * from version 2, loaded from `@blockleaf/editor/embeds`. Captionable.
+ */
+export const EMBED_NODE = 'embed';
+
+/** The toolbar for a selected video, audio clip, file or embed. */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';
 
-/** Resizing and full width for images and videos, from `./media`. */
+/** Resizing and full width for images, videos and embeds. */
 export const MEDIA_RESIZE_EXTENSION_NAME = 'mediaResize';
 
 /** A toggle block: its first child is the title, the rest open and close. */

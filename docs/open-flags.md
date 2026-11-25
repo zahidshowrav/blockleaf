@@ -8,11 +8,28 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29 · **Last reviewed:** 2026-11-24
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30 · **Last reviewed:** 2026-11-25
 
 ---
 
 ## Settled
+
+### F30 — what an embed stores, and which sites it may show · decided 2026-11-25
+
+`PA-15` adds `embed` to a new `./embeds` subpath: a frame showing another
+site's player. A frame is the `href` risk with a page attached, so the
+decision is mostly about what the schema lets through.
+
+**Decisions:**
+
+- **`embed { id, src, width, align }`, with `src` the provider's player address.** Not the page that was pasted, and no separate `provider` field that could disagree with it. The pasted page is turned into a player address once, on the way in (`toEmbedSrc`), by rebuilding it from the id, so stray parameters such as `autoplay` never get through.
+- **A fixed provider list in the schema: YouTube, Vimeo, Loom, Spotify, CodePen.** Each is one whole-address pattern on the provider's player host. The editor's node, the validator and the renderer all check it; the renderer keeps its own copy (`F15`) and a shared table of vectors holds the two together. A host cannot add a provider: a frame the renderer and the validator do not know is exactly what the list exists to refuse. Adding one is a library change.
+- **YouTube plays from `youtube-nocookie.com`.** No cookies until someone presses play.
+- **The frame is sandboxed** to scripts, same-origin, popups and presentation, lazy-loaded, with `strict-origin-when-cross-origin` as its referrer policy, which YouTube's player now needs.
+- **In the editor, a click selects the block.** An unselected frame ignores the pointer and the editor selects the block under it; a selected one takes clicks, so its player works.
+- **It shares the media chrome.** Captionable, resized like a video (`F21`), with the media toolbar. `withEmbeds` and `withMedia` both add the toolbars and resizing, and each removes the other's copy first.
+- **The renderer renders it, built in.** It took both renderer budgets past 3.5 kB. With the link preview card still to come, both are now 4.25 kB (decided 2026-11-25), for the reason `F29` gave: a stored block must never silently vanish from a published page.
+- **Why:** the list is the security boundary, so it lives where every reader of a document checks it, not only where documents are written.
 
 ### F29 — what video, audio and a file store · decided 2026-11-24
 

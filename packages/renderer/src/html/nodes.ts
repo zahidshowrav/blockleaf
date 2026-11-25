@@ -11,6 +11,7 @@ import {
 	headingLevel,
 	attachmentAttributes,
 	audioAttributes,
+	embedAttributes,
 	imageAttributes,
 	isChecked,
 	isHeaderCell,
@@ -219,6 +220,30 @@ export const createHtmlNodes = (
 				controls: '',
 				preload: 'metadata',
 				'aria-label': labels.video
+			},
+			''
+		);
+	},
+
+	embed: ({ node }) => {
+		const attrs = embedAttributes(node);
+		if (!attrs) return '';
+		return element(
+			'iframe',
+			{
+				'data-id': blockId(node),
+				src: attrs.src,
+				...widthAttributes(attrs.width),
+				'data-align': attrs.align,
+				class: 'blockleaf-embed',
+				'data-provider': attrs.provider,
+				title: labels.embed(attrs.provider),
+				loading: 'lazy',
+				allow: 'encrypted-media; fullscreen; picture-in-picture',
+				allowfullscreen: '',
+				referrerpolicy: 'strict-origin-when-cross-origin',
+				sandbox:
+					'allow-scripts allow-same-origin allow-popups allow-presentation'
 			},
 			''
 		);

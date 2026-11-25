@@ -1,0 +1,136 @@
+---
+title: Embeds
+description: YouTube, Vimeo, Loom, Spotify and CodePen in a frame, from the opt-in embeds subpath.
+icon: SquarePlay
+---
+
+`@blockleaf/editor/embeds` adds an **embed** block: a video, a song or a
+pen from another site, shown in a frame.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withEmbeds } from '@blockleaf/editor/embeds';
+
+const extensions = withEmbeds(presets.standard());
+```
+
+The block is new in schema version 2. An editor without this subpath keeps
+a stored one as a placeholder and saves it back unchanged.
+
+## Which sites
+
+| Provider | Paste a link like                         |
+| -------- | ----------------------------------------- |
+| YouTube  | `youtube.com/watch?v=…`, `youtu.be/…`     |
+| Vimeo    | `vimeo.com/…`                             |
+| Loom     | `loom.com/share/…`                        |
+| Spotify  | a track, album, playlist, episode or show |
+| CodePen  | `codepen.io/someone/pen/…`                |
+
+Only these. A frame runs another site's page inside yours, so the list is
+part of the schema, like the rule for a link's address. A document cannot
+point a frame anywhere else, whoever wrote it.
+
+YouTube plays from `youtube-nocookie.com`, which sets no cookies until
+someone presses play. A start time in the link, such as `?t=90` or
+`&t=1m30s`, is kept.
+
+## Getting one in
+
+- **Paste a link on an empty line.** A supported link pasted alone on a
+  line of its own becomes an embed. Pasted into a sentence, it stays a link.
+- **Type `/embed`.** The slash menu asks for the link. Press `Enter` to
+  embed it, or `Escape` to go back to the list. A link it cannot embed gets
+  a message saying so, and nothing changes.
+
+Or with a command, from host code or your own chrome:
+
+```ts
+editor.commands.setEmbed({ src: 'https://youtu.be/dQw4w9WgXcQ' });
+editor.commands.updateEmbed({ align: 'center' });
+```
+
+Both return `false` for a link no provider on the list serves. The helpers
+behind them are exported too:
+
+```ts
+import { toEmbedSrc, embedProviderOf } from '@blockleaf/editor/embeds';
+
+toEmbedSrc('https://youtu.be/dQw4w9WgXcQ');
+// 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ'
+toEmbedSrc('https://example.com'); // null
+embedProviderOf('https://player.vimeo.com/video/76979871'); // 'vimeo'
+```
+
+## What is stored
+
+```json
+{
+	"type": "embed",
+	"attrs": {
+		"id": "…",
+		"src": "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+		"width": 560,
+		"align": "center"
+	}
+}
+```
+
+`src` is the provider's **player address**, not the page that was pasted.
+The page is turned into a player address once, on the way in. After that,
+the editor, the validator and the renderer only check the stored address
+against the list, and anything else is dropped: the editor will not write
+it, the validator rejects it, and the renderer renders nothing.
+
+`width` and `align` work as they do for a video: pixels or `"full"`, and
+`left`, `center` or `right`.
+
+## In the editor
+
+**A click selects an embed; it does not start the player.** Once it is
+selected, the player works, so a second click plays it. Select it and the
+media toolbar appears, with alignment, **Full width**, **Toggle caption** and
+**Delete**.
+
+An embed resizes like a video: a handle on each side, the width only, and
+`Alt`+`Shift`+`←` or `→` from the keyboard. Video players keep a 16:9
+shape. Spotify and CodePen have a fixed height instead.
+
+An embed takes a caption, stored as a `figure` holding the embed and a
+`caption`, like any other captioned block. See
+[Captions](/docs/schema#captions).
+
+## Options
+
+```ts
+withEmbeds(presets.standard(), {
+	pasteToEmbed: false, // a pasted link stays a link
+	resize: false,
+	mediaMenu: false,
+	captionMenu: false
+});
+```
+
+The toolbars and resizing are the ones [`@blockleaf/editor/media`](./media.mdx)
+adds. With both subpaths loaded they are shared, and each is in the editor
+once.
+
+Strings are under `labels.embeds`: each provider's name for its frame, and
+the slash menu's address field. See [i18n](./i18n.mdx).
+
+## Rendering
+
+[`@blockleaf/renderer`](./rendering.mdx) renders an embed on both targets,
+with no setup, as the same `<iframe>` the editor writes. It checks the
+stored address against its own copy of the list and renders nothing for
+anything else. `labels.embed` names each frame from its provider.
+
+## Content Security Policy
+
+If your site sends a `Content-Security-Policy` header, allow the players as
+frame sources:
+
+```text
+frame-src https://www.youtube-nocookie.com https://player.vimeo.com
+  https://www.loom.com https://open.spotify.com https://codepen.io;
+```

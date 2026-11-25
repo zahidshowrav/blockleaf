@@ -31,6 +31,7 @@ const BLOCKS = new Set([
 	'video',
 	'audio',
 	'attachment',
+	'embed',
 	'table',
 	'figure',
 	'caption',
