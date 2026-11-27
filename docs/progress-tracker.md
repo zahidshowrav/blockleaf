@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-16`, `PA-19` to `PA-22` and `PA-24` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-16`, `PA-19` to `PA-24` are done.
 
-**Next:** what is left in `PA` — `PA-04`, `PA-18` and `PA-23` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** what is left in `PA` — `PA-04` and `PA-18` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
@@ -580,7 +580,7 @@ subpath adds 3.5 kB on top of it.
 | PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Done        | `0f5095c` | 2026-11-24 |
 | PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Done        | `6167d57` | 2026-11-24 |
 | PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Done        | `bcea22e` | 2026-11-23 |
-| PA-23 | Block background colour                                           | core                           | Not started | —         | —          |
+| PA-23 | Block background colour                                           | core                           | Done        | `520c078` | 2026-11-27 |
 | PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Done        | `a173335` | 2026-11-24 |
 
 `PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
