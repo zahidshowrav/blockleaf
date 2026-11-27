@@ -274,11 +274,19 @@ const textAlignSchema = z
 	.nullable()
 	.optional();
 
+/** Version 2: a colour token, such as `'yellow'`. */
+const backgroundColorSchema = z
+	.string()
+	.regex(STYLE_TOKEN)
+	.nullable()
+	.optional();
+
 export const paragraphNodeSchema: z.ZodType<ParagraphNode> = z.object({
 	type: z.literal('paragraph'),
 	attrs: z
 		.object({
 			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema,
 			textAlign: textAlignSchema
 		})
 		.optional(),
@@ -290,6 +298,7 @@ export const headingNodeSchema: z.ZodType<HeadingNode> = z.object({
 	attrs: z.object({
 		level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
 		id: z.string().optional(),
+		backgroundColor: backgroundColorSchema,
 		textAlign: textAlignSchema
 	}),
 	content: z.array(inlineNodeSchema).optional()
@@ -437,7 +446,8 @@ export const bulletListNodeSchema: z.ZodType<BulletListNode> = z.object({
 	type: z.literal('bulletList'),
 	attrs: z
 		.object({
-			id: z.string().optional()
+			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema
 		})
 		.optional(),
 	content: z
@@ -454,7 +464,8 @@ export const orderedListNodeSchema: z.ZodType<OrderedListNode> = z.object({
 	attrs: z
 		.object({
 			start: z.number().optional(),
-			id: z.string().optional()
+			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema
 		})
 		.optional(),
 	content: z
@@ -498,7 +509,8 @@ export const taskListNodeSchema: z.ZodType<TaskListNode> = z.object({
 	type: z.literal('taskList'),
 	attrs: z
 		.object({
-			id: z.string().optional()
+			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema
 		})
 		.optional(),
 	content: z
@@ -514,7 +526,8 @@ export const blockquoteNodeSchema: z.ZodType<BlockquoteNode> = z.object({
 	type: z.literal('blockquote'),
 	attrs: z
 		.object({
-			id: z.string().optional()
+			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema
 		})
 		.optional(),
 	content: z
@@ -541,7 +554,8 @@ export const detailsNodeSchema: z.ZodType<DetailsNode> = z.object({
 	attrs: z
 		.object({
 			open: z.boolean().optional(),
-			id: z.string().optional()
+			id: z.string().optional(),
+			backgroundColor: backgroundColorSchema
 		})
 		.optional(),
 	content: z

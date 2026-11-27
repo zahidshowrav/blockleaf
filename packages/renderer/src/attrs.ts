@@ -539,3 +539,11 @@ export const linkPreviewAttributes = (
 		siteName: optionalString(node.attrs?.siteName)
 	};
 };
+
+/** A block's background colour token, or none. */
+export const blockBackground = (node: RenderableNode): string | undefined => {
+	const value = node.attrs?.backgroundColor;
+	return typeof value === 'string' && STYLE_TOKEN_PATTERN.test(value)
+		? value
+		: undefined;
+};

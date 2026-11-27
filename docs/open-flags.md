@@ -8,11 +8,26 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31 · **Last reviewed:** 2026-11-25
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32 · **Last reviewed:** 2026-11-25
 
 ---
 
 ## Settled
+
+### F32 — what a block's background colour stores, and on which blocks · decided 2026-11-25
+
+`PA-23` gives a block a background colour. It is the one `PA` change that
+adds an attribute to nodes that already exist, so the shape was decided by
+the developer before it was built.
+
+**Decisions:**
+
+- **`backgroundColor`, a token** (`F18`), named for what it is rather than `tone`: a callout's `tone` is a free string such as `info` with no colour behind it, and one name meaning two things would be worse than two names. A table cell's background (`TB-04`) uses the same name.
+- **On the text blocks only**: `paragraph`, `heading`, `blockquote`, `bulletList`, `orderedList`, `taskList` and `details`. Not `callout`, which is already a coloured box; not `codeBlock`, which has its own background; not the table, whose cells get theirs in `TB-04`; not media. A list is coloured whole: the block menu acts on top-level blocks.
+- **The text background palette**, drawn through `--bl-highlight-<token>`, so one colour looks the same on a word and on a block in either theme, and a host retheming one changes both.
+- **In every preset, with the command**, for `F25`'s reason: an editor drops an attribute it does not know. The block menu, which is core chrome, sets it; no subpath is involved.
+- **Absent when unset**, as `textAlign` is (`undefined`, not `null`), so a version 1 document opened and saved unedited is unchanged. It joins version 2 with no new bump.
+- **The block menu's palette is copied onto it**: the menu is portalled to `document.body`, outside the editor, so its swatches would otherwise have no colours.
 
 ### F31 — what a link preview card stores, and who fetches it · decided 2026-11-25
 

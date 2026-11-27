@@ -5,6 +5,14 @@ export {
 	presets,
 	type PresetName
 } from './core/extensions.js';
+export {
+	BlockBackground,
+	readBlockBackground
+} from './core/block-background.js';
+export {
+	BLOCK_BACKGROUND_TYPES,
+	BLOCK_BACKGROUND_EXTENSION_NAME
+} from './core/constants.js';
 export { Link, sanitizeHref } from './core/marks/link.js';
 export { Callout, type CalloutOptions } from './core/nodes/callout.js';
 export { Details, type DetailsOptions } from './core/nodes/details.js';

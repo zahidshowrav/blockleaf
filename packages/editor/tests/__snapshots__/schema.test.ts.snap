@@ -58,6 +58,7 @@ exports[`document schema > matches committed schema snapshot fixture (EC-10) 1`]
     },
     {
       "attrs": {
+        "backgroundColor": "yellow",
         "id": "para-1",
         "textAlign": "center",
       },

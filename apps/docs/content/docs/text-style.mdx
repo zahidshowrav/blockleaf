@@ -102,6 +102,51 @@ the schema has had since `0.1.0`, with a token in its `color`:
 | `pink`   | `#fce4f1` | `#47162f` |
 | `red`    | `#fde0e0` | `#4b1818` |
 
+## Block background colour
+
+A whole block can have a background, from the **Background** group in its
+[block menu](./chrome.mdx#the-block-menu). Unlike everything else on this
+page, it needs no subpath: it is in every preset.
+
+```json
+{
+	"type": "paragraph",
+	"attrs": { "backgroundColor": "yellow" },
+	"content": [{ "type": "text", "text": "Worth knowing" }]
+}
+```
+
+- **The same palette as a text background**, drawn through
+  `--bl-highlight-<token>`, so a colour looks the same on a word and on a
+  block, in the light theme and the dark one. Override one of those
+  properties and both change.
+- **The text blocks take one**: a paragraph, a heading, a quote, a list
+  (the whole list, not one item) and a toggle. A callout is already a
+  coloured box, a code block has its own background, a table's cells will
+  get their own colour, and media have none.
+- **Stored only when set.** A block with no colour stores nothing, so a
+  document opened and saved unedited comes back as it was. Default in the
+  menu takes the colour off.
+- **Only a token is kept.** Anything else in `backgroundColor`, pasted or
+  stored, is dropped rather than written into `style`, and the validator
+  rejects it.
+- **Rendered as** `data-background="yellow"` and
+  `style="background-color: var(--bl-highlight-yellow)"`, by the editor and
+  both renderer targets, with a little padding from the stylesheet.
+
+```ts
+editor.commands.setBlockBackground('yellow', pos); // the block at pos
+editor.commands.setBlockBackground('yellow'); // the blocks in the selection
+editor.commands.setBlockBackground(null, pos); // take it off
+```
+
+### Why it is not in the subpath
+
+For the reason text alignment's attribute is not: an editor drops an
+attribute it does not know. A block coloured in one editor would lose its
+colour when the document was saved from another that did not load the
+subpath. A mark survives that; an attribute does not.
+
 Colour, font and size are marks of their own rather than attributes of one
 shared `textStyle` mark. An editor keeps a mark it does not know but drops an
 attribute it does not know, so separate marks are never lost on save.

@@ -79,7 +79,7 @@ export type BlockMenuLabels = {
 	handleHint: string;
 	/** The `+` button beside the handle. */
 	insert: string;
-	groups: Record<'turnInto' | 'align' | 'actions', string>;
+	groups: Record<'turnInto' | 'align' | 'background' | 'actions', string>;
 	actions: Record<
 		| 'move-up'
 		| 'move-down'
@@ -483,7 +483,12 @@ export const defaultLabels: ResolvedLabels = {
 		handle: 'Block actions',
 		handleHint: 'Drag to move, click for actions',
 		insert: 'Insert a block below',
-		groups: { turnInto: 'Turn into', align: 'Align', actions: 'Actions' },
+		groups: {
+			turnInto: 'Turn into',
+			align: 'Align',
+			background: 'Background',
+			actions: 'Actions'
+		},
 		actions: {
 			'move-up': 'Move up',
 			'move-down': 'Move down',

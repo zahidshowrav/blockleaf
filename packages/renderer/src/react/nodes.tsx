@@ -22,6 +22,7 @@ import {
 	tableMinWidth,
 	tableRows,
 	textAlign,
+	blockBackground,
 	videoAttributes,
 	widthAttributes
 } from '../attrs.js';
@@ -38,16 +39,31 @@ import { type RenderableNode } from '../types.js';
 
 const Doc: NodeRenderer = ({ children }) => <>{children}</>;
 
-/** A paragraph's, heading's or caption's alignment, as the editor writes it. */
-const alignStyle = (node: RenderableNode) => {
+/**
+ * A block's alignment and background colour, as the editor writes them:
+ * a `style`, and the colour's token in `data-background`.
+ */
+const blockStyle = (node: RenderableNode) => {
 	const align = textAlign(node);
-	return align ? { textAlign: align } : undefined;
+	const background = blockBackground(node);
+	return {
+		'data-background': background,
+		style:
+			align || background
+				? {
+						textAlign: align,
+						backgroundColor: background
+							? `var(--bl-highlight-${background})`
+							: undefined
+					}
+				: undefined
+	};
 };
 
 const Paragraph: NodeRenderer = ({ node, children }) => (
 	<p
 		data-id={blockId(node)}
-		style={alignStyle(node)}
+		{...blockStyle(node)}
 	>
 		{children}
 	</p>
@@ -59,7 +75,7 @@ const Heading: NodeRenderer = ({ node, root, children }) => {
 		<Tag
 			id={headingAnchor(root, blockId(node))}
 			data-id={blockId(node)}
-			style={alignStyle(node)}
+			{...blockStyle(node)}
 		>
 			{children}
 		</Tag>
@@ -67,7 +83,12 @@ const Heading: NodeRenderer = ({ node, root, children }) => {
 };
 
 const Blockquote: NodeRenderer = ({ node, children }) => (
-	<blockquote data-id={blockId(node)}>{children}</blockquote>
+	<blockquote
+		data-id={blockId(node)}
+		{...blockStyle(node)}
+	>
+		{children}
+	</blockquote>
 );
 
 const CodeBlock: NodeRenderer = ({ node, children }) => {
@@ -86,13 +107,19 @@ const HorizontalRule: NodeRenderer = ({ node }) => (
 );
 
 const BulletList: NodeRenderer = ({ node, children }) => (
-	<ul data-id={blockId(node)}>{children}</ul>
+	<ul
+		data-id={blockId(node)}
+		{...blockStyle(node)}
+	>
+		{children}
+	</ul>
 );
 
 const OrderedList: NodeRenderer = ({ node, children }) => (
 	<ol
 		data-id={blockId(node)}
 		start={listStart(node)}
+		{...blockStyle(node)}
 	>
 		{children}
 	</ol>
@@ -106,6 +133,7 @@ const TaskList: NodeRenderer = ({ node, children }) => (
 	<ul
 		data-id={blockId(node)}
 		data-type="taskList"
+		{...blockStyle(node)}
 	>
 		{children}
 	</ul>
@@ -158,6 +186,7 @@ const Details: NodeRenderer = ({ node, renderNode, combine }) => {
 		<details
 			data-id={blockId(node)}
 			open={node.attrs?.open === true}
+			{...blockStyle(node)}
 		>
 			{title ? <summary>{renderNode(title, node)}</summary> : null}
 			{combine(body.map((child) => renderNode(child, node)))}
@@ -280,7 +309,7 @@ const Figure: NodeRenderer = ({ node, children }) => (
 const Caption: NodeRenderer = ({ node, children }) => (
 	<figcaption
 		className="blockleaf-caption"
-		style={alignStyle(node)}
+		{...blockStyle(node)}
 	>
 		{children}
 	</figcaption>

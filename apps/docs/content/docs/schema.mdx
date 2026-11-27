@@ -141,6 +141,7 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`textColor`** — a mark with `{ color }`, a token: lower case, a letter first, at most 32 characters. See [text styles](./text-style.mdx).
 - **`fontFamily`** and **`fontSize`** — marks with `{ family }` and `{ size }`, tokens like `textColor`'s.
 - **`tableOfContents`** — a block with no attributes beyond its id. It never stores its entries, so it cannot go stale.
+- **`backgroundColor`** on `paragraph`, `heading`, `blockquote`, `bulletList`, `orderedList`, `taskList` and `details` — a colour token, such as `"yellow"`, or absent for none. Absent stores nothing. See [block background colour](./text-style.mdx#block-background-colour).
 - **`textAlign`** on `paragraph` and `heading` — `'left' | 'center' | 'right' | 'justify'`, or absent for the language's own direction. Absent is the default and stores nothing, so an unaligned block is stored exactly as in version 1. It is in every preset, unlike the commands that set it, so an editor without them still keeps it on save.
 - **`video`**, **`audio`** and **`attachment`** — media blocks, each captionable. Their sources are `https:` or relative, never `data:`. See [media](./media.mdx).
 - **`embed`** — a frame showing a YouTube, Vimeo, Loom, Spotify or CodePen player. Its `src` must be a player address on the provider list. See [embeds](./embeds.mdx).

@@ -23,6 +23,7 @@ import {
 	tableMinWidth,
 	tableRows,
 	textAlign,
+	blockBackground,
 	videoAttributes,
 	widthAttributes
 } from '../attrs.js';
@@ -54,7 +55,7 @@ export const createHtmlNodes = (
 	paragraph: ({ node, children }) =>
 		element(
 			'p',
-			{ 'data-id': blockId(node), style: alignStyle(node) },
+			{ 'data-id': blockId(node), ...blockStyle(node) },
 			children
 		),
 
@@ -64,13 +65,17 @@ export const createHtmlNodes = (
 			{
 				id: headingAnchor(root, blockId(node)),
 				'data-id': blockId(node),
-				style: alignStyle(node)
+				...blockStyle(node)
 			},
 			children
 		),
 
 	blockquote: ({ node, children }) =>
-		element('blockquote', { 'data-id': blockId(node) }, children),
+		element(
+			'blockquote',
+			{ 'data-id': blockId(node), ...blockStyle(node) },
+			children
+		),
 
 	codeBlock: ({ node, children }) => {
 		const language = codeLanguage(node);
@@ -89,12 +94,20 @@ export const createHtmlNodes = (
 		voidElement('hr', { 'data-id': blockId(node) }),
 
 	bulletList: ({ node, children }) =>
-		element('ul', { 'data-id': blockId(node) }, children),
+		element(
+			'ul',
+			{ 'data-id': blockId(node), ...blockStyle(node) },
+			children
+		),
 
 	orderedList: ({ node, children }) =>
 		element(
 			'ol',
-			{ 'data-id': blockId(node), start: listStart(node) },
+			{
+				'data-id': blockId(node),
+				start: listStart(node),
+				...blockStyle(node)
+			},
 			children
 		),
 
@@ -104,7 +117,11 @@ export const createHtmlNodes = (
 	taskList: ({ node, children }) =>
 		element(
 			'ul',
-			{ 'data-id': blockId(node), 'data-type': 'taskList' },
+			{
+				'data-id': blockId(node),
+				'data-type': 'taskList',
+				...blockStyle(node)
+			},
 			children
 		),
 
@@ -185,7 +202,7 @@ export const createHtmlNodes = (
 		const summary = title
 			? `<summary>${renderNode(title, node)}</summary>`
 			: '';
-		return `<details${attributes({ 'data-id': blockId(node) })}${
+		return `<details${attributes({ 'data-id': blockId(node), ...blockStyle(node) })}${
 			node.attrs?.open === true ? ' open' : ''
 		}>${summary}${combine(body.map((child) => renderNode(child, node)))}</details>`;
 	},
@@ -408,7 +425,7 @@ export const createHtmlNodes = (
 	caption: ({ node, children }) =>
 		element(
 			'figcaption',
-			{ class: 'blockleaf-caption', style: alignStyle(node) },
+			{ class: 'blockleaf-caption', ...blockStyle(node) },
 			children
 		),
 
@@ -445,10 +462,20 @@ export const createHtmlNodes = (
 	}
 });
 
-/** The `style` a paragraph, heading or caption carries for its alignment, if any. */
-const alignStyle = (node: RenderableNode): string | undefined => {
+/**
+ * The attributes a block carries for its alignment and its background colour,
+ * in the order the editor writes them.
+ */
+const blockStyle = (node: RenderableNode) => {
 	const align = textAlign(node);
-	return align ? `text-align: ${align}` : undefined;
+	const background = blockBackground(node);
+	const style = [
+		align && `text-align: ${align}`,
+		background && `background-color: var(--bl-highlight-${background})`
+	]
+		.filter(Boolean)
+		.join('; ');
+	return { 'data-background': background, style: style || undefined };
 };
 
 /** Whether a row is made entirely of header cells, so its cells head columns. */

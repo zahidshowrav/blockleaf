@@ -181,6 +181,76 @@ const cases: Array<[string, RenderableDocument]> = [
 		)
 	],
 	[
+		'block background colours, with and without alignment',
+		docOf(
+			{
+				type: 'heading',
+				attrs: {
+					level: 2,
+					id: 'h',
+					textAlign: 'center',
+					backgroundColor: 'blue'
+				},
+				content: [text('Title')]
+			},
+			{
+				type: 'paragraph',
+				attrs: { id: 'p', backgroundColor: 'yellow' },
+				content: [text('Note')]
+			},
+			{
+				type: 'blockquote',
+				attrs: { id: 'q', backgroundColor: 'gray' },
+				content: [
+					{
+						type: 'paragraph',
+						attrs: { id: 'qp' },
+						content: [text('Quote')]
+					}
+				]
+			},
+			{
+				type: 'bulletList',
+				attrs: { id: 'ul', backgroundColor: 'green' },
+				content: [
+					{
+						type: 'listItem',
+						attrs: { id: 'li' },
+						content: [
+							{
+								type: 'paragraph',
+								attrs: { id: 'lp' },
+								content: [text('Item')]
+							}
+						]
+					}
+				]
+			},
+			{
+				type: 'orderedList',
+				attrs: { id: 'ol', start: 1, backgroundColor: 'orange' },
+				content: [
+					{
+						type: 'listItem',
+						attrs: { id: 'oli' },
+						content: [
+							{
+								type: 'paragraph',
+								attrs: { id: 'olp' },
+								content: [text('One')]
+							}
+						]
+					}
+				]
+			},
+			{
+				type: 'paragraph',
+				attrs: { id: 'bad', backgroundColor: 'red; color: red' },
+				content: [text('Unsafe')]
+			}
+		)
+	],
+	[
 		'text color, built-in and a host token',
 		docOf({
 			type: 'paragraph',

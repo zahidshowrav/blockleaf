@@ -177,7 +177,11 @@ describe('document schema', () => {
 				},
 				{
 					type: 'paragraph' as const,
-					attrs: { id: 'para-1', textAlign: 'center' as const },
+					attrs: {
+						id: 'para-1',
+						textAlign: 'center' as const,
+						backgroundColor: 'yellow'
+					},
 					content: [
 						{ type: 'text' as const, text: 'Plain text, ' },
 						{

@@ -141,6 +141,8 @@ export interface ParagraphNode {
 	type: 'paragraph';
 	attrs?: {
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 		textAlign?: TextAlign | null;
 	};
 	content?: InlineNode[];
@@ -151,6 +153,8 @@ export interface HeadingNode {
 	attrs: {
 		level: 1 | 2 | 3;
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 		textAlign?: TextAlign | null;
 	};
 	content?: InlineNode[];
@@ -160,6 +164,8 @@ export interface BlockquoteNode {
 	type: 'blockquote';
 	attrs?: {
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 	};
 	content?: BlockNode[];
 }
@@ -195,6 +201,8 @@ export interface BulletListNode {
 	type: 'bulletList';
 	attrs?: {
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 	};
 	content?: ListItemNode[];
 }
@@ -204,6 +212,8 @@ export interface OrderedListNode {
 	attrs?: {
 		start?: number;
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 	};
 	content?: ListItemNode[];
 }
@@ -222,6 +232,8 @@ export interface TaskListNode {
 	type: 'taskList';
 	attrs?: {
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 	};
 	content?: TaskItemNode[];
 }
@@ -252,6 +264,8 @@ export interface DetailsNode {
 	attrs?: {
 		open?: boolean;
 		id?: string;
+		/** A colour token since version 2, such as `'yellow'`. */
+		backgroundColor?: string | null;
 	};
 	content?: BlockNode[];
 }
