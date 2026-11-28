@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, everything but `PA-17` is done.
+site is deployed at `blockleaf.dev`. `PA` is closed: `PA-01` to `PA-24` are done.
 
-**Next:** `PA-17` (columns), the last task in `PA`. The core is close to its 160 kB budget, so how columns stay small is decided first. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** `TB`. `PA-17` (2026-11-28) put columns in `./layout` (`F34`); the core grew 0.26 kB, for the two slash items, to 155.47 kB. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
@@ -556,32 +556,32 @@ address picker for both. The renderer draws both built in; both its budgets
 are now 4.25 kB (decided 2026-11-25). The core is at 154.71 kB, and the
 subpath adds 3.5 kB on top of it.
 
-| Id    | Task                                                              | Ships as                       | Status      | Commit    | Completed  |
-| ----- | ----------------------------------------------------------------- | ------------------------------ | ----------- | --------- | ---------- |
-| PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
-| PA-02 | Mentions                                                          | `./mentions`                   | Done        | `10a117b` | 2026-11-22 |
-| PA-03 | Emoji                                                             | `./emoji`                      | Done        | `f4b8327` | 2026-11-23 |
-| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Done        | `8479f86` | 2026-11-28 |
-| PA-05 | Text colour                                                       | `./text-style`                 | Done        | `9cc3941` | 2026-11-23 |
-| PA-06 | Text alignment                                                    | `./text-style`                 | Done        | `acbe2a0` | 2026-11-23 |
-| PA-07 | Subscript and superscript                                         | `./text-style`                 | Done        | `897531e` | 2026-11-23 |
-| PA-08 | Table of contents                                                 | `./toc`                        | Done        | `9dd7ece` | 2026-11-23 |
-| PA-09 | Character and word count                                          | `./toc`                        | Done        | `280a25f` | 2026-11-23 |
-| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Done        | `b810f8e` | 2026-11-23 |
-| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Done        | `8ac43bd` | 2026-11-23 |
-| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Done        | `5a05f62` | 2026-11-24 |
-| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Done        | `591902f` | 2026-11-24 |
-| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Done        | `2b04a32` | 2026-11-24 |
-| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Done        | `0ad1a1d` | 2026-11-25 |
-| PA-16 | Link preview card, caption included                               | `./embeds`                     | Done        | `f413487` | 2026-11-25 |
-| PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
-| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Done        | `7cc92cd` | 2026-11-28 |
-| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
-| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Done        | `0f5095c` | 2026-11-24 |
-| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Done        | `6167d57` | 2026-11-24 |
-| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Done        | `bcea22e` | 2026-11-23 |
-| PA-23 | Block background colour                                           | core                           | Done        | `520c078` | 2026-11-27 |
-| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Done        | `a173335` | 2026-11-24 |
+| Id    | Task                                                              | Ships as                       | Status | Commit    | Completed  |
+| ----- | ----------------------------------------------------------------- | ------------------------------ | ------ | --------- | ---------- |
+| PA-01 | `details` — the toggle block the schema already carries           | core                           | Done   | `c6149b6` | 2026-11-22 |
+| PA-02 | Mentions                                                          | `./mentions`                   | Done   | `10a117b` | 2026-11-22 |
+| PA-03 | Emoji                                                             | `./emoji`                      | Done   | `f4b8327` | 2026-11-23 |
+| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Done   | `8479f86` | 2026-11-28 |
+| PA-05 | Text colour                                                       | `./text-style`                 | Done   | `9cc3941` | 2026-11-23 |
+| PA-06 | Text alignment                                                    | `./text-style`                 | Done   | `acbe2a0` | 2026-11-23 |
+| PA-07 | Subscript and superscript                                         | `./text-style`                 | Done   | `897531e` | 2026-11-23 |
+| PA-08 | Table of contents                                                 | `./toc`                        | Done   | `9dd7ece` | 2026-11-23 |
+| PA-09 | Character and word count                                          | `./toc`                        | Done   | `280a25f` | 2026-11-23 |
+| PA-10 | Font family, stored as a token                                    | `./text-style`                 | Done   | `b810f8e` | 2026-11-23 |
+| PA-11 | Font size, stored as a token                                      | `./text-style`                 | Done   | `8ac43bd` | 2026-11-23 |
+| PA-12 | Video, with `PA-20`'s caption built in                            | `./media`                      | Done   | `5a05f62` | 2026-11-24 |
+| PA-13 | Audio, with `PA-20`'s caption built in                            | `./media`                      | Done   | `591902f` | 2026-11-24 |
+| PA-14 | File attachment, with `PA-20`'s caption built in                  | `./media`                      | Done   | `2b04a32` | 2026-11-24 |
+| PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Done   | `0ad1a1d` | 2026-11-25 |
+| PA-16 | Link preview card, caption included                               | `./embeds`                     | Done   | `f413487` | 2026-11-25 |
+| PA-17 | Columns                                                           | `./layout`                     | Done   | `42d47f3` | 2026-11-28 |
+| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Done   | `7cc92cd` | 2026-11-28 |
+| PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done   | `2299442` | 2026-11-22 |
+| PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Done   | `0f5095c` | 2026-11-24 |
+| PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Done   | `6167d57` | 2026-11-24 |
+| PA-22 | Background colour, a second bubble-menu action beside text colour | `./text-style`                 | Done   | `bcea22e` | 2026-11-23 |
+| PA-23 | Block background colour                                           | core                           | Done   | `520c078` | 2026-11-27 |
+| PA-24 | Resize handles and one-click full width, image and video          | `./media`                      | Done   | `a173335` | 2026-11-24 |
 
 `PA-10` and `PA-11` store a token — `fontSize: "lg"` resolving through
 `--bl-font-size-lg` — not a CSS value. A `14px` written into a document is
