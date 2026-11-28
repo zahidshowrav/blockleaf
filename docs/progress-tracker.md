@@ -22,9 +22,9 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-03`, `PA-05` to `PA-16`, `PA-19` to `PA-24` are done.
+site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-16` and `PA-19` to `PA-24` are done.
 
-**Next:** what is left in `PA` — `PA-04` and `PA-18` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** what is left in `PA` — `PA-18` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
@@ -561,7 +561,7 @@ subpath adds 3.5 kB on top of it.
 | PA-01 | `details` — the toggle block the schema already carries           | core                           | Done        | `c6149b6` | 2026-11-22 |
 | PA-02 | Mentions                                                          | `./mentions`                   | Done        | `10a117b` | 2026-11-22 |
 | PA-03 | Emoji                                                             | `./emoji`                      | Done        | `f4b8327` | 2026-11-23 |
-| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Not started | —         | —          |
+| PA-04 | Math, block and inline                                            | `@blockleaf/math`              | Done        | `8479f86` | 2026-11-28 |
 | PA-05 | Text colour                                                       | `./text-style`                 | Done        | `9cc3941` | 2026-11-23 |
 | PA-06 | Text alignment                                                    | `./text-style`                 | Done        | `acbe2a0` | 2026-11-23 |
 | PA-07 | Subscript and superscript                                         | `./text-style`                 | Done        | `897531e` | 2026-11-23 |
