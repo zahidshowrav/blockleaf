@@ -22,15 +22,15 @@ Blocks run in the order listed: `SC` → `EC` → `CH` → `MC` → `RD` → `HD
 
 **Position:** `MC` and `RD` are closed apart from `RD-06`. In `HD`, `HD-01` to
 `HD-10`, `HD-12` to `HD-14` are done; only `HD-11` is left. `FC` is closed: `FC-01` to `FC-05` are done. Both packages are live on npm and the docs
-site is deployed at `blockleaf.dev`. In `PA`, `PA-01` to `PA-16` and `PA-19` to `PA-24` are done.
+site is deployed at `blockleaf.dev`. In `PA`, everything but `PA-17` is done.
 
-**Next:** what is left in `PA` — `PA-18` — with `PA-17` last, as planned. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
+**Next:** `PA-17` (columns), the last task in `PA`. The core is close to its 160 kB budget, so how columns stay small is decided first. PA work runs as short stacks of PRs, one per dependency chain (decided 2026-11-23), with the tracker updated once, in each stack's top PR. The early release shipped `PA-01` and `PA-19` as
 editor `0.10.0` and renderer `0.4.0` on 2026-11-22. `PA-02` then moved
 `SCHEMA_VERSION` to 2 on `main` (`F24`), with a migration from 1 that
 changes nothing. Every other `PA` and `TB` task joins version 2 without
 bumping again, and version 2 is released once that batch is in.
 `PA-08` and `PA-09` share the `./toc` subpath; the table of contents stores
-nothing but its id (`F27`). `PA-18` comes near the end of `PA`, once the blocks it has to export exist. `HD-11`
+nothing but its id (`F27`). `PA-18` (2026-11-28) writes GitHub-style Markdown from `@blockleaf/renderer/markdown`, with its own walk so a paragraph's marks are placed once around the text they share. `HD-11`
 waits for someone past ten thousand blocks to ask for it. `HD-13` made pasting linear: 5,000 blocks in 1.7s, from 20.5s. `HD-10` gave tables a caption
 as a `figure` holding the table and a `caption` (`F20`, amended 2026-11-20),
 and needed no `SCHEMA_VERSION` bump: both are new node types and no existing
@@ -575,7 +575,7 @@ subpath adds 3.5 kB on top of it.
 | PA-15 | Embeds — provider allowlist in the schema; caption included       | `./embeds`                     | Done        | `0ad1a1d` | 2026-11-25 |
 | PA-16 | Link preview card, caption included                               | `./embeds`                     | Done        | `f413487` | 2026-11-25 |
 | PA-17 | Columns                                                           | `./layout`                     | Not started | —         | —          |
-| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Not started | —         | —          |
+| PA-18 | Markdown export — a fourth target on the renderer's walker        | `@blockleaf/renderer/markdown` | Done        | `7cc92cd` | 2026-11-28 |
 | PA-19 | Print stylesheet, so the browser can save a readable PDF          | `blockleaf.css`                | Done        | `2299442` | 2026-11-22 |
 | PA-20 | `figure`/`figcaption` on `image` — caption and its own alignment  | core                           | Done        | `0f5095c` | 2026-11-24 |
 | PA-21 | Caption chrome shared by every media and embed block              | `./media`, `./embeds`          | Done        | `6167d57` | 2026-11-24 |
