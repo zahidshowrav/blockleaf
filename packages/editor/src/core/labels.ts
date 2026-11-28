@@ -35,7 +35,8 @@ export type BlockTypeId =
 	| 'file'
 	| 'embed'
 	| 'link-preview'
-	| 'table-of-contents';
+	| 'table-of-contents'
+	| 'math';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
 
@@ -249,6 +250,19 @@ export type DetailsLabels = {
 	toggle: string;
 };
 
+export type MathLabels = {
+	/** Accessible name of the field a formula is typed into. */
+	source: string;
+	/** Shown in that field while it is empty. */
+	placeholder: string;
+	/** The button that closes the field. */
+	done: string;
+	/** Shown in place of a formula that is empty. */
+	empty: string;
+	/** Announced for a formula that cannot be drawn. Gets the LaTeX. */
+	invalid: (latex: string) => string;
+};
+
 export type TableOfContentsLabels = {
 	/** Accessible name of the list of headings. */
 	label: string;
@@ -340,6 +354,7 @@ export type ResolvedLabels = {
 	details: DetailsLabels;
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
+	math: MathLabels;
 	tableOfContents: TableOfContentsLabels;
 	textCount: TextCountLabels;
 	textColor: TextColorLabels;
@@ -383,6 +398,7 @@ export type BlockleafLabels = {
 	details?: Partial<DetailsLabels>;
 	mentions?: Partial<MentionLabels>;
 	emoji?: Partial<EmojiLabels>;
+	math?: Partial<MathLabels>;
 	tableOfContents?: Partial<TableOfContentsLabels>;
 	textCount?: Partial<TextCountLabels>;
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
@@ -427,7 +443,8 @@ export const defaultLabels: ResolvedLabels = {
 		file: 'File',
 		embed: 'Embed',
 		'link-preview': 'Link preview',
-		'table-of-contents': 'Table of contents'
+		'table-of-contents': 'Table of contents',
+		math: 'Math'
 	},
 	slashMenu: {
 		menu: 'Slash commands',
@@ -458,7 +475,8 @@ export const defaultLabels: ResolvedLabels = {
 			embed: 'Show a video, song or pen from a link.',
 			'link-preview':
 				'Show a link as a card, with its title and picture.',
-			'table-of-contents': 'List the headings, with a link to each.'
+			'table-of-contents': 'List the headings, with a link to each.',
+			math: 'Write a formula in LaTeX.'
 		},
 		tableSize: 'Table size',
 		tableSizeCell: (rows, columns) => `${rows} by ${columns}`,
@@ -613,6 +631,13 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'No emoji found',
 		loading: 'Loading emoji…'
 	},
+	math: {
+		source: 'LaTeX',
+		placeholder: 'E = mc^2',
+		done: 'Done',
+		empty: 'Empty formula',
+		invalid: (latex) => `Formula that cannot be shown: ${latex}`
+	},
 	tableOfContents: {
 		label: 'Table of contents',
 		empty: 'Add a heading and it will be listed here.'
@@ -733,6 +758,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	details: { ...defaultLabels.details, ...labels?.details },
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
 	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
+	math: { ...defaultLabels.math, ...labels?.math },
 	tableOfContents: {
 		...defaultLabels.tableOfContents,
 		...labels?.tableOfContents

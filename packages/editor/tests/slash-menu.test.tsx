@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { Editor } from '@tiptap/core';
+import { Editor, Node } from '@tiptap/core';
 import type { SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -19,11 +19,11 @@ import {
 } from '../src/ui/index.js';
 
 describe('Slash menu command registry (CH-01)', () => {
-	it('initializes with all 18 default commands', () => {
+	it('initializes with every default command', () => {
 		const registry = createCommandRegistry();
 		const commands = registry.getAll();
 
-		expect(commands).toHaveLength(20);
+		expect(commands).toHaveLength(21);
 		const ids = commands.map((c) => c.id);
 		expect(ids).toEqual([
 			'paragraph',
@@ -45,7 +45,8 @@ describe('Slash menu command registry (CH-01)', () => {
 			'file',
 			'embed',
 			'link-preview',
-			'table-of-contents'
+			'table-of-contents',
+			'math'
 		]);
 	});
 
@@ -85,7 +86,7 @@ describe('Slash menu command registry (CH-01)', () => {
 		const registry = createCommandRegistry();
 		registry.remove('divider');
 		expect(registry.get('divider')).toBeUndefined();
-		expect(registry.getAll()).toHaveLength(19);
+		expect(registry.getAll()).toHaveLength(20);
 	});
 
 	it('reorders commands given an array of ids', () => {
@@ -94,15 +95,15 @@ describe('Slash menu command registry (CH-01)', () => {
 		const ids = registry.getAll().map((c) => c.id);
 		expect(ids[0]).toBe('table');
 		expect(ids[1]).toBe('task-list');
-		expect(ids).toHaveLength(20);
+		expect(ids).toHaveLength(21);
 	});
 
 	it('filters commands by query across titles, aliases, keywords, and descriptions', () => {
 		const registry = createCommandRegistry();
 
 		// Empty query returns all commands
-		expect(registry.filter('')).toHaveLength(20);
-		expect(registry.filter('   ')).toHaveLength(20);
+		expect(registry.filter('')).toHaveLength(21);
+		expect(registry.filter('   ')).toHaveLength(21);
 
 		// Exact title matches rank highest
 		const textResults = registry.filter('text');
@@ -304,7 +305,7 @@ describe('<SlashMenu /> UI Component', () => {
 
 			// Options
 			const options = screen.getAllByRole('option');
-			expect(options).toHaveLength(20);
+			expect(options).toHaveLength(21);
 			expect(options[0]?.getAttribute('aria-selected')).toBe('true');
 			expect(options[1]?.getAttribute('aria-selected')).toBe('false');
 		} finally {
@@ -599,6 +600,47 @@ describe('Image slash command', () => {
 
 		input?.remove();
 		click.mockRestore();
+		editor.destroy();
+	});
+});
+
+describe('the Math item', () => {
+	// A stand-in for `@blockleaf/math`'s block: the item needs only a node
+	// of that name, and these tests must not depend on that package.
+	const MathBlockStandIn = Node.create({
+		name: 'mathBlock',
+		group: 'block',
+		atom: true,
+		addAttributes: () => ({ latex: { default: '' } }),
+		parseHTML: () => [{ tag: 'div[data-type="mathBlock"]' }],
+		renderHTML: () => ['div', { 'data-type': 'mathBlock' }]
+	});
+
+	const math = () => {
+		const item = defaultSlashCommands.find(
+			(command) => command.id === 'math'
+		);
+		if (!item) throw new Error('no math item');
+		return item;
+	};
+
+	it('is hidden in an editor without maths', () => {
+		const editor = new Editor({ extensions: createExtensions('standard') });
+		expect(math().isAvailable?.(editor)).toBe(false);
+		editor.destroy();
+	});
+
+	it('inserts an empty block formula where maths is loaded', () => {
+		const editor = new Editor({
+			extensions: [...createExtensions('standard'), MathBlockStandIn]
+		});
+		expect(math().isAvailable?.(editor)).toBe(true);
+		math().run(editor);
+		const formula = editor
+			.getJSON()
+			.content?.find((node) => node.type === 'mathBlock');
+		expect(formula?.attrs?.latex).toBe('');
+		expect(typeof formula?.attrs?.id).toBe('string');
 		editor.destroy();
 	});
 });

@@ -6,6 +6,8 @@ import {
 	CAPTION_MENU_EXTENSION_NAME,
 	DETAILS_NODE,
 	EMBED_NODE,
+	MATH_BLOCK_NODE,
+	MATH_INLINE_NODE,
 	EMOJI_EXTENSION_NAME,
 	MENTIONS_EXTENSION_NAME,
 	TABLE_A11Y_EXTENSION_NAME,
@@ -161,7 +163,9 @@ const LABELLED: ReadonlySet<string> = new Set([
 	VIDEO_NODE,
 	AUDIO_NODE,
 	ATTACHMENT_NODE,
-	EMBED_NODE
+	EMBED_NODE,
+	MATH_INLINE_NODE,
+	MATH_BLOCK_NODE
 ]);
 
 export const BlockleafEditor = ({
@@ -194,7 +198,8 @@ export const BlockleafEditor = ({
 		// upload one is built by the host because it needs their adapter, and
 		// the table accessibility, unknown-content and toggle ones come with
 		// `createExtensions`, and the mention and emoji pickers, the table
-		// of contents and the media blocks and toolbars with their subpaths; none knows anything about labels. Each, if nobody gave it labels
+		// of contents and the media blocks and toolbars with their subpaths, and the formulas
+		// from `@blockleaf/math`; none knows anything about labels. Each, if nobody gave it labels
 		// of its own, gets these rather than staying English.
 		const chrome = base.map((extension) =>
 			LABELLED.has(extension.name) &&

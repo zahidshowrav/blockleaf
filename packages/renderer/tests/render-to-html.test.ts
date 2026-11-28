@@ -260,3 +260,23 @@ describe('documents this package did not write', () => {
 		expect(renderToHTML({ type: 'doc' })).toBe('');
 	});
 });
+
+describe('maths', () => {
+	const doc = docOf(
+		{
+			type: 'paragraph',
+			content: [
+				text('so '),
+				{ type: 'mathInline', attrs: { latex: 'a < b' } }
+			]
+		},
+		{ type: 'mathBlock', attrs: { id: 'm', latex: '\\frac{1}{2}' } }
+	);
+
+	it('writes each formula as its source, escaped', () => {
+		expect(renderToHTML(doc)).toBe(
+			'<p>so <span class="blockleaf-math" data-type="mathInline">a &lt; b</span></p>' +
+				'<div data-id="m" class="blockleaf-math" data-type="mathBlock">\\frac{1}{2}</div>'
+		);
+	});
+});

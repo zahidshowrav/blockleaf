@@ -22,6 +22,7 @@ export {
 	isChecked,
 	linkAttributes,
 	listStart,
+	mathAttributes,
 	videoAttributes,
 	type AttachmentAttributes,
 	type AudioAttributes,

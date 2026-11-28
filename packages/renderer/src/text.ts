@@ -33,6 +33,7 @@ const BLOCKS = new Set([
 	'attachment',
 	'embed',
 	'linkPreview',
+	'mathBlock',
 	'table',
 	'figure',
 	'caption',
@@ -81,6 +82,13 @@ export const toPlainText = (
 
 		if (node.type === 'mention') {
 			parts.push(mentionAttributes(node).text);
+			return;
+		}
+
+		// A formula is its LaTeX source, as in the editor.
+		if (node.type === 'mathInline' || node.type === 'mathBlock') {
+			const latex = node.attrs?.latex;
+			if (typeof latex === 'string') parts.push(latex);
 			return;
 		}
 

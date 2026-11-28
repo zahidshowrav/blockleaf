@@ -8,6 +8,7 @@ import {
 	DividerIcon,
 	EmbedIcon,
 	LinkPreviewIcon,
+	MathIcon,
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
@@ -31,6 +32,7 @@ import {
 	DETAILS_NODE,
 	EMBED_NODE,
 	LINK_PREVIEW_NODE,
+	MATH_BLOCK_NODE,
 	TABLE_OF_CONTENTS_NODE,
 	UPLOAD_EXTENSION_NAME,
 	VIDEO_NODE
@@ -353,6 +355,26 @@ export const createSlashCommands = (
 		isAvailable: (editor) =>
 			editor.schema.nodes[TABLE_OF_CONTENTS_NODE] !== undefined,
 		run: (editor) => editor.chain().focus().insertTableOfContents().run()
+	},
+	{
+		id: 'math',
+		title: blockTypes.math,
+		description: labels.descriptions.math,
+		aliases: ['equation', 'formula', 'latex'],
+		group: labels.groups.advanced,
+		icon: MathIcon,
+		keywords: ['math', 'maths', 'equation', 'formula', 'latex', 'tex'],
+		// Only where `@blockleaf/math` added the block. Inserted as plain
+		// content, so this bundle needs nothing from that package; an empty
+		// formula opens its own field.
+		isAvailable: (editor) =>
+			editor.schema.nodes[MATH_BLOCK_NODE] !== undefined,
+		run: (editor) =>
+			editor
+				.chain()
+				.focus()
+				.insertContent({ type: MATH_BLOCK_NODE, attrs: { latex: '' } })
+				.run()
 	}
 ];
 

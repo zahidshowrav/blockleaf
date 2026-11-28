@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the stored shape > stores the LaTeX source and nothing else 1`] = `
+{
+  "attrs": {
+    "schemaVersion": 2,
+  },
+  "content": [
+    {
+      "attrs": {
+        "id": "p",
+      },
+      "content": [
+        {
+          "text": "Energy is ",
+          "type": "text",
+        },
+        {
+          "attrs": {
+            "latex": "E = mc^2",
+          },
+          "type": "mathInline",
+        },
+        {
+          "text": ".",
+          "type": "text",
+        },
+      ],
+      "type": "paragraph",
+    },
+    {
+      "attrs": {
+        "id": "m1",
+        "latex": "\\int_0^1 x\\,dx",
+      },
+      "type": "mathBlock",
+    },
+  ],
+  "type": "doc",
+}
+`;

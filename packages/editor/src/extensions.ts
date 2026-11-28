@@ -11,7 +11,9 @@ export {
 } from './core/block-background.js';
 export {
 	BLOCK_BACKGROUND_TYPES,
-	BLOCK_BACKGROUND_EXTENSION_NAME
+	BLOCK_BACKGROUND_EXTENSION_NAME,
+	MATH_BLOCK_NODE,
+	MATH_INLINE_NODE
 } from './core/constants.js';
 export { Link, sanitizeHref } from './core/marks/link.js';
 export { Callout, type CalloutOptions } from './core/nodes/callout.js';

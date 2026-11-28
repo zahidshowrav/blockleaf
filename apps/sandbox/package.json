@@ -12,6 +12,8 @@
 	},
 	"dependencies": {
 		"@blockleaf/editor": "workspace:*",
+		"@blockleaf/math": "workspace:*",
+		"katex": "0.19.1",
 		"react": "19.3.0",
 		"react-dom": "19.3.0"
 	},

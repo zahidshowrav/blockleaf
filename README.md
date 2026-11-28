@@ -83,14 +83,15 @@ Dark mode follows `prefers-color-scheme` and can be forced with `data-theme="dar
 
 pnpm + Turborepo.
 
-| Path                                          | What                                                                     |
-| --------------------------------------------- | ------------------------------------------------------------------------ |
-| `packages/editor`                             | `@blockleaf/editor` — schema, extensions, React bindings, default chrome |
-| `packages/renderer`                           | `@blockleaf/renderer` — stored JSON to React or an HTML string           |
-| `packages/tsconfig`, `packages/eslint-config` | shared presets (private)                                                 |
-| `apps/docs`                                   | the Fumadocs site published at `blockleaf.dev`; not published to npm     |
-| `apps/sandbox`                                | Vite SPA for fast extension work; not published                          |
-| `examples/vite-spa`                           | a runnable app: write, store as JSON, publish with the renderer          |
+| Path                                          | What                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------- |
+| `packages/editor`                             | `@blockleaf/editor` — schema, extensions, React bindings, default chrome   |
+| `packages/renderer`                           | `@blockleaf/renderer` — stored JSON to React or an HTML string             |
+| `packages/math`                               | `@blockleaf/math` — LaTeX formulas, drawn by KaTeX, kept out of the editor |
+| `packages/tsconfig`, `packages/eslint-config` | shared presets (private)                                                   |
+| `apps/docs`                                   | the Fumadocs site published at `blockleaf.dev`; not published to npm       |
+| `apps/sandbox`                                | Vite SPA for fast extension work; not published                            |
+| `examples/vite-spa`                           | a runnable app: write, store as JSON, publish with the renderer            |
 
 Inside `packages/editor`, `src/core` → `src/react` → `src/ui` is a one-way import boundary enforced by lint, so pulling `@blockleaf/core` out later stays a `mv` rather than a refactor.
 

@@ -128,7 +128,20 @@ export interface MentionNode {
 	marks?: BlockleafMark[];
 }
 
-export type InlineNode = TextNode | HardBreakNode | MentionNode;
+/**
+ * A formula inside a line of text (version 2), stored as LaTeX source.
+ * Drawn by `@blockleaf/math`; without it, the source is shown.
+ */
+export interface MathInlineNode {
+	type: 'mathInline';
+	attrs: {
+		latex: string;
+	};
+	marks?: BlockleafMark[];
+}
+
+export type InlineNode =
+	TextNode | HardBreakNode | MentionNode | MathInlineNode;
 
 /* -------------------------------------------------------------------------- */
 /* Block Nodes                                                                */
@@ -355,6 +368,18 @@ export interface LinkPreviewNode {
 	};
 }
 
+/**
+ * A formula as its own block (version 2), stored as LaTeX source. Drawn
+ * by `@blockleaf/math`; without it, the source is shown.
+ */
+export interface MathBlockNode {
+	type: 'mathBlock';
+	attrs: {
+		id: string;
+		latex: string;
+	};
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -426,6 +451,7 @@ export type TableCellContentNode =
 	| AttachmentNode
 	| EmbedNode
 	| LinkPreviewNode
+	| MathBlockNode
 	| TableOfContentsNode;
 
 export interface TableHeaderNode {
@@ -467,6 +493,7 @@ export type BlockNode =
 	| AttachmentNode
 	| EmbedNode
 	| LinkPreviewNode
+	| MathBlockNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

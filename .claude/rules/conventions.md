@@ -9,6 +9,11 @@
 - **`packages/renderer`** (`@blockleaf/renderer`) — stored JSON to React or an
   HTML string, with no editor and no ProseMirror. Its own workspace, never a
   subpath of the editor. Subpaths: `./react`, `./html`.
+- **`packages/math`** (`@blockleaf/math`) — LaTeX formulas, inline and as
+  blocks, drawn by KaTeX. Its own package so the editor never carries KaTeX;
+  `katex`, the editor, the renderer and Tiptap are all peers. `.` is the
+  editor side (plain DOM, no React); `./react` and `./html` draw formulas in
+  the renderer. Only `src/react.tsx` may import React.
 - **`packages/eslint-config`** (`@blockleaf/eslint-config`) — shared flat configs,
   exported as `./base` and `./react-library`. Private.
 - **`packages/tsconfig`** (`@blockleaf/tsconfig`) — shared `tsconfig` presets. Private.

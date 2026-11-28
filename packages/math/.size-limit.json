@@ -1,0 +1,29 @@
+[
+	{
+		"name": "withMath (this package's own code; KaTeX is a peer, about 62 kB more)",
+		"path": "dist/index.js",
+		"import": "{ withMath }",
+		"limit": "2.5 kB",
+		"ignore": [
+			"@blockleaf/editor",
+			"@tiptap/core",
+			"@tiptap/pm",
+			"katex",
+			"react"
+		]
+	},
+	{
+		"name": "createMathComponents for renderToHTML (KaTeX not counted)",
+		"path": "dist/html.js",
+		"import": "{ createMathComponents }",
+		"limit": "500 B",
+		"ignore": ["@blockleaf/renderer", "katex"]
+	},
+	{
+		"name": "createMathComponents for RenderDocument (KaTeX not counted)",
+		"path": "dist/react.js",
+		"import": "{ createMathComponents }",
+		"limit": "500 B",
+		"ignore": ["@blockleaf/renderer", "katex", "react"]
+	}
+]
