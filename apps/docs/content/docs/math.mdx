@@ -1,0 +1,194 @@
+---
+title: Math
+description: LaTeX formulas, inside a line or as their own block, from the separate @blockleaf/math package.
+icon: Sigma
+---
+
+`@blockleaf/math` adds two things: a **formula inside a line** of text, and
+a **formula as its own block**. You write them in LaTeX, and
+[KaTeX](https://katex.org) draws them.
+
+```sh
+pnpm add @blockleaf/math katex
+```
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withMath } from '@blockleaf/math';
+
+const extensions = withMath(presets.standard());
+```
+
+Math is its own package, not a subpath of the editor, because KaTeX is
+large: about 62 kB, minified and compressed. A page that never shows a
+formula never downloads it. The editor itself stays the same size.
+
+Both formulas are new in schema version 2. An editor without this package
+keeps a stored one as a placeholder and saves it back unchanged.
+
+## Getting one in
+
+- **Type `$x^2$` in a line.** When you type the closing `$`, the text
+  between the two becomes a formula. A `$` after a letter, a digit or a
+  backslash does not start one, and neither does a space just inside the
+  `$`, so `It costs $5 and $10` stays a sentence.
+- **Type `$$` on an empty line, then press `Enter`.** The line becomes an
+  empty block formula, with its field open.
+- **Type `/math`.** The slash menu inserts an empty block formula, with
+  its field open.
+
+Or with a command, from host code or your own chrome:
+
+```ts
+editor.commands.insertMathInline('E = mc^2');
+editor.commands.insertMathBlock('\\int_0^1 x\\,dx');
+```
+
+## Changing one
+
+Click a formula, or select it and press `Enter`. A field opens under it with
+the LaTeX. The formula above the field is the preview: it is drawn again on
+every key you press.
+
+| Key           | In the field                                        |
+| ------------- | --------------------------------------------------- |
+| `Enter`       | Keep the change and put the caret after the formula |
+| `Shift+Enter` | A new line, for a long formula                      |
+| `Escape`      | Undo the change and leave the formula selected      |
+
+Clicking anywhere else keeps the change too. A formula left empty is
+removed, whichever way the field closes. Each change is one undo step.
+
+LaTeX that cannot be drawn is still stored exactly as you typed it. The
+formula shows its source in the error colour, and a screen reader hears
+that it cannot be shown.
+
+## What is stored
+
+```json
+{ "type": "mathInline", "attrs": { "latex": "E = mc^2" } }
+```
+
+```json
+{ "type": "mathBlock", "attrs": { "id": "…", "latex": "\\int_0^1 x\\,dx" } }
+```
+
+Only the LaTeX source. The drawn formula is never stored: it is large, it
+changes from one KaTeX version to the next, and it cannot be turned back
+into source to edit. `latex` can be up to 10,000 characters, and may be
+empty.
+
+An inline formula is one unit: the caret moves past it, not into it. A block
+formula has a block id, so the drag handle and the block menu work on it as
+on any other block. As plain text, a formula is its source.
+
+## How a formula is drawn
+
+```ts
+withMath(presets.standard(), { output: 'html' });
+```
+
+| `output`             | What draws it                  | What the page needs                      |
+| -------------------- | ------------------------------ | ---------------------------------------- |
+| `'mathml'` (default) | The browser, from MathML       | Nothing more than `styles.css`           |
+| `'html'`             | KaTeX's own layout, and MathML | `katex/dist/katex.min.css` and its fonts |
+
+**MathML** is the default because it needs nothing else: no second
+stylesheet and no font files. Every current major browser draws it. Each
+browser uses its own maths font, so a formula looks slightly different in
+each one.
+
+**`'html'`** looks the same in every browser. The cost is that you must load
+KaTeX's stylesheet yourself, and serve the fonts it points to:
+
+```ts
+import 'katex/dist/katex.min.css';
+```
+
+Without it, formulas show as a jumble of letters. Either way, MathML is in
+the page, so screen readers can read the formula.
+
+## Options
+
+```ts
+withMath(presets.standard(), {
+	output: 'mathml', // or 'html'; see above
+	macros: { '\\R': '\\mathbb{R}' }, // shorthands every formula can use
+	shortcuts: false // no `$x^2$` rule, no `$$` then Enter
+});
+```
+
+`macros` are read, never written. A `\gdef` inside one formula does not
+reach the next one.
+
+Strings are under `labels.math`: the field's name and placeholder, the
+**Done** button, the text for an empty formula, and what a screen reader
+hears for one that cannot be drawn. The slash menu's item is
+`blockTypes.math`. See [i18n](./i18n.mdx).
+
+## Safety
+
+KaTeX can turn some commands into links or raw HTML: `\href`, `\url`,
+`\includegraphics`, `\htmlClass` and others. This package always runs KaTeX
+in its untrusted mode, so those commands are shown as text and never acted
+on. A formula can never carry a link, whatever a stored document says. KaTeX
+is also given limits on how much work one formula can make, so a document
+cannot stall the page that shows it.
+
+## Rendering
+
+[`@blockleaf/renderer`](./rendering.mdx) shows each formula's **source** by
+default. Its size budget cannot hold KaTeX, and the source is still
+readable:
+
+```html
+<span
+	class="blockleaf-math"
+	data-type="mathInline"
+	>E = mc^2</span
+>
+<div
+	data-id="…"
+	class="blockleaf-math"
+	data-type="mathBlock"
+>
+	\int_0^1 x\,dx
+</div>
+```
+
+To draw the formulas instead, pass this package's components. They write
+the same elements, with the formula inside:
+
+```tsx
+import { RenderDocument } from '@blockleaf/renderer/react';
+import { createMathComponents } from '@blockleaf/math/react';
+
+// Once, outside your component.
+const components = createMathComponents();
+
+<RenderDocument
+	doc={doc}
+	components={components}
+/>;
+```
+
+```ts
+import { renderToHTML } from '@blockleaf/renderer/html';
+import { createMathComponents } from '@blockleaf/math/html';
+
+const html = renderToHTML(doc, { components: createMathComponents() });
+```
+
+`createMathComponents` takes `output` and `macros`, as `withMath` does. With
+the default MathML output, the page needs no script, so the React version
+works in a server component. A formula that cannot be drawn keeps its
+source, marked `data-invalid`.
+
+If you already pass other `components`, spread them together:
+`{ ...yours, ...createMathComponents() }`.
+
+## Bundle cost
+
+The package's own code adds about 2.1 kB on top of the editor. KaTeX adds
+about 62 kB more, and you install it yourself, so you choose its version.
+The renderer components add about 0.3 kB, plus KaTeX.

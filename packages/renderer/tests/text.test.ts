@@ -211,3 +211,19 @@ describe('a captioned table (HD-10)', () => {
 		expect(toPlainText(doc)).toBe('cell\n\ncaption');
 	});
 });
+
+describe('toPlainText with maths', () => {
+	it('gives each formula as its source', () => {
+		const doc = docOf(
+			{
+				type: 'paragraph',
+				content: [
+					text('area '),
+					{ type: 'mathInline', attrs: { latex: '\\pi r^2' } }
+				]
+			},
+			{ type: 'mathBlock', attrs: { id: 'm', latex: 'e^{i\\pi} = -1' } }
+		);
+		expect(toPlainText(doc)).toBe('area \\pi r^2\n\ne^{i\\pi} = -1');
+	});
+});

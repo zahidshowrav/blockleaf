@@ -63,7 +63,8 @@ export const BLOCK_NODE_TYPES = [
 	'audio',
 	'attachment',
 	'embed',
-	'linkPreview'
+	'linkPreview',
+	'mathBlock'
 ] as const;
 
 /**
@@ -131,6 +132,14 @@ export const EMBED_NODE = 'embed';
  * `@blockleaf/editor/embeds`. Captionable.
  */
 export const LINK_PREVIEW_NODE = 'linkPreview';
+
+/**
+ * A formula inside a line of text, and a formula as its own block. In the
+ * schema from version 2, stored as LaTeX source, and loaded from the
+ * separate `@blockleaf/math` package so the editor never carries KaTeX.
+ */
+export const MATH_INLINE_NODE = 'mathInline';
+export const MATH_BLOCK_NODE = 'mathBlock';
 
 /** The toolbar for a selected video, audio clip, file, embed or link card. */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';

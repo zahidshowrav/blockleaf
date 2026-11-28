@@ -17,6 +17,7 @@ import { withMedia } from '@blockleaf/editor/media';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
 import { TextCount, withTableOfContents } from '@blockleaf/editor/toc';
+import { withMath } from '@blockleaf/math';
 
 import { sandboxUpload } from './upload-adapter.js';
 
@@ -91,11 +92,20 @@ const sandboxLinkPreview: FetchLinkPreview = (url) =>
 
 /**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
- * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`, `?embeds`. With none, the editor is
+ * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`, `?embeds`,
+ * `?math`. With none, the editor is
  * the default preset, as a host that installs nothing gets it.
  */
 const extensions = (() => {
-	const flags = ['mentions', 'textstyle', 'emoji', 'toc', 'media', 'embeds'];
+	const flags = [
+		'mentions',
+		'textstyle',
+		'emoji',
+		'toc',
+		'media',
+		'embeds',
+		'math'
+	];
 	if (!flags.some((flag) => params.has(flag))) return undefined;
 	let base = presets.standard();
 	if (params.has('mentions')) base = withSandboxMentions(base);
@@ -105,6 +115,15 @@ const extensions = (() => {
 	if (params.has('media')) base = withMedia(base);
 	if (params.has('embeds')) {
 		base = withEmbeds(base, { fetchLinkPreview: sandboxLinkPreview });
+	}
+	// `?math=html` draws with KaTeX's own layout, which needs its stylesheet.
+	if (params.get('math') === 'html') {
+		void import('katex/dist/katex.min.css');
+	}
+	if (params.has('math')) {
+		base = withMath(base, {
+			output: params.get('math') === 'html' ? 'html' : 'mathml'
+		});
 	}
 	return base;
 })();

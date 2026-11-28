@@ -371,3 +371,19 @@ export const LinkPreviewIcon = /* @__PURE__ */ mediaIcon(
 export const FileIcon = /* @__PURE__ */ mediaIcon(
 	'M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5'
 );
+
+export const MathIcon = (props: IconProps) => (
+	<svg
+		viewBox="0 0 24 24"
+		width="16"
+		height="16"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		{...props}
+	>
+		<path d="M18 5H6l6 7-6 7h12" />
+	</svg>
+);

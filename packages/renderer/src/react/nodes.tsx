@@ -16,6 +16,7 @@ import {
 	isChecked,
 	isHeaderCell,
 	listStart,
+	mathAttributes,
 	mentionAttributes,
 	rowspan,
 	tableColumns,
@@ -226,6 +227,21 @@ const Mention: NodeRenderer = ({ node }) => {
 		>
 			{text}
 		</span>
+	);
+};
+
+/** A formula as its source. `@blockleaf/math` has the renderer that draws it. */
+const MathSource: NodeRenderer = ({ node }) => {
+	const { latex, block, attributes } = mathAttributes(node);
+	const { class: className, ...data } = attributes;
+	const Tag = block ? 'div' : 'span';
+	return (
+		<Tag
+			className={className}
+			{...data}
+		>
+			{latex}
+		</Tag>
 	);
 };
 
@@ -550,5 +566,7 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	tableCell: TableCell,
 	text: Text,
 	hardBreak: HardBreak,
-	mention: Mention
+	mention: Mention,
+	mathInline: MathSource,
+	mathBlock: MathSource
 };

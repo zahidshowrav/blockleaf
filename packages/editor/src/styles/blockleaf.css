@@ -809,6 +809,113 @@
 	box-decoration-break: clone;
 }
 
+/*
+ * Math (PA-04). A formula inside a line, and a formula as its own block.
+ * The renderer shows the LaTeX source until `@blockleaf/math` draws it, so
+ * a source with nothing drawn reads as code.
+ */
+
+.blockleaf-editor__content .blockleaf-math:not(:has(math, .katex)) {
+	font-family: var(--bl-font-mono);
+	font-size: 0.9em;
+}
+
+.blockleaf-editor__content div.blockleaf-math {
+	position: relative;
+	margin: var(--bl-space-block) 0;
+	padding: 4px;
+	border-radius: var(--bl-radius, 6px);
+	overflow-x: auto;
+	text-align: center;
+}
+
+/* The field hangs below the formula, so a block being edited cannot clip
+   it; its formula scrolls instead. */
+.blockleaf-editor__content div.blockleaf-math[data-editing] {
+	overflow: visible;
+}
+
+.blockleaf-editor__content div.blockleaf-math > .blockleaf-math__formula {
+	display: block;
+	overflow-x: auto;
+}
+
+.blockleaf-editor__content .blockleaf-math[data-invalid] {
+	color: var(--bl-color-danger, #b91c1c);
+}
+
+.blockleaf-editor__content .blockleaf-math[data-empty] {
+	color: var(--bl-color-muted);
+}
+
+.blockleaf-editor__content .blockleaf-math__formula {
+	cursor: pointer;
+}
+
+.blockleaf-editor__content span.blockleaf-math {
+	position: relative;
+	padding: 0 1px;
+	border-radius: calc(var(--bl-radius, 6px) - 2px);
+}
+
+.blockleaf-editor__content .blockleaf-math.ProseMirror-selectednode,
+.blockleaf-editor__content .blockleaf-math[data-editing] {
+	background: var(--bl-color-selection);
+	outline: none;
+}
+
+.blockleaf-math__panel {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	z-index: 50;
+	display: flex;
+	gap: 4px;
+	width: max(280px, 100%);
+	max-width: min(560px, calc(100vw - 32px));
+	padding: 4px;
+	border: 1px solid var(--bl-color-border);
+	border-radius: var(--bl-radius, 6px);
+	background: var(--bl-color-bg);
+	box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+	color: var(--bl-color-fg);
+	font-family: var(--bl-font-sans);
+	font-size: var(--bl-font-size-sm, 0.875rem);
+	text-align: start;
+	white-space: normal;
+}
+
+.blockleaf-math__input {
+	flex: 1;
+	min-width: 0;
+	min-height: 2.25em;
+	padding: 4px 8px;
+	border: 1px solid var(--bl-color-border);
+	border-radius: calc(var(--bl-radius, 6px) - 2px);
+	background: transparent;
+	color: inherit;
+	font-family: var(--bl-font-mono);
+	font-size: inherit;
+	resize: vertical;
+}
+
+.blockleaf-math__done {
+	align-self: flex-start;
+	padding: 4px 10px;
+	border: 1px solid var(--bl-color-border);
+	border-radius: calc(var(--bl-radius, 6px) - 2px);
+	background: var(--bl-color-code-bg);
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.blockleaf-math__input:focus-visible,
+.blockleaf-math__done:focus-visible {
+	outline: 2px solid var(--bl-color-accent);
+	outline-offset: -1px;
+}
+
 .blockleaf-editor__content details > summary {
 	cursor: pointer;
 }

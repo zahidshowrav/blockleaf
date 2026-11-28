@@ -17,6 +17,7 @@ import {
 	isChecked,
 	isHeaderCell,
 	listStart,
+	mathAttributes,
 	mentionAttributes,
 	rowspan,
 	tableColumns,
@@ -459,8 +460,18 @@ export const createHtmlNodes = (
 	mention: ({ node }) => {
 		const { text, attributes } = mentionAttributes(node);
 		return element('span', attributes, escapeText(text));
-	}
+	},
+
+	mathInline: ({ node }) => mathSource(node),
+
+	mathBlock: ({ node }) => mathSource(node)
 });
+
+/** A formula as its source. `@blockleaf/math` has the renderer that draws it. */
+const mathSource = (node: RenderableNode): string => {
+	const { latex, block, attributes } = mathAttributes(node);
+	return element(block ? 'div' : 'span', attributes, escapeText(latex));
+};
 
 /**
  * The attributes a block carries for its alignment and its background colour,

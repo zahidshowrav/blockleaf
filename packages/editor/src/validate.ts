@@ -32,6 +32,8 @@ import type {
 	EmbedNode,
 	LinkPreviewNode,
 	InlineNode,
+	MathBlockNode,
+	MathInlineNode,
 	ItalicMark,
 	LinkMark,
 	ListItemNode,
@@ -77,6 +79,7 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'attachment',
 	'embed',
 	'linkPreview',
+	'mathBlock',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -86,7 +89,8 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'tableCell',
 	'text',
 	'hardBreak',
-	'mention'
+	'mention',
+	'mathInline'
 ]);
 
 const MARK_TYPES: ReadonlySet<string> = new Set([
@@ -260,8 +264,26 @@ export const mentionNodeSchema: z.ZodType<MentionNode> = z.object({
 	marks: z.array(blockleafMarkSchema).optional()
 });
 
+/**
+ * A formula's LaTeX source. Capped so a stored formula cannot grow without
+ * bound; empty is allowed, as a new formula is before anything is typed.
+ */
+const latexSchema = z.string().max(10_000);
+
+/** Version 2. */
+export const mathInlineNodeSchema: z.ZodType<MathInlineNode> = z.object({
+	type: z.literal('mathInline'),
+	attrs: z.object({ latex: latexSchema }),
+	marks: z.array(blockleafMarkSchema).optional()
+});
+
 export const inlineNodeSchema: z.ZodType<InlineNode> = orUnrecognisedNode(
-	z.union([textNodeSchema, hardBreakNodeSchema, mentionNodeSchema])
+	z.union([
+		textNodeSchema,
+		hardBreakNodeSchema,
+		mentionNodeSchema,
+		mathInlineNodeSchema
+	])
 );
 
 /* -------------------------------------------------------------------------- */
@@ -411,6 +433,12 @@ export const linkPreviewNodeSchema: z.ZodType<LinkPreviewNode> = z.object({
 		image: z.string().nullable().optional(),
 		siteName: z.string().nullable().optional()
 	})
+});
+
+/** Version 2. */
+export const mathBlockNodeSchema: z.ZodType<MathBlockNode> = z.object({
+	type: z.literal('mathBlock'),
+	attrs: z.object({ id: z.string(), latex: latexSchema })
 });
 
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
@@ -597,6 +625,7 @@ export const tableCellContentNodeSchema: z.ZodType<TableCellContentNode> =
 				attachmentNodeSchema,
 				embedNodeSchema,
 				linkPreviewNodeSchema,
+				mathBlockNodeSchema,
 				tableOfContentsNodeSchema
 			])
 		)
@@ -705,6 +734,7 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				attachmentNodeSchema,
 				embedNodeSchema,
 				linkPreviewNodeSchema,
+				mathBlockNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -738,6 +768,7 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				attachmentNodeSchema,
 				embedNodeSchema,
 				linkPreviewNodeSchema,
+				mathBlockNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -747,7 +778,8 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				tableOfContentsNodeSchema,
 				textNodeSchema,
 				hardBreakNodeSchema,
-				mentionNodeSchema
+				mentionNodeSchema,
+				mathInlineNodeSchema
 			])
 		)
 );

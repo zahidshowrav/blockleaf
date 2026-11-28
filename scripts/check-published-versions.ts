@@ -16,6 +16,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+// TODO: add 'math' once @blockleaf/math has been published; until then npm
+// answers 404 and this check would fail every night.
 const packages = ['editor', 'renderer'] as const;
 
 const manifestVersion = async (name: string): Promise<string> => {

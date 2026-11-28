@@ -547,3 +547,27 @@ export const blockBackground = (node: RenderableNode): string | undefined => {
 		? value
 		: undefined;
 };
+
+/**
+ * A formula's LaTeX source and the attributes of its element, as the editor
+ * writes them: a `<span>` inside a line, a `<div>` with its block id as a
+ * block. The source is the element's text until something draws it.
+ */
+export const mathAttributes = (
+	node: RenderableNode
+): {
+	latex: string;
+	block: boolean;
+	attributes: Record<string, string | undefined>;
+} => {
+	const block = node.type === 'mathBlock';
+	return {
+		latex: stringAttr(node, 'latex'),
+		block,
+		attributes: {
+			'data-id': block ? blockId(node) : undefined,
+			class: 'blockleaf-math',
+			'data-type': block ? 'mathBlock' : 'mathInline'
+		}
+	};
+};
