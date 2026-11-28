@@ -13,6 +13,12 @@
 		"limit": "4.25 kB"
 	},
 	{
+		"name": "renderToMarkdown",
+		"path": "dist/markdown.js",
+		"import": "{ renderToMarkdown }",
+		"limit": "4 kB"
+	},
+	{
 		"name": "text extractors only",
 		"path": "dist/index.js",
 		"import": "{ toPlainText, extractHeadings }",
