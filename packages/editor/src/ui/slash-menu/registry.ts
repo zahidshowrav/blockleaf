@@ -9,6 +9,8 @@ import {
 	EmbedIcon,
 	LinkPreviewIcon,
 	MathIcon,
+	Columns2Icon,
+	Columns3Icon,
 	Heading1Icon,
 	Heading2Icon,
 	Heading3Icon,
@@ -33,10 +35,13 @@ import {
 	EMBED_NODE,
 	LINK_PREVIEW_NODE,
 	MATH_BLOCK_NODE,
+	COLUMNS_NODE,
 	TABLE_OF_CONTENTS_NODE,
 	UPLOAD_EXTENSION_NAME,
 	VIDEO_NODE
 } from '../../core/constants.js';
+// Types only: the command comes from `@blockleaf/editor/layout`.
+import type {} from '../../core/nodes/columns.js';
 import {
 	defaultLabels,
 	type BlockTypeLabels,
@@ -375,7 +380,21 @@ export const createSlashCommands = (
 				.focus()
 				.insertContent({ type: MATH_BLOCK_NODE, attrs: { latex: '' } })
 				.run()
-	}
+	},
+	...([2, 3] as const).map((count): SlashCommand => ({
+		id: `columns-${count}`,
+		title: blockTypes[`columns-${count}`],
+		description: labels.descriptions[`columns-${count}`],
+		// Typed without a space, which would close the menu: `/2col`, `/3col`.
+		aliases: [`${count}col`, `columns${count}`],
+		group: labels.groups.advanced,
+		icon: count === 2 ? Columns2Icon : Columns3Icon,
+		keywords: ['columns', 'layout', 'side by side', 'grid'],
+		// Only where `@blockleaf/editor/layout` added the block.
+		isAvailable: (editor) =>
+			editor.schema.nodes[COLUMNS_NODE] !== undefined,
+		run: (editor) => editor.chain().focus().insertColumns(count).run()
+	}))
 ];
 
 export const defaultSlashCommands: SlashCommand[] =

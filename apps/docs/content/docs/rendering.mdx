@@ -437,6 +437,7 @@ Markdown has:
 | Callout                                                               | A quote, with its emoji first                        |
 | Toggle                                                                | `<details>`, with the first block as its `<summary>` |
 | Math                                                                  | `$…$` inside a line, `$$…$$` as a block              |
+| Columns                                                               | Each column's blocks, one after another              |
 | Video, audio, file, embed, card                                       | A link to it                                         |
 | Mention                                                               | Its text, such as `@Ada`                             |
 | Table of contents                                                     | Nothing; Markdown readers build their own            |
@@ -546,32 +547,33 @@ Minified and brotlied, with all dependencies.
 
 Every node in [the schema](./schema.mdx) renders:
 
-| Node                         | Element                                                                                               |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `paragraph`                  | `<p>`, with `style="text-align: …"` when aligned                                                      |
-| `heading`                    | `<h1>`–`<h3>`, clamped into range                                                                     |
-| `blockquote`                 | `<blockquote>`                                                                                        |
-| `codeBlock`                  | `<pre><code class="language-…">`                                                                      |
-| `horizontalRule`             | `<hr>`                                                                                                |
-| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                                                                 |
-| `listItem`                   | `<li>`                                                                                                |
-| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                                                  |
-| `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                                                 |
-| `details`                    | `<details open>`, its first block inside `<summary>`                                                  |
-| `image`                      | `<img class="blockleaf-image">`, `data-width=\"full\"` at full width                                  |
-| `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                                         |
-| `audio`                      | `<audio class="blockleaf-audio" controls preload="metadata">`, named by its title                     |
-| `attachment`                 | `<a class="blockleaf-attachment" download>` with the file's name and size                             |
-| `embed`                      | `<iframe class="blockleaf-embed">`, only for a player address on the list                             |
-| `linkPreview`                | `<a class="blockleaf-link-preview">` with its title, description, site and picture                    |
-| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                                                  |
-| `tableRow`                   | `<tr>`                                                                                                |
-| `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">`                        |
-| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                                                 |
-| `text` / `hardBreak`         | text / `<br>`                                                                                         |
-| `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                                       |
-| `tableOfContents`            | `<nav class="blockleaf-toc">` with a link to each heading                                             |
-| `mathInline` / `mathBlock`   | `<span class="blockleaf-math">` / `<div>`, holding the LaTeX source; see [math](./math.mdx#rendering) |
+| Node                         | Element                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `paragraph`                  | `<p>`, with `style="text-align: …"` when aligned                                                                                     |
+| `heading`                    | `<h1>`–`<h3>`, clamped into range                                                                                                    |
+| `blockquote`                 | `<blockquote>`                                                                                                                       |
+| `codeBlock`                  | `<pre><code class="language-…">`                                                                                                     |
+| `horizontalRule`             | `<hr>`                                                                                                                               |
+| `bulletList` / `orderedList` | `<ul>` / `<ol start>`                                                                                                                |
+| `listItem`                   | `<li>`                                                                                                                               |
+| `taskList` / `taskItem`      | `<ul data-type="taskList">` with a disabled checkbox                                                                                 |
+| `callout`                    | `<div data-type="callout" class="blockleaf-callout">`                                                                                |
+| `details`                    | `<details open>`, its first block inside `<summary>`                                                                                 |
+| `image`                      | `<img class="blockleaf-image">`, `data-width=\"full\"` at full width                                                                 |
+| `video`                      | `<video class="blockleaf-video" controls preload="metadata">`                                                                        |
+| `audio`                      | `<audio class="blockleaf-audio" controls preload="metadata">`, named by its title                                                    |
+| `attachment`                 | `<a class="blockleaf-attachment" download>` with the file's name and size                                                            |
+| `embed`                      | `<iframe class="blockleaf-embed">`, only for a player address on the list                                                            |
+| `linkPreview`                | `<a class="blockleaf-link-preview">` with its title, description, site and picture                                                   |
+| `table`                      | `<table>` with `<colgroup>`, `<thead>` and `<tbody>`                                                                                 |
+| `tableRow`                   | `<tr>`                                                                                                                               |
+| `figure` / `caption`         | `<figure class="blockleaf-figure">` / `<figcaption class="blockleaf-caption">`                                                       |
+| `tableHeader` / `tableCell`  | `<th scope>` / `<td>`                                                                                                                |
+| `text` / `hardBreak`         | text / `<br>`                                                                                                                        |
+| `mention`                    | `<span class="blockleaf-mention" data-mention-id>@label</span>`                                                                      |
+| `tableOfContents`            | `<nav class="blockleaf-toc">` with a link to each heading                                                                            |
+| `mathInline` / `mathBlock`   | `<span class="blockleaf-math">` / `<div>`, holding the LaTeX source; see [math](./math.mdx#rendering)                                |
+| `columns` / `column`         | `<div class="blockleaf-columns">` / `<div class="blockleaf-column">`, a width as `flex-grow`; see [columns](./columns.mdx#rendering) |
 
 Marks nest outwards from the first in the array, which is what the editor
 does: `[bold, italic]` is `<strong><em>`, never `<em><strong>`. It matters to

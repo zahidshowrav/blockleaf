@@ -61,5 +61,12 @@
 		"import": "{ withEmbeds }",
 		"limit": "92 kB",
 		"ignore": ["react", "react-dom"]
+	},
+	{
+		"name": "layout subpath, standalone (shares the runtime in practice; 1.3 kB on top of the toc subpath's)",
+		"path": "dist/layout.js",
+		"import": "{ withLayout }",
+		"limit": "61.5 kB",
+		"ignore": ["react", "react-dom"]
 	}
 ]

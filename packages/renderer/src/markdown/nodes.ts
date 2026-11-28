@@ -273,6 +273,10 @@ export const createMarkdownNodes = (
 			.join('\n\n');
 	},
 
+	// Markdown has no columns: each column's blocks, one after another.
+	columns: ({ children }) => children,
+	column: ({ children }) => children,
+
 	// Markdown readers build their own contents from the headings.
 	tableOfContents: () => '',
 

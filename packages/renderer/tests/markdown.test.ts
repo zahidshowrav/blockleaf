@@ -502,3 +502,21 @@ describe('overrides', () => {
 		).toBe('P: a\n');
 	});
 });
+
+describe('columns', () => {
+	it('writes each column’s blocks one after another', () => {
+		expect(
+			md({
+				type: 'columns',
+				content: [
+					{
+						type: 'column',
+						attrs: { width: 30 },
+						content: [paragraph('Pros')]
+					},
+					{ type: 'column', content: [paragraph('Cons')] }
+				]
+			})
+		).toBe('Pros\n\nCons\n');
+	});
+});
