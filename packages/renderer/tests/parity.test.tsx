@@ -19,6 +19,44 @@ import { type RenderableDocument } from '../src/types.js';
 const cases: Array<[string, RenderableDocument]> = [
 	['paragraph', docOf(paragraph('hi', 'p1'))],
 	[
+		'columns, one with a width',
+		docOf({
+			type: 'columns',
+			attrs: { id: 'row' },
+			content: [
+				{
+					type: 'column',
+					attrs: { id: 'c1', width: 30 },
+					content: [paragraph('left', 'p1')]
+				},
+				{
+					type: 'column',
+					attrs: { id: 'c2', width: 70 },
+					content: [paragraph('right', 'p2')]
+				}
+			]
+		})
+	],
+	[
+		'columns, equal',
+		docOf({
+			type: 'columns',
+			attrs: { id: 'row' },
+			content: [
+				{
+					type: 'column',
+					attrs: { id: 'c1', width: null },
+					content: [paragraph('left', 'p1')]
+				},
+				{
+					type: 'column',
+					attrs: { id: 'c2' },
+					content: [paragraph('right', 'p2')]
+				}
+			]
+		})
+	],
+	[
 		'heading',
 		docOf({
 			type: 'heading',

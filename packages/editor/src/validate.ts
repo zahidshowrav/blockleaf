@@ -14,6 +14,8 @@ import type {
 	CaptionNode,
 	CodeBlockNode,
 	CodeMark,
+	ColumnNode,
+	ColumnsNode,
 	DetailsNode,
 	FigureNode,
 	HardBreakNode,
@@ -80,6 +82,8 @@ const NODE_TYPES: ReadonlySet<string> = new Set([
 	'embed',
 	'linkPreview',
 	'mathBlock',
+	'columns',
+	'column',
 	'table',
 	'figure',
 	'tableOfContents',
@@ -441,6 +445,32 @@ export const mathBlockNodeSchema: z.ZodType<MathBlockNode> = z.object({
 	attrs: z.object({ id: z.string(), latex: latexSchema })
 });
 
+/**
+ * Version 2. One column: its share of the row in per cent, or `null` for an
+ * equal share, and any block but another row of columns.
+ */
+export const columnNodeSchema: z.ZodType<ColumnNode> = z.object({
+	type: z.literal('column'),
+	attrs: z.object({
+		id: z.string(),
+		width: z.number().positive().max(100).nullable().optional()
+	}),
+	content: z
+		.array(z.lazy((): z.ZodType<BlockNode> => blockNodeSchema))
+		.refine(
+			(blocks) => blocks.every((block) => block.type !== 'columns'),
+			'A column cannot hold another row of columns'
+		)
+		.optional()
+});
+
+/** Version 2. Two to four columns, side by side. */
+export const columnsNodeSchema: z.ZodType<ColumnsNode> = z.object({
+	type: z.literal('columns'),
+	attrs: z.object({ id: z.string() }),
+	content: z.array(columnNodeSchema).min(2).max(4).optional()
+});
+
 export const listItemNodeSchema: z.ZodType<ListItemNode> = z.object({
 	type: z.literal('listItem'),
 	attrs: z
@@ -735,6 +765,8 @@ export const blockNodeSchema: z.ZodType<BlockNode> = z.lazy(
 				embedNodeSchema,
 				linkPreviewNodeSchema,
 				mathBlockNodeSchema,
+				columnsNodeSchema,
+				columnNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,
@@ -769,6 +801,8 @@ export const blockleafNodeSchema: z.ZodType<BlockleafNode> = z.lazy(
 				embedNodeSchema,
 				linkPreviewNodeSchema,
 				mathBlockNodeSchema,
+				columnsNodeSchema,
+				columnNodeSchema,
 				tableNodeSchema,
 				figureNodeSchema,
 				captionNodeSchema,

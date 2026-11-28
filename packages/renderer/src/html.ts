@@ -16,6 +16,7 @@ export {
 	calloutEmoji,
 	calloutTone,
 	codeLanguage,
+	columnWidth,
 	headingLevel,
 	highlightBackground,
 	highlightColor,

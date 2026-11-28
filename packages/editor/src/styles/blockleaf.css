@@ -810,6 +810,104 @@
 }
 
 /*
+ * Columns (PA-17). A row of two to four columns. A stored width is the
+ * column's `flex-grow`, so shares that do not add up to 100 still lay out.
+ * In the editor a column's blocks sit in `__content`, beside its divider;
+ * the renderer writes them straight into the column.
+ */
+
+.blockleaf-editor__content .blockleaf-columns {
+	display: flex;
+	gap: var(--bl-columns-gap, 1.5rem);
+}
+
+.blockleaf-editor__content .blockleaf-column {
+	flex: 1 1 0;
+	min-width: 0;
+	position: relative;
+}
+
+.blockleaf-editor__content .blockleaf-column > * + *,
+.blockleaf-editor__content .blockleaf-column__content > * + * {
+	margin-top: var(--bl-space-block);
+}
+
+.blockleaf-editor__content .blockleaf-column > :first-child,
+.blockleaf-editor__content .blockleaf-column__content > :first-child {
+	margin-top: 0;
+}
+
+.blockleaf-editor__content .blockleaf-column > :last-child,
+.blockleaf-editor__content .blockleaf-column__content > :last-child {
+	margin-bottom: 0;
+}
+
+/* The divider: the gap between two columns, a line while hovered. */
+.blockleaf-editor__content .blockleaf-column__resize {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: calc(var(--bl-columns-gap, 1.5rem) / -2 - 6px);
+	width: 12px;
+	cursor: col-resize;
+	touch-action: none;
+	z-index: 1;
+}
+
+.blockleaf-editor__content .blockleaf-column__resize::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 5px;
+	width: 2px;
+	border-radius: 1px;
+}
+
+.blockleaf-editor__content .blockleaf-column__resize:hover::after,
+.blockleaf-editor__content
+	.blockleaf-column--resizing
+	> .blockleaf-column__resize::after {
+	background: var(--bl-color-accent);
+}
+
+.blockleaf-editor__content
+	.blockleaf-column:last-child
+	> .blockleaf-column__resize {
+	display: none;
+}
+
+/* Where a dragged block will land beside another. */
+.blockleaf-columns-drop {
+	position: absolute;
+	width: 3px;
+	border-radius: 2px;
+	background: var(--bl-color-accent);
+	pointer-events: none;
+}
+
+/* A phone stacks the columns, in order, rather than squeezing them. */
+@media (max-width: 640px) {
+	.blockleaf-editor__content .blockleaf-columns {
+		flex-direction: column;
+	}
+
+	.blockleaf-editor__content .blockleaf-column {
+		flex-basis: auto;
+	}
+
+	.blockleaf-editor__content .blockleaf-column__resize {
+		display: none;
+	}
+}
+
+@media print {
+	.blockleaf-editor__content .blockleaf-column__resize {
+		display: none;
+	}
+}
+
+/*
  * Math (PA-04). A formula inside a line, and a formula as its own block.
  * The renderer shows the LaTeX source until `@blockleaf/math` draws it, so
  * a source with nothing drawn reads as code.

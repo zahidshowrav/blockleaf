@@ -56,6 +56,10 @@
 			"types": "./dist/embeds.d.ts",
 			"import": "./dist/embeds.js"
 		},
+		"./layout": {
+			"types": "./dist/layout.d.ts",
+			"import": "./dist/layout.js"
+		},
 		"./validate": {
 			"types": "./dist/validate.d.ts",
 			"import": "./dist/validate.js"

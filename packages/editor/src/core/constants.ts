@@ -64,7 +64,9 @@ export const BLOCK_NODE_TYPES = [
 	'attachment',
 	'embed',
 	'linkPreview',
-	'mathBlock'
+	'mathBlock',
+	'columns',
+	'column'
 ] as const;
 
 /**
@@ -140,6 +142,13 @@ export const LINK_PREVIEW_NODE = 'linkPreview';
  */
 export const MATH_INLINE_NODE = 'mathInline';
 export const MATH_BLOCK_NODE = 'mathBlock';
+
+/**
+ * Blocks side by side: a `columns` row holding two to four `column`s. In
+ * the schema from version 2, loaded from `@blockleaf/editor/layout`.
+ */
+export const COLUMNS_NODE = 'columns';
+export const COLUMN_NODE = 'column';
 
 /** The toolbar for a selected video, audio clip, file, embed or link card. */
 export const MEDIA_MENU_EXTENSION_NAME = 'mediaMenu';

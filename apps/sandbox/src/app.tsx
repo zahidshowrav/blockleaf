@@ -13,6 +13,7 @@ import type {
 import { withEmbeds, type FetchLinkPreview } from '@blockleaf/editor/embeds';
 import { withEmoji } from '@blockleaf/editor/emoji';
 import { presets } from '@blockleaf/editor/extensions';
+import { withLayout } from '@blockleaf/editor/layout';
 import { withMedia } from '@blockleaf/editor/media';
 import { withMentions, type MentionItem } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
@@ -93,7 +94,7 @@ const sandboxLinkPreview: FetchLinkPreview = (url) =>
 /**
  * The opt-in subpaths, each behind its own flag so a test loads only what it
  * exercises: `?mentions`, `?textstyle`, `?emoji`, `?toc`, `?media`, `?embeds`,
- * `?math`. With none, the editor is
+ * `?math`, `?layout`. With none, the editor is
  * the default preset, as a host that installs nothing gets it.
  */
 const extensions = (() => {
@@ -104,7 +105,8 @@ const extensions = (() => {
 		'toc',
 		'media',
 		'embeds',
-		'math'
+		'math',
+		'layout'
 	];
 	if (!flags.some((flag) => params.has(flag))) return undefined;
 	let base = presets.standard();
@@ -120,6 +122,7 @@ const extensions = (() => {
 	if (params.get('math') === 'html') {
 		void import('katex/dist/katex.min.css');
 	}
+	if (params.has('layout')) base = withLayout(base);
 	if (params.has('math')) {
 		base = withMath(base, {
 			output: params.get('math') === 'html' ? 'html' : 'mathml'

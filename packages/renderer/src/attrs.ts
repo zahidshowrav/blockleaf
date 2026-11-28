@@ -571,3 +571,14 @@ export const mathAttributes = (
 		}
 	};
 };
+
+/**
+ * A column's stored width: its share of the row, in per cent, written as
+ * its `flex-grow`. `undefined` is an equal share.
+ */
+export const columnWidth = (node: RenderableNode): number | undefined => {
+	const width = node.attrs?.width;
+	return typeof width === 'number' && width > 0 && width <= 100
+		? width
+		: undefined;
+};

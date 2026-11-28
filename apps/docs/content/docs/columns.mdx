@@ -1,0 +1,147 @@
+---
+title: Columns
+description: Put blocks side by side, two to four in a row, from the opt-in layout subpath.
+icon: Columns2
+---
+
+Columns put blocks side by side:
+
+```
+┌──────────────┬──────────────┐
+│ ## Pros      │ ## Cons      │
+│ - Fast       │ - New        │
+│ - Small      │ - Few users  │
+└──────────────┴──────────────┘
+```
+
+They ship as an opt-in subpath, and the blocks are new in schema version 2.
+
+```ts
+import { presets } from '@blockleaf/editor/extensions';
+import { withLayout } from '@blockleaf/editor/layout';
+
+const extensions = withLayout(presets.standard());
+```
+
+```tsx
+<BlockleafEditor extensions={extensions} />
+```
+
+An editor without the subpath keeps stored columns as a placeholder and
+saves them back unchanged.
+
+## Making columns
+
+- **The slash menu.** Type `/columns` and pick **2 columns** or
+  **3 columns**. `/2col` and `/3col` go straight to them. The caret starts
+  in the first column.
+- **Drag a block beside another.** Drag a block by its handle onto the left
+  or right edge of another block. A line down that edge shows where it will
+  land. The two become a row of two columns. Drop on the edge of a row that
+  already has columns, and the block becomes a new column there, up to four.
+
+Or with a command:
+
+```ts
+editor.commands.insertColumns(3);
+```
+
+A block dragged from outside can be dropped into a column, like anywhere
+else. The drag handle stays on the blocks at the top of the page: beside a
+row, it moves or deletes the whole row.
+
+## Widths
+
+Columns start the same width. Drag the line between two columns to share
+the width between them differently. Double-click that line to make every
+column in the row the same width again, or run
+`editor.commands.resetColumnWidths()` with the caret in the row.
+
+A width is stored as the column's **share of the row, in per cent**, never
+in pixels, so it means the same thing on every screen.
+
+## Removing a column
+
+Press `Backspace` at the start of an empty column to remove it. A row left
+with one column turns back into that column's blocks. Or, with the caret in
+the column:
+
+```ts
+editor.commands.removeColumn();
+```
+
+## On a phone
+
+Below 640px wide, the columns stack one under another, in order. Nothing
+is squeezed. The renderer's output does the same, with the same stylesheet.
+
+## What is stored
+
+```json
+{
+	"type": "columns",
+	"attrs": { "id": "…" },
+	"content": [
+		{
+			"type": "column",
+			"attrs": { "id": "…", "width": 30 },
+			"content": [{ "type": "paragraph", "content": [] }]
+		},
+		{
+			"type": "column",
+			"attrs": { "id": "…", "width": 70 },
+			"content": [{ "type": "paragraph", "content": [] }]
+		}
+	]
+}
+```
+
+- A row holds **two to four** columns.
+- `width` is a number from above 0 to 100, or `null` for an equal share.
+  Either every column in a row has a width or none does; the editor sets a
+  row back to equal widths when only some have one.
+- A column holds any block **except another row of columns**. The editor
+  lifts a nested row out into its blocks, and `./validate` refuses one.
+
+## Rendering
+
+[`@blockleaf/renderer`](./rendering.mdx) writes the same elements as the
+editor, so the same stylesheet lays them out:
+
+```html
+<div
+	data-id="…"
+	data-type="columns"
+	class="blockleaf-columns"
+>
+	<div
+		data-id="…"
+		data-width="30"
+		style="flex-grow: 30"
+		data-type="column"
+		class="blockleaf-column"
+	>
+		…
+	</div>
+</div>
+```
+
+A width is the column's `flex-grow`, so shares that do not add up to 100
+still lay out. [Markdown](./rendering.mdx#markdown) has no columns, so each
+column's blocks are written one after another.
+
+## Styling
+
+| Property           | Default  | What it sets              |
+| ------------------ | -------- | ------------------------- |
+| `--bl-columns-gap` | `1.5rem` | The space between columns |
+
+The divider's tooltip is under `labels.columns.resize`. The slash menu's
+items are `blockTypes['columns-2']` and `blockTypes['columns-3']`. See
+[i18n](./i18n.mdx).
+
+## Bundle cost
+
+The subpath adds about 1.3 kB on top of the editor. The main entry grows
+only by the two slash menu items, which hide themselves without the
+subpath.

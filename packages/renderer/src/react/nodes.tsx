@@ -5,6 +5,7 @@ import {
 	calloutEmoji,
 	calloutTone,
 	codeLanguage,
+	columnWidth,
 	colspan,
 	headerRowCount,
 	headingLevel,
@@ -176,6 +177,33 @@ const Callout: NodeRenderer = ({ node, children }) => (
 		{children}
 	</div>
 );
+
+/** A row of columns (PA-17, F34), as the editor writes it. */
+const Columns: NodeRenderer = ({ node, children }) => (
+	<div
+		data-id={blockId(node)}
+		data-type="columns"
+		className="blockleaf-columns"
+	>
+		{children}
+	</div>
+);
+
+/** One column; its stored share is its `flex-grow`. */
+const Column: NodeRenderer = ({ node, children }) => {
+	const width = columnWidth(node);
+	return (
+		<div
+			data-id={blockId(node)}
+			data-width={width}
+			style={width === undefined ? undefined : { flexGrow: width }}
+			data-type="column"
+			className="blockleaf-column"
+		>
+			{children}
+		</div>
+	);
+};
 
 /**
  * A toggle: the first block is its title, inside `<summary>`, and the
@@ -554,6 +582,8 @@ export const defaultNodes: Record<string, NodeRenderer> = {
 	taskList: TaskList,
 	taskItem: TaskItem,
 	callout: Callout,
+	columns: Columns,
+	column: Column,
 	details: Details,
 	image: Image,
 	table: tableRenderer(),

@@ -36,7 +36,9 @@ export type BlockTypeId =
 	| 'embed'
 	| 'link-preview'
 	| 'table-of-contents'
-	| 'math';
+	| 'math'
+	| 'columns-2'
+	| 'columns-3';
 
 export type BlockTypeLabels = Record<BlockTypeId, string>;
 
@@ -250,6 +252,11 @@ export type DetailsLabels = {
 	toggle: string;
 };
 
+export type ColumnsLabels = {
+	/** Tooltip on the divider between two columns. */
+	resize: string;
+};
+
 export type MathLabels = {
 	/** Accessible name of the field a formula is typed into. */
 	source: string;
@@ -355,6 +362,7 @@ export type ResolvedLabels = {
 	mentions: MentionLabels;
 	emoji: EmojiLabels;
 	math: MathLabels;
+	columns: ColumnsLabels;
 	tableOfContents: TableOfContentsLabels;
 	textCount: TextCountLabels;
 	textColor: TextColorLabels;
@@ -399,6 +407,7 @@ export type BlockleafLabels = {
 	mentions?: Partial<MentionLabels>;
 	emoji?: Partial<EmojiLabels>;
 	math?: Partial<MathLabels>;
+	columns?: Partial<ColumnsLabels>;
 	tableOfContents?: Partial<TableOfContentsLabels>;
 	textCount?: Partial<TextCountLabels>;
 	textColor?: Partial<Omit<TextColorLabels, 'colors'>> & {
@@ -444,7 +453,9 @@ export const defaultLabels: ResolvedLabels = {
 		embed: 'Embed',
 		'link-preview': 'Link preview',
 		'table-of-contents': 'Table of contents',
-		math: 'Math'
+		math: 'Math',
+		'columns-2': '2 columns',
+		'columns-3': '3 columns'
 	},
 	slashMenu: {
 		menu: 'Slash commands',
@@ -476,7 +487,9 @@ export const defaultLabels: ResolvedLabels = {
 			'link-preview':
 				'Show a link as a card, with its title and picture.',
 			'table-of-contents': 'List the headings, with a link to each.',
-			math: 'Write a formula in LaTeX.'
+			math: 'Write a formula in LaTeX.',
+			'columns-2': 'Put blocks side by side, in two columns.',
+			'columns-3': 'Put blocks side by side, in three columns.'
 		},
 		tableSize: 'Table size',
 		tableSizeCell: (rows, columns) => `${rows} by ${columns}`,
@@ -638,6 +651,9 @@ export const defaultLabels: ResolvedLabels = {
 		empty: 'Empty formula',
 		invalid: (latex) => `Formula that cannot be shown: ${latex}`
 	},
+	columns: {
+		resize: 'Drag to resize. Double-click for equal widths.'
+	},
 	tableOfContents: {
 		label: 'Table of contents',
 		empty: 'Add a heading and it will be listed here.'
@@ -759,6 +775,7 @@ export const resolveLabels = (labels?: BlockleafLabels): ResolvedLabels => ({
 	mentions: { ...defaultLabels.mentions, ...labels?.mentions },
 	emoji: { ...defaultLabels.emoji, ...labels?.emoji },
 	math: { ...defaultLabels.math, ...labels?.math },
+	columns: { ...defaultLabels.columns, ...labels?.columns },
 	tableOfContents: {
 		...defaultLabels.tableOfContents,
 		...labels?.tableOfContents

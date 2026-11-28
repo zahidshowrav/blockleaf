@@ -380,6 +380,31 @@ export interface MathBlockNode {
 	};
 }
 
+/**
+ * Blocks side by side (version 2): two to four `column`s. Loaded from
+ * `@blockleaf/editor/layout`.
+ */
+export interface ColumnsNode {
+	type: 'columns';
+	attrs: {
+		id: string;
+	};
+	content?: ColumnNode[];
+}
+
+/**
+ * One column. `width` is its share of the row, in per cent; `null` is an
+ * equal share. It holds any block but another `columns`.
+ */
+export interface ColumnNode {
+	type: 'column';
+	attrs: {
+		id: string;
+		width?: number | null;
+	};
+	content?: BlockNode[];
+}
+
 export interface TableNode {
 	type: 'table';
 	attrs?: {
@@ -494,6 +519,8 @@ export type BlockNode =
 	| EmbedNode
 	| LinkPreviewNode
 	| MathBlockNode
+	| ColumnsNode
+	| ColumnNode
 	| TableNode
 	| FigureNode
 	| CaptionNode

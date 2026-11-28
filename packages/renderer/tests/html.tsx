@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 
 import { createEmbeds } from '@blockleaf/editor/embeds';
 import { createExtensions } from '@blockleaf/editor/extensions';
+import { withLayout } from '@blockleaf/editor/layout';
 import { createMedia } from '@blockleaf/editor/media';
 import { withMentions } from '@blockleaf/editor/mentions';
 import { withTextStyle } from '@blockleaf/editor/text-style';
@@ -22,11 +23,13 @@ import { type RenderableDocument } from '../src/types.js';
 export const editorHTML = (doc: RenderableDocument): string => {
 	const editor = new Editor({
 		extensions: [
-			...withTableOfContents(
-				withTextStyle(
-					withMentions(createExtensions('standard'), {
-						items: () => []
-					})
+			...withLayout(
+				withTableOfContents(
+					withTextStyle(
+						withMentions(createExtensions('standard'), {
+							items: () => []
+						})
+					)
 				)
 			),
 			// The blocks only: the toolbars need a mounted editor.

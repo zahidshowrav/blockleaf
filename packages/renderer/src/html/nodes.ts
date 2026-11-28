@@ -5,6 +5,7 @@ import {
 	calloutEmoji,
 	calloutTone,
 	codeLanguage,
+	columnWidth,
 	colspan,
 	columnStyle,
 	headerRowCount,
@@ -159,6 +160,34 @@ export const createHtmlNodes = (
 			},
 			children
 		),
+
+	// Columns (PA-17, F34): a row, and each column's share as its
+	// `flex-grow`, as the editor writes them.
+	columns: ({ node, children }) =>
+		element(
+			'div',
+			{
+				'data-id': blockId(node),
+				'data-type': 'columns',
+				class: 'blockleaf-columns'
+			},
+			children
+		),
+
+	column: ({ node, children }) => {
+		const width = columnWidth(node);
+		return element(
+			'div',
+			{
+				'data-id': blockId(node),
+				'data-width': width,
+				style: width === undefined ? undefined : `flex-grow: ${width}`,
+				'data-type': 'column',
+				class: 'blockleaf-column'
+			},
+			children
+		);
+	},
 
 	// A table of contents (PA-08, F27). The editor's `getHTML` writes the
 	// `nav` alone; the list is filled in here, from the document's headings.

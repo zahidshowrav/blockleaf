@@ -227,3 +227,19 @@ describe('toPlainText with maths', () => {
 		expect(toPlainText(doc)).toBe('area \\pi r^2\n\ne^{i\\pi} = -1');
 	});
 });
+
+describe('toPlainText with columns', () => {
+	it('keeps each column’s blocks apart', () => {
+		expect(
+			toPlainText(
+				docOf({
+					type: 'columns',
+					content: [
+						{ type: 'column', content: [paragraph('left')] },
+						{ type: 'column', content: [paragraph('right')] }
+					]
+				})
+			)
+		).toBe('left\n\nright');
+	});
+});

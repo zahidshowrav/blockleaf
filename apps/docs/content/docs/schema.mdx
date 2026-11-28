@@ -81,6 +81,8 @@ Added on top of it:
 | `mention`                                 | `id, label, kind`                              | Inline, version 2. `id` is your key, `label` the name when it was mentioned, `kind` an optional string. See [mentions](./mentions.mdx).                                                 |
 | `mathInline`                              | `latex`                                        | Inline, version 2. A formula inside a line, stored as LaTeX source, up to 10,000 characters. See [math](./math.mdx).                                                                    |
 | `mathBlock`                               | `id, latex`                                    | Version 2. A formula as its own block, stored as LaTeX source. See [math](./math.mdx).                                                                                                  |
+| `columns`                                 | `id`                                           | Version 2. Two to four `column`s side by side. See [columns](./columns.mdx).                                                                                                            |
+| `column`                                  | `id, width`                                    | Version 2. One column: its share of the row in per cent, or `null` for equal. Holds any block but another `columns`.                                                                    |
 | `tableOfContents`                         | —                                              | Version 2. Stores nothing but its block id: the entries are the document's headings, listed whenever it is drawn. See [table of contents](./table-of-contents.mdx).                     |
 
 ## Mark set
@@ -149,6 +151,7 @@ Version 2 adds node and mark types, and one optional attribute.
 - **`embed`** — a frame showing a YouTube, Vimeo, Loom, Spotify or CodePen player. Its `src` must be a player address on the provider list. See [embeds](./embeds.mdx).
 - **`linkPreview`** — a link shown as a card, with the page's title, description, site name and picture stored on it. `url` must be `https:`. See [link previews](./embeds.mdx#link-previews).
 - **`mathInline`** and **`mathBlock`** — a formula inside a line and a formula as its own block, each `{ latex }` with the LaTeX source and nothing drawn. The block also has its `id`. See [math](./math.mdx).
+- **`columns`** and **`column`** — blocks side by side, two to four in a row. A column's `width` is its share of the row in per cent, or `null`. See [columns](./columns.mdx).
 - **`width: "full"`** on `image`, `video` and `embed` — the width of the page, as a name. An image's `width` was pixels or `null` in version 1, and still is unless someone presses Full width. See [resizing](./media.mdx#resizing).
 - **An image in a `figure`** — a figure may hold an `image` as well as a `table`, and its `caption` takes `textAlign`, absent to follow the image. An editor that only knows version 1 would refuse an image inside a figure, which is why this is in the bump and not beside it like the table caption was.
 - The rest of the batch joins version 2 before it is released. It is one bump for all of them, not one each. [Emoji](./emoji.mdx) are not in it: they are stored as plain text.

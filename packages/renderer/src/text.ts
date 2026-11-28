@@ -34,6 +34,8 @@ const BLOCKS = new Set([
 	'embed',
 	'linkPreview',
 	'mathBlock',
+	'columns',
+	'column',
 	'table',
 	'figure',
 	'caption',
