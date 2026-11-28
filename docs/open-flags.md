@@ -8,11 +8,28 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33 · **Last reviewed:** 2026-11-28
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33, F34 · **Last reviewed:** 2026-11-28
 
 ---
 
 ## Settled
+
+### F34 — what columns store, how wide they are, and how they are made · decided 2026-11-28
+
+`PA-17` puts blocks side by side. It is the last `PA` item and the only one
+that fights the existing chrome: the drag handle and the block menu assume
+one stack of blocks. The core entry had under 5 kB left of its 160 kB budget,
+so the developer settled the shape and the placement first.
+
+**Decisions:**
+
+- **Two nodes: `columns { id }` holding two to four `column { id, width }`**, and each column holds ordinary blocks. New in schema version 2, with no new bump (`F24`). `./validate` holds the count to 2–4. A column cannot hold another `columns`: the editor lifts a nested one out.
+- **`width` is a share of the row, in per cent, or `null` for an equal share.** Not pixels, so this is not the measured-on-one-screen value `F22` refused for every other node: a share means the same thing on every screen. The renderer writes it as the column's `flex-grow`, so shares that do not add up to 100 still lay out. A dragged width is reversible: a double click on the divider sets every column back to `null`.
+- **`./layout`, an editor subpath**, as the tracker had it. Core gains only the slash-menu items, which show when the node is in the schema, as for maths.
+- **Phones stack the columns.** Below 640px wide, columns sit one under another, in order; nothing is squeezed.
+- **Made from the slash menu (`/columns`, `/2col`, `/3col`), or by dropping a dragged block on the left or right edge of another top-level block.** Dropping on the edge of a `columns` block adds a column there, up to four. Backspace at the start of an empty column removes it; a `columns` left with one column turns back into its blocks.
+- **The drag handle stays on top-level blocks.** Beside a `columns` block it moves and deletes the whole row. A block dragged from outside can be dropped into a column; a block inside a column moves out by cut and paste. A handle for the blocks inside a column waits for someone to ask, because it is the one change here that grows the core.
+- **The renderer writes real columns** in React and HTML. Markdown has no columns, so it writes each column's blocks one after another.
 
 ### F33 — what a formula stores, where KaTeX lives, and how the renderer shows it · decided 2026-11-28
 
