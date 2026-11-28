@@ -1,5 +1,33 @@
 # @blockleaf/editor
 
+## 0.11.0
+
+### Minor Changes
+
+- bcea22e: Background colour for text: the `highlight` mark's `color` now takes a colour token. Stored hex, `rgb()` and `hsl()` values still render; any other value is no longer written into `style`.
+- 520c078: Block background colour: a paragraph, heading, quote, list or toggle takes a colour token in `backgroundColor`, from the block menu's new Background group or `setBlockBackground`. In every preset; new in schema version 2.
+- 6167d57: A caption toolbar, from `@blockleaf/editor/media`, with caption alignment and Remove caption. New: `createToggleCaptionAction(title)` and `labels.caption`.
+- 8479f86: The schema and `./validate` know `mathInline` and `mathBlock`, new in schema version 2, and the slash menu has a Math item that shows when `@blockleaf/math` is loaded. Strings are under `labels.math`.
+- 0ad1a1d: Embeds, from the new `@blockleaf/editor/embeds` subpath: YouTube, Vimeo, Loom, Spotify and CodePen in a frame, by pasting a link or with `/embed`. Only player addresses from that list are stored; new in schema version 2.
+- f4b8327: Emoji, from the new `@blockleaf/editor/emoji` subpath: type `:` to pick one. Emoji are inserted as plain text, so nothing new is stored.
+- b810f8e: Font family, from `@blockleaf/editor/text-style`: a new `fontFamily` mark with `setFontFamily` / `unsetFontFamily`. New in schema version 2.
+- 8ac43bd: Font size, from `@blockleaf/editor/text-style`: a new `fontSize` mark with `setFontSize` / `unsetFontSize`. New in schema version 2.
+- 0f5095c: Images can take a caption, with `toggleCaption()` and `setCaptionAlign()`. Stored as a `figure`, like a captioned table; new in schema version 2.
+- f413487: Link preview cards, from `@blockleaf/editor/embeds`: `/preview` turns an `https:` link into a card with its title, description, site name and picture, which your `fetchLinkPreview` supplies. New in schema version 2.
+- 5a05f62: Video, audio and file blocks, from `@blockleaf/editor/media`. Uploads go to the block for the file's type, and the default `uploadAccept` grows to match. Sources must be `https:` or relative; new in schema version 2.
+- a173335: Resize images and videos, and set them to full width, from `@blockleaf/editor/media`. New commands `setMediaWidth(width)` and `toggleMediaFullWidth()`; new in schema version 2.
+- 10a117b: Mentions, from the new `@blockleaf/editor/mentions` subpath: `withMentions(extensions, { items })` inserts a `mention` node on `@`. `SCHEMA_VERSION` is now `2`: stored documents do not change, but an older editor opens a version 2 document read-only. Upgrade `@blockleaf/renderer` before the editor.
+- 897531e: Subscript and superscript, from the new `@blockleaf/editor/text-style` subpath, through `withTextStyle(extensions)`. New in schema version 2.
+- 9dd7ece: Table of contents block, from the new `@blockleaf/editor/toc` subpath, plus `useTableOfContents`, `getTableOfContents` and `goToHeading`. New in schema version 2.
+- acbe2a0: Text alignment for paragraphs and headings, with `setTextAlign` / `unsetTextAlign` from `withTextStyle`. New in schema version 2; `onChange` now leaves out attributes whose value is `undefined`.
+- 9cc3941: Text colour, from `@blockleaf/editor/text-style`: a new `textColor` mark with `setTextColor` / `unsetTextColor`. New in schema version 2.
+- 280a25f: Word and character count, from `@blockleaf/editor/toc`: `<TextCount />`, `useTextCount()` and `countText(doc)`. Nothing is stored; `BlockleafEditor`'s children can now use Tiptap's `useCurrentEditor()`.
+
+### Patch Changes
+
+- dd548dd: Pasting into selected table cells no longer gives the repeated cells the same block ids.
+- c112d81: Doc comments in the type files no longer mention internal tracking ids.
+
 ## 0.10.0
 
 ### Minor Changes
