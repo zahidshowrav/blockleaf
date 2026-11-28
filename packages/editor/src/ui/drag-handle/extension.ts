@@ -70,7 +70,11 @@ export const DragHandleExtension =
 			const labels = this.options.labels ?? defaultLabels;
 			const actions = resolveBlockActions(
 				this.options.actions,
-				createBlockActions(labels.blockMenu, labels.blockTypes)
+				createBlockActions(
+					labels.blockMenu,
+					labels.blockTypes,
+					labels.textColor
+				)
 			);
 			const insertButton = this.options.insertButton !== false;
 

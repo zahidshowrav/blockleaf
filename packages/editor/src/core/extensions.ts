@@ -6,6 +6,7 @@ import { Underline } from '@tiptap/extension-underline';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { StarterKit } from '@tiptap/starter-kit';
 
+import { BlockBackground } from './block-background.js';
 import { PastedBlockIds, UniqueID } from './block-ids.js';
 import {
 	BLOCK_NODE_TYPES,
@@ -173,6 +174,8 @@ export const createExtensions = (
 			Link,
 			// In every preset, so no editor drops a stored alignment (F25).
 			TextAlignAttribute,
+			// And a stored block colour, for the same reason.
+			BlockBackground,
 			UniqueID.configure({
 				types: ['paragraph']
 			}),
@@ -204,6 +207,8 @@ export const createExtensions = (
 		// In every preset, so no editor drops a stored alignment (F25). The
 		// commands and buttons are in `@blockleaf/editor/text-style`.
 		TextAlignAttribute,
+		// A block's background colour; the block menu sets it.
+		BlockBackground,
 		TableKit.configure({
 			table: {
 				resizable: false

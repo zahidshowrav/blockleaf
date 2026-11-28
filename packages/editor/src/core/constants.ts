@@ -175,6 +175,22 @@ export const SUPERSCRIPT_MARK = 'superscript';
 export const TEXT_ALIGNMENTS = ['left', 'center', 'right', 'justify'] as const;
 export const TEXT_ALIGN_ATTRIBUTE_EXTENSION_NAME = 'blockleafTextAlign';
 export const TEXT_ALIGN_TYPES = ['paragraph', 'heading', 'caption'] as const;
+/**
+ * A block's background colour: the `backgroundColor` attribute, a
+ * token, in the schema from version 2 and in every preset. The text blocks
+ * take it; a callout, a code block, a table and media do not.
+ */
+export const BLOCK_BACKGROUND_EXTENSION_NAME = 'blockleafBlockBackground';
+export const BLOCK_BACKGROUND_TYPES = [
+	'paragraph',
+	'heading',
+	'blockquote',
+	'bulletList',
+	'orderedList',
+	'taskList',
+	'details'
+] as const;
+
 /** The commands and shortcuts for `textAlign`, from `@blockleaf/editor/text-style`. */
 export const TEXT_ALIGN_EXTENSION_NAME = 'textAlign';
 

@@ -394,6 +394,13 @@
 	border-left: 1px solid var(--bl-color-border);
 }
 
+/* A block's background colour (PA-23): the text palette, a little inset
+   so the colour does not touch the letters. */
+.blockleaf-editor__content [data-background] {
+	padding: 2px 6px;
+	border-radius: var(--bl-radius);
+}
+
 .blockleaf-editor__content .blockleaf-audio {
 	display: block;
 	width: 100%;
@@ -1551,6 +1558,55 @@
 
 .blockleaf-block-handle__button:active {
 	cursor: grabbing;
+}
+
+/* The palette again for the block menu, which is portalled out of the
+   editor and shows each background colour as a swatch. */
+.blockleaf-block-menu {
+	--bl-highlight-gray: #ebeced;
+	--bl-highlight-brown: #f2e6dc;
+	--bl-highlight-orange: #fde3cf;
+	--bl-highlight-yellow: #fef08a;
+	--bl-highlight-green: #d9f5e1;
+	--bl-highlight-blue: #dbe8fe;
+	--bl-highlight-purple: #ece6fd;
+	--bl-highlight-pink: #fce4f1;
+	--bl-highlight-red: #fde0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+	.blockleaf-block-menu:not([data-theme='light']) {
+		--bl-highlight-gray: #2d333b;
+		--bl-highlight-brown: #3d2b1f;
+		--bl-highlight-orange: #4a2b12;
+		--bl-highlight-yellow: #38330c;
+		--bl-highlight-green: #12351f;
+		--bl-highlight-blue: #152b4f;
+		--bl-highlight-purple: #2f2150;
+		--bl-highlight-pink: #47162f;
+		--bl-highlight-red: #4b1818;
+	}
+}
+
+.blockleaf-block-menu[data-theme='dark'] {
+	--bl-highlight-gray: #2d333b;
+	--bl-highlight-brown: #3d2b1f;
+	--bl-highlight-orange: #4a2b12;
+	--bl-highlight-yellow: #38330c;
+	--bl-highlight-green: #12351f;
+	--bl-highlight-blue: #152b4f;
+	--bl-highlight-purple: #2f2150;
+	--bl-highlight-pink: #47162f;
+	--bl-highlight-red: #4b1818;
+}
+
+.blockleaf-block-menu__swatch {
+	display: block;
+	width: 16px;
+	height: 16px;
+	border: 1px solid var(--bl-block-border);
+	border-radius: 4px;
+	box-sizing: border-box;
 }
 
 .blockleaf-block-menu {

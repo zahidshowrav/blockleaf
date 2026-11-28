@@ -151,6 +151,20 @@ describe('attribute presence', () => {
 	});
 
 	// F23: the first block is the title, the rest is the body.
+	it('colours a toggle as a whole', () => {
+		expect(
+			renderToHTML(
+				docOf({
+					type: 'details',
+					attrs: { backgroundColor: 'pink' },
+					content: [paragraph('Title')]
+				})
+			)
+		).toBe(
+			'<details data-background="pink" style="background-color: var(--bl-highlight-pink)"><summary><p>Title</p></summary></details>'
+		);
+	});
+
 	it('puts the first block of details in its summary', () => {
 		expect(
 			renderToHTML(

@@ -295,6 +295,19 @@ describe('deliberate differences from the editor', () => {
 		expect(html).toContain('<details data-id="d" open="">');
 		expect(html).toContain('<summary><p>Title</p></summary><p>inside</p>');
 	});
+
+	it('colours a toggle as a whole', () => {
+		const html = reactHTML(
+			docOf({
+				type: 'details',
+				attrs: { backgroundColor: 'pink' },
+				content: [paragraph('Title')]
+			})
+		);
+		expect(html).toContain(
+			'<details data-background="pink" style="background-color:var(--bl-highlight-pink)">'
+		);
+	});
 });
 
 describe('attributes', () => {

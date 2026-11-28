@@ -40,7 +40,7 @@ const textOf = (editor: Editor) =>
 	editor.state.doc.content.content.map((node) => node.textContent);
 
 describe('Block actions (CH-03)', () => {
-	it('ships turn-into entries, the alignments and the four block operations', () => {
+	it('ships turn-into entries, the alignments, the backgrounds and the four block operations', () => {
 		const ids = defaultBlockActions.map((a) => a.id);
 		expect(ids).toEqual([
 			'turn-paragraph',
@@ -56,6 +56,16 @@ describe('Block actions (CH-03)', () => {
 			'align-center',
 			'align-right',
 			'align-justify',
+			'background-none',
+			'background-gray',
+			'background-brown',
+			'background-orange',
+			'background-yellow',
+			'background-green',
+			'background-blue',
+			'background-purple',
+			'background-pink',
+			'background-red',
 			'move-up',
 			'move-down',
 			'duplicate',

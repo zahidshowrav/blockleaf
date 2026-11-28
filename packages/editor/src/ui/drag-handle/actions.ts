@@ -1,4 +1,5 @@
 import type { Editor } from '@tiptap/core';
+import { createElement } from 'react';
 
 import {
 	AlignCenterIcon,
@@ -11,11 +12,16 @@ import {
 	TrashIcon
 } from './icons.js';
 import type { BlockAction } from './types.js';
-import { TEXT_ALIGN_TYPES } from '../../core/constants.js';
+import {
+	BLOCK_BACKGROUND_TYPES,
+	TEXT_ALIGN_TYPES,
+	TEXT_COLORS
+} from '../../core/constants.js';
 import {
 	defaultLabels,
 	type BlockMenuLabels,
-	type BlockTypeLabels
+	type BlockTypeLabels,
+	type TextColorLabels
 } from '../../core/labels.js';
 import { whenNodeExists } from '../schema-guard.js';
 import {
@@ -135,6 +141,41 @@ const align = (
 	run: (editor, pos) => focusBlock(editor, pos).setTextAlign(value).run()
 });
 
+const COLOURABLE: ReadonlySet<string> = new Set(BLOCK_BACKGROUND_TYPES);
+
+/** A square of the colour, or an empty one for none. */
+const swatch = (color: string | null) => () =>
+	createElement('span', {
+		className: 'blockleaf-block-menu__swatch',
+		style: color
+			? { background: `var(--bl-highlight-${color})` }
+			: undefined
+	});
+
+/**
+ * A "Background" entry: one colour, or `null` for none. On the
+ * text blocks only — a callout, a code block, a table and media have their
+ * own look.
+ */
+const background = (
+	labels: BlockMenuLabels,
+	colors: TextColorLabels,
+	color: (typeof TEXT_COLORS)[number] | null
+): BlockAction => ({
+	id: `background-${color ?? 'none'}`,
+	title: color ? colors.colors[color] : colors.none,
+	group: labels.groups.background,
+	icon: swatch(color),
+	isActive: (editor, pos) =>
+		(blockAt(editor, pos)?.attrs.backgroundColor ?? null) === color,
+	isAvailable: (editor, pos) =>
+		'setBlockBackground' in editor.commands &&
+		COLOURABLE.has(blockAt(editor, pos)?.type.name ?? ''),
+	run: (editor, pos) => {
+		editor.chain().focus().setBlockBackground(color, pos).run();
+	}
+});
+
 /**
  * The default block actions, built against a label set.
  *
@@ -143,7 +184,8 @@ const align = (
  */
 export const createBlockActions = (
 	labels: BlockMenuLabels = defaultLabels.blockMenu,
-	blockTypes: BlockTypeLabels = defaultLabels.blockTypes
+	blockTypes: BlockTypeLabels = defaultLabels.blockTypes,
+	colors: TextColorLabels = defaultLabels.textColor
 ): BlockAction[] => [
 	/* @__PURE__ */ turnInto(
 		labels.groups.turnInto,
@@ -224,6 +266,8 @@ export const createBlockActions = (
 	/* @__PURE__ */ align(labels, 'center', AlignCenterIcon, 'Mod+Shift+E'),
 	/* @__PURE__ */ align(labels, 'right', AlignRightIcon, 'Mod+Shift+R'),
 	/* @__PURE__ */ align(labels, 'justify', AlignJustifyIcon, 'Mod+Shift+J'),
+	/* @__PURE__ */ background(labels, colors, null),
+	...TEXT_COLORS.map((color) => background(labels, colors, color)),
 	{
 		id: 'move-up',
 		title: labels.actions['move-up'],
