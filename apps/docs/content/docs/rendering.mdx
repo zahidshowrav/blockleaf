@@ -1,6 +1,6 @@
 ---
 title: Server rendering
-description: Turn stored JSON into React or an HTML string, with no editor and no ProseMirror.
+description: Turn stored JSON into React, an HTML string or Markdown, with no editor and no ProseMirror.
 icon: Server
 ---
 
@@ -388,6 +388,86 @@ renderToHTML(doc, {
 `escapeText`, `escapeAttribute`, `element` and `voidElement` are exported from
 `@blockleaf/renderer/html` so an override does not have to reimplement them.
 
+## Markdown
+
+For a README, a Git repository, a chat message, or a model that reads
+Markdown best:
+
+```ts
+import { renderToMarkdown } from '@blockleaf/renderer/markdown';
+
+const markdown = renderToMarkdown(article.body);
+```
+
+A document like this one:
+
+> **Shopping list**
+>
+> - Milk
+> - Bread
+>
+> Area is πr²
+
+comes out as:
+
+```md
+# Shopping list
+
+- Milk
+- Bread
+
+Area is $\pi r^2$
+```
+
+The output is GitHub's kind of Markdown, so tables, task lists and
+`~~strike~~` are included. It ends with one new line, and an empty document
+gives an empty string.
+
+Markdown says less than a document can. Each block becomes the nearest thing
+Markdown has:
+
+| In the document                                                       | In the Markdown                                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------- |
+| Headings, paragraphs, quotes, rules                                   | `#`, text, `>`, `---`                                |
+| Lists and to-do lists                                                 | `-`, `1.`, `- [x]`, nested by indenting              |
+| Code block                                                            | A fenced block with its language                     |
+| Bold, italic, strike, code, links                                     | `**`, `*`, `~~`, backticks, `[text](url)`            |
+| Table                                                                 | A GitHub table; a merged cell covers empty cells     |
+| Image                                                                 | `![alt](src)`                                        |
+| Callout                                                               | A quote, with its emoji first                        |
+| Toggle                                                                | `<details>`, with the first block as its `<summary>` |
+| Math                                                                  | `$…$` inside a line, `$$…$$` as a block              |
+| Video, audio, file, embed, card                                       | A link to it                                         |
+| Mention                                                               | Its text, such as `@Ada`                             |
+| Table of contents                                                     | Nothing; Markdown readers build their own            |
+| Underline, colours, fonts, highlight, alignment, sub- and superscript | Dropped; the text stays                              |
+
+Text that looks like Markdown stays text. A paragraph that says
+`# not a heading` or `*not bold*` is escaped, so it reads back the same.
+Links and images go through the same URL rules as the other targets; an
+unsafe link keeps its text and loses the link.
+
+It takes the same `components`, `marks`, `labels` and `unknown` options as
+`renderToHTML`. An override returns a string. A block's override gets
+`inline(node)`, which writes the node's text with its marks:
+
+```ts
+renderToMarkdown(doc, {
+	// GitHub's own callout syntax, instead of a plain quote.
+	components: {
+		callout: ({ node, children }) =>
+			`> [!NOTE]\n${children.replace(/^/gm, '> ')}`
+	},
+	// Underline as HTML, which GitHub shows.
+	marks: {
+		underline: ({ children }) => `<ins>${children}</ins>`
+	}
+});
+```
+
+`escapeMarkdown` and `codeSpan` are exported from the same entry, for
+overrides that write text of their own.
+
 ## Text, headings and excerpts
 
 Some jobs want the words and not the markup — a search index, a reading-time
@@ -441,11 +521,12 @@ Then `extractHeadings(doc)` gives you the list to link to.
 
 ## Entry points
 
-| Import                      | Contains                                         | Needs React |
-| --------------------------- | ------------------------------------------------ | ----------- |
-| `@blockleaf/renderer`       | text extractors, sanitisers, attr helpers, types | no          |
-| `@blockleaf/renderer/react` | `RenderDocument`                                 | yes         |
-| `@blockleaf/renderer/html`  | `renderToHTML`, escaping helpers                 | no          |
+| Import                         | Contains                                         | Needs React |
+| ------------------------------ | ------------------------------------------------ | ----------- |
+| `@blockleaf/renderer`          | text extractors, sanitisers, attr helpers, types | no          |
+| `@blockleaf/renderer/react`    | `RenderDocument`                                 | yes         |
+| `@blockleaf/renderer/html`     | `renderToHTML`, escaping helpers                 | no          |
+| `@blockleaf/renderer/markdown` | `renderToMarkdown`, `escapeMarkdown`, `codeSpan` | no          |
 
 React is an **optional** peer dependency. A script that only needs the URL
 rules — validating a row before it goes into the database, say — imports the
@@ -455,6 +536,7 @@ root entry and installs nothing else.
 | --------------------------------- | ------: |
 | `RenderDocument`                  | 3.29 kB |
 | `renderToHTML`                    | 3.37 kB |
+| `renderToMarkdown`                | 3.73 kB |
 | `toPlainText` + `extractHeadings` |   592 B |
 | `sanitizeHref` + `sanitizeSrc`    |   217 B |
 

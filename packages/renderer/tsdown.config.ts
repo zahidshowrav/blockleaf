@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-	entry: ['src/index.ts', 'src/react.ts', 'src/html.ts'],
+	entry: ['src/index.ts', 'src/react.ts', 'src/html.ts', 'src/markdown.ts'],
 	format: ['esm'],
 	dts: true,
 	clean: !process.argv.includes('--watch'),
