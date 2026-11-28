@@ -8,11 +8,29 @@ Flags are referenced by id from [`progress-tracker.md`](./progress-tracker.md). 
 recording the decision inline and moving it to **Settled**, rather than deleting
 it; the reasoning is worth more later than the tidiness is now.
 
-**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32 · **Last reviewed:** 2026-11-25
+**Open:** none · **Settled:** F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33 · **Last reviewed:** 2026-11-28
 
 ---
 
 ## Settled
+
+### F33 — what a formula stores, where KaTeX lives, and how the renderer shows it · decided 2026-11-28
+
+`PA-04` adds maths: a formula inside a line of text and a formula as its own
+block. It is the first `PA` item that needs a large third-party library to
+draw anything, and the editor's core entry had under 5 kB left of its 160 kB
+budget, so the developer settled where the library lives before it was built.
+
+**Decisions:**
+
+- **Two nodes: `mathInline { latex }` and `mathBlock { id, latex }`**, storing the LaTeX source and nothing else. The drawn output is never stored: it is large, changes between library versions and cannot be edited back. New in schema version 2, with no new bump (`F24`). `mathInline` is an inline atom edited as a whole; `mathBlock` is a top-level block with an `id`, so the drag handle and block menu work on it. `latex` is capped at 10,000 characters by `./validate`; an empty string is allowed.
+- **Rejected: a mark on plain text.** Editing a formula one character at a time with no preview, and a formula split by another mark, would both be worse.
+- **`@blockleaf/math`, its own package, with `katex` as a peer dependency**, as the tracker had it. Core and the editor's budget do not change, and a host that never uses maths never installs KaTeX. Rejected: an editor subpath with an optional peer, which puts a third-party peer on the editor's manifest and leaves the renderer side with no clean home.
+- **MathML by default, KaTeX's HTML as an opt-in.** MathML is drawn by the browser and needs no KaTeX stylesheet or fonts, so the one-stylesheet promise holds; it looks slightly different from browser to browser. A host that wants identical output everywhere opts into KaTeX's HTML and imports `katex/dist/katex.min.css` itself. The default never requires a second stylesheet.
+- **`trust: false`, always.** Untrusted, KaTeX shows `\href`, `\url` and raw HTML commands as text, so a formula can never carry a link that skipped the `href` rule. Bad LaTeX never throws: the source shows in the error colour and is stored as typed.
+- **The renderer writes the source by default**: `<span class="blockleaf-math" data-type="mathInline">` and a `<div>` for the block, with the LaTeX as text, because its 4.25 kB budget cannot hold KaTeX. **`@blockleaf/math` exports the override that draws real formulas**, for `RenderDocument`'s `components` and `renderToHTML`'s options. With MathML it needs no script in the browser, so it works in a server component.
+- **Without `@blockleaf/math`**, an editor shows each formula as a placeholder and saves it back unchanged, as for any node it does not know.
+- **Input:** `$…$` makes an inline formula, `$$` and Enter on an empty line makes a block, and `/math` is in the slash menu. A formula is edited in a small popover with its source and a live preview. Markdown export (`PA-18`) writes `$…$` and `$$…$$`.
 
 ### F32 — what a block's background colour stores, and on which blocks · decided 2026-11-25
 
